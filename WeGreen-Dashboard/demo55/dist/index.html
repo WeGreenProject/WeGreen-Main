@@ -37,7 +37,39 @@ License: For each use you must have a valid license purchased only from above li
 		<link href="assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
 		<link href="assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 		<!--end::Global Stylesheets Bundle-->
-		<script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
+		<script></script>
+		    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f8fa;
+            padding: 20px;
+        }
+        .card {
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            border: none;
+            border-radius: 10px;
+        }
+        .nav-pills-custom .nav-link {
+            border: 2px dashed #e4e6ef;
+            background: transparent;
+            transition: all 0.3s;
+        }
+        .nav-pills-custom .nav-link.active {
+            border-color: #009ef7;
+            background-color: transparent;
+        }
+        .nav-pills-custom .nav-link .bullet-custom {
+            background-color: #009ef7;
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table {
+            width: 100%;
+            min-width: 100%;
+        }
+    </style>
 	</head>
 	<!--end::Head-->
 	<!--begin::Body-->
@@ -60,8 +92,7 @@ License: For each use you must have a valid license purchased only from above li
 							</div>
 							<!--begin::Logo image-->
 							<a href="../../demo55/dist/index.html">
-								<img alt="Logo" src="assets/media/logos/demo55-small.svg" class="h-25px theme-light-show" />
-								<img alt="Logo" src="assets/media/logos/demo55-small-dark.svg" class="h-25px theme-dark-show" />
+								<img alt="Logo" src="assets/media/logos/WeGreen-SemFundo.png" class="h-25px theme-light-show"/>
 							</a>
 							<!--end::Logo image-->
 						</div>
@@ -973,8 +1004,7 @@ License: For each use you must have a valid license purchased only from above li
 						<div class="app-sidebar-logo flex-shrink-0 d-none d-md-flex flex-center align-items-center" id="kt_app_sidebar_logo">
 							<!--begin::Logo-->
 							<a href="../../demo55/dist/index.html">
-								<img alt="Logo" src="assets/media/logos/demo55.svg" class="h-25px d-none d-sm-inline app-sidebar-logo-default theme-light-show" />
-								<img alt="Logo" src="assets/media/logos/demo55-dark.svg" class="h-25px theme-dark-show" />
+								<img alt="Logo" src="assets/media/logos/WeGreen-SemFundo.png" class="h-200px d-none d-sm-inline app-sidebar-logo-default theme-light-show"/>
 							</a>
 							<!--end::Logo-->
 							<!--begin::Aside toggle-->
@@ -4359,8 +4389,8 @@ License: For each use you must have a valid license purchased only from above li
 												<div class="card-header pt-7">
 													<!--begin::Title-->
 													<h3 class="card-title align-items-start flex-column">
-														<span class="card-label fw-bold text-gray-800">Visits by Source</span>
-														<span class="text-gray-400 mt-1 fw-semibold fs-6">29.4k visitors</span>
+														<span class="card-label fw-bold text-gray-800">Expected Earnings</span>
+														<span class="text-gray-400 mt-1 fw-semibold fs-6">(Colocar o Earnings)</span>
 													</h3>
 													<!--end::Title-->
 													<!--begin::Toolbar-->
@@ -4795,269 +4825,582 @@ License: For each use you must have a valid license purchased only from above li
 										<!--end::Col-->
 									</div>
 									<!--end::Row-->
-									<!--begin::Table Widget 5-->
-									<div class="card card-flush mb-5 mb-xl-10">
-										<!--begin::Card header-->
-										<div class="card-header pt-7">
-											<!--begin::Title-->
-											<h3 class="card-title align-items-start flex-column">
-												<span class="card-label fw-bold text-dark">Stock Report</span>
-												<span class="text-gray-400 mt-1 fw-semibold fs-6">Total 2,356 Items in the Stock</span>
-											</h3>
-											<!--end::Title-->
-											<!--begin::Actions-->
-											<div class="card-toolbar">
-												<!--begin::Filters-->
-												<div class="d-flex flex-stack flex-wrap gap-4">
-													<!--begin::Destination-->
-													<div class="d-flex align-items-center fw-bold">
-														<!--begin::Label-->
-														<div class="text-muted fs-7 me-2">Cateogry</div>
-														<!--end::Label-->
-														<!--begin::Select-->
-														<select class="form-select form-select-transparent text-dark fs-7 lh-1 fw-bold py-0 ps-3 w-auto" data-control="select2" data-hide-search="true" data-dropdown-css-class="w-150px" data-placeholder="Select an option">
-															<option></option>
-															<option value="Show All" selected="selected">Show All</option>
-															<option value="a">Category A</option>
-															<option value="b">Category B</option>
-														</select>
-														<!--end::Select-->
-													</div>
-													<!--end::Destination-->
-													<!--begin::Status-->
-													<div class="d-flex align-items-center fw-bold">
-														<!--begin::Label-->
-														<div class="text-muted fs-7 me-2">Status</div>
-														<!--end::Label-->
-														<!--begin::Select-->
-														<select class="form-select form-select-transparent text-dark fs-7 lh-1 fw-bold py-0 ps-3 w-auto" data-control="select2" data-hide-search="true" data-dropdown-css-class="w-150px" data-placeholder="Select an option" data-kt-table-widget-5="filter_status">
-															<option></option>
-															<option value="Show All" selected="selected">Show All</option>
-															<option value="In Stock">In Stock</option>
-															<option value="Out of Stock">Out of Stock</option>
-															<option value="Low Stock">Low Stock</option>
-														</select>
-														<!--end::Select-->
-													</div>
-													<!--end::Status-->
-													<!--begin::Search-->
-													<a href="../../demo55/dist/apps/ecommerce/catalog/products.html" class="btn btn-light btn-sm">View Stock</a>
-													<!--end::Search-->
-												</div>
-												<!--begin::Filters-->
-											</div>
-											<!--end::Actions-->
-										</div>
-										<!--end::Card header-->
-										<!--begin::Card body-->
-										<div class="card-body">
-											<!--begin::Table-->
-											<table class="table align-middle table-row-dashed fs-6 gy-3" id="kt_table_widget_5_table">
-												<!--begin::Table head-->
-												<thead>
-													<!--begin::Table row-->
-													<tr class="text-start text-gray-400 fw-bold fs-7 text-uppercase gs-0">
-														<th class="min-w-150px">Item</th>
-														<th class="text-end pe-3 min-w-100px">Product ID</th>
-														<th class="text-end pe-3 min-w-150px">Date Added</th>
-														<th class="text-end pe-3 min-w-100px">Price</th>
-														<th class="text-end pe-3 min-w-100px">Status</th>
-														<th class="text-end pe-0 min-w-75px">Qty</th>
-													</tr>
-													<!--end::Table row-->
-												</thead>
-												<!--end::Table head-->
-												<!--begin::Table body-->
-												<tbody class="fw-bold text-gray-600">
-													<tr>
-														<!--begin::Item-->
-														<td>
-															<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-dark text-hover-primary">Macbook Air M1</a>
-														</td>
-														<!--end::Item-->
-														<!--begin::Product ID-->
-														<td class="text-end">#XGY-356</td>
-														<!--end::Product ID-->
-														<!--begin::Date added-->
-														<td class="text-end">02 Apr, 2023</td>
-														<!--end::Date added-->
-														<!--begin::Price-->
-														<td class="text-end">$1,230</td>
-														<!--end::Price-->
-														<!--begin::Status-->
-														<td class="text-end">
-															<span class="badge py-3 px-4 fs-7 badge-light-primary">In Stock</span>
-														</td>
-														<!--end::Status-->
-														<!--begin::Qty-->
-														<td class="text-end" data-order="58">
-															<span class="text-dark fw-bold">58 PCS</span>
-														</td>
-														<!--end::Qty-->
-													</tr>
-													<tr>
-														<!--begin::Item-->
-														<td>
-															<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-dark text-hover-primary">Surface Laptop 4</a>
-														</td>
-														<!--end::Item-->
-														<!--begin::Product ID-->
-														<td class="text-end">#YHD-047</td>
-														<!--end::Product ID-->
-														<!--begin::Date added-->
-														<td class="text-end">01 Apr, 2023</td>
-														<!--end::Date added-->
-														<!--begin::Price-->
-														<td class="text-end">$1,060</td>
-														<!--end::Price-->
-														<!--begin::Status-->
-														<td class="text-end">
-															<span class="badge py-3 px-4 fs-7 badge-light-danger">Out of Stock</span>
-														</td>
-														<!--end::Status-->
-														<!--begin::Qty-->
-														<td class="text-end" data-order="0">
-															<span class="text-dark fw-bold">0 PCS</span>
-														</td>
-														<!--end::Qty-->
-													</tr>
-													<tr>
-														<!--begin::Item-->
-														<td>
-															<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-dark text-hover-primary">Logitech MX 250</a>
-														</td>
-														<!--end::Item-->
-														<!--begin::Product ID-->
-														<td class="text-end">#SRR-678</td>
-														<!--end::Product ID-->
-														<!--begin::Date added-->
-														<td class="text-end">24 Mar, 2023</td>
-														<!--end::Date added-->
-														<!--begin::Price-->
-														<td class="text-end">$64</td>
-														<!--end::Price-->
-														<!--begin::Status-->
-														<td class="text-end">
-															<span class="badge py-3 px-4 fs-7 badge-light-primary">In Stock</span>
-														</td>
-														<!--end::Status-->
-														<!--begin::Qty-->
-														<td class="text-end" data-order="290">
-															<span class="text-dark fw-bold">290 PCS</span>
-														</td>
-														<!--end::Qty-->
-													</tr>
-													<tr>
-														<!--begin::Item-->
-														<td>
-															<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-dark text-hover-primary">AudioEngine HD3</a>
-														</td>
-														<!--end::Item-->
-														<!--begin::Product ID-->
-														<td class="text-end">#PXF-578</td>
-														<!--end::Product ID-->
-														<!--begin::Date added-->
-														<td class="text-end">24 Mar, 2023</td>
-														<!--end::Date added-->
-														<!--begin::Price-->
-														<td class="text-end">$1,060</td>
-														<!--end::Price-->
-														<!--begin::Status-->
-														<td class="text-end">
-															<span class="badge py-3 px-4 fs-7 badge-light-danger">Out of Stock</span>
-														</td>
-														<!--end::Status-->
-														<!--begin::Qty-->
-														<td class="text-end" data-order="46">
-															<span class="text-dark fw-bold">46 PCS</span>
-														</td>
-														<!--end::Qty-->
-													</tr>
-													<tr>
-														<!--begin::Item-->
-														<td>
-															<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-dark text-hover-primary">HP Hyper LTR</a>
-														</td>
-														<!--end::Item-->
-														<!--begin::Product ID-->
-														<td class="text-end">#PXF-778</td>
-														<!--end::Product ID-->
-														<!--begin::Date added-->
-														<td class="text-end">16 Jan, 2023</td>
-														<!--end::Date added-->
-														<!--begin::Price-->
-														<td class="text-end">$4500</td>
-														<!--end::Price-->
-														<!--begin::Status-->
-														<td class="text-end">
-															<span class="badge py-3 px-4 fs-7 badge-light-primary">In Stock</span>
-														</td>
-														<!--end::Status-->
-														<!--begin::Qty-->
-														<td class="text-end" data-order="78">
-															<span class="text-dark fw-bold">78 PCS</span>
-														</td>
-														<!--end::Qty-->
-													</tr>
-													<tr>
-														<!--begin::Item-->
-														<td>
-															<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-dark text-hover-primary">Dell 32 UltraSharp</a>
-														</td>
-														<!--end::Item-->
-														<!--begin::Product ID-->
-														<td class="text-end">#XGY-356</td>
-														<!--end::Product ID-->
-														<!--begin::Date added-->
-														<td class="text-end">22 Dec, 2023</td>
-														<!--end::Date added-->
-														<!--begin::Price-->
-														<td class="text-end">$1,060</td>
-														<!--end::Price-->
-														<!--begin::Status-->
-														<td class="text-end">
-															<span class="badge py-3 px-4 fs-7 badge-light-warning">Low Stock</span>
-														</td>
-														<!--end::Status-->
-														<!--begin::Qty-->
-														<td class="text-end" data-order="8">
-															<span class="text-dark fw-bold">8 PCS</span>
-														</td>
-														<!--end::Qty-->
-													</tr>
-													<tr>
-														<!--begin::Item-->
-														<td>
-															<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-dark text-hover-primary">Google Pixel 6 Pro</a>
-														</td>
-														<!--end::Item-->
-														<!--begin::Product ID-->
-														<td class="text-end">#XVR-425</td>
-														<!--end::Product ID-->
-														<!--begin::Date added-->
-														<td class="text-end">27 Dec, 2023</td>
-														<!--end::Date added-->
-														<!--begin::Price-->
-														<td class="text-end">$1,060</td>
-														<!--end::Price-->
-														<!--begin::Status-->
-														<td class="text-end">
-															<span class="badge py-3 px-4 fs-7 badge-light-primary">In Stock</span>
-														</td>
-														<!--end::Status-->
-														<!--begin::Qty-->
-														<td class="text-end" data-order="124">
-															<span class="text-dark fw-bold">124 PCS</span>
-														</td>
-														<!--end::Qty-->
-													</tr>
-												</tbody>
-												<!--end::Table body-->
-											</table>
-											<!--end::Table-->
-										</div>
-										<!--end::Card body-->
-									</div>
+									<!--end::Row-->
+									<!--begin::Row-->
+	<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recent Orders - Full Width</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f8fa;
+            padding: 20px;
+        }
+        .card {
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            border: none;
+            border-radius: 10px;
+        }
+        .nav-pills-custom .nav-link {
+            border: 2px dashed #e4e6ef;
+            background: transparent;
+            transition: all 0.3s;
+        }
+        .nav-pills-custom .nav-link.active {
+            border-color: #009ef7;
+            background-color: transparent;
+        }
+        .nav-pills-custom .nav-link .bullet-custom {
+            background-color: #009ef7;
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table {
+            width: 100%;
+            min-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!--begin::Table widget 2-->
+            <div class="card h-md-100">
+                <!--begin::Header-->
+                <div class="card-header align-items-center border-0">
+                    <!--begin::Title-->
+                    <h3 class="fw-bold text-gray-900 m-0">Recent Orders</h3>
+                    <!--end::Title-->
+                    <!--begin::Menu-->
+                    <button class="btn btn-icon btn-color-gray-400 btn-active-color-primary justify-content-end" data-bs-toggle="dropdown">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <rect opacity="0.3" x="2" y="2" width="20" height="20" rx="4" fill="currentColor"/>
+                            <rect x="11" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor"/>
+                            <rect x="15" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor"/>
+                            <rect x="7" y="11" width="2.6" height="2.6" rx="1.3" fill="currentColor"/>
+                        </svg>
+                    </button>
+                    <!--end::Menu-->
+                </div>
+                <!--end::Header-->
+                
+                <!--begin::Body-->
+                <div class="card-body pt-2">
+                    <!--begin::Nav-->
+                    <ul class="nav nav-pills nav-pills-custom mb-3">
+                        <!--begin::Item-->
+						<li class="nav-item mb-3 me-3 me-lg-6">
+						<!--begin::Link-->
+						<a class="nav-link d-flex justify-content-between flex-column flex-center overflow-hidden active w-80px h-85px py-4" data-bs-toggle="pill" href="#kt_stats_widget_2_tab_1">
+							<!--begin::Icon-->
+							<div class="nav-icon">
+								<img alt="" src="assets/media/svg/products-categories/t-shirt.svg" class="" />
+							</div>
+							<!--end::Icon-->
+							<!--begin::Subtitle-->
+							<span class="nav-text text-gray-700 fw-bold fs-6 lh-1">T-shirt</span>
+							<!--end::Subtitle-->
+							<!--begin::Bullet-->
+							<span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+							<!--end::Bullet-->
+						</a>
+						<!--end::Link-->
+					</li>
+					<li class="nav-item mb-3 me-3 me-lg-6">
+					<!--begin::Link-->
+					<a class="nav-link d-flex justify-content-between flex-column flex-center overflow-hidden w-80px h-85px py-4" data-bs-toggle="pill" href="#kt_stats_widget_2_tab_2">
+						<!--begin::Icon-->
+						<div class="nav-icon">
+							<img alt="" src="assets/media/svg/products-categories/gaming.svg" class="" />
+						</div>
+						<!--end::Icon-->
+						<!--begin::Subtitle-->
+						<span class="nav-text text-gray-700 fw-bold fs-6 lh-1">Gaming</span>
+						<!--end::Subtitle-->
+						<!--begin::Bullet-->
+						<span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+						<!--end::Bullet-->
+					</a>
+					<!--end::Link-->
+					<li class="nav-item mb-3 me-3 me-lg-6">
+						<!--begin::Link-->
+						<a class="nav-link d-flex justify-content-between flex-column flex-center overflow-hidden w-80px h-85px py-4" data-bs-toggle="pill" href="#kt_stats_widget_2_tab_3">
+							<!--begin::Icon-->
+							<div class="nav-icon">
+								<img alt="" src="assets/media/svg/products-categories/watch.svg" class="" />
+							</div>
+							<!--end::Icon-->
+							<!--begin::Subtitle-->
+							<span class="nav-text text-gray-600 fw-bold fs-6 lh-1">Watch</span>
+							<!--end::Subtitle-->
+							<!--begin::Bullet-->
+							<span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+							<!--end::Bullet-->
+						</a>
+						<!--end::Link-->
+						<li class="nav-item mb-3 me-3 me-lg-6">
+							<!--begin::Link-->
+							<a class="nav-link d-flex justify-content-between flex-column flex-center overflow-hidden w-80px h-85px py-4" data-bs-toggle="pill" href="#kt_stats_widget_2_tab_4">
+								<!--begin::Icon-->
+								<div class="nav-icon">
+									<img alt="" src="assets/media/svg/products-categories/gloves.svg" class="nav-icon" />
+								</div>
+								<!--end::Icon-->
+								<!--begin::Subtitle-->
+								<span class="nav-text text-gray-600 fw-bold fs-6 lh-1">Gloves</span>
+								<!--end::Subtitle-->
+								<!--begin::Bullet-->
+								<span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+								<!--end::Bullet-->
+							</a>
+							<!--end::Link-->
+						</li>
+						<li class="nav-item mb-3">
+							<!--begin::Link-->
+							<a class="nav-link d-flex justify-content-between flex-column flex-center overflow-hidden w-80px h-85px py-4" data-bs-toggle="pill" href="#kt_stats_widget_2_tab_5">
+								<!--begin::Icon-->
+								<div class="nav-icon">
+									<img alt="" src="assets/media/svg/products-categories/shoes.svg" class="nav-icon" />
+								</div>
+								<!--end::Icon-->
+								<!--begin::Subtitle-->
+								<span class="nav-text text-gray-600 fw-bold fs-6 lh-1">Shoes</span>
+								<!--end::Subtitle-->
+								<!--begin::Bullet-->
+								<span class="bullet-custom position-absolute bottom-0 w-100 h-4px bg-primary"></span>
+								<!--end::Bullet-->
+							</a>
+							<!--end::Link-->
+						</li>
+                    </ul>
+                    <!--end::Nav-->
+                    
+                    <!--begin::Tab Content-->
+                    <div class="tab-content">
+                        <!--begin::Tap pane-->
+                        <div class="tab-pane fade show active" id="kt_stats_widget_2_tab_1">
+                            <!--begin::Table container-->
+                            <div class="table-responsive">
+                                <!--begin::Table-->
+                                <table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+                                    <!--begin::Table head-->
+									<thead>
+										<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+											<th class="ps-0 w-50px">ITEM</th>
+											<th class="min-w-125px"></th>
+											<th class="text-end min-w-100px">QTY</th>
+											<th class="pe-0 text-end min-w-100px">PRICE</th>
+											<th class="pe-0 text-end min-w-100px">TOTAL PRICE</th>
+										</tr>
+									</thead>
+                                    <!--end::Table head-->
+                                    <!--begin::Table body-->
+                                   <tbody>
+										<tr>
+											<td>
+												<img src="assets/media/stock/ecommerce/210.png" class="w-50px ms-n1" alt="" />
+											</td>
+											<td class="ps-0">
+												<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Elephant 1802</a>
+												<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-2347</span>
+											</td>
+											<td>
+												<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x1</span>
+											</td>
+											<td class="text-end pe-0">
+												<span class="text-gray-800 fw-bold d-block fs-6">$72.00</span>
+											</td>
+											<td class="text-end pe-0">
+												<span class="text-gray-800 fw-bold d-block fs-6">$126.00</span>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<img src="assets/media/stock/ecommerce/215.png" class="w-50px ms-n1" alt="" />
+											</td>
+											<td class="ps-0">
+												<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Red Laga</a>
+												<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-1321</span>
+											</td>
+											<td>
+												<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x2</span>
+											</td>
+											<td class="text-end pe-0">
+												<span class="text-gray-800 fw-bold d-block fs-6">$45.00</span>
+											</td>
+											<td class="text-end pe-0">
+												<span class="text-gray-800 fw-bold d-block fs-6">$76.00</span>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<img src="assets/media/stock/ecommerce/209.png" class="w-50px ms-n1" alt="" />
+											</td>
+											<td class="ps-0">
+												<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">RiseUP</a>
+												<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-4312</span>
+											</td>
+											<td>
+												<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x3</span>
+											</td>
+											<td class="text-end pe-0">
+												<span class="text-gray-800 fw-bold d-block fs-6">$84.00</span>
+											</td>
+											<td class="text-end pe-0">
+												<span class="text-gray-800 fw-bold d-block fs-6">$168.00</span>
+											</td>
+										</tr>
+									</tbody>
+                                    <!--end::Table body-->
+                                </table>
+                                <!--end::Table-->
+                            </div>
+                            <!--end::Table container-->
+                        </div>
+                        <!--end::Tap pane-->
+                        
+                        <!-- Outros tabs seguem o mesmo padrão -->
+<div class="tab-pane fade" id="kt_stats_widget_2_tab_2">
+															<!--begin::Table container-->
+															<div class="table-responsive">
+																<!--begin::Table-->
+																<table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+																	<!--begin::Table head-->
+																	<thead>
+																		<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+																			<th class="ps-0 w-50px">ITEM</th>
+																			<th class="min-w-125px"></th>
+																			<th class="text-end min-w-100px">QTY</th>
+																			<th class="pe-0 text-end min-w-100px">PRICE</th>
+																			<th class="pe-0 text-end min-w-100px">TOTAL PRICE</th>
+																		</tr>
+																	</thead>
+																	<!--end::Table head-->
+																	<!--begin::Table body-->
+																	<tbody>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/197.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Elephant 1802</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-4312</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x1</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$32.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$312.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/178.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Red Laga</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-3122</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x2</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$53.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$62.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/22.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">RiseUP</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-1142</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x3</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$74.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$139.00</span>
+																			</td>
+																		</tr>
+																	</tbody>
+																	<!--end::Table body-->
+																</table>
+																<!--end::Table-->
+															</div>
+															<!--end::Table container-->
+														</div>
+                        
+<div class="tab-pane fade" id="kt_stats_widget_2_tab_3">
+															<!--begin::Table container-->
+															<div class="table-responsive">
+																<!--begin::Table-->
+																<table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+																	<!--begin::Table head-->
+																	<thead>
+																		<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+																			<th class="ps-0 w-50px">ITEM</th>
+																			<th class="min-w-125px"></th>
+																			<th class="text-end min-w-100px">QTY</th>
+																			<th class="pe-0 text-end min-w-100px">PRICE</th>
+																			<th class="pe-0 text-end min-w-100px">TOTAL PRICE</th>
+																		</tr>
+																	</thead>
+																	<!--end::Table head-->
+																	<!--begin::Table body-->
+																	<tbody>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/1.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Elephant 1324</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-1523</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x1</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$43.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$231.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/24.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Red Laga</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-5314</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x2</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$71.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$53.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/71.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">RiseUP</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-4222</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x3</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$23.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$213.00</span>
+																			</td>
+																		</tr>
+																	</tbody>
+																	<!--end::Table body-->
+																</table>
+																<!--end::Table-->
+															</div>
+															<!--end::Table container-->
+														</div>
+                        
+                        <div class="tab-pane fade" id="kt_stats_widget_2_tab_4">
+															<!--begin::Table container-->
+															<div class="table-responsive">
+																<!--begin::Table-->
+																<table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+																	<!--begin::Table head-->
+																	<thead>
+																		<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+																			<th class="ps-0 w-50px">ITEM</th>
+																			<th class="min-w-125px"></th>
+																			<th class="text-end min-w-100px">QTY</th>
+																			<th class="pe-0 text-end min-w-100px">PRICE</th>
+																			<th class="pe-0 text-end min-w-100px">TOTAL PRICE</th>
+																		</tr>
+																	</thead>
+																	<!--end::Table head-->
+																	<!--begin::Table body-->
+																	<tbody>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/41.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Elephant 2635</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-1523</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x1</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$65.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$163.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/63.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Red Laga</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-2745</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x2</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$64.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$73.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/59.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">RiseUP</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-5173</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x3</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$54.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$173.00</span>
+																			</td>
+																		</tr>
+																	</tbody>
+																	<!--end::Table body-->
+																</table>
+																<!--end::Table-->
+															</div>
+															<!--end::Table container-->
+														</div>
+                        
+<div class="tab-pane fade" id="kt_stats_widget_2_tab_5">
+															<!--begin::Table container-->
+															<div class="table-responsive">
+																<!--begin::Table-->
+																<table class="table table-row-dashed align-middle gs-0 gy-4 my-0">
+																	<!--begin::Table head-->
+																	<thead>
+																		<tr class="fs-7 fw-bold text-gray-500 border-bottom-0">
+																			<th class="ps-0 w-50px">ITEM</th>
+																			<th class="min-w-125px"></th>
+																			<th class="text-end min-w-100px">QTY</th>
+																			<th class="pe-0 text-end min-w-100px">PRICE</th>
+																			<th class="pe-0 text-end min-w-100px">TOTAL PRICE</th>
+																		</tr>
+																	</thead>
+																	<!--end::Table head-->
+																	<!--begin::Table body-->
+																	<tbody>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/10.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Nike</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-2163</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x1</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$64.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$287.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/96.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Adidas</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-2162</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x2</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$76.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$51.00</span>
+																			</td>
+																		</tr>
+																		<tr>
+																			<td>
+																				<img src="assets/media/stock/ecommerce/13.png" class="w-50px ms-n1" alt="" />
+																			</td>
+																			<td class="ps-0">
+																				<a href="../../demo55/dist/apps/ecommerce/catalog/edit-product.html" class="text-gray-800 fw-bold text-hover-primary mb-1 fs-6 text-start pe-0">Puma</a>
+																				<span class="text-gray-400 fw-semibold fs-7 d-block text-start ps-0">Item: #XDG-1537</span>
+																			</td>
+																			<td>
+																				<span class="text-gray-800 fw-bold d-block fs-6 ps-0 text-end">x3</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$27.00</span>
+																			</td>
+																			<td class="text-end pe-0">
+																				<span class="text-gray-800 fw-bold d-block fs-6">$167.00</span>
+																			</td>
+																		</tr>
+																	</tbody>
+																	<!--end::Table body-->
+																</table>
+																<!--end::Table-->
+															</div>
+															<!--end::Table container-->
+														</div>
+                    </div>
+                    <!--end::Tab Content-->
+                </div>
+                <!--end::Body-->
+            </div>
+            <!--end::Table widget 2-->
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 									<!--end::Table Widget 5-->
 									<!--begin::Row-->
 									<div class="row g-5 g-xl-10 g-xl-10">
