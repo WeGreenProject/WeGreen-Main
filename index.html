@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wegreen - Dê uma nova vida à moda, de forma consciente.</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Variáveis de Cor (ajuste conforme seu style.css) */
+        :root {
+            --wegreen-dark: #fffdfd;
+            --wegreen-accent: #A6D90C; /* Verde Lima */
+        }
+        .bg-wegreen-dark { background-color: var(--wegreen-dark) !important; }
+        .text-wegreen-accent { color: var(--wegreen-accent) !important; }
+        .bg-wegreen-accent { background-color: var(--wegreen-accent) !important; }
+        
+        /* Estilo do Botão Verde Lima e Texto Preto */
+        .btn-wegreen-accent {
+            background-color: var(--wegreen-accent);
+            border-color: var(--wegreen-accent);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .btn-wegreen-accent:hover {
+            background-color: #90c207; /* Tonalidade levemente mais escura no hover */
+            border-color: #90c207;
+        }
+
+        /* Estilos da Navegação */
+        .header-main {
+            top: 3.5rem; /* Posição ajustada após a top-bar */
+        }
+        .logo-img {
+            height: 120px; /* Tamanho da logo */
+        }
+        .profile-img-small {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border: 2px solid var(--wegreen-accent);
+        }
+        .btn-wegreen-login, .btn-wegreen-register {
+            background-color: transparent;
+            border: 2px solid rgb(255, 255, 255);
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-wegreen-register:hover {
+            background-color: var(--wegreen-accent);
+            border-color: var(--wegreen-accent);
+            color: var(--wegreen-dark); /* Texto preto no botão hover */
+        }
+        
+        /* Estilos do Carrossel (Hero Section) */
+        #heroCarousel .carousel-item {
+  height: 90vh;
+  min-height: 600px;
+  max-height: 900px;
+}
+
+.carousel-visual-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel-visual-media {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  filter: brightness(80%);
+}
+
+.carousel-caption-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+/* Botões (indicadores) em verde lima */
+.carousel-indicators [data-bs-target] {
+  background-color: #32cd32; /* verde lima */
+}
+
+.carousel-indicators .active {
+  background-color: #adff2f; /* verde mais claro */
+}
+
+/* Controles laterais em verde lima e texto branco */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(100%) sepia(30%) saturate(400%) hue-rotate(70deg) brightness(120%);
+}
+
+/* ======= A NOSSA ESSÊNCIA SECTION ======= */
+#essencia {
+  background-color: #414429;
+  color: #adff2f;
+  text-align: center;
+  padding: 80px 0;
+}
+
+#essencia h2 {
+  font-size: 2.5rem;
+  color: #adff2f;
+  margin-bottom: 1rem;
+}
+
+#essencia p.lead {
+  font-size: 1.1rem;
+  color: rgba(173, 255, 47, 0.85);
+}
+
+#essencia h4 {
+  color: #adff2f;
+  margin-bottom: 1rem;
+  letter-spacing: 1px;
+}
+
+#essencia p {
+  color: rgba(173, 255, 47, 0.85);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.icon-essencia {
+  width: 70px;
+  height: auto;
+  filter: invert(87%) sepia(73%) saturate(321%) hue-rotate(57deg) brightness(112%) contrast(95%);
+  transition: transform 0.3s ease;
+}
+
+.icon-essencia:hover {
+  transform: scale(1.1);
+}
+
+#loja {
+  background-color: #fdfdfb;
+}
+
+#loja h2 {
+  color: #414429;
+}
+
+.nav-pills .nav-link {
+  color: #414429;
+  border-radius: 30px;
+  border: 1px solid #414429;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #adff2f;
+  color: #fff;
+  border: 1px solid #adff2f;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #414429;
+  color: #adff2f;
+}
+
+.filtro {
+  width: 160px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+}
+
+.produto-card {
+  border: none;
+  border-radius: 18px;
+  background-color: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.produto-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.produto-card img {
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  object-fit: cover;
+  height: 260px;
+}
+
+.produto-card .card-title {
+  color: #414429;
+  font-weight: 600;
+}
+
+.produto-card .preco {
+  color: #414429;
+  font-size: 1.1rem;
+}
+
+.btn-wegreen-accent {
+  background-color: #adff2f;
+  color: #fff;
+  border: none;
+}
+
+.btn-wegreen-accent:hover {
+  background-color: #8ee000;
+  color: #fff;
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="top-bar bg-wegreen-accent text-dark py-2 text-center">
+        <p class="mb-0 fw-bold slogan-text">Dê uma nova vida à moda, de forma consciente.</p>
+    </div>
+
+    <header class="header-main text-white position-absolute w-100 z-3">
+        <div class="container-fluid px-5">
+            <nav class="navbar navbar-expand-lg py-3">
+                
+                <a class="navbar-brand me-4" href="#">
+                    <img src="img/WeGreen-removebg-preview.png" alt="Wegreen Logo" class="logo-img">
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-start" id="navbarNav">
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mulher</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
+                                <li><a class="dropdown-item" href="#">Tops e T-shirts</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Acessórios</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Homem</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Blusas</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Calçado</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Crianças</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                            <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Blusas</a></li>
+                                <li><a class="dropdown-item" href="#">Casacos</a></li>
+                                <li><a class="dropdown-item" href="#">T-shirts</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
+                                <li><a class="dropdown-item" href="#">Calçado</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Designers</a></li>
+                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Artesãos</a></li>
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Marcas</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="#">Naz</a></li>
+                                <li><a class="dropdown-item" href="#">Nea Vegan Shoes</a></li>
+                                <li><a class="dropdown-item" href="#">PlayUp®</a></li>
+                                <li><a class="dropdown-item" href="#">Vintage for a Cause</a></li>
+                                <li><a class="dropdown-item" href="#">Isto®</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="d-flex align-items-center ms-auto">
+                    
+                    <form class="d-flex search-bar me-3" role="search">
+                        <input class="form-control rounded-pill me-2 border-0 bg-secondary bg-opacity-25 text-white" type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
+                        <button class="btn btn-outline-light rounded-pill" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+
+                    <a class="nav-link text-white mx-2 fs-5" href="#"><i class="bi bi-bag"></i></a> 
+                    
+                    <button class="btn btn-wegreen-login me-2 rounded-pill d-none d-lg-block" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+                    <button class="btn btn-wegreen-register me-3 rounded-pill d-none d-lg-block" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">Registar</button>
+
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="img/pexels-beccacorreiaph-31095884.jpg" class="rounded-circle profile-img-small me-1" alt="Perfil do Utilizador">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3">
+                            <li><div class="dropdown-header d-flex align-items-center">
+                                <h6 class="mb-0 text-wegreen-accent">Olá, Mariana!</h6>
+                            </div></li>
+                            <li><a class="dropdown-item" href="#">Definições de Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Login Admin</a></li>
+                            <li><a class="dropdown-item" href="#">Mudar de Conta</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#">Sair</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+  </div>
+
+  <div class="carousel-inner">
+    <!-- SLIDE 1 (VÍDEO) -->
+    <div class="carousel-item active">
+      <div class="carousel-visual-wrapper">
+        <video class="d-block w-100 carousel-visual-media" autoplay muted loop playsinline>
+          <source src="img/6121230-uhd_4096_2160_25fps.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="carousel-caption-overlay d-flex align-items-center">
+        <div class="container-lg">
+          <div class="row pt-5 align-items-center">
+            <div class="col-lg-7 text-white">
+              <h1 class="display-3 fw-bold hero-title">Moda Sustentável e Colaborativa.</h1>
+              <p class="lead mt-4 mb-4 text-white-75">
+                Marketplace focada nos jovens conscientes e na redução do Desperdício Têxtil.
+              </p>
+              <button class="btn btn-lg me-3 btn-wegreen-accent rounded-pill text-white">Ver Produtos</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 (VÍDEO) -->
+    <div class="carousel-item">
+      <div class="carousel-visual-wrapper">
+        <video class="d-block w-100 carousel-visual-media" autoplay muted loop playsinline>
+          <source src="img/6424126-hd_1920_1080_25fps.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="carousel-caption-overlay d-flex align-items-center">
+        <div class="container-lg">
+          <div class="row pt-5 align-items-center">
+            <div class="col-lg-7 text-white">
+              <h2 class="display-4 fw-bold hero-title">Apoiar Designers, Artesãos e Marcas Locais.</h2>
+              <p class="lead mt-4 mb-4 text-white-75">
+                A nossa missão é conectar designers, artistas, artesãos e marcas a consumidores conscientes.
+              </p>
+              <a href="#" class="btn btn-lg btn-outline-light rounded-pill">Saiba Mais sobre a Missão &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 (IMAGEM igual ao 1) -->
+    <div class="carousel-item">
+      <div class="carousel-visual-wrapper">
+        <img src="img/pexels-cottonbro-6069529.jpg" class="d-block w-100 carousel-visual-media" alt="Moda Sustentável">
+      </div>
+      <div class="carousel-caption-overlay d-flex align-items-center">
+        <div class="container-lg">
+          <div class="row pt-5 align-items-center">
+            <div class="col-lg-7 text-white">
+              <h1 class="display-3 fw-bold hero-title">Moda Sustentável e Colaborativa.</h1>
+              <p class="lead mt-4 mb-4 text-white-75">
+                Marketplace focada nos jovens conscientes e na redução do Desperdício Têxtil.
+              </p>
+              <button class="btn btn-lg me-3 btn-wegreen-accent rounded-pill text-white">Ver Produtos</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 (IMAGEM igual ao 2) -->
+    <div class="carousel-item">
+      <div class="carousel-visual-wrapper">
+        <img src="img/pexels-michael-burrows-7148002.jpg" class="d-block w-100 carousel-visual-media" alt="Apoio a Designers">
+      </div>
+      <div class="carousel-caption-overlay d-flex align-items-center">
+        <div class="container-lg">
+          <div class="row pt-5 align-items-center">
+            <div class="col-lg-7 text-white">
+              <h2 class="display-4 fw-bold hero-title">Apoiar Designers, Artesãos e Marcas Locais.</h2>
+              <p class="lead mt-4 mb-4 text-white-75">
+                A nossa missão é conectar designers, artistas, artesãos e marcas a consumidores conscientes.
+              </p>
+              <a href="#" class="btn btn-lg btn-outline-light rounded-pill">Saiba Mais sobre a Missão &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controles -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Anterior</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Próximo</span>
+  </button>
+</div>
+
+<section id="essencia" class="py-5">
+  <div class="container text-center">
+    <h2 class="fw-bold mb-3">A Nossa Essência</h2>
+    <p class="lead mb-5">
+  Descobre a missão, visão e valores que orientam o nosso propósito sustentável.
+    </p>
+
+    <div class="row justify-content-center text-center">
+      <!-- Missão -->
+      <div class="col-md-4 mb-5">
+        <img src="https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/heart-handshake.svg" 
+             alt="Missão" class="icon-essencia mb-4">
+        <h4 class="fw-bold text-uppercase">Missão</h4>
+        <p>
+        Conectar designers, artistas plásticos , artesãos , marcas e consumidores conscientes através de uma plataforma sustentável, transparente e colaborativa.        </p>
+      </div>
+
+      <!-- Visão -->
+      <div class="col-md-4 mb-5">
+        <img src="https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/eye.svg" 
+             alt="Visão" class="icon-essencia mb-4">
+        <h4 class="fw-bold text-uppercase">Visão</h4>
+        <p>
+        Transformar a moda num ecossistema sustentável, transparente e colaborativo, onde cada escolha tem impacto positivo e cada peça conta uma história de consciência e propósito.        </p>
+      </div>
+
+      <!-- Valores -->
+      <div class="col-md-4 mb-5">
+        <img src="https://cdn.jsdelivr.net/gh/lucide-icons/lucide/icons/handshake.svg" 
+             alt="Valores" class="icon-essencia mb-4">
+        <h4 class="fw-bold text-uppercase">Valores</h4>
+        <p>
+        Sustentabilidade, transparência, colaboração, inovação, visibilidade e a autenticidade.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="loja" class="py-5">
+  <div class="container">
+    <h2 class="fw-bold text-center mb-4 text-dark">A Loja Wegreen</h2>
+    <p class="text-center mb-5 text-muted fs-5">
+      Explora peças únicas de marcas sustentáveis, designers independentes e moda em segunda mão.
+    </p>
+
+    <!-- Abas -->
+    <ul class="nav nav-pills justify-content-center mb-4" id="produtoTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="todos-tab" data-bs-toggle="pill" data-bs-target="#todos" type="button" role="tab">Todos</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="mais-vendidos-tab" data-bs-toggle="pill" data-bs-target="#mais-vendidos" type="button" role="tab">Mais Vendidos</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="marcas-tab" data-bs-toggle="pill" data-bs-target="#marcas" type="button" role="tab">Marcas Sustentáveis</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="segunda-mao-tab" data-bs-toggle="pill" data-bs-target="#segunda-mao" type="button" role="tab">Segunda Mão</button>
+      </li>
+    </ul>
+
+    <!-- Filtros -->
+    <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
+      <select class="form-select filtro" aria-label="Filtrar por categoria">
+        <option selected>Categoria</option>
+        <option value="1">Roupa</option>
+        <option value="2">Calçado</option>
+        <option value="3">Acessórios</option>
+      </select>
+
+      <select class="form-select filtro" aria-label="Filtrar por preço">
+        <option selected>Preço</option>
+        <option value="1">Até €30</option>
+        <option value="2">€30 - €60</option>
+        <option value="3">Mais de €60</option>
+      </select>
+
+      <select class="form-select filtro" aria-label="Filtrar por marca">
+        <option selected>Marca</option>
+        <option>Nea Vegan Shoes</option>
+        <option>Naz</option>
+        <option>PlayUp</option>
+        <option>Segunda Mão</option>
+      </select>
+    </div>
+
+    <!-- Conteúdo das Abas -->
+    <div class="tab-content" id="produtoTabsContent">
+
+      <!-- TAB: Todos -->
+      <div class="tab-pane fade show active" id="todos" role="tabpanel">
+        <div class="row g-4">
+          <!-- Produto 1 -->
+          <!-- Produto 1 -->
+        <div class="col-md-3 col-sm-6">
+        <a href="produtonazcasaco.html" class="text-decoration-none text-dark">
+            <div class="card produto-card h-100 text-center">
+            <img src="img/claudia-alpaca-pistachio-jumpernaz-6377511.webp" class="card-img-top" alt="Casaco Verde Pistácio">
+            <div class="card-body">
+                <h5 class="card-title">Casaco Verde Pistácio</h5>
+                <p class="card-text text-muted">By <strong>Naz</strong></p>
+                <p class="preco fw-bold">€139,90</p>
+            </div>
+            </div>
+        </a>
+        </div>
+
+          <!-- Produto 2 -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card produto-card h-100 text-center">
+              <img src="img/MG_7966.webp" class="card-img-top" alt="Ténis Vegan">
+              <div class="card-body">
+                <h5 class="card-title">Ténis Azuis Vegan</h5>
+                <p class="card-text text-muted">By <strong>Nea Vegan Shoes</strong></p>
+                <p class="preco fw-bold">€69,90</p>
+              </div>
+            </div>
+          </div>
+          <!-- Produto 3 -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card produto-card h-100 text-center">
+              <img src="img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg" class="card-img-top" alt="Body PlayUp">
+              <div class="card-body">
+                <h5 class="card-title">Calça de ganga em algodão</h5>
+                <p class="card-text text-muted">By <strong>PlayUp</strong></p>
+                <p class="preco fw-bold">€64,00</p>
+              </div>
+            </div>
+          </div>
+          <!-- Produto 4 -->
+          <div class="col-md-3 col-sm-6">
+            <div class="card produto-card h-100 text-center">
+              <img src="img/Chloé Paddington bag.jpeg" class="card-img-top" alt="Casaco Segunda Mão">
+              <div class="card-body">
+                <h5 class="card-title">Mala Chloe Paddigton</h5>
+                <p class="card-text text-muted">By <strong>Maria Lopes</strong></p>
+                <p class="preco fw-bold">€235,00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- As outras tabs (Mais vendidos, Marcas, Segunda mão) podem reutilizar produtos filtrados -->
+      <div class="tab-pane fade" id="mais-vendidos" role="tabpanel">
+        <p class="text-center text-muted mt-5">Em breve: produtos mais vendidos</p>
+      </div>
+      <div class="tab-pane fade" id="marcas" role="tabpanel">
+        <p class="text-center text-muted mt-5">Explora as nossas marcas sustentáveis</p>
+      </div>
+      <div class="tab-pane fade" id="segunda-mao" role="tabpanel">
+        <p class="text-center text-muted mt-5">Peças únicas em segunda mão, cheias de histórias</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+          <div class="modal-header bg-wegreen-dark text-white rounded-top-4">
+            <h5 class="modal-title" id="loginModalLabel">Login Wegreen</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body bg-light">
+            <form>
+              <div class="mb-3">
+                <label for="loginEmail" class="form-label">Email</label>
+                <input type="email" class="form-control rounded-pill" id="loginEmail" placeholder="seu.email@exemplo.com">
+              </div>
+              <div class="mb-3">
+                <label for="loginPassword" class="form-label">Palavra-passe</label>
+                <input type="password" class="form-control rounded-pill" id="loginPassword" placeholder="********">
+              </div>
+              <button type="submit" class="btn btn-wegreen-accent w-100 rounded-pill text-dark">Entrar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content rounded-4">
+          <div class="modal-header bg-wegreen-dark text-white rounded-top-4">
+            <h5 class="modal-title" id="registerModalLabel">Registo Wegreen</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body bg-light">
+            <form>
+              <div class="mb-3">
+                <label for="registerName" class="form-label">Nome Completo</label>
+                <input type="text" class="form-control rounded-pill" id="registerName" placeholder="Seu Nome">
+              </div>
+              <div class="mb-3">
+                <label for="registerEmail" class="form-label">Email</label>
+                <input type="email" class="form-control rounded-pill" id="registerEmail" placeholder="seu.email@exemplo.com">
+              </div>
+              <div class="mb-3">
+                <label for="accountType" class="form-label">Tipo de Conta</label>
+                <select class="form-select rounded-pill" id="accountType">
+                  <option selected>Selecione o seu perfil</option>
+                  <option value="admin">Admnistrador</option>
+                  <option value="consumer">Vendedor</option>
+                  <option value="artisan">Artesão/Designer</option>
+                  <option value="brand">Marca Sustentável</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-wegreen-accent w-100 rounded-pill text-dark">Criar Conta</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
