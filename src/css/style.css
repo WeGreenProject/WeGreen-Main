@@ -1,0 +1,140 @@
+/* ======================== */
+/* 0. CONFIGURAÇÕES GERAIS - WEGREEN E BOOTSTRAP */
+/* ======================== */
+:root {
+    /* Paleta de Cores Wegreen */
+    --color-primary-dark: #1E3C40;  /* Fundo Escuro (Navbar) */
+    --color-wegreen-accent: #E3E748; /* Verde Limão (Destaque/Botão/Top Bar) */
+    --color-dark: #212529;    
+    
+    /* Simulação de fonte moderna arredondada (Varela Round) */
+    --font-sans: 'Varela Round', sans-serif;
+}
+
+body {
+    font-family: var(--font-sans);
+    color: var(--color-dark);
+}
+
+h1, h2, h3, h4, .hero-title {
+    font-family: var(--font-sans);
+    font-weight: 700;
+}
+
+/* Estilo para o Logo (Imagem) */
+.logo-img {
+    height: 40px; /* Ajuste o tamanho conforme o seu logo */
+    width: auto;
+    object-fit: contain;
+}
+
+/* Estilo para a Foto de Perfil */
+.profile-img-small {
+    width: 30px; 
+    height: 30px; 
+    object-fit: cover;
+    border: 2px solid var(--color-wegreen-accent); /* Destaque com a cor primária */
+}
+
+/* Cores de fundo personalizadas */
+.bg-wegreen-dark {
+    background-color: var(--color-primary-dark) !important;
+}
+.bg-wegreen-accent {
+    background-color: var(--color-wegreen-accent) !important;
+}
+
+/* ======================== */
+/* TOP BAR */
+/* ======================== */
+.top-bar {
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+/* ======================== */
+/* NAVBAR E BOTÕES */
+/* ======================== */
+
+/* Botão Login (Fundo Verde Limão, Texto Preto) */
+.btn-wegreen-login {
+    background-color: var(--color-wegreen-accent);
+    border-color: var(--color-wegreen-accent);
+    color: var(--color-dark);
+    font-weight: bold;
+}
+.btn-wegreen-login:hover {
+    background-color: #d1d545;
+    border-color: #d1d545;
+}
+
+/* Botão Registar (Borda Verde Limão, Fundo Transparente, Texto Verde Limão) */
+.btn-wegreen-register {
+    background-color: transparent;
+    border: 2px solid var(--color-wegreen-accent);
+    color: var(--color-wegreen-accent);
+    font-weight: bold;
+}
+.btn-wegreen-register:hover {
+    background-color: var(--color-wegreen-accent);
+    color: var(--color-dark);
+}
+
+/* Barra de Pesquisa Moderna e Arredondada */
+.search-bar .btn {
+    border: none;
+    background-color: var(--color-wegreen-accent);
+    color: var(--color-dark);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    background-color: var(--color-primary-dark) !important;
+}
+.dropdown-item:hover {
+    background-color: var(--color-wegreen-accent) !important;
+    color: var(--color-dark) !important;
+}
+
+/* ======================== */
+/* CARROSSEL/HERO (Definir Imagens/Vídeos aqui) */
+/* ======================== */
+.hero-content-block {
+    /* Adiciona um gradiente escuro por cima da imagem para o texto ser legível */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), var(--color-primary-dark, #1E3C40)); 
+    background-size: cover;
+    background-position: center top;
+}
+
+/* SLIDE 1: Substitua 'url( )' pelo seu caminho de imagem ou vídeo thumbnail */
+.hero-img-1 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), var(--color-primary-dark)), 
+                      url('placeholder-hero-image-1.jpg'); 
+}
+
+/* SLIDE 2: Substitua 'url( )' pelo seu caminho de imagem ou vídeo thumbnail */
+.hero-img-2 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), var(--color-primary-dark)), 
+                      url('placeholder-hero-image-2.jpg'); 
+}
+
+/* Botão de Destaque no Carrossel */
+.btn-wegreen-accent {
+    background-color: var(--color-wegreen-accent);
+    border-color: var(--color-wegreen-accent);
+    color: var(--color-dark) !important; 
+}
+
+/* ======================== */
+/* MODAIS */
+/* ======================== */
+.form-control.rounded-pill, .form-select.rounded-pill {
+    font-family: var(--font-sans);
+}
+
+/* Responsividade */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background-color: rgba(30, 60, 64, 0.98); 
+    }
+}
