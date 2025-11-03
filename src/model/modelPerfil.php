@@ -21,9 +21,9 @@ class Perfil{
                     $msg .= "</div></li>";
                     $msg .= "<li><a class='dropdown-item' href='dashboard.html'>Dashboard Administrador</a></li>";
                     $msg .= "<li><a class='dropdown-item' href='#'>Definições de Perfil</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a class='dropdown-item text-danger' href='#'>Sair</a></li>";
+                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</a></li>";
                 }
                 else if($tpUser == 2)
                 {
@@ -31,9 +31,9 @@ class Perfil{
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
                     $msg .= "</div></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a class='dropdown-item text-danger' href='#'>Sair</a></li>";
+                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</a></li>";
                 }
                 else if($tpUser == 3)
                 {
@@ -42,9 +42,9 @@ class Perfil{
                     $msg .= "</div></li>";
                     $msg .= "<li><a class='dropdown-item' href='dashboard.html'>Dashboard</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a class='dropdown-item text-danger' href='#'>Sair</a></li>";
+                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</a></li>";
                 }
                 else
                 {
@@ -68,6 +68,13 @@ class Perfil{
         
         return ($msg);
 
+    }
+    function logout(){
+
+        session_start();
+        session_destroy();
+
+        return("Obrigado!");
     }
 }
 ?>
