@@ -99,7 +99,7 @@
 
                     <a class="nav-link text-white mx-2 fs-5" href="#"><i class="bi bi-bag"></i></a> 
                     
-                    <button class="btn btn-wegreen-login me-2 rounded-pill d-none d-lg-block" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+                    <a href="login.html"><button  class="btn btn-wegreen-login me-2 rounded-pill d-none d-lg-block" onclick="" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button></a>
                     <button class="btn btn-wegreen-register me-3 rounded-pill d-none d-lg-block" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">Registar</button>
 
                     <div class="nav-item dropdown">
@@ -376,31 +376,6 @@
     </div>
   </div>
 </section>
-
-
-    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content rounded-4">
-          <div class="modal-header bg-wegreen-dark text-white rounded-top-4">
-            <h5 class="modal-title" id="loginModalLabel">Login Wegreen</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body bg-light">
-            <form>
-              <div class="mb-3">
-                <label for="loginEmail" class="form-label">Email</label>
-                <input type="email" class="form-control rounded-pill" id="loginEmail" placeholder="seu.email@exemplo.com">
-              </div>
-              <div class="mb-3">
-                <label for="loginPassword" class="form-label">Palavra-passe</label>
-                <input type="password" class="form-control rounded-pill" id="loginPassword" placeholder="********">
-              </div>
-              <button type="submit" class="btn btn-wegreen-accent w-100 rounded-pill text-dark">Entrar</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
       <div class="modal-dialog">
