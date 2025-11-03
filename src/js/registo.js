@@ -1,9 +1,12 @@
-function login1(){
+function registaUser(){
 
     let dados = new FormData();
     dados.append("op", 1);
-    dados.append("username", $('#usernameLogin').val());
-    dados.append("password", $('#passwordLogin').val());
+    dados.append("username", $('#username').val());
+    dados.append("email", $('#email').val());
+    dados.append("nif", $('#nif').val());
+    dados.append("password", $('#password').val());
+    dados.append("foto", $('#foto').prop('files')[0]);
 
     $.ajax({
     url: "src/controller/controllerLogin.php",
@@ -19,11 +22,7 @@ function login1(){
 
         let obj = JSON.parse(msg);
         if(obj.flag){
-            alerta2(obj.msg);
-            setTimeout(function(){ 
-                window.location.href = "index.html";
-            }, 2000);
-
+            alerta("Utilizador",obj.msg,"success");
         }else{
             alerta("Utilizador",obj.msg,"error");    
         }

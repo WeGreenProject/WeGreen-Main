@@ -864,3 +864,8 @@ body {
         align-items: flex-start;
     }
 }
+        .swal2-popup.custom-toast {
+background-color: #4CAF50 !important;
+color: white !important;
+width: 400px  !important; 
+}
