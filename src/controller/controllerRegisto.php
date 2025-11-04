@@ -1,5 +1,5 @@
 <?php
-include_once '../model/modelLogin.php';
+include_once '../model/modelRegisto.php';
 
 $func = new Registo();
 
@@ -8,9 +8,7 @@ if ($_POST['op'] == 1) {
         $_POST['username'], 
         $_POST['email'],
         $_POST['nif'],
-        $_POST['foto'],
-        $_POST['password'],
-        $_FILES['foto']
+        $_POST['password']
     );
     echo $resp;
 }
