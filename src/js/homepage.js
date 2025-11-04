@@ -34,7 +34,7 @@ function logout(){
     cache: false,
     contentType: false,
     processData: false
-    })
+    })  
     
     .done(function(msg) {
 

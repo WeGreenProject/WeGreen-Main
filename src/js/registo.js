@@ -6,10 +6,9 @@ function registaUser(){
     dados.append("email", $('#email').val());
     dados.append("nif", $('#nif').val());
     dados.append("password", $('#password').val());
-    dados.append("foto", $('#foto').prop('files')[0]);
 
     $.ajax({
-    url: "src/controller/controllerLogin.php",
+    url: "src/controller/controllerRegisto.php",
     method: "POST",
     data: dados,
     dataType: "html",
@@ -21,6 +20,7 @@ function registaUser(){
     .done(function( msg ) {
 
         let obj = JSON.parse(msg);
+        console.log(msg); 
         if(obj.flag){
             alerta("Utilizador",obj.msg,"success");
         }else{
