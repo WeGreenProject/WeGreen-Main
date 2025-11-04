@@ -1,561 +1,537 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wegreen | Casaco Verde Pistácio</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wegreen | Parceria Naz</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- CSS Custom -->
   <link rel="stylesheet" href="src/css/style.css">
 
   <style>
+    :root {
+      --wegreen-accent: #adff2f;
+      --wegreen-dark: #1a1a1a;
+    }
+
+    body {
+      background-color: #fff;
+      color: var(--wegreen-dark);
+    }
+
     .top-bar {
-  margin-bottom: -4px; /* elimina qualquer espaço entre top bar e navbar */
-  z-index: 4;
-  position: relative;
+      background: var(--wegreen-accent);
+      color: var(--wegreen-dark);
+      font-weight: 600;
+      letter-spacing: .3px;
+    }
+
+    .btn-wegreen-accent {
+      background: var(--wegreen-accent);
+      color: #1a1a1a;
+      font-weight: 600;
+      transition: .2s;
+      border: none;
+    }
+
+    .btn-wegreen-accent:hover {
+      background: #9ee62f;
+      color: #000;
+    }
+
+    .gallery-thumb img {
+      border-radius: 8px;
+      transition: .3s ease;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .gallery-thumb.active img,
+    .gallery-thumb img:hover {
+      border-color: var(--wegreen-accent);
+      transform: scale(1.05);
+    }
+
+    .brand-partner {
+      background: #f9f9f9;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      margin: 2rem 0;
+    }
+
+    .brand-partner img {
+      width: 120px;
+      margin-bottom: 1rem;
+    }
+
+    .brand-partner p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .badge.bg-success {
+  background-color: #adff2f !important;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
-    .bg-wegreen-accent { background-color: #adff2f !important; }
-    .btn-wegreen-accent { background-color: #adff2f; color: #1a1a1a; font-weight: 600; }
-    .btn-wegreen-accent:hover { background-color: #9ee62f; color: #000; }
 
-    #cartCount {
-      font-size: 0.7rem;
-      padding: 0.25rem 0.45rem;
-      display: none;
+    .brand-partner a {
+      text-decoration: none;
+      color: var(--wegreen-dark);
+      font-weight: 600;
+      transition: color .2s;
     }
 
-    #checkoutModal .modal-content {
+    .brand-partner a:hover {
+      color: var(--wegreen-accent);
+    }
+
+    footer {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .footer-logo {
+      width: 230px;
+      max-width: 100%;
+      filter: brightness(1.1);
+    }
+
+    .text-wegreen-accent {
+      color: #adff2f;
+    }
+
+    .footer-link {
+      color: #ffffff;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-link:hover {
+      color: #adff2f;
+      text-decoration: underline;
+    }
+
+    .social-link {
+      color: #adff2f;
+      font-size: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+      color: #ccff66;
+      transform: scale(1.15);
+    }
+
+    .btn-wegreen-accent {
+      background-color: #adff2f;
       border: none;
-      box-shadow: 0 4px 25px rgba(0,0,0,0.25);
+      color: #000;
+      font-weight: 600;
     }
 
-    #checkoutModal img {
-      border-radius: 10px;
-      border: 2px solid #adff2f;
+    .btn-wegreen-accent:hover {
+      background-color: #bfff4d;
+      color: #000;
     }
 
-    #checkoutModal button.btn-outline-danger {
-      border: none;
-      color: #ff4d4d;
-    }
-    #checkoutModal button.btn-outline-danger:hover {
-      background-color: #ff4d4d;
-      color: #fff;
-    }
+    #planos .card {
+  transition: all 0.3s ease;
+}
 
-    .reviews-section h4 {
-  color: #414429;
-  font-weight: 700;
+#planos .card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 0 20px rgba(0, 128, 0, 0.2);
+}
+
+.text-wegreen-accent {
+  color: #9acd32 !important; /* verde lima */
+}
+
+.bg-wegreen-accent {
+  background-color: #9acd32 !important;
+}
+
+.btn-wegreen-accent {
+  background-color: #9acd32;
+  border: none;
+}
+
+.btn-wegreen-accent:hover {
+  background-color: #86b82d;
+}
+
+.btn-wegreen-dark {
+  color: #1c1c1c;
+}
+
+.footer-logo {
+  width: 220px; /* logotipo grande */
+}
+
+.social-link i {
+  color: #9acd32;
+  font-size: 1.5rem;
+  transition: 0.3s;
+}
+
+.social-link:hover i {
+  color: #7fbf00;
+}
+
+
+    .pickup-card:hover {
+  background-color: #f6fff0;
+  transform: translateY(-4px);
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link {
+  color: #333;
+  border: none;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link.active {
+  color: #000;
+  border-color: #adff2f;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #78b42e;
+}
+
+.tab-content {
+  background: #fff;
+  border-radius: 0 0 12px 12px;
+}
+
+
+.brand-partner {
+  border-left: 5px solid var(--wegreen);
 }
 
 .review-item {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.25rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: 0.3s;
 }
-
 .review-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.footer-link:hover {
+  color: var(--wegreen);
 }
 
   </style>
 </head>
-  <!-- 🧭 Navbar -->
-<header class="header-main bg-dark text-white position-fixed top-0 start-0 w-100 z-3 shadow-sm">
-  <div class="container-fluid px-5">
-    <nav class="navbar navbar-expand-lg navbar-dark py-3">
-      
-      <!-- 🌿 LOGO -->
-      <a class="navbar-brand me-4" href="index.html">
-        <img src="src/img/WeGreen-removebg-preview.png" alt="Wegreen Logo" class="logo-img" style="height: 55px;">
-      </a>
-      
-      <!-- Toggle Mobile -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+<body>
 
-      <!-- 🧭 Links de Navegação -->
-      <div class="collapse navbar-collapse justify-content-start" id="navbarNav">
-        <ul class="navbar-nav mb-2 mb-lg-0">
-          
-          <!-- Mulher -->
-          <li class="nav-item dropdown mx-2">
-            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown">Mulher</a>
-            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-              <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
-              <li><a class="dropdown-item" href="#">Vestidos</a></li>
-              <li><a class="dropdown-item" href="#">Tops e T-shirts</a></li>
-              <li><a class="dropdown-item" href="#">Calças</a></li>
-              <li><a class="dropdown-item" href="#">Acessórios</a></li>
-            </ul>
-          </li>
+  <div class="top-bar bg-wegreen-accent text-dark py-2 text-center">
+        <p class="mb-0 fw-bold slogan-text">Dê uma nova vida à moda, de forma consciente.</p>
+    </div>
 
-          <!-- Homem -->
-          <li class="nav-item dropdown mx-2">
-            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown">Homem</a>
-            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-              <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
-              <li><a class="dropdown-item" href="#">Blusas</a></li>
-              <li><a class="dropdown-item" href="#">Calças</a></li>
-              <li><a class="dropdown-item" href="#">Calçado</a></li>
-            </ul>
-          </li>
+    <header class="header-main text-white position-absolute w-100 z-3">
+        <div class="container-fluid px-5">
+            <nav class="navbar navbar-expand-lg py-3">
+                
+                <a class="navbar-brand me-4" href="#">
+                    <img src="src/img/WeGreen-removebg-preview.png" alt="Wegreen Logo" class="logo-img">
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-          <!-- Crianças -->
-          <li class="nav-item dropdown mx-2">
-            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown">Crianças</a>
-            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-              <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
-              <li><a class="dropdown-item" href="#">Blusas</a></li>
-              <li><a class="dropdown-item" href="#">Casacos</a></li>
-              <li><a class="dropdown-item" href="#">T-shirts</a></li>
-              <li><a class="dropdown-item" href="#">Calças</a></li>
-              <li><a class="dropdown-item" href="#">Vestidos</a></li>
-              <li><a class="dropdown-item" href="#">Calçado</a></li>
-            </ul>
-          </li>
+                <div class="collapse navbar-collapse justify-content-start" id="navbarNav">
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mulher</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
+                                <li><a class="dropdown-item" href="#">Tops e T-shirts</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Acessórios</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Homem</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Blusas</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Calçado</a></li>
+                            </ul>
+                        </li>
 
-          <!-- Designers / Artesãos -->
-          <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Designers</a></li>
-          <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Artesãos</a></li>
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Crianças</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                            <li><a class="dropdown-item" href="#">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Blusas</a></li>
+                                <li><a class="dropdown-item" href="#">Casacos</a></li>
+                                <li><a class="dropdown-item" href="#">T-shirts</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
+                                <li><a class="dropdown-item" href="#">Calçado</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Designers</a></li>
+                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Artesãos</a></li>
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Marcas</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="#">Naz</a></li>
+                                <li><a class="dropdown-item" href="#">Nea Vegan Shoes</a></li>
+                                <li><a class="dropdown-item" href="#">PlayUp®</a></li>
+                                <li><a class="dropdown-item" href="#">Vintage for a Cause</a></li>
+                                <li><a class="dropdown-item" href="#">Isto®</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="d-flex align-items-center ms-auto">
+                    
+                    <form class="d-flex search-bar me-3" role="search">
+                        <input class="form-control rounded-pill me-2 border-0 bg-secondary bg-opacity-25 text-white" type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
+                        <button class="btn btn-outline-light rounded-pill" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
 
-          <!-- Marcas -->
-          <li class="nav-item dropdown mx-2">
-            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown">Marcas</a>
-            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-              <li><a class="dropdown-item" href="#">Naz</a></li>
-              <li><a class="dropdown-item" href="#">Nea Vegan Shoes</a></li>
-              <li><a class="dropdown-item" href="#">PlayUp®</a></li>
-              <li><a class="dropdown-item" href="#">Vintage for a Cause</a></li>
-              <li><a class="dropdown-item" href="#">Isto®</a></li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+                    <a class="nav-link text-white mx-2 fs-5" href="#"><i class="bi bi-bag"></i></a> 
+                    
+                    <a href="login.html"><button  class="btn btn-wegreen-login me-2 rounded-pill d-none d-lg-block" onclick="" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button></a>
+                    <button class="btn btn-wegreen-register me-3 rounded-pill d-none d-lg-block" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">Registar</button>
 
-      <!-- 🔍 Pesquisa, Carrinho e Perfil -->
-      <div class="d-flex align-items-center ms-auto">
-
-        <!-- 🔎 Barra de Pesquisa -->
-        <form class="d-flex search-bar me-3" role="search">
-          <input class="form-control rounded-pill me-2 border-0 bg-secondary bg-opacity-25 text-white" 
-                 type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
-          <button class="btn btn-outline-light rounded-pill" type="submit">
-            <i class="bi bi-search"></i>
-          </button>
-        </form>
-
-        <!-- 🛍 Carrinho -->
-        <a class="nav-link text-white mx-2 fs-5 position-relative" href="#" id="cartButton" data-bs-toggle="modal" data-bs-target="#checkoutModal">
-          <i class="bi bi-bag"></i>
-          <span id="cartCount" class="badge bg-wegreen-accent text-dark position-absolute top-0 start-100 translate-middle rounded-pill">0</span>
-        </a>
-
-        <!-- 🔐 Login / Registo -->
-        <button class="btn btn-wegreen-login me-2 rounded-pill d-none d-lg-block text-dark bg-wegreen-accent fw-bold" 
-                type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
-          Login
-        </button>
-        <button class="btn btn-outline-light me-3 rounded-pill d-none d-lg-block fw-bold" 
-                type="button" data-bs-toggle="modal" data-bs-target="#registerModal">
-          Registar
-        </button>
-
-        <!-- 👤 Perfil do Utilizador -->
-        <div class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-            <img src="src/img/pexels-beccacorreiaph-31095884.jpg" class="rounded-circle profile-img-small me-1" 
-                 alt="Perfil do Utilizador" style="width: 38px; height: 38px; object-fit: cover;">
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3">
-            <li><div class="dropdown-header d-flex align-items-center">
-              <h6 class="mb-0 text-wegreen-accent">Olá, Mariana!</h6>
-            </div></li>
-            <li><a class="dropdown-item" href="#">Definições de Perfil</a></li>
-            <li><a class="dropdown-item" href="#">Login Admin</a></li>
-            <li><a class="dropdown-item" href="#">Mudar de Conta</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#">Sair</a></li>
-          </ul>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="src/img/pexels-beccacorreiaph-31095884.jpg" class="rounded-circle profile-img-small me-1" alt="Perfil do Utilizador">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3" id="PerfilTipo">
+                        </ul>
+                    </div>
+                </div>
+            </nav>
         </div>
-      </div>
-      </div>
-    </nav>
-  </div>
-</header>
+    </header>
 
-<br>
-  <!-- 🌿 Produto -->
-  <main class="py-5 mt-4">
-  <div class="container">
+    <br>
+
+    <main class="container py-5">
     <div class="row align-items-start g-5">
-      
-      <!-- 📸 FOTO -->
       <div class="col-md-6 text-center">
-        <img src="src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp" class="img-fluid rounded-4 shadow-sm" alt="Casaco Verde Pistácio">
+        <img src="src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp" class="img-fluid rounded-4 shadow-sm" alt="Casaco Naz Pistácio">
       </div>
 
-      <!-- 🧵 DETALHES -->
       <div class="col-md-6">
         <div class="d-flex align-items-center mb-3">
-          <img src="src/img/Logo_naz.webp" alt="Naz" class="me-3 rounded-circle" width="50">
+          <img src="src/img/Logo_naz.webp" alt="Naz" width="60" class="me-3">
           <div>
-            <h5 class="mb-0 fw-bold">Naz</h5>
-            <small class="text-muted">Marca Sustentável</small>
+            <h4 class="fw-bold mb-0">Naz</h4>
+            <small class="text-muted">Parceria Local</small>
           </div>
         </div>
 
-        <h2 class="fw-bold">Casaco Verde Pistácio</h2>
-        <p class="text-muted fs-5">€139,90</p>
+       <h2 class="fw-bold mb-2">Blusa Verde Pistácio</h2>
+<p class="fs-4 fw-semibold">€139,90</p>
+<p class="text-muted">
+  A Naz é uma marca portuguesa parceira da Wegreen, comprometida com a produção ética e sustentável.
+  Esta blusa é feita com lã de alpaca e acabamentos biodegradáveis — ideal para quem valoriza conforto e consciência ambiental.
+</p>
 
-        <p>Casaco em lã de alpaca produzido de forma ética em Portugal.  
-        Peça leve, macia e biodegradável — ideal para dias frios com estilo consciente.</p>
+<div class="mt-3">
+  <span class="badge bg-success bg-opacity-75 text-dark px-3 py-2 rounded-pill">
+    <i class="bi bi-check-circle-fill me-1"></i> Excelente estado
+  </span>
+  <small class="d-block text-muted mt-2">
+    Todas as peças Naz passam por um rigoroso controlo de qualidade, garantindo a durabilidade e a preservação do tecido.
+  </small>
+</div>
 
-        <p><strong>Composição:</strong> 80% Alpaca, 20% Lã Orgânica</p>
-        <p><strong>Estado:</strong> Novo</p>
-
-        <p><strong>Tamanho:</strong>
-          <select id="tamanhoSelect" class="form-select w-auto d-inline-block">
+        <div class="mb-3">
+          <label class="fw-bold">Tamanho</label>
+          <select id="sizeSelect" class="form-select w-auto d-inline-block ms-2">
+            <option>XS</option>
             <option>S</option>
-            <option>M</option>
+            <option selected>M</option>
             <option>L</option>
+            <option>XL</option>
           </select>
-        </p>
+        </div>
 
-        <button id="btnAddCarrinho" class="btn btn-wegreen-accent rounded-pill text-white mt-3"
-          data-produto="Casaco Verde Pistácio"
+        <button id="btnAddCart" class="btn btn-wegreen-accent rounded-pill px-4"
+          data-produto="Blusa Verde Pistácio Naz"
           data-preco="139.90"
           data-imagem="src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp">
           Adicionar ao Carrinho
         </button>
 
-        <!-- ⭐ AVALIAÇÃO GLOBAL -->
-        <div class="rating-summary mt-5 mb-4 p-3 bg-light rounded-4 border">
-          <h4 class="fw-bold mb-2">Avaliação Global</h4>
-          <div class="d-flex align-items-center">
-            <div class="text-warning fs-4 me-2">
-              <i class="bi bi-star-fill"></i>
-              <i class="bi bi-star-fill"></i>
-              <i class="bi bi-star-fill"></i>
-              <i class="bi bi-star-fill"></i>
-              <i class="bi bi-star-half"></i>
-            </div>
-            <span class="fw-bold fs-5">4.7/5</span>
-          </div>
-          <p class="text-muted mb-0">Com base em <strong>53 avaliações verificadas</strong></p>
-        </div>
-
-        <!-- 🗣️ CRÍTICAS DOS CLIENTES -->
-        <div class="reviews-section">
-          <h4 class="fw-bold mb-4">Críticas dos Clientes</h4>
-
-          <!-- Crítica 1 -->
-          <div class="review-item border-bottom pb-4 mb-4">
-            <div class="d-flex align-items-center mb-3">
-              <img src="src/img/pexels-brynna-spencer-63356-227294.jpg" alt="Joana Pinto"
-                   class="rounded-circle me-3 shadow-sm" style="width: 55px; height: 55px; object-fit: cover;">
-              <div>
-                <h6 class="mb-0 fw-bold">Joana Pinto</h6>
-                <div class="text-warning small">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                </div>
-                <small class="text-muted">15 de Março de 2025</small>
-              </div>
-            </div>
-            <p class="text-muted mb-0">
-              Adorei o casaco! É super confortável e nota-se a qualidade dos materiais.
-              O envio foi rápido e a embalagem totalmente reciclável 🌱
-            </p>
-          </div>
-
-          <!-- Crítica 2 -->
-          <div class="review-item border-bottom pb-4 mb-4">
-            <div class="d-flex align-items-center mb-3">
-              <img src="src/img/pexels-olly-762020.jpg" alt="Carolina Mendes"
-                   class="rounded-circle me-3 shadow-sm" style="width: 55px; height: 55px; object-fit: cover;">
-              <div>
-                <h6 class="mb-0 fw-bold">Carolina Mendes</h6>
-                <div class="text-warning small">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i>
-                </div>
-                <small class="text-muted">2 de Fevereiro de 2025</small>
-              </div>
-            </div>
-            <p class="text-muted mb-0">
-              O casaco é lindo e fiel às fotos! Só achei o tamanho um pouco pequeno — recomendo escolher um número acima.
-            </p>
-          </div>
-
-          <!-- Crítica 3 -->
-          <div class="review-item border-bottom pb-4 mb-4">
-            <div class="d-flex align-items-center mb-3">
-              <img src="src/img/pexels-dave-buxton-1918474-3549893.jpg" alt="Rita Moreira"
-                   class="rounded-circle me-3 shadow-sm" style="width: 55px; height: 55px; object-fit: cover;">
-              <div>
-                <h6 class="mb-0 fw-bold">Rita Moreira</h6>
-                <div class="text-warning small">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i><i class="bi bi-star"></i>
-                </div>
-                <small class="text-muted">28 de Janeiro de 2025</small>
-              </div>
-            </div>
-            <p class="text-muted mb-0">
-              Materiais fantásticos e adorei o design minimalista. O atendimento foi muito atencioso, só demorou um dia extra para chegar.
-            </p>
-          </div>
-
-          <!-- Crítica 4 -->
-          <div class="review-item border-bottom pb-4 mb-4">
-            <div class="d-flex align-items-center mb-3">
-              <img src="src/img/pexels-mangaphotography-674685.jpg" alt="Inês Carvalho"
-                   class="rounded-circle me-3 shadow-sm" style="width: 55px; height: 55px; object-fit: cover;">
-              <div>
-                <h6 class="mb-0 fw-bold">Inês Carvalho</h6>
-                <div class="text-warning small">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
-                </div>
-                <small class="text-muted">14 de Janeiro de 2025</small>
-              </div>
-            </div>
-            <p class="text-muted mb-0">
-              Boa peça, mas esperava que fosse ligeiramente mais espessa. Ainda assim, recomendo pela qualidade e pela ética da marca 🌍
-            </p>
-          </div>
-
-          <!-- Crítica 5 -->
-          <div class="review-item">
-            <div class="d-flex align-items-center mb-3">
-              <img src="src/img/pexels-stefanstefancik-91227.jpg" alt="Miguel Faria"
-                   class="rounded-circle me-3 shadow-sm" style="width: 55px; height: 55px; object-fit: cover;">
-              <div>
-                <h6 class="mb-0 fw-bold">Miguel Faria</h6>
-                <div class="text-warning small">
-                  <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
-                </div>
-                <small class="text-muted">5 de Janeiro de 2025</small>
-              </div>
-            </div>
-            <p class="text-muted mb-0">
-              Excelente compra! A textura é suave e o corte moderno. Gosto especialmente por ser feito com materiais sustentáveis 🇵🇹
-            </p>
-          </div>
-
-          <!-- ✍️ FORMULÁRIO DE NOVA CRÍTICA -->
-          <hr class="my-5">
-          <h5 class="fw-bold mb-3">Deixa a tua avaliação</h5>
-          <form id="reviewForm">
-            <div class="mb-3">
-              <input type="text" id="nome" class="form-control" placeholder="O teu nome" required>
-            </div>
-            <div class="mb-3">
-              <textarea id="comentario" class="form-control" placeholder="Escreve a tua opinião..." rows="3" required></textarea>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label d-block mb-2">Avaliação:</label>
-              <div id="ratingStars" class="text-warning fs-4">
-                <i class="bi bi-star" data-value="1"></i>
-                <i class="bi bi-star" data-value="2"></i>
-                <i class="bi bi-star" data-value="3"></i>
-                <i class="bi bi-star" data-value="4"></i>
-                <i class="bi bi-star" data-value="5"></i>
-              </div>
-            </div>
-
-            <button type="submit" class="btn btn-wegreen-accent rounded-pill text-dark fw-bold">
-              Submeter Avaliação
-            </button>
-          </form>
-        </div>
+<div class="container mt-5">
+  <h5 class="fw-bold mb-3">Métodos de Pickup Disponíveis</h5>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="pickup-card text-center p-4 border rounded-4 shadow-sm bg-white">
+        <i class="bi bi-shop fs-2 text-success"></i>
+        <h6 class="fw-bold mt-2">Loja Física Naz</h6>
+        <p class="small text-muted mb-0">Rua das Flores, Porto (Levantar em 2 horas)</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="pickup-card text-center p-4 border rounded-4 shadow-sm bg-white">
+        <i class="bi bi-box-seam fs-2 text-success"></i>
+        <h6 class="fw-bold mt-2">CTT Express</h6>
+        <p class="small text-muted mb-0">Entrega em 1–2 dias úteis</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="pickup-card text-center p-4 border rounded-4 shadow-sm bg-white">
+        <i class="bi bi-truck fs-2 text-success"></i>
+        <h6 class="fw-bold mt-2">DPD Pickup</h6>
+        <p class="small text-muted mb-0">Entrega rápida e sustentável</p>
       </div>
     </div>
   </div>
-</main>
+</div>
 
-  <!-- 🛒 Modal do Carrinho -->
-  <div class="modal fade" id="checkoutModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content rounded-4">
-        <div class="modal-header bg-dark text-white">
-          <h5 class="modal-title"><i class="bi bi-bag me-2"></i>O Meu Carrinho</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div id="carrinhoItens" class="mb-3"></div>
-          <hr>
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <strong>Subtotal</strong>
-            <strong>€<span id="carrinhoSubtotal">0.00</span></strong>
-          </div>
-          <button id="btnFinalizarCompra" class="btn btn-wegreen-accent w-100 rounded-pill text-white fw-bold">
-            Finalizar Compra
-          </button>
-        </div>
-      </div>
+<div class="container mt-5">
+  <h5 class="fw-bold mb-4">Detalhes do Produto</h5>
+
+  <ul class="nav nav-tabs" id="productTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-semibold" id="estado-tab" data-bs-toggle="tab" data-bs-target="#estado" type="button" role="tab">Estado</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="cor-tab" data-bs-toggle="tab" data-bs-target="#cor" type="button" role="tab">Cor</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="material-tab" data-bs-toggle="tab" data-bs-target="#material" type="button" role="tab">Material</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="origem-tab" data-bs-toggle="tab" data-bs-target="#origem" type="button" role="tab">Origem</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="sustentabilidade-tab" data-bs-toggle="tab" data-bs-target="#sustentabilidade" type="button" role="tab">Sustentabilidade</button>
+    </li>
+  </ul>
+
+  <div class="tab-content border border-top-0 p-4 rounded-bottom bg-white shadow-sm" id="productTabsContent">
+    <div class="tab-pane fade show active" id="estado" role="tabpanel" aria-labelledby="estado-tab">
+      <p class="mb-0">
+        Este artigo encontra-se em <strong>excelente estado</strong>, proveniente da coleção <strong>Outlet Naz</strong>, 
+        com materiais de alta durabilidade e acabamento premium.  
+        Todas as peças são revistas e certificadas antes de serem disponibilizadas na Wegreen.
+      </p>
+    </div>
+
+    <div class="tab-pane fade" id="cor" role="tabpanel" aria-labelledby="cor-tab">
+      <p class="mb-0">
+        <strong>Cor:</strong> Verde Pistácio 
+        Uma tonalidade suave inspirada na natureza, que combina conforto e frescura — perfeita para todas as estações.
+      </p>
+    </div>
+
+    <div class="tab-pane fade" id="material" role="tabpanel" aria-labelledby="material-tab">
+      <ul class="mb-0">
+        <li>80% Alpaca natural (biodegradável)</li>
+        <li>20% Lã orgânica certificada</li>
+        <li>Tingimento natural sem químicos agressivos</li>
+        <li>Etiqueta e embalagem em algodão reciclado</li>
+      </ul>
+    </div>
+
+    <div class="tab-pane fade" id="origem" role="tabpanel" aria-labelledby="origem-tab">
+      <p class="mb-0">
+        <strong>Produzido em:</strong> Porto, Portugal 🇵🇹  
+        A Naz trabalha com oficinas locais e artesãos da região norte, promovendo a economia circular e o comércio justo.
+      </p>
+    </div>
+
+    <div class="tab-pane fade" id="sustentabilidade" role="tabpanel" aria-labelledby="sustentabilidade-tab">
+      <ul class="mb-0">
+        <li>Produção local de baixo impacto</li>
+        <li>Embalagem 100% reciclável</li>
+        <li>Certificação <strong>Eco-Textile Standard</strong></li>
+        <li>Transparência total no processo produtivo</li>
+      </ul>
     </div>
   </div>
+</div>
+</div>
 
-  <!-- Footer -->
-  <footer class="bg-dark text-white text-center py-3 mt-5">
-    <p class="mb-0">&copy; 2025 Wegreen — Dê uma nova vida à moda, de forma consciente.</p>
-  </footer>
+  <footer class="bg-dark text-white pt-5 pb-3 mt-5">
+  <div class="container">
+    <div class="row gy-4 align-items-start">
 
-  <!-- Scripts -->
+      <div class="col-md-4 text-center text-md-start">
+        <div class="mb-3">
+          <img src="src/img/WeGreen-removebg-preview.png" alt="Wegreen Logo" class="footer-logo">
+        </div>
+        <p class="text-white-50 mb-4">
+          Dê uma nova vida à moda, de forma consciente.  
+          A Wegreen conecta designers, marcas e consumidores num movimento por um futuro sustentável.
+        </p>
+        <div class="d-flex justify-content-center justify-content-md-start gap-3 mt-3">
+          <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+          <a href="#" class="social-link"><i class="bi bi-envelope"></i></a>
+        </div>
+      </div>
+
+      <div class="col-md-3 text-center text-md-start">
+        <h5 class="fw-bold mb-3 text-wegreen-accent">Explorar</h5>
+        <ul class="list-unstyled">
+          <li><a href="#loja" class="footer-link">Loja Wegreen</a></li>
+          <li><a href="#essencia" class="footer-link">Sobre Nós</a></li>
+          <li><a href="#" class="footer-link">Designers & Artesãos</a></li>
+          <li><a href="#" class="footer-link">Marcas Sustentáveis</a></li>
+          <li><a href="#" class="footer-link">Contactos</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-3 text-center text-md-start">
+        <h5 class="fw-bold mb-3 text-wegreen-accent">Suporte</h5>
+        <ul class="list-unstyled">
+          <li><a href="#" class="footer-link">Ajuda & FAQ</a></li>
+          <li><a href="#" class="footer-link">Termos e Condições</a></li>
+          <li><a href="#" class="footer-link">Política de Privacidade</a></li>
+          <li><a href="#" class="footer-link">Envios & Devoluções</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-2 text-center text-md-start">
+        <h5 class="fw-bold mb-3 text-wegreen-accent">Newsletter</h5>
+        <p class="text-white-50 small">Subscreve e recebe novidades sobre moda sustentável.</p>
+        <form class="d-flex mt-2">
+          <input type="email" class="form-control form-control-sm rounded-start-pill" placeholder="O teu email">
+          <button class="btn btn-wegreen-accent btn-sm rounded-end-pill"><i class="bi bi-send"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary">
+
+    <div class="text-center">
+      <p class="mb-0 text-white-50">
+        &copy; 2025 <strong>Wegreen</strong> — Dê uma nova vida à moda, de forma consciente.  
+        | Desenvolvido por <strong>Jéssica Fernandes</strong> | <strong>Manuel Silvestre</strong> | <strong>Pedro Pereira</strong>
+      </p>
+    </div>
+  </div>
+</footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <script>
-    const btnAdd = document.getElementById("btnAddCarrinho");
-    const cartCountEl = document.getElementById("cartCount");
-    const carrinhoItensEl = document.getElementById("carrinhoItens");
-    const subtotalEl = document.getElementById("carrinhoSubtotal");
-
-    // === Atualiza contador ===
-    function atualizarContador() {
-      const carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
-      cartCountEl.textContent = carrinho.length;
-      cartCountEl.style.display = carrinho.length > 0 ? "inline-block" : "none";
-    }
-
-    // === Renderiza carrinho no modal ===
-    function renderCarrinho() {
-      const carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
-      carrinhoItensEl.innerHTML = "";
-      let subtotal = 0;
-
-      if (carrinho.length === 0) {
-        carrinhoItensEl.innerHTML = '<p class="text-muted text-center mb-0">O carrinho está vazio.</p>';
-      } else {
-        carrinho.forEach((item, index) => {
-          subtotal += item.preco;
-          carrinhoItensEl.innerHTML += `
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <div class="d-flex align-items-center">
-                <img src="${item.imagem}" class="rounded-4 me-3" style="width:70px;height:70px;object-fit:cover;">
-                <div>
-                  <h6 class="fw-bold mb-1">${item.nome}</h6>
-                  <small class="text-muted">Tamanho: ${item.tamanho}</small>
-                  <p class="fw-semibold mb-0">€${item.preco.toFixed(2)}</p>
-                </div>
-              </div>
-              <button class="btn btn-sm btn-outline-danger rounded-pill" data-index="${index}">
-                <i class="bi bi-x-lg"></i>
-              </button>
-            </div>`;
-        });
-      }
-
-      subtotalEl.textContent = subtotal.toFixed(2);
-    }
-
-    // === Adiciona produto ao carrinho ===
-    btnAdd.addEventListener("click", () => {
-      const produto = {
-        nome: btnAdd.dataset.produto,
-        preco: parseFloat(btnAdd.dataset.preco),
-        imagem: btnAdd.dataset.imagem,
-        tamanho: document.querySelector("#tamanhoSelect").value
-      };
-
-      let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
-      carrinho.push(produto);
-      localStorage.setItem("carrinho", JSON.stringify(carrinho));
-
-      atualizarContador();
-      renderCarrinho();
-
-      Swal.fire({
-        icon: "success",
-        title: "Adicionado ao Carrinho!",
-        text: `${produto.nome} foi adicionado com sucesso 🌿`,
-        confirmButtonColor: "#adff2f"
-      });
-    });
-
-    // === Remover item ===
-    document.addEventListener("click", e => {
-      if (e.target.closest(".btn-outline-danger")) {
-        const index = e.target.closest("button").getAttribute("data-index");
-        let carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
-        carrinho.splice(index, 1);
-        localStorage.setItem("carrinho", JSON.stringify(carrinho));
-        renderCarrinho();
-        atualizarContador();
-      }
-    });
-
-    // === Finalizar Compra ===
-    document.getElementById("btnFinalizarCompra").addEventListener("click", () => {
-      const carrinho = JSON.parse(localStorage.getItem("carrinho") || "[]");
-      if (carrinho.length === 0) {
-        Swal.fire({ icon: "warning", title: "Carrinho vazio!", text: "Adicione produtos antes de finalizar." });
-        return;
-      }
-      window.location.href = "checkout.html";
-    });
-
-    // Inicializa
-    atualizarContador();
-    renderCarrinho();
-
-
-    const stars = document.querySelectorAll('#ratingStars i');
-  let selectedRating = 0;
-
-  stars.forEach(star => {
-    star.addEventListener('mouseover', () => {
-      stars.forEach(s => s.classList.replace('bi-star-fill', 'bi-star'));
-      for (let i = 0; i < star.dataset.value; i++) {
-        stars[i].classList.replace('bi-star', 'bi-star-fill');
-      }
-    });
-
-    star.addEventListener('click', () => {
-      selectedRating = star.dataset.value;
-    });
-
-    star.addEventListener('mouseleave', () => {
-      stars.forEach((s, i) => {
-        s.classList.toggle('bi-star-fill', i < selectedRating);
-        s.classList.toggle('bi-star', i >= selectedRating);
-      });
-    });
-  });
-
-  // ✍️ Submissão da crítica
-  document.getElementById('reviewForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const nome = document.getElementById('nome').value.trim();
-    const comentario = document.getElementById('comentario').value.trim();
-
-    if (!nome || !comentario || selectedRating === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Oops...',
-        text: 'Por favor preenche todos os campos e escolhe uma avaliação!',
-        confirmButtonColor: '#adff2f'
-      });
-      return;
-    }
-
-    Swal.fire({
-      icon: 'success',
-      title: 'Avaliação enviada!',
-      text: 'Obrigado pela tua partilha 🌿',
-      confirmButtonColor: '#adff2f'
-    });
-
-    e.target.reset();
-    selectedRating = 0;
-    stars.forEach(s => s.classList.replace('bi-star-fill', 'bi-star'));
-  });
-  </script>
 </body>
 </html>
