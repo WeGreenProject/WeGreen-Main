@@ -15,6 +15,9 @@ if ($_POST['op'] == 1) {
 if ($_POST['op'] == 2) {
     $resp = $func->logout();
     echo $resp;
-
+}
+if ($_POST['op'] == 3) {
+    $resp = $func->getDadosPlanos($_SESSION['utilizador'],$_SESSION['plano'],$_SESSION['tipo']);
+    echo $resp;
 }
 ?>
