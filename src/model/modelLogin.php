@@ -21,8 +21,13 @@ class Login{
     $row = $result->fetch_assoc();
         $msg = "Bem vindo ".$row['nome'];
         $_SESSION['utilizador'] = $row['id'];
+        $_SESSION['nome'] = $row['nome'];
         $_SESSION['tipo'] = $row['tipo_utilizador_id'];
         $_SESSION['foto'] = $row['foto'];
+        $_SESSION['raking'] = $row['ranking_id'];
+        $_SESSION['plano'] = $row['plano_id'];
+        $_SESSION['data'] = $row['data_criacao'];
+        $_SESSION['email'] = $row['email'];
     }else{
         $flag = false;
         $msg = "Erro! Dados Inválidos";
