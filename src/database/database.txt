@@ -29,7 +29,7 @@ CREATE TABLE Planos (
 
 INSERT INTO Planos (nome, preco, limite_produtos, rastreio_tipo, relatorio_pdf) VALUES 
 ('Free', 0, 3, 'Basico', FALSE),
-('Premium', 25, 10, 'Basico', FALSE),
+('Premium', 25, 10, 'Basico', TRUE),
 ('Enterprise', 100, NULL, 'Avancado', TRUE);
 
 -- ========================
@@ -53,7 +53,6 @@ CREATE TABLE Utilizadores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    contacto VARCHAR(20),
     nif VARCHAR(20),
     foto varchar(250),
     password VARCHAR(255) NOT NULL,
@@ -61,18 +60,19 @@ CREATE TABLE Utilizadores (
     plano_id INT,
     ranking_id INT,
     pontos_conf INT DEFAULT 0,
-    data_criacao DATE DEFAULT (CURDATE()),
+    data_criacao DATE,
     FOREIGN KEY (ranking_id) REFERENCES Ranking(id),
     FOREIGN KEY (tipo_utilizador_id) REFERENCES Tipo_Utilizadores(id),
     FOREIGN KEY (plano_id) REFERENCES Planos(id)
 );
-
-INSERT INTO Utilizadores (nome, email, contacto, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
+select * from Utilizadores;
+INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
 VALUES 
-('Admin WeGreen', 'admin@wegreen.pt', '910000000', 'admin123', 1, 3, 3, 200,NULL),
-('João Silva', 'joao@wegreen.pt', '911111111', 'cliente123', 2, 1, 1, 10,NULL),
-('Maria Santos', 'maria@wegreen.pt', '912222222', 'anunciante123', 3, 2, 2, 75,NULL);
-
+('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,NULL),
+('João Silva', 'joao@wegreen.pt','cliente123', 2, 1, 1, 10,NULL),
+INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
+VALUES 
+('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,NULL);
 -- ========================
 -- TABELA: genero
 -- ========================
@@ -108,17 +108,6 @@ CREATE TABLE Produto (
     FOREIGN KEY (genero_id) REFERENCES Genero(id)
 );
 
-INSERT INTO produtos_mulher 
-(nome, foto, preco, marca_id, preco_id, tamanho_id, cor_id, estado_id, material_id, marca_nome, tamanho_nome, estado_nome)
-VALUES
-('Blusa Colorida Custo Barcelona', '4aa0032639cfb631fe2d24df2baeb114.jpg', 15.00, 2, 1, 3, 1, 2, 3, 'Custo Barcelona', 'M', 'Excelente'),
-('Vestido Versace Coleção 2003', 'ddbe3c8f8aef92c51a1745dcb4923752.jpg', 289.90, 2, 4, 2, 4, 1, 3, 'Versace', 'S', 'Como Novo'),
-('Calças de ganga Low Rise', '835c014897bbbab6c135f8dfd9f59bdf.jpg', 35.40, 3, 1, 2, 3, 2, 2, 'NYWS', 'S', 'Excelente'),
-('Botas pele', 'b7358d779d9fc865d22f428ec1641391.jpg', 79.00, 3, 2, 4, 4, 1, 1, 'Ana Salazar', 'L', 'Como Novo'),
-('Blusão de ganga', '58c4e54e715841986e82c05fb3506a0d.jpg', 23.80, 1, 1, 3, 2, 2, 2, 'Miss Sixty', 'M', 'Excelente'),
-('Vestido algodão de Verão', '1c5af95e896564ebf09d600686c049ee.jpg', 35.00, 4, 2, 3, 5, 3, 3, 'PlayUp®', 'M', 'Bom'),
-('Casaco Desportivo Nike', 'c5584a14a4d828c79754a5b553a3abe3.jpg', 22.00, 4, 1, 4, 4, 1, 2, 'Nike', 'L', 'Como Novo');
-
 -- ========================
 -- TABELA: Tipo_Produtos
 -- ========================
@@ -132,7 +121,7 @@ INSERT INTO Tipo_Produtos (descricao) VALUES
 ('Calçado'),
 ('Acessórios'),
 ('Beleza'),
-('Tecnologia');
+('Outros');
 
 -- ========================
 -- TABELA: Produtos
@@ -140,12 +129,15 @@ INSERT INTO Tipo_Produtos (descricao) VALUES
 CREATE TABLE Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
+	descricão varchar(250),
     tipo_produto_id INT,
-    preco DECIMAL(10,2),
-    foto VARCHAR(255),
+    preco DECIMAL(10,2) NOT NULL,
+    foto VARCHAR(255) NOT NULL,
+    parceria varchar(250),
+    tamanho varchar(250),
     anunciante_id INT,
     data_criacao DATE DEFAULT (CURDATE()),
-    ativo BOOLEAN DEFAULT TRUE,
+    estado varchar(250) NOT NULL,
     FOREIGN KEY (tipo_produto_id) REFERENCES Tipo_Produtos(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
@@ -270,7 +262,6 @@ CREATE TABLE Historico_Produtos (
     data_atualizacao DATE DEFAULT (CURDATE()),
     FOREIGN KEY (encomenda_id) REFERENCES Encomendas(id)
 );
-
 INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao)
 VALUES 
 (1, 'Em trânsito', 'A encomenda saiu do centro de distribuição.');
