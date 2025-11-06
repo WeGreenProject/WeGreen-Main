@@ -5,10 +5,12 @@ session_start();
 $func = new Perfil();
 
 if ($_POST['op'] == 1) {
-    if (isset($_SESSION['utilizador']) && isset($_SESSION['tipo'])) {
+    if (isset($_SESSION['utilizador']) && isset($_SESSION['tipo'])) 
+    {    
         $resp = $func->getDadosTipoPerfil($_SESSION['utilizador'],$_SESSION['tipo']);
         echo $resp;
-    } else {
+    } else 
+    {
         echo "<li><a class='dropdown-item' href='login.html'>Entrar na sua conta</a></li>";
     }
 }
@@ -17,7 +19,15 @@ if ($_POST['op'] == 2) {
     echo $resp;
 }
 if ($_POST['op'] == 3) {
-    $resp = $func->getDadosPlanos($_SESSION['utilizador'],$_SESSION['plano'],$_SESSION['tipo']);
-    echo $resp;
+    if(isset($_SESSION['utilizador']) && isset($_SESSION['tipo']))
+    {
+            $resp = $func->getDadosPlanos($_SESSION['utilizador'],$_SESSION['plano'],$_SESSION['tipo']);
+        echo $resp;
+    }
+    else
+    {
+        echo "";
+    }
+
 }
 ?>
