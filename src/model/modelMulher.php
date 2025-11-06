@@ -3,20 +3,29 @@ require_once 'connection.php'
 
 class Mulher {
 
-    function getProdutosMulher($marca, $preco, $tamanho, $cor, $estado, $material){
+    function getProdutosMulher($marca, $preco, $tamanho, $cor, $estado, $material, $genero){
         global $conn;
          $msg = "";
          $row = "";
 
-        $sql = "SELECT * FROM produtos_mulher WHERE 1=1";
+        $sql = "SELECT * FROM Produto WHERE 1=1";
 
         if ($marca != "") {
             $sql .= " AND marca_id = '$marca'";
         }
 
-        if($preco != "") {
-            $sql .= " AND preco_id = $preco'";
+        if ($preco != "") {
+        if ($preco == 1) {
+        $sql .= " AND preco <= 50";
+    } elseif ($preco == 2) {
+        $sql .= " AND preco BETWEEN 50 AND 100";
+    } elseif ($preco == 3) {
+        $sql .= " AND preco BETWEEN 100 AND 200";
+    } elseif ($preco == 4) {
+        $sql .= " AND preco > 200";
         }
+    }
+
 
         if ($tamanho != "") {
             $sql .= " AND tamanho_id = '$tamanho'";
@@ -36,7 +45,10 @@ class Mulher {
 
     }
 
-
+    if ($genero !="") {
+        $sql .= " AND genero_id = '$genero'";
+    }
+    
         $result = $conn->query($sql);
 
          if ($result->num_rows > 0) {

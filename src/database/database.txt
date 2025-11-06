@@ -73,11 +73,18 @@ VALUES
 ('João Silva', 'joao@wegreen.pt', '911111111', 'cliente123', 2, 1, 1, 10,NULL),
 ('Maria Santos', 'maria@wegreen.pt', '912222222', 'anunciante123', 3, 2, 2, 75,NULL);
 
+-- ========================
+-- TABELA: genero
+-- ========================
+CREATE TABLE Genero (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(250)
+);
 
 -- ========================
--- TABELA: produtos_mulher
+-- TABELA: Produto
 -- ========================
-CREATE TABLE produtos_mulher (
+CREATE TABLE Produto (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
     foto VARCHAR(250),
@@ -87,10 +94,18 @@ CREATE TABLE produtos_mulher (
     tamanho_id INT,
     cor_id INT,
     estado_id INT,
+    genero_id INT,
     material_id INT,
     marca_nome VARCHAR(100),
     tamanho_nome VARCHAR(50),
     estado_nome VARCHAR(50),
+    FOREIGN KEY (marca_id) REFERENCES Marca(id),
+    FOREIGN KEY (preco_id) REFRECES Preco(id),
+    FOREIGN KEY (tamanho_id) REFERENCES Tamanho(id),
+    FOREIGN KEY (cor_id) REFERENCES Cor(id),
+    FOREIGN KEY (estado_id) REFERENCES Estado(id),
+    FOREIGN KEY (material_id) REFERENCES Material(id),
+    FOREIGN KEY (genero_id) REFERENCES Genero(id)
 );
 
 INSERT INTO produtos_mulher 

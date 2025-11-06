@@ -11,6 +11,7 @@ if ($_POST['op'] == 1) {
         $_POST['cor'],
         $_POST['estado'],
         $_POST['material']
+         1 // genero_id da Mulher
     );
     echo $resp;
 }
