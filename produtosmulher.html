@@ -99,34 +99,72 @@
   <main class="container py-5 mt-5">
     <h2 class="fw-bold text-center mb-5">Mulher</h2>
 
-    <div class="row mb-4">
-      <div class="col-md-2 col-sm-6 mb-3">
-        <select class="form-select rounded-pill fw-semibold">
-          <option selected>Marca</option>
-        </select>
-
-      </div>
-      <div class="col-md-2 col-sm-6 mb-3">
-        <select class="form-select rounded-pill fw-semibold">
-          <option selected>Preço</option>
-        </select>
-      </div>
-      <div class="col-md-2 col-sm-6 mb-3">
-        <select class="form-select rounded-pill fw-semibold">
-          <option selected>Tamanho</option>
-        </select>
-      </div>
-      <div class="col-md-2 col-sm-6 mb-3">
-        <select class="form-select rounded-pill fw-semibold">
-          <option selected>Cor</option>
-        </select>
-      </div>
-      <div class="col-md-2 col-sm-6 mb-3">
-        <select class="form-select rounded-pill fw-semibold">
-             <option selected>Estado</option>
-        </select>
-      </div>
+  <div class="row mb-4">
+    <div class="col-md-2 col-sm-6 mb-3">
+      <select id="marcaSelect" class="form-select rounded-pill fw-semibold">
+        <option value="">Marca</option>
+        <option value="1">Miss Sixty</option>
+        <option value="2">Custo Barcelona</option>
+        <option value="3">Ana Salazar</option>
+        <option value="4">PlayUp®</option>
+      </select>
     </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+      <select id="precoSelect" class="form-select rounded-pill fw-semibold">
+        <option value="">Preço</option>
+        <option value="1">até €50</option>
+        <option value="2">€50 – €100</option>
+        <option value="3">€100 – €200</option>
+        <option value="4">Mais de €200</option>
+      </select>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+      <select id="tamanhoSelect" class="form-select rounded-pill fw-semibold">
+        <option value="">Tamanho</option>
+        <option value="1">XS</option>
+        <option value="2">S</option>
+        <option value="3">M</option>
+        <option value="4">L</option>
+        <option value="5">XL</option>
+        <option value="6">XXL</option>
+      </select>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+      <select id="corSelect" class="form-select rounded-pill fw-semibold">
+        <option value="">Cor</option>
+        <option value="1">Rosa</option>
+        <option value="2">Azul</option>
+        <option value="3">Castanho</option>
+        <option value="4">Preto</option>
+        <option value="5">Branco</option>
+        <option value="6">Verde</option>
+        <option value="7">Roxo</option>
+      </select>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+      <select id="estadoSelect" class="form-select rounded-pill fw-semibold" name="estado">
+        <option value="">Estado</option>
+        <option value="1">Como novo</option>
+        <option value="2">Excelente</option>
+        <option value="3">Bom</option>
+      </select>
+    </div>
+
+    <div class="col-md-2 col-sm-6 mb-3">
+      <select id="materialSelect" class="form-select rounded-pill fw-semibold" name="material">
+        <option value="">Material</option>
+        <option value="1">Pele</option>
+        <option value="2">Ganga</option>
+        <option value="3">Algodão</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="listaProdutos" class="row g-4">
 
     <div class="row g-4">
       <div class="col-md-3 col-sm-6">
@@ -134,7 +172,7 @@
           <img src="src/img/4aa0032639cfb631fe2d24df2baeb114.jpg" class="card-img-top rounded-top-4" alt="Blusa custo barcelona">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Blusa Colorida Custo Barcelona</h6>
-            <p class="text-muted mb-1">Custo Barcelona · M</p>
+            <p class="text-muted mb-1">Custo Barcelona · M · Excelente </p>
             <p class="fw-semibold">€15</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -145,7 +183,7 @@
           <img src="src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg" class="card-img-top rounded-top-4" alt="Vestido">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Vestido Versace Coleção 2003</h6>
-            <p class="text-muted mb-1">Versace · S</p>
+            <p class="text-muted mb-1">Versace · S · Como Novo</p>
             <p class="fw-semibold">€289,90</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -156,7 +194,7 @@
           <img src="src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg" class="card-img-top rounded-top-4" alt="Calças ganga">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Calças de ganga Low Rise </h6>
-            <p class="text-muted mb-1">NYWS · S</p>
+            <p class="text-muted mb-1">NYWS · S · Excelente</p>
             <p class="fw-semibold">€35,40</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -167,7 +205,7 @@
           <img src="src/img/b7358d779d9fc865d22f428ec1641391.jpg" class="card-img-top rounded-top-4" alt="Botas Pele">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Botas pele</h6>
-            <p class="text-muted mb-1">Ana Salazar · 38</p>
+            <p class="text-muted mb-1">Ana Salazar · 38 · Como Novo</p>
             <p class="fw-semibold">€79</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -179,7 +217,7 @@
           <img src="src/img/58c4e54e715841986e82c05fb3506a0d.jpg" class="card-img-top rounded-top-4" alt="Blusão ganga">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Blusão de ganga</h6>
-            <p class="text-muted mb-1">Miss Sixty · M</p>
+            <p class="text-muted mb-1">Miss Sixty · M · Excelente </p>
             <p class="fw-semibold">€23,80</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -190,7 +228,7 @@
           <img src="src/img/206af231b9b61956182afd1d73a47082.jpg"card-img-top rounded-top-4" alt="Leggings">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Leggings Yoga</h6>
-            <p class="text-muted mb-1">Abercrombie & Fitch · XS</p>
+            <p class="text-muted mb-1">Abercrombie & Fitch · XS · Excelente</p>
             <p class="fw-semibold">10,90</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -201,7 +239,7 @@
           <img src="src/img/1c5af95e896564ebf09d600686c049ee.jpg" class="card-img-top rounded-top-4" alt="Vestido de Verão">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Vestido algodão de Verão</h6>
-            <p class="text-muted mb-1">PlayUp® · M</p>
+            <p class="text-muted mb-1">PlayUp® · M · Bom</p>
             <p class="fw-semibold">€35</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -212,7 +250,7 @@
           <img src="src/img/c5584a14a4d828c79754a5b553a3abe3.jpg" class="card-img-top rounded-top-4" alt="Casaco em Fibras Recicladas">
           <div class="card-body text-center">
             <h6 class="fw-bold mb-1">Casaco Desportivo Nike</h6>
-            <p class="text-muted mb-1">Nike · L</p>
+            <p class="text-muted mb-1">Nike · L · Como Novo</p>
             <p class="fw-semibold">€22,00</p>
             <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
           </div>
@@ -273,7 +311,7 @@
       <hr class="my-4 border-secondary">
       <div class="text-center">
         <p class="mb-0 text-white-50">
-          &copy; 2025 <strong>Wegreen</strong> — Dê uma nova vida à moda, de forma consciente. 
+          &copy; 2025 <strong>Wegreen</strong> — Dê uma nova vida à moda, de forma consciente 
           | Desenvolvido por <strong>Jéssica Fernandes</strong> | <strong>Manuel Silvestre</strong> | <strong>Pedro Pereira</strong>
         </p>
       </div>

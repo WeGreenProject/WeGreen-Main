@@ -70,12 +70,43 @@ INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, r
 VALUES 
 ('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,NULL),
 ('João Silva', 'joao@wegreen.pt','cliente123', 2, 1, 1, 10,NULL),
-
-('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,NULL);
-
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
 VALUES 
 ('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,NULL);
+-- ========================
+-- TABELA: genero
+-- ========================
+CREATE TABLE Genero (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(250)
+);
+
+-- ========================
+-- TABELA: Produto
+-- ========================
+CREATE TABLE Produto (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    foto VARCHAR(250),
+    preco DECIMAL(10,2) NOT NULL,
+    marca_id INT,
+    preco_id INT,
+    tamanho_id INT,
+    cor_id INT,
+    estado_id INT,
+    genero_id INT,
+    material_id INT,
+    marca_nome VARCHAR(100),
+    tamanho_nome VARCHAR(50),
+    estado_nome VARCHAR(50),
+    FOREIGN KEY (marca_id) REFERENCES Marca(id),
+    FOREIGN KEY (preco_id) REFRECES Preco(id),
+    FOREIGN KEY (tamanho_id) REFERENCES Tamanho(id),
+    FOREIGN KEY (cor_id) REFERENCES Cor(id),
+    FOREIGN KEY (estado_id) REFERENCES Estado(id),
+    FOREIGN KEY (material_id) REFERENCES Material(id),
+    FOREIGN KEY (genero_id) REFERENCES Genero(id)
+);
 
 -- ========================
 -- TABELA: Tipo_Produtos
