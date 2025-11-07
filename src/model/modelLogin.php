@@ -23,6 +23,7 @@ class Login{
         $_SESSION['utilizador'] = $row['id'];
         $_SESSION['nome'] = $row['nome'];
         $_SESSION['tipo'] = $row['tipo_utilizador_id'];
+        $_SESSION['PontosConf'] = $row['pontos_conf'];
         $_SESSION['foto'] = $row['foto'];
         $_SESSION['raking'] = $row['ranking_id'];
         $_SESSION['plano'] = $row['plano_id'];

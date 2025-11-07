@@ -51,5 +51,69 @@ class DashboardAnunciante{
         return ($msg);
 
     }
+    function CarregaProdutos($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT COUNT(*) As StockProdutos FROM Produtos WHERE anunciante_id = " . $ID_User;
+        $result = $conn->query($sql);
+
+        
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                
+                $msg  = "<div class='stat-icon'>📦</div>";
+                $msg .= "<div class='stat-label'>Produtos em Stock</div>";
+                $msg .= "<div class='stat-value'>".$row["StockProdutos"]."</div>";
+                $msg .= "<div class='stat-change'>+3 produtos novos</div>";
+
+            }
+            
+        }
+        else
+        {
+                $msg  = "<div class='stat-icon'>📦</div>";
+                $msg .= "<div class='stat-label'>Produtos em Stock</div>";
+                $msg .= "<div class='plan-badge'>Erro a Encontrar Produtos</div>";
+                $msg .= "<div class='stat-change'>+3 produtos novos</div>";
+        }
+        $conn->close();
+
+        return ($msg);
+
+    }
+    function CarregaPontos($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * FROM Utilizadores WHERE id = " . $ID_User;
+        $result = $conn->query($sql);
+
+        
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                
+                $msg  = "<div class='stat-icon'>🎯</div>";
+                $msg .= "<div class='stat-label'>Pontos de Confiança</div>";
+                $msg .= "<div class='stat-value'>".$row['pontos_conf']."</div>";
+                $msg .= "<div class='stat-change'>↑ Baseado nas suas vendas</div>";
+
+            }
+            
+        }
+        else
+        {
+                $msg  = "<div class='stat-icon'>🎯</div>";
+                $msg .= "<div class='stat-label'>Pontos de Confiança</div>";
+                $msg .= "<div class='stat-value'>Pontos de Confiança nao encontrado!</div>";
+                $msg .= "<div class='stat-change'>↑ Baseado nas suas vendas</div>";
+        }
+        $conn->close();
+
+        return ($msg);
+
+    }
 }
 ?>
