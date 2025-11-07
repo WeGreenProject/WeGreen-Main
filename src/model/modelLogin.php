@@ -28,6 +28,8 @@ class Login{
         $_SESSION['plano'] = $row['plano_id'];
         $_SESSION['data'] = $row['data_criacao'];
         $_SESSION['email'] = $row['email'];
+
+        
     }else{
         $flag = false;
         $msg = "Erro! Dados Inválidos";
