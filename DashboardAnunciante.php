@@ -79,11 +79,8 @@
                 </div>
 
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-label">Pontos de Confiança</div>
-                        <div class="stat-value" id="totalRevenue">0</div>
-                        <div class="stat-change">↑ Baseado nas suas vendas</div>
+                    <div class="stat-card" id="PontosConfianca">
+
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">📈</div>
@@ -91,11 +88,8 @@
                         <div class="stat-value" id="totalProfit">€0.00</div>
                         <div class="stat-change">↑ +22% este mês</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📦</div>
-                        <div class="stat-label">Produtos em Stock</div>
-                        <div class="stat-value" id="totalStock">0</div>
-                        <div class="stat-change">3 novos produtos</div>
+                    <div class="stat-card" id="ProdutoStock">
+
                     </div>
                     <div class="stat-card" id="PlanosAtual">
 
