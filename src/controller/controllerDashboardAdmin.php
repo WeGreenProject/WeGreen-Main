@@ -20,4 +20,16 @@ if ($_POST['op'] == 4) {
     $resp = $func->getGastos();
     echo $resp;
 }
+if ($_POST['op'] == 5) {
+    $resp = $func->getVendasGrafico();
+    echo $resp;
+}
+if ($_POST['op'] == 6) {
+    $resp = $func->getTopTipoGrafico();
+    echo $resp;
+}
+if ($_POST['op'] == 7) {
+    $resp = $func->getDadosPerfil($_SESSION['utilizador']);
+    echo $resp;
+}
 ?>

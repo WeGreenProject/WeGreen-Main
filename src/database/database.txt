@@ -1,9 +1,5 @@
-select * from Tipo_Utilizadores;
-
-
 CREATE DATABASE WeGreen;
 USE WeGreen;
-
 -- ========================
 -- TABELA: Tipo_Utilizadores
 -- ========================
@@ -69,7 +65,7 @@ CREATE TABLE Utilizadores (
 );
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
 VALUES 
-('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,NULL),
+('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,"src/img/pexels-beccacorreiaph-31095884.jpg"),
 ('João Silva', 'joao@wegreen.pt','cliente123', 2, 1, 1, 10,NULL),
 ('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,NULL);
 
@@ -153,7 +149,6 @@ CREATE TABLE Rendimento (
     data_registo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
-select * from Rendimento;
 INSERT INTO Rendimento (anunciante_id, valor,descricao)
 VALUES 
 (3, 25,"Premium comprado!"),
@@ -176,6 +171,7 @@ CREATE TABLE Gastos (
 
 INSERT INTO Gastos (anunciante_id, valor, descricao)
 VALUES (3, 50.00, 'Publicidade online');
+
 
 -- ========================
 -- TABELA: Transportadora
@@ -210,6 +206,19 @@ INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportad
 VALUES 
 ('WG12345', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico');
 
+INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, data_envio, estado, plano_rastreio)
+VALUES 
+('WG12346', 2, 3, 1, CURDATE(), 'Entregue', 'Basico'),
+('WG12347', 7, 3, 2, CURDATE(), 'Em trânsito', 'Basico'),
+('WG12352', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico'),
+('WG12353', 7, 3, 1, CURDATE(), 'Entregue', 'Basico'),
+('WG12348', 2, 4, 1, CURDATE(), 'Entregue', 'Avancado'),
+('WG12349', 7, 4, 2, CURDATE(), 'Pendente', 'Avancado'),
+('WG12354', 2, 4, 2, CURDATE(), 'Entregue', 'Avancado'),
+('WG12350', 2, 5, 1, CURDATE(), 'Entregue', 'Basico'),
+('WG12351', 7, 5, 2, CURDATE(), 'Cancelada', 'Basico'),
+('WG12355', 7, 5, 1, CURDATE(), 'Pendente', 'Basico');
+
 -- ========================
 -- TABELA: Denuncias
 -- ========================
@@ -225,9 +234,7 @@ CREATE TABLE Denuncias (
     FOREIGN KEY (denunciado_id) REFERENCES Utilizadores(id)
 );
 
-INSERT INTO Denuncias (denunciante_id, denunciado_id, descricao)
-VALUES 
-(2, 3, 'Produto não entregue.');
+
 
 -- ========================
 -- TABELA: Historico_Produtos
@@ -242,7 +249,37 @@ CREATE TABLE Historico_Produtos (
 );
 INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao)
 VALUES 
-(1, 'Em trânsito', 'A encomenda saiu do centro de distribuição.');
+(2, 'Entregue', 'Produto entregue ao cliente.'),
+(3, 'Em trânsito', 'Produto enviado pela transportadora.'),
+(4, 'Entregue', 'Entrega concluída.'),
+(5, 'Pendente', 'Aguardando envio.'),
+(6, 'Entregue', 'Venda finalizada com sucesso.'),
+(7, 'Cancelada', 'Encomenda cancelada pelo cliente.'),
+(8, 'Em trânsito', 'Produto saiu do armazém.'),
+(9, 'Entregue', 'Cliente recebeu o produto.'),
+(10, 'Entregue', 'Envio concluído.'),
+(11, 'Pendente', 'Aguardando confirmação de pagamento.');
+
+CREATE TABLE Vendas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    encomenda_id INT,
+    anunciante_id INT NOT NULL,
+    produto_id INT NULL,
+    quantidade INT DEFAULT 1,
+    valor DECIMAL(10,2),
+    lucro DECIMAL(10,2),
+    data_venda DATE DEFAULT (CURDATE()),
+    FOREIGN KEY (encomenda_id) REFERENCES Encomendas(id),
+    FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
+    FOREIGN KEY (produto_id) REFERENCES Produtos(id)
+);
+INSERT INTO Vendas (encomenda_id, anunciante_id, produto_id, quantidade, valor, lucro)
+VALUES
+(1, 3, 1, 2, 39.98, 2.40),
+(2, 3, 3, 1, 89.99, 5.40),  
+(3, 3, 2, 1, 49.99, 3.00),  
+(4, 4, 3, 3, 269.97, 16.20), 
+(5, 4, 2, 1, 49.99, 3.00); 
 
 CREATE TABLE Planos_Ativos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -255,5 +292,5 @@ CREATE TABLE Planos_Ativos (
     FOREIGN KEY (plano_id) REFERENCES Planos(id)
 );
 
-INSERT INTO Planos_Ativos (anunciante_id, plano_id, mes_plano,ativo)
-VALUES (3, 2, DATE_FORMAT(CURDATE(), '%Y-%m'),ativo);
+INSERT INTO Planos_Ativos (anunciante_id, plano_id, data_inicio, ativo)
+VALUES (3, 2, CURDATE(), TRUE);
