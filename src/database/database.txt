@@ -1,8 +1,6 @@
 CREATE DATABASE WeGreen;
 USE WeGreen;
--- ========================
--- TABELA: Tipo_Utilizadores
--- ========================
+
 CREATE TABLE Tipo_Utilizadores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(250) NOT NULL
@@ -13,9 +11,7 @@ INSERT INTO Tipo_Utilizadores (descricao) VALUES
 ('Cliente'),
 ('Anunciante');
 
--- ========================
--- TABELA: Planos
--- ========================
+
 CREATE TABLE Planos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(200) NOT NULL,
@@ -30,9 +26,7 @@ INSERT INTO Planos (nome, preco, limite_produtos, rastreio_tipo, relatorio_pdf) 
 ('Premium', 25, 10, 'Basico', TRUE),
 ('Enterprise', 100, NULL, 'Avancado', TRUE);
 
--- ========================
--- TABELA: Ranking
--- ========================
+
 CREATE TABLE Ranking (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(250),
@@ -44,9 +38,7 @@ INSERT INTO Ranking (nome, pontos) VALUES
 ('Ouro', 50),
 ('Diamante', 150);
 
--- ========================
--- TABELA: Utilizadores
--- ========================
+
 CREATE TABLE Utilizadores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -76,9 +68,7 @@ VALUES
 ('Maria Luiza', 'Luiza@wegreen.pt','anunciante123', 3, 1, 3, 0,NULL),
 ('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,NULL);
 
--- ========================
--- TABELA: Tipo_Produtos
--- ========================
+
 CREATE TABLE Tipo_Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(100) NOT NULL
@@ -91,9 +81,7 @@ INSERT INTO Tipo_Produtos (descricao) VALUES
 ('Beleza'),
 ('Outros');
 
--- ========================
--- TABELA: Produtos
--- ========================
+
 CREATE TABLE Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
@@ -117,9 +105,7 @@ VALUES
 ('Tênis Sustentável', 2, 49.99, 'tenis.jpg', 3),
 ('Relógio de Bambu', 3, 89.99, 'relogio.jpg', 3);
 
--- ========================
--- TABELA: Mensagens
--- ========================
+
 CREATE TABLE Mensagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     remetente_id INT,
@@ -138,9 +124,7 @@ INSERT INTO Mensagens (remetente_id, destinatario_id, mensagem)
 VALUES 
 (3, 2, 'Olá João! O seu pedido já foi enviado.');
 
--- ========================
--- TABELA: Rendimento
--- ========================
+
 CREATE TABLE Rendimento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     valor DECIMAL(10,2),
@@ -157,9 +141,6 @@ VALUES
 (null, 5,"Comissão cobrada!");
 
 
--- ========================
--- TABELA: Gastos
--- ========================
 CREATE TABLE Gastos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     anunciante_id INT,
@@ -172,10 +153,6 @@ CREATE TABLE Gastos (
 INSERT INTO Gastos (anunciante_id, valor, descricao)
 VALUES (3, 50.00, 'Publicidade online');
 
-
--- ========================
--- TABELA: Transportadora
--- ========================
 CREATE TABLE Transportadora (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome ENUM('CTT', 'DPD') NOT NULL
@@ -185,9 +162,6 @@ INSERT INTO Transportadora (nome) VALUES
 ('CTT'),
 ('DPD');
 
--- ========================
--- TABELA: Encomendas
--- ========================
 CREATE TABLE Encomendas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codigo_encomenda VARCHAR(50) UNIQUE,
@@ -219,9 +193,7 @@ VALUES
 ('WG12351', 7, 5, 2, CURDATE(), 'Cancelada', 'Basico'),
 ('WG12355', 7, 5, 1, CURDATE(), 'Pendente', 'Basico');
 
--- ========================
--- TABELA: Denuncias
--- ========================
+
 CREATE TABLE Denuncias (
     id INT AUTO_INCREMENT PRIMARY KEY,
     denunciante_id INT,
@@ -235,10 +207,6 @@ CREATE TABLE Denuncias (
 );
 
 
-
--- ========================
--- TABELA: Historico_Produtos
--- ========================
 CREATE TABLE Historico_Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     encomenda_id INT,

@@ -147,7 +147,7 @@
                         <h3>Evolução de Vendas</h3>
                         <p>Gráfico de vendas ao longo do tempo</p>
                     </div>
-                    <canvas id="salesTimelineChart"></canvas>
+                    <canvas id="GraficoVendas" with="100px" height="100px"></canvas>
                 </div>
             </div>
 
@@ -184,8 +184,8 @@
                         <h3>Perfil da Loja</h3>
                     </div>
                     <div class="form-group">
-                        <label>Nome da Loja</label>
-                        <input type="text" value="Fashion Store" />
+                        <label>Nome </label>
+                        <input type="text" value="Pedro " />
                     </div>
                     <div class="form-group">
                         <label>Email</label>
@@ -258,6 +258,16 @@
         },
         {
             id: 3,
+            name: 'Calças Jeans',
+            price: 89.90,
+            cost: 45.00,
+            stock: 30,
+            sold: 15,
+            image: '👖',
+            desc: 'Jeans de alta qualidade'
+        },
+        {
+            id: 4,
             name: 'Vestido Verão',
             price: 79.90,
             cost: 35.00,
@@ -611,14 +621,12 @@
         alert('Produto adicionado com sucesso!');
     });
 
-    // Fechar modal ao clicar fora
     document.getElementById('productModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeModal();
         }
     });
 
-    // Inicializar dashboard
     updateDashboard();
     </script>
 </body>
@@ -628,6 +636,43 @@
 }
 
 ?>
+
+
+<script>
+   
+    const dados = {
+      labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho'],
+      datasets: [{
+        label: 'Vendas (em €)',
+        data: [120, 190, 300, 250, 400, 500],
+        borderColor: 'rgba(0, 0, 0, 1)',
+        backgroundColor: 'rgba(252, 222, 53, 0.84)',
+        fill: true,
+        tension: 0.2 
+      }]
+    };
+
+    
+    const config = {
+      type: 'line',
+      data: dados,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          title: {
+            display: true,
+            text: 'Gráfico de Vendas Mensais'
+          }
+        }
+      }
+    };
+
+    new Chart(
+      document.getElementById('GraficoVendas'),
+      config
+    );
+  </script>
 <script src="src/js/Anunciante.js"></script>
 
 </html>

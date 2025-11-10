@@ -15,7 +15,13 @@
         display: flex;
         min-height: 100vh;
     }
-
+    #widgetsWrapper{
+    background:#EEEEEE;
+    padding:20px;
+    box-sizing: border-box;
+    width:100%;
+}
+.chartDiv{  margin: 8px auto;}
     .sidebar {
         width: 280px;
         background: linear-gradient(180deg, #1c1c1c 0%, #121212 100%);
