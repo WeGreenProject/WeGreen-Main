@@ -80,7 +80,6 @@
 
                 <div class="stats-grid">
                     <div class="stat-card" id="PontosConfianca">
-
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">📈</div>

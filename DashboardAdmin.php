@@ -15,11 +15,10 @@
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
 
-
+    <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
-    <script src="src/js/lib/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 
