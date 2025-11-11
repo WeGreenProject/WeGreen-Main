@@ -146,8 +146,8 @@ class Perfil{
                 $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                $msg .= "</div>"; // fecha row
-                $msg .= "</div>"; // fecha container
+                $msg .= "</div>";
+                $msg .= "</div>";
 
                 }
                 else if($plano == 2)
@@ -214,7 +214,7 @@ class Perfil{
                 }
                 else
                 {
-                                    $msg  = "<div class='container text-center'>";
+                $msg  = "<div class='container text-center'>";
                 $msg .= "<h2 class='fw-bold mb-4 text-dark'>Planos Wegreen</h2>";
                 $msg .= "<p class='text-muted mb-5 fs-5'>Escolhe o plano ideal para ti e junta-te à comunidade sustentável da Wegreen.</p>";
 
@@ -338,8 +338,8 @@ class Perfil{
                 $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                $msg .= "</div>"; // fecha row
-                $msg .= "</div>"; // fecha container
+                $msg .= "</div>";
+                $msg .= "</div>";
 
                 }
                 else if($plano == 2)
@@ -486,5 +486,30 @@ class Perfil{
     return ($msg);
 
 }
+function getDadosProdutos($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * FROM Produtos WHERE id = " . $ID_User;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+
+                    $msg  = "<h3 class='fw-bold mb-3'>".$row["nome"]."</h3>";
+                    $msg .= "<p class='text-muted mb-2'>Marca: <span class='fw-semibold'>Custo Barcelona</span></p>";
+                    $msg .= "<p class='text-muted mb-2'>Tamanho: <span class='fw-semibold'>".$row["tamanho"]."</span></p>";
+                    $msg .= "<p class='text-muted mb-2'>Estado: <span class='fw-semibold'>".$row["estado"]."</span></p>";
+                    $msg .= "<h4 class='fw-bold text-success mb-3'>".$row["preco"]."</h4>";
+                    $msg .= "<p class='mb-4'>";
+                    $msg .= "".$row["descricao"]."";
+                    $msg .= "</p>";
+
+            }
+            
+        }
+}
+
 }
 ?>

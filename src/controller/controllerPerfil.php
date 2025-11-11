@@ -28,6 +28,9 @@ if ($_POST['op'] == 3) {
     {
         echo "";
     }
-
+}
+if ($_POST['op'] == 4) {
+    $resp = $func->getDadosProdutos();
+    echo $resp;
 }
 ?>
