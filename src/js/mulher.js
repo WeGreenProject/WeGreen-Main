@@ -1,34 +1,57 @@
-function getProdutosMulher() {
+function getProdutosMulher()
+{
     let dados = new FormData();
     dados.append("op", 1);
-    dados.append("marca", $("#marcaSelect").val());
-    dados.append("preco", $("#precoSelect").val());
-    dados.append("tamanho", $("#tamanhoSelect").val());
-    dados.append("cor", $("#corSelect").val());
-    dados.append("estado", $("#estadoSelect").val());
-    dados.append("material", $("#materialSelect").val());
 
     $.ajax({
-        url: "src/controller/controllerMulher.php",
-        method: "POST",
-        data: dados,
-        dataType: "html",
-        cache: false,
-        contentType: false,
-        processData: false
+    url: "src/controller/controllerMulher.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
     })
-    .done(function(msg) {
-        $('#listaProdutos').html(msg);
+    
+    .done(function( msg ) {
+         $('#ProdutoMulherVenda').html(msg);
     })
-    .fail(function(jqXHR, textStatus) {
-        alert("Request failed: " + textStatus);
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
     });
+
 }
+function getProdutoMulherMostrar()
+{
+    const params = new URLSearchParams(window.location.search);
+    const produtoID = params.get("id");
 
-$(function() {
-    getProdutosMulher();
+    let dados = new FormData();
+    dados.append("op", 2);
+    dados.append("id", produtoID);
 
-    $("#marcaSelect, #precoSelect, #tamanhoSelect, #corSelect, #estadoSelect, #materialSelect").change(function() {
-        getProdutosMulher();
+    $.ajax({
+    url: "src/controller/controllerMulher.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+        console.log(msg);
+         $('#ProdutoInfo').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
     });
+
+}
+$(function() {
+    getProdutoMulherMostrar();
+    getProdutosMulher();
 });
