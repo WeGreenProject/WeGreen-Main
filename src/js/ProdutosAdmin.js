@@ -75,7 +75,55 @@ function getProdutosPendentes(){
     alert( "Request failed: " + textStatus );
     });
 }
+function getProdutosAprovado()
+{
+    let dados = new FormData();
+    dados.append("op",4);
+
+    $.ajax({
+    url: "src/controller/controllerProdutosAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#Aprovados').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
+function getProdutosRejeitado()
+{
+    let dados = new FormData();
+    dados.append("op",5);
+
+    $.ajax({
+    url: "src/controller/controllerProdutosAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#Rejeitados').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
 $(function() {
+    getProdutosRejeitado();
+    getProdutosAprovado();
     getDadosPerfil();
     getProdutosAprovar();
     getProdutosPendentes();
