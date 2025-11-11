@@ -29,7 +29,7 @@
                 <div class="logo">
                     <span class="logo-icon">👔</span>
                     <div class="logo-text">
-                        <h1>Fashion Store</h1>
+                        <h1>Wegreen</h1>
                         <p>Painel do Adminstrador</p>
                     </div>
                 </div>
