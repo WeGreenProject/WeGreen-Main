@@ -7,8 +7,8 @@
     <title>Aprovação de Produtos - Fashion Store</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/AdminProdutos.css">
-        <link rel="stylesheet" href="src/css/Admin.css">
-    
+    <link rel="stylesheet" href="src/css/Admin.css">
+
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
 
@@ -101,45 +101,28 @@
             <!-- Estatísticas de Aprovação -->
             <div class="approval-stats">
                 <div class="approval-stat-card" id="Pendentes">
-                    <div class="approval-stat-icon">⏳</div>
-                    <div class="approval-stat-info">
-                        <div class="approval-stat-value" id="pendingCount">0</div>
-                        <div class="approval-stat-label">Pendentes</div>
-                    </div>
                 </div>
-                <div class="approval-stat-card">
-                    <div class="approval-stat-icon">✅</div>
-                    <div class="approval-stat-info">
-                        <div class="approval-stat-value" id="approvedCount">0</div>
-                        <div class="approval-stat-label">Aprovados</div>
-                    </div>
+                <div class="approval-stat-card" id="Aprovados">
                 </div>
-                <div class="approval-stat-card">
-                    <div class="approval-stat-icon">❌</div>
-                    <div class="approval-stat-info">
-                        <div class="approval-stat-value" id="rejectedCount">0</div>
-                        <div class="approval-stat-label">Rejeitados</div>
-                    </div>
+                <div class="approval-stat-card" id="Rejeitados">
                 </div>
             </div>
 
             <!-- Filtros -->
-            <div class="approval-filters">
-                <button class="filter-btn active" onclick="filterApproval('all')">
+            <div class="approval-filters" id="">
+                <button class="filter-btn active">
                     Todos <span class="filter-badge" id="allBadge">0</span>
                 </button>
-                <button class="filter-btn" onclick="filterApproval('pending')">
+                <button class="filter-btn">
                     Pendentes <span class="filter-badge" id="pendingBadge">0</span>
                 </button>
-                <button class="filter-btn" onclick="filterApproval('approved')">
+                <button class="filter-btn">
                     Aprovados <span class="filter-badge" id="approvedBadge">0</span>
                 </button>
-                <button class="filter-btn" onclick="filterApproval('rejected')">
+                <button class="filter-btn">
                     Rejeitados <span class="filter-badge" id="rejectedBadge">0</span>
                 </button>
             </div>
-
-            <!-- Tabela de Produtos -->
             <div class="table-container" id="tableAprovar">
                 <table>
                     <thead>
@@ -162,6 +145,6 @@
         </main>
     </div>
 </body>
-    <script src="src/js/ProdutosAdmin.js"></script>
-</html>
+<script src="src/js/ProdutosAdmin.js"></script>
 
+</html>

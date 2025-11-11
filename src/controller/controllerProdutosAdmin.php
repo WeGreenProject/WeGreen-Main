@@ -16,4 +16,12 @@ if ($_POST['op'] == 3) {
     $resp = $func->getProdutosPendentes();
     echo $resp;
 }
+if ($_POST['op'] == 4) {
+    $resp = $func->getProdutosAprovado();
+    echo $resp;
+}
+if ($_POST['op'] == 5) {
+    $resp = $func->getProdutosRejeitado();
+    echo $resp;
+}
 ?>
