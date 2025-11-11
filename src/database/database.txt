@@ -1,17 +1,23 @@
 CREATE DATABASE WeGreen;
 USE WeGreen;
-
+ 
+-- ========================
+-- TABELA: Tipo_Utilizadores
+-- ========================
 CREATE TABLE Tipo_Utilizadores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(250) NOT NULL
 );
-
+ 
 INSERT INTO Tipo_Utilizadores (descricao) VALUES 
 ('Administrador'),
 ('Cliente'),
 ('Anunciante');
-
-
+ 
+select * from Tipo_Utilizadores;
+-- ========================
+-- TABELA: Planos
+-- ========================
 CREATE TABLE Planos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(200) NOT NULL,
@@ -20,29 +26,34 @@ CREATE TABLE Planos (
     rastreio_tipo VARCHAR(200) NOT NULL,
     relatorio_pdf BOOLEAN DEFAULT FALSE
 );
-
+ 
 INSERT INTO Planos (nome, preco, limite_produtos, rastreio_tipo, relatorio_pdf) VALUES 
 ('Free', 0, 3, 'Basico', FALSE),
-('Premium', 25, 10, 'Basico', TRUE),
+('Premium', 25, 10, 'Basico', FALSE),
 ('Enterprise', 100, NULL, 'Avancado', TRUE);
-
-
+ 
+-- ========================
+-- TABELA: Ranking
+-- ========================
 CREATE TABLE Ranking (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(250),
     pontos INT
 );
-
+ 
 INSERT INTO Ranking (nome, pontos) VALUES 
 ('Bronze', 0),
 ('Ouro', 50),
 ('Diamante', 150);
-
-
+ 
+-- ========================
+-- TABELA: Utilizadores
+-- ========================
 CREATE TABLE Utilizadores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    contacto VARCHAR(20),
     nif VARCHAR(20),
     foto varchar(250),
     password VARCHAR(255) NOT NULL,
@@ -50,62 +61,70 @@ CREATE TABLE Utilizadores (
     plano_id INT,
     ranking_id INT,
     pontos_conf INT DEFAULT 0,
-    data_criacao DATE,
+    data_criacao DATE DEFAULT (CURDATE()),
     FOREIGN KEY (ranking_id) REFERENCES Ranking(id),
     FOREIGN KEY (tipo_utilizador_id) REFERENCES Tipo_Utilizadores(id),
     FOREIGN KEY (plano_id) REFERENCES Planos(id)
 );
+ 
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
 VALUES 
-('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,"src/img/pexels-beccacorreiaph-31095884.jpg"),
+('Admin WeGreen', 'admin@wegreen.pt','admin123', 1, 3, 3, 200,NULL),
 ('João Silva', 'joao@wegreen.pt','cliente123', 2, 1, 1, 10,NULL),
 ('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,NULL);
-
-INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
-VALUES 
-('Maria Luiza3', 'Luiza3@wegreen.pt','anunciante123', 3, 3, 3, 0,NULL),
-('Maria Luiza2', 'Luiza2@wegreen.pt','anunciante123', 3, 2, 3, 0,NULL),
-('Maria Luiza', 'Luiza@wegreen.pt','anunciante123', 3, 1, 3, 0,NULL),
-('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,NULL);
-
-
+ 
+ 
+-- ========================
+-- TABELA: Tipo_Produtos
+-- ========================
 CREATE TABLE Tipo_Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(100) NOT NULL
 );
-
+ 
 INSERT INTO Tipo_Produtos (descricao) VALUES
 ('Roupa'),
 ('Calçado'),
 ('Acessórios'),
 ('Beleza'),
-('Outros');
-
-
+('Tecnologia');
+ 
+-- ========================
+-- TABELA: Produtos
+-- ========================
 CREATE TABLE Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
-	descricão varchar(250),
     tipo_produto_id INT,
-    preco DECIMAL(10,2) NOT NULL, #Preco que queres vender (Custas - Preco = Lucro)
-	custo DECIMAL(10,2) NOT NULL, #Quanto custa o produto
-    foto VARCHAR(255) NOT NULL,
-    parceria varchar(250),
-    tamanho varchar(250),
+    preco DECIMAL(10,2),
+    foto VARCHAR(255),
     anunciante_id INT,
     data_criacao DATE DEFAULT (CURDATE()),
-    estado varchar(250) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (tipo_produto_id) REFERENCES Tipo_Produtos(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
+ALTER TABLE Produtos
+ADD COLUMN tamanho VARCHAR(30),
+ADD COLUMN estado VARCHAR(20),
+ADD COLUMN descricao VARCHAR(255);
+ 
+INSERT INTO Produtos (nome, tipo_produto_id, preco, foto, anunciante_id, tamanho, estado, descricao)
+VALUES
+('Blusa Colorida Custo Barcelona', 4, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 3, 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.'),
+('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src\img\camisapolotommy.jpg', 3, 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.'),
+('Tênis Adidas UltraBoost', 2, 249.99, 'src\img\Sapatilhas_Ultraboost_5x_Preto_IH3110.avif', 3, '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.'),
+('Bolsa de Couro Michael Kors', 3, 359.99, 'src\img\bolsamichaelkros.webp', 3, 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.'),
+('Creme Hidratante Nivea', 4, 29.90, 'creme_nivea.jpg', 3, 'Único tamanho', 'Novo', 'Creme hidratante Nivea para todos os tipos de pele, ideal para uso diário.'),
+('Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src\img\s-l1200.webp', 3, 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.'),
+('Casaco Verde Pistachio',1, 139.90, 'src\img\claudia-alpaca-pistachio-jumpernaz-6377511.webp','3','S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio'.)
+('Ténis Azuis Vegan', 1, 69.90, 'src/img/MG_7966.webp', 3, '38', 'Novo', 'Tenis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.'),
+('Calça de ganga em algodão, 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 3, '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.'),
+('Mala Chloe Paddigton', 1, 235.00, 'src/img/Chloé Paddington bag.jpeg', 3, 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.');
 
-INSERT INTO Produtos (nome, tipo_produto_id, preco, foto, anunciante_id)
-VALUES 
-('T-Shirt Orgânica', 1, 19.99, 'tshirt.jpg', 3),
-('Tênis Sustentável', 2, 49.99, 'tenis.jpg', 3),
-('Relógio de Bambu', 3, 89.99, 'relogio.jpg', 3);
-
-
+-- ========================
+-- TABELA: Mensagens
+-- ========================
 CREATE TABLE Mensagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     remetente_id INT,
@@ -118,29 +137,30 @@ CREATE TABLE Mensagens (
     FOREIGN KEY (remetente_id) REFERENCES Utilizadores(id),
     FOREIGN KEY (destinatario_id) REFERENCES Utilizadores(id)
 );
-
+ 
 -- Mensagem exemplo
 INSERT INTO Mensagens (remetente_id, destinatario_id, mensagem)
 VALUES 
 (3, 2, 'Olá João! O seu pedido já foi enviado.');
-
-
+ 
+-- ========================
+-- TABELA: Rendimento
+-- ========================
 CREATE TABLE Rendimento (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    anunciante_id INT,
     valor DECIMAL(10,2),
-    anunciante_id int,
-	descricao TEXT,
+     descricao TEXT,
     data_registo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
+ 
 INSERT INTO Rendimento (anunciante_id, valor,descricao)
-VALUES 
-(3, 25,"Premium comprado!"),
-(4, 100,"Enterprize comprado!"),
-(5, 25,"Premium comprado!"),
-(null, 5,"Comissão cobrada!");
-
-
+VALUES (3, 250.75,"Premium comprado!");
+ 
+-- ========================
+-- TABELA: Gastos
+-- ========================
 CREATE TABLE Gastos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     anunciante_id INT,
@@ -149,19 +169,25 @@ CREATE TABLE Gastos (
     data_registo DATE DEFAULT (CURDATE()),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
-
+ 
 INSERT INTO Gastos (anunciante_id, valor, descricao)
 VALUES (3, 50.00, 'Publicidade online');
-
+ 
+-- ========================
+-- TABELA: Transportadora
+-- ========================
 CREATE TABLE Transportadora (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome ENUM('CTT', 'DPD') NOT NULL
 );
-
+ 
 INSERT INTO Transportadora (nome) VALUES 
 ('CTT'),
 ('DPD');
-
+ 
+-- ========================
+-- TABELA: Encomendas
+-- ========================
 CREATE TABLE Encomendas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codigo_encomenda VARCHAR(50) UNIQUE,
@@ -175,25 +201,14 @@ CREATE TABLE Encomendas (
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
     FOREIGN KEY (transportadora_id) REFERENCES Transportadora(id)
 );
-
+ 
 INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, data_envio, estado, plano_rastreio)
 VALUES 
-('WG12345', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico');
-
-INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, data_envio, estado, plano_rastreio)
-VALUES 
-('WG12346', 2, 3, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12347', 7, 3, 2, CURDATE(), 'Em trânsito', 'Basico'),
-('WG12352', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico'),
-('WG12353', 7, 3, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12348', 2, 4, 1, CURDATE(), 'Entregue', 'Avancado'),
-('WG12349', 7, 4, 2, CURDATE(), 'Pendente', 'Avancado'),
-('WG12354', 2, 4, 2, CURDATE(), 'Entregue', 'Avancado'),
-('WG12350', 2, 5, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12351', 7, 5, 2, CURDATE(), 'Cancelada', 'Basico'),
-('WG12355', 7, 5, 1, CURDATE(), 'Pendente', 'Basico');
-
-
+('WG12345', 2, 3, 1, CURDATE(), 'Pendente', 'Basico');
+ 
+-- ========================
+-- TABELA: Denuncias
+-- ========================
 CREATE TABLE Denuncias (
     id INT AUTO_INCREMENT PRIMARY KEY,
     denunciante_id INT,
@@ -205,8 +220,16 @@ CREATE TABLE Denuncias (
     FOREIGN KEY (denunciante_id) REFERENCES Utilizadores(id),
     FOREIGN KEY (denunciado_id) REFERENCES Utilizadores(id)
 );
-
-
+ 
+SELECT * FROM Utilizadores;
+ 
+INSERT INTO Denuncias (denunciante_id, denunciado_id, descricao)
+VALUES 
+(2, 3, 'Produto não entregue.');
+ 
+-- ========================
+-- TABELA: Historico_Produtos
+-- ========================
 CREATE TABLE Historico_Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     encomenda_id INT,
@@ -215,8 +238,10 @@ CREATE TABLE Historico_Produtos (
     data_atualizacao DATE DEFAULT (CURDATE()),
     FOREIGN KEY (encomenda_id) REFERENCES Encomendas(id)
 );
+
 INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao)
 VALUES 
+(1, 'Em trânsito', 'A encomenda saiu do centro de distribuição.');
 (2, 'Entregue', 'Produto entregue ao cliente.'),
 (3, 'Em trânsito', 'Produto enviado pela transportadora.'),
 (4, 'Entregue', 'Entrega concluída.'),
