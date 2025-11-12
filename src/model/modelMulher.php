@@ -70,8 +70,7 @@ function getProdutoMulherMostrar($ID_Produto){
                 $msg .= "<p class='text-muted mb-2'>Estado: <span class='fw-semibold'>".$rowProduto["estado"]."</span></p>";
                 $msg .= "<h4 class='fw-bold text-success mb-3'>".$rowProduto["preco"]."€</h4>";
                 $msg .= "<p class='mb-4'>";
-                $msg .= "Blusa colorida da Custo Barcelona nunca usada, com etiqueta.";
-                $msg .= "</p>";
+                $msg .= "<p class='mb-4'>".$rowProduto["descricao"]."</p>";
                 $msg .= "<div class='d-flex gap-3 mb-4'>";
                 $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
                 $msg .= "data-id='".$rowProduto['id']."'>";
