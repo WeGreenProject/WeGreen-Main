@@ -37,7 +37,7 @@ function getProdutoMulherMostrar($ID_Produto){
         $rowProduto = "";
         $rowFoto = "";
 
-        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.* FROM Produtos WHERE id = " . $ID_Produto;
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
         $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE produto_id = $ID_Produto";
         $result = $conn->query($sql);
         $result2 = $conn->query($sql2);
@@ -81,14 +81,14 @@ function getProdutoMulherMostrar($ID_Produto){
                 $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
                 $msg .= "<div class='d-flex align-items-center'>";
                 $msg .= "<div class='position-relative me-3'>";
-                $msg .= "<img src='src/img/pexels-olly-733872.jpg' class='rounded-circle border border-2 border-success shadow-sm' width='90' height='90' style='object-fit: cover;'>";
+                $msg .= "<img src='".$rowProduto["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm' width='90' height='90' style='object-fit: cover;'>";
                 $msg .= "</div>";
                 $msg .= "<div>";
-                $msg .= "<h5 class='fw-bold text-wegreen-accent mb-1'>Maria Santos</h5>";
+                $msg .= "<h5 class='fw-bold text-wegreen-accent mb-1'>".$rowProduto["NomeAnunciante"]."</h5>";
                 $msg .= "<div class='text-muted small mb-2 d-flex align-items-center'><i class='bi bi-geo-alt-fill me-1 text-success'></i> Lisboa, Portugal</div>";
                 $msg .= "<div class='mb-2'><span class='badge bg-success-subtle text-success border border-success fw-semibold rounded-pill px-3 py-1'><i class='bi bi-patch-check-fill'></i> Top Anunciante</span></div>";
                 $msg .= "<div class='text-muted small mb-2'>Anúncios: <span class='fw-semibold text-dark'>8</span> · Vendidos: <span class='fw-semibold text-dark'>15</span></div>";
-                $msg .= "<div class='text-muted small d-flex align-items-center'><i class='bi bi-stars text-success me-1'></i> Pontos de Confiança: <span class='fw-semibold text-dark ms-1'>120</span></div>";
+                $msg .= "<div class='text-muted small d-flex align-items-center'><i class='bi bi-stars text-success me-1'></i> Pontos de Confiança: <span class='fw-semibold text-dark ms-1'>".$rowProduto["PontosConfianca"]."</span></div>";
                 $msg .= "<div class='progress my-2' style='height: 8px; border-radius: 8px; background-color: #e9f7ef;'><div class='progress-bar bg-success' role='progressbar' style='width: 85%;'></div></div>";
                 $msg .= "<div class='small text-success fw-semibold'>Nível: 85%</div>";
                 $msg .= "</div>";
