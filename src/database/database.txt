@@ -105,22 +105,26 @@ CREATE TABLE Produtos (
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
 ALTER TABLE Produtos
+ADD COLUMN genero VARCHAR(20),
 ADD COLUMN tamanho VARCHAR(30),
 ADD COLUMN estado VARCHAR(20),
 ADD COLUMN descricao VARCHAR(255);
  
-INSERT INTO Produtos (nome, tipo_produto_id, preco, foto, anunciante_id, tamanho, estado, descricao)
+INSERT INTO Produtos 
+(nome, genero, tipo_produto_id, preco, foto, anunciante_id, tamanho, estado, descricao)
 VALUES
-('Blusa Colorida Custo Barcelona', 4, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 3, 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.'),
-('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src\img\camisapolotommy.jpg', 3, 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.'),
-('Tênis Adidas UltraBoost', 2, 249.99, 'src\img\Sapatilhas_Ultraboost_5x_Preto_IH3110.avif', 3, '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.'),
-('Bolsa de Couro Michael Kors', 3, 359.99, 'src\img\bolsamichaelkros.webp', 3, 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.'),
-('Creme Hidratante Nivea', 4, 29.90, 'creme_nivea.jpg', 3, 'Único tamanho', 'Novo', 'Creme hidratante Nivea para todos os tipos de pele, ideal para uso diário.'),
-('Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src\img\s-l1200.webp', 3, 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.'),
-('Casaco Verde Pistachio',1, 139.90, 'src\img\claudia-alpaca-pistachio-jumpernaz-6377511.webp','3','S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio'.)
-('Ténis Azuis Vegan', 1, 69.90, 'src/img/MG_7966.webp', 3, '38', 'Novo', 'Tenis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.'),
-('Calça de ganga em algodão, 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 3, '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.'),
-('Mala Chloe Paddigton', 1, 235.00, 'src/img/Chloé Paddington bag.jpeg', 3, 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.');
+('Blusa Colorida Custo Barcelona', 'Mulher', 4, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 3, 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.'),
+('Sweatshirt North Face', 'Criança', 4, 18.00, 'src\img\image22.webp', 3, '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.'),
+('Botas Timbaland', 'Criança', 4, 26.00, 'src\img\image66.webp', 3, '10 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.'),
+('Camisa Polo Tommy Hilfiger', 'Homem', 1, 79.90, 'src/img/camisapolotommy.jpg', 3, 'M', 'Novo', 'Botas de chuva Timbaland, nunca usada, com etiqueta.'),
+('Tênis Adidas UltraBoost', 'Homem', 2, 249.99, 'src/img/Sapatilhas_Ultraboost_5x_Preto_IH3110.avif', 3, '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.'),
+('Bolsa de Couro Michael Kors', 'Mulher', 3, 359.99, 'src/img/bolsamichaelkros.webp', 3, 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.'),
+('Creme Hidratante Nivea', 'Mulher', 4, 29.90, 'src/img/creme_nivea.jpg', 3, 'Único tamanho', 'Novo', 'Creme hidratante Nivea para todos os tipos de pele, ideal para uso diário.'),
+('Fone de Ouvido Bose QuietComfort 35', 'Homem', 5, 899.00, 'src/img/s-l1200.webp', 3, 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.'),
+('Casaco Verde Pistachio', 'Mulher', 1, 139.90, 'src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp', 3, 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.'),
+('Ténis Azuis Vegan', 'Mulher', 1, 69.90, 'src/img/MG_7966.webp', 3, '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.'),
+('Calça de ganga em algodão', 'Criança', 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 3, '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.'),
+('Mala Chloe Paddigton', 'Mulher', 1, 235.00, 'src/img/Chloé Paddington bag.jpeg', 3, 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.');
 
 -- ========================
 -- TABELA: Mensagens
