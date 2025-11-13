@@ -43,18 +43,30 @@
             margin-bottom: 20px;
             border-bottom: 1px solid #2a2a2a;
             background: #1a1a1a;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo:hover {
+            opacity: 0.85;
         }
 
         .logo-icon {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            background: #ffffff;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.25);
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .logo-text h1 {
@@ -481,13 +493,15 @@
 <body>
     <div class="container">
         <aside class="sidebar">
-            <div class="logo">
-                <span class="logo-icon">👔</span>
+            <a href="" class="logo" style="text-decoration: none;">
+                <div class="logo-icon">
+                    <a href=""><img alt="Logo" src="assets/media/logos/WeGreen-SemFundo.png" class="h-25px theme-light-show"/></a>
+                </div>
                 <div class="logo-text">
-                    <h1>Fashion Store</h1>
+                    <h1>WeGrenn</h1>
                     <p>Painel do Anunciante</p>
                 </div>
-            </div>
+            </a>
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
@@ -1001,14 +1015,13 @@
             alert('Produto adicionado com sucesso!');
         });
 
-        // Fechar modal ao clicar fora
+        
         document.getElementById('productModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
 
-        // Inicializar dashboard
         updateDashboard();
     </script>
 </body>
