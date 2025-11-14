@@ -9,7 +9,7 @@ if ($_POST['op'] == 1) {
     echo $resp;
 }
 if ($_POST['op'] == 2) {
-    $resp = $func->getProdutosAprovar();
+    $resp = $func->getProdutosAprovar($_POST['estado']);
     echo $resp;
 }
 if ($_POST['op'] == 3) {
@@ -22,6 +22,10 @@ if ($_POST['op'] == 4) {
 }
 if ($_POST['op'] == 5) {
     $resp = $func->getProdutosRejeitado();
+    echo $resp;
+}
+if ($_POST['op'] == 6) {
+    $resp = $func->getFiltro();
     echo $resp;
 }
 ?>
