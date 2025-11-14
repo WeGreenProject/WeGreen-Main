@@ -207,30 +207,32 @@ CREATE TABLE Encomendas (
     cliente_id INT,
     anunciante_id INT,
     transportadora_id INT,
+    produto_id int,
+    TipoProdutoNome int,
     data_envio DATE,
+    morada varchar(250),
     estado VARCHAR(250),
     plano_rastreio VARCHAR(250),
     FOREIGN KEY (cliente_id) REFERENCES Utilizadores(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (transportadora_id) REFERENCES Transportadora(id)
+    FOREIGN KEY (produto_id) REFERENCES Produtos(id),
+    FOREIGN KEY (transportadora_id) REFERENCES Transportadora(id),
+    FOREIGN KEY (TipoProdutoNome) REFERENCES Tipo_Produtos(id)
 );
-
-INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, data_envio, estado, plano_rastreio)
+INSERT INTO Encomendas 
+(codigo_encomenda, cliente_id, anunciante_id, transportadora_id, produto_id, TipoProdutoNome, data_envio, morada, estado, plano_rastreio)
 VALUES 
-('WG12345', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico');
-
-INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, data_envio, estado, plano_rastreio)
-VALUES 
-('WG12346', 2, 3, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12347', 7, 3, 2, CURDATE(), 'Em trânsito', 'Basico'),
-('WG12352', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico'),
-('WG12353', 7, 3, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12348', 2, 4, 1, CURDATE(), 'Entregue', 'Avancado'),
-('WG12349', 7, 4, 2, CURDATE(), 'Pendente', 'Avancado'),
-('WG12354', 2, 4, 2, CURDATE(), 'Entregue', 'Avancado'),
-('WG12350', 2, 5, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12351', 7, 5, 2, CURDATE(), 'Cancelada', 'Basico'),
-('WG12355', 7, 5, 1, CURDATE(), 'Pendente', 'Basico');
+('WG12345', 2, 3, 1, 1, 1, CURDATE(), 'Rua das Flores 15, Lisboa', 'Pendente', 'Básico'),
+('WG12346', 2, 3, 1, 2, 1, CURDATE(), 'Av. do Mar 20, Porto', 'Entregue', 'Básico'),
+('WG12347', 7, 3, 2, 3, 2, CURDATE(), 'Rua Central 12, Coimbra', 'Pendente', 'Básico'),
+('WG12352', 2, 3, 1, 4, 3, CURDATE(), 'Rua Nova 8, Braga', 'Pendente', 'Básico'),
+('WG12353', 7, 3, 1, 5, 1, CURDATE(), 'Av. das Oliveiras 30, Setúbal', 'Entregue', 'Básico'),
+('WG12348', 2, 1, 1, 6, 5, CURDATE(), 'Rua Verde 5, Faro', 'Entregue', 'Avançado'),
+('WG12349', 7, 1, 2, 7, 4, CURDATE(), 'Rua do Sol 40, Lisboa', 'Pendente', 'Avançado'),
+('WG12354', 2, 1, 2, 1, 1, CURDATE(), 'Rua das Amendoeiras 22, Coimbra', 'Entregue', 'Avançado'),
+('WG12350', 2, 4, 1, 2, 1, CURDATE(), 'Av. dos Descobrimentos 50, Aveiro', 'Entregue', 'Básico'),
+('WG12351', 7, 4, 2, 3, 2, CURDATE(), 'Rua dos Cedros 18, Leiria', 'Cancelada', 'Básico'),
+('WG12355', 7, 4, 1, 4, 3, CURDATE(), 'Rua da Alegria 7, Viseu', 'Pendente', 'Básico');
 
 -- ========================
 -- TABELA: Denuncias
