@@ -8,7 +8,7 @@ function getProdutosMulher(){
         $msg = "";
         $row = "";
 
-        $sql = "SELECT produtos.* FROM produtos;";
+        $sql = "SELECT produtos.* FROM produtos where produtos.genero LIKE 'Mulher';";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -36,11 +36,18 @@ function getProdutoMulherMostrar($ID_Produto){
         $msg = "";
         $rowProduto = "";
         $rowFoto = "";
-
-        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
+        
+        
+        $sql = "SELECT (SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id) AS TotalAnuncios, Produtos.foto AS FotoProduto, Produtos.*, utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca,utilizadores.foto AS FotoPerfil,ranking.nome AS RankingAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS Vendidos
+        FROM Produtos
+        JOIN utilizadores ON produtos.anunciante_id = utilizadores.id
+        JOIN ranking ON utilizadores.ranking_id = ranking.id
+        LEFT JOIN vendas ON utilizadores.id = vendas.anunciante_id AND produtos.id = vendas.produto_id
+        WHERE Produtos.id = $ID_Produto";
         $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE produto_id = $ID_Produto";
         $result = $conn->query($sql);
         $result2 = $conn->query($sql2);
+      
         if ($result->num_rows > 0) {
               while ($rowProduto = $result->fetch_assoc()) {
                 $msg .= "<div class='col-md-6'>";
@@ -85,11 +92,10 @@ function getProdutoMulherMostrar($ID_Produto){
                 $msg .= "<div>";
                 $msg .= "<h5 class='fw-bold text-wegreen-accent mb-1'>".$rowProduto["NomeAnunciante"]."</h5>";
                 $msg .= "<div class='text-muted small mb-2 d-flex align-items-center'><i class='bi bi-geo-alt-fill me-1 text-success'></i> Lisboa, Portugal</div>";
-                $msg .= "<div class='mb-2'><span class='badge bg-success-subtle text-success border border-success fw-semibold rounded-pill px-3 py-1'><i class='bi bi-patch-check-fill'></i> Top Anunciante</span></div>";
-                $msg .= "<div class='text-muted small mb-2'>Anúncios: <span class='fw-semibold text-dark'>8</span> · Vendidos: <span class='fw-semibold text-dark'>15</span></div>";
+                $msg .= "<div class='mb-2'><span class='badge bg-success-subtle text-success border border-success fw-semibold rounded-pill px-3 py-1'><i class='bi bi-patch-check-fill'></i> Rank: ".$rowProduto["RankingAnunciante"]."</span></div>";
+                $msg .= "<div class='text-muted small mb-2'>Anúncios: <span class='fw-semibold text-dark'>".$rowProduto["TotalAnuncios"]."</span> · Vendidos: <span class='fw-semibold text-dark'>".$rowProduto["Vendidos"]."</span></div>";
                 $msg .= "<div class='text-muted small d-flex align-items-center'><i class='bi bi-stars text-success me-1'></i> Pontos de Confiança: <span class='fw-semibold text-dark ms-1'>".$rowProduto["PontosConfianca"]."</span></div>";
-                $msg .= "<div class='progress my-2' style='height: 8px; border-radius: 8px; background-color: #e9f7ef;'><div class='progress-bar bg-success' role='progressbar' style='width: 85%;'></div></div>";
-                $msg .= "<div class='small text-success fw-semibold'>Nível: 85%</div>";
+                $msg .= "<div class='progress my-2' style='height: 8px; border-radius: 8px; background-color: #e9f7ef;'><div class='progress-bar bg-success' role='progressbar' style='width:" .$rowProduto["PontosConfianca"]."%;'></div></div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
 
