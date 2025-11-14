@@ -1,3 +1,8 @@
+<?php
+    session_start();
+
+    if($_SESSION['tipo'] == 1){ 
+?>
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -18,6 +23,7 @@
     <script src="src/js/lib/sweatalert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
+
 
 <body>
     <div class="container">
@@ -98,7 +104,6 @@
                 <p>Revise e aprove produtos pendentes de fornecedores</p>
             </div>
 
-            <!-- Estatísticas de Aprovação -->
             <div class="approval-stats">
                 <div class="approval-stat-card" id="Pendentes">
                 </div>
@@ -109,30 +114,22 @@
             </div>
 
             <!-- Filtros -->
-            <div class="approval-filters" id="">
-                <button class="filter-btn active">
-                    Todos <span class="filter-badge" id="allBadge">0</span>
-                </button>
-                <button class="filter-btn">
-                    Pendentes <span class="filter-badge" id="pendingBadge">0</span>
-                </button>
-                <button class="filter-btn">
-                    Aprovados <span class="filter-badge" id="approvedBadge">0</span>
-                </button>
-                <button class="filter-btn">
-                    Rejeitados <span class="filter-badge" id="rejectedBadge">0</span>
-                </button>
+            <div class="approval-filters" id="Filtros">
+
             </div>
-            <div class="table-container" id="tableAprovar">
-                <table>
+            <div class="table-container">
+                <table id="tableAprovar" class="display">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nome</th>
+                            <th>Nome Encomenda</th>
                             <th>Preço</th>
                             <th>Anunciante</th>
-                            <th>Tipo_Produto</th>
+                            <th>Cliente</th>
+                            <th>Plano</th>
+                            <th>Tipo_produto</th>
                             <th>Data</th>
+                            <th>Morada</th>
                             <th>Status</th>
                             <th>Aceitar</th>
                             <th>Recusar</th>
@@ -145,6 +142,12 @@
         </main>
     </div>
 </body>
+<?php
+}else{
+echo "sem permissão!";
+}
+
+?>
 <script src="src/js/ProdutosAdmin.js"></script>
 
 </html>
