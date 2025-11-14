@@ -102,6 +102,7 @@ CREATE TABLE Produtos (
     foto VARCHAR(255),
 	genero VARCHAR(255),  
     anunciante_id INT,
+    designer_id INT DEFAULT NULL
     marca VARCHAR(30),
     tamanho VARCHAR(30),
     estado VARCHAR(20),

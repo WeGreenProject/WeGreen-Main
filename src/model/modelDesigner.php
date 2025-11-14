@@ -1,14 +1,14 @@
 <?php
 require_once 'connection.php';
 
-class Homem {
+class Designer {
 
-function getProdutosHomem(){
+function getProdutosDesigner(){
         global $conn;
         $msg = "";
         $row = "";
 
-        $sql = "SELECT produtos.* FROM produtos where produtos.genero LIKE 'Homem';";
+        $sql = "SELECT produtos.* FROM produtos;";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -20,7 +20,7 @@ function getProdutosHomem(){
                 $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
                 $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
                 $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoHomemMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                $msg .= "<a href='ProdutoDesignerMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
@@ -31,7 +31,7 @@ function getProdutosHomem(){
 
     }
 }
-function getProdutoHomemMostrar($ID_Produto){
+function getProdutoDesignerMostrar($ID_Produto){
         global $conn;
         $msg = "";
         $rowProduto = "";
