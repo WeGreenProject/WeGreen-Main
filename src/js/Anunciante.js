@@ -64,12 +64,34 @@ function CarregaPontos() {
         alert("Erro ao carregar Pontos: " + textStatus);
     });
 }
+function getGastos()
+{
+    let dados = new FormData();
+    dados.append("op", 4);
 
-// ========================
-// FUNÇÕES PARA GRÁFICOS
-// ========================
+    $.ajax({
+    url: "src/controller/controllerDashboardAnunciante.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function(msg) {
+    console.log("Resposta dos gastos:", msg);
+    $('#GastosCard').html("<h1>TESTE</h1>");
+})
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
 
-function getVendasGrafico() {
+}
+
+
+function getVendasMensais() {
     $.ajax({
         url: "src/controller/controllerDashboardAdmin.php",
         type: "POST",
@@ -258,14 +280,12 @@ function renderMarginChart() {
     });
 }
 
-// ========================
-// FUNÇÃO PRINCIPAL PARA ATUALIZAR DASHBOARD
-// ========================
 
 function updateDashboard() {
     getDadosPlanos();
     CarregaProdutos();
     CarregaPontos();
+    CarregaGastos();
     renderSalesChart();
     renderTopProductsChart();
     renderRecentProducts();
@@ -273,9 +293,6 @@ function updateDashboard() {
     renderMarginChart();
 }
 
-// ========================
-// INICIALIZAÇÃO
-// ========================
 $(document).ready(function() {
     updateDashboard();
 });

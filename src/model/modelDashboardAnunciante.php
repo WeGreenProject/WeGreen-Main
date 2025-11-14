@@ -64,6 +64,9 @@ class DashboardAnunciante {
         return $msg;
     }
 
+
+
+
     function CarregaPontos($ID_User) {
         global $conn;
         $msg = "";
@@ -87,14 +90,39 @@ class DashboardAnunciante {
         return $msg;
     }
 
-    // =========================
-    // GRÁFICOS
-    // =========================
+    function getGastos(){
+    global $conn;
+
+    $msg = "";
+
+    $sql = "SELECT SUM(gastos.valor) AS TotalGastos FROM gastos";
+    $result = $conn->query($sql);
+
+    $novos = $this->getNovosGastos(); 
+
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+
+        $msg  = "<div class='stat-icon'>💸</div>";
+        $msg .= "<div class='stat-label'>Gastos Totais</div>";
+        $msg .= "<div class='stat-value'>".$row['TotalGastos']."€</div>";
+        $msg .= "<div class='stat-change'>+ ".$novos."€ gastos recentes</div>";
+
+    } else {
+
+        $msg  = "<div class='stat-icon'>💸</div>";
+        $msg .= "<div class='stat-label'>Gastos Totais</div>";
+        $msg .= "<div class='stat-value'>Nenhum gasto encontrado</div>";
+
+    }
+
+    return $msg;
+}
+
 
     function getVendasMensais($ID_User) {
         global $conn;
-        $dados = array_fill(1, 12, 0); // inicializa meses de 1 a 12
-
+        $dados = array_fill(1, 12, 0); 
         $sql = "SELECT MONTH(data_venda) AS mes, SUM(valor) AS total
                 FROM Vendas
                 WHERE anunciante_id = $ID_User

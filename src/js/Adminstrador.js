@@ -94,30 +94,7 @@ function getGastos()
     });
 
 }
-function getGastos()
-{
-    let dados = new FormData();
-    dados.append("op", 4);
 
-    $.ajax({
-    url: "src/controller/controllerDashboardAdmin.php",
-    method: "POST",
-    data: dados,
-    dataType: "html",
-    cache: false,
-    contentType: false,
-    processData: false
-    })
-    
-    .done(function( msg ) {
-         $('#GastosCard').html(msg);
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
-    });
-
-}
 function getVendasGrafico() {
     $.ajax({
         url: "src/controller/controllerDashboardAdmin.php",

@@ -80,8 +80,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
                 <div class="stats-grid">
                     <div class="stat-card" id="PontosConfianca"></div>
-                    <div class="stat-card" id="GastosCard">
-                    </div>
+                    <div class="stat-card" id="GastosCard"></div>
                     <div class="stat-card" id="ProdutoStock"></div>
                     <div class="stat-card" id="PlanosAtual"></div>
                 </div>
