@@ -3,10 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Wegreen | Criança</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="src/css/style.css">
+  <link rel="stylesheet" href="src/css/lib/datatables.css">
+  <link rel="stylesheet" href="src/css/lib/select2.css">
+
+  <script src="src/js/lib/jquery.js"></script>
+  <script src="src/js/lib/datatables.js"></script>
+  <script src="src/js/lib/select2.js"></script>
+  <script src="src/js/lib/sweatalert.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
      <header class="header-main text-white position-absolute w-100 z-3">
@@ -172,98 +180,7 @@
   </div>
 
   <div id="listaProdutos" class="row g-4">
-
-    <div class="row g-4">
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/435e5ceb4782b9d64d6fd8f6b98b8c43.jpg" class="card-img-top rounded-top-4" alt="Sweatshirt Billabong">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Vestido Florido Kiabi</h6>
-            <p class="text-muted mb-1">Petit Bataeu · 5-6 anos · Excelente </p>
-            <p class="fw-semibold">€10.99</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-<div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/b84f331b41a9186e8f11148934c4f96e.jpg" class="card-img-top rounded-top-4" alt="Blusa GAP">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Vestido Gnaga</h6>
-            <p class="text-muted mb-1">Kiabi · 3-4 anos · Excelente</p>
-            <p class="fw-semibold">€12,90</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/5a461b2559677e9ce79d2b9fcef3d180.jpg" class="card-img-top rounded-top-4" alt="Calças ganga">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Vestido Flores e Riscas </h6>
-            <p class="text-muted mb-1">Kiabi · 5-6 anos · Como Novo</p>
-            <p class="fw-semibold">€15,40</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/70b24c5a1d27c0c01db26dfa6fbc863e.jpg" class="card-img-top rounded-top-4" alt="Calcas Levis">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Tenis Ganga</h6>
-            <p class="text-muted mb-1">Petit Bataeu · 3-4 anos · Como Novo</p>
-            <p class="fw-semibold">€29,00</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/287b9e204dcef3b9b5ff0325651ea8b1.jpg" class="card-img-top rounded-top-4" alt="Bone Nike">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Boné vintage adidas</h6>
-            <p class="text-muted mb-1">Adidas · M · Excelente </p>
-            <p class="fw-semibold">€25,00</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/c7207ee168469ab3d8d156219a152fd2.jpg"card-img-top rounded-top-4" alt="Sapatilhas Converse">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Sapatilhas Converse One Star</h6>
-            <p class="text-muted mb-1">Converse · 39.5 · Excelente</p>
-            <p class="fw-semibold">78,20</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/2e9f7de6e5f076619e8c6ebc71b16a15.jpg" class="card-img-top rounded-top-4" alt="Vestido de Verão">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Casaco Inverno Timabaland</h6>
-            <p class="text-muted mb-1">Timbaland · M · Bom</p>
-            <p class="fw-semibold">€25,00</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/245641d9ad0561ef54b3b05130c6b2de.jpg" class="card-img-top rounded-top-4" alt="Casaco em Fibras Recicladas">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">T-shirt Red Hot Chili Peppers 2001</h6>
-            <p class="text-muted mb-1">Red Hot Chili Peppers · L · Como Novo</p>
-            <p class="fw-semibold">€22,00</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-    </div>
+ <div class="row g-4" id="ProdutoCriançaVenda"></div>
   </main>
 
   <footer class="bg-dark text-white pt-5 pb-3 mt-5">
@@ -325,7 +242,8 @@
     </div>
   </footer>
    
-  <script src="src/js/homem.js"></script>
+  <script src="src/js/criança.js"></script>
+  <script src="src/js/homepage.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

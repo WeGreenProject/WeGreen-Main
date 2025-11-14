@@ -100,6 +100,7 @@ CREATE TABLE Produtos (
     tipo_produto_id INT,
     preco DECIMAL(10,2),
     foto VARCHAR(255),
+	genero VARCHAR(255),  
     anunciante_id INT,
     marca VARCHAR(30),
     tamanho VARCHAR(30),
@@ -110,15 +111,27 @@ CREATE TABLE Produtos (
     FOREIGN KEY (tipo_produto_id) REFERENCES Tipo_Produtos(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
-INSERT INTO Produtos (nome, tipo_produto_id, preco, foto, anunciante_id, tamanho, estado, descricao,marca)
+INSERT INTO Produtos 
+(nome, tipo_produto_id, preco, foto, genero, anunciante_id, marca, tamanho, estado, descricao)
 VALUES
-('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 1, 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.','Custo Barcelona'),
-('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 3, 'S', 'Como Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.','Versace'),
-('Calças de ganga Low Rise', 2, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 3, 'S', 'Excelente', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.','NYWS'),
-('Botas pele', 3, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 3, '38', 'Como Novo', 'Bolsa de couro Michael Kors, elegância e sofisticação em um único produto.','Ana Salazar'),
-('Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 3, 'M', 'Excelente', 'Creme hidratante Nivea para todos os tipos de pele, ideal para uso diário.','Miss Sixty'),
-('Leggings Yoga', 5, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 3, 'XS', 'Excelente', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.','Abercrombie & Fitch'),
-('Casaco Desportivo Nike', 4, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 3, 'L', 'Como Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.','Nike');
+('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', 1, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.'),
+('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.'),
+('Calças de ganga Low Rise', 2, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Homem', 3, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.'),
+('Botas pele', 3, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', 3, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.'),
+('Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', 3, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.'),
+('Leggings Yoga', 5, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', 3, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.'),
+('Casaco Desportivo Nike', 4, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', 3, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.'),
+('Sweatshirt North Face', 4, 18.00, 'src/img/image22.webp', 'Criança', 3, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.'),
+('Botas Timbaland', 3, 26.00, 'src/img/image66.webp', 'Criança', 3, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.'),
+('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', 3, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.'),
+('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/Sapatilhas_Ultraboost_5x_Preto_IH3110.avif', 'Homem', 3, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.'),
+('Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/bolsamichaelkros.webp', 'Mulher', 3, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.'),
+('Creme Hidratante Nivea', 5, 29.90, 'src/img/creme_nivea.jpg', 'Mulher', 3, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea para todos os tipos de pele, ideal para uso diário.'),
+('Fone de Ouvido Bose QuietComfort 35', 4, 899.00, 'src/img/s-l1200.webp', 'Homem', 3, 'Bose', 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.'),
+('Casaco Verde Pistachio', 1, 139.90, 'src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp', 'Mulher', 3, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.'),
+('Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', 3, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.'),
+('Calça de ganga em algodão', 2, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', 3, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.'),
+('Mala Chloe Paddigton', 5, 235.00, 'src/img/Chloé Paddington bag.jpeg', 'Mulher', 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.');
 
 CREATE TABLE Produto_Fotos (
     id INT AUTO_INCREMENT PRIMARY KEY,
