@@ -295,6 +295,7 @@
         gap: 10px;
         margin-bottom: 30px;
         flex-wrap: wrap;
+        align-items: center;
     }
 
     .filter-btn {
@@ -652,3 +653,72 @@
             flex-direction: column;
         }
     }
+    #tableAprovar {
+    width: 101% !important;
+}
+        .simple-add-section {
+            margin-bottom: 0px;
+            display: flex;
+            justify-content: flex-start;
+            margin-right: auto;
+        }
+                .btn-add-order:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(90deg, #ffed4e 0%, #ffd700 100%);
+        }
+
+        .btn-add-order:active {
+            transform: translateY(-1px);
+        }
+                .btn-icon {
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+         .btn-add-order {
+            background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
+            border: 2px solid #ffd700;
+            color: #000;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-add-order:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+            background: linear-gradient(90deg, #ffed4e 0%, #ffd700 100%);
+        }
+
+        .btn-add-order:active {
+            transform: translateY(-1px);
+        }
+        .add-order-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+                        .add-order-section {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .btn-add-order {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+

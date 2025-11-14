@@ -10,7 +10,6 @@ class Login{
     $msg = "";
     $flag = true;
     session_start();
-
     $stmt = $conn->prepare("SELECT * FROM Utilizadores WHERE nome = ? AND password = ?");
     $stmt->bind_param("ss", $username, $pw);
     $stmt->execute();
@@ -39,7 +38,7 @@ class Login{
     $stmt->close();
     $conn->close();
 
-        return (json_encode(array(
+    return (json_encode(array(
         "msg" => $msg,
         "flag" => $flag
         )));

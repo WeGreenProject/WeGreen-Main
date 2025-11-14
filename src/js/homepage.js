@@ -79,7 +79,7 @@ function getDadosPlanos(){
 $(function() {
     getDadosTipoPerfil();
     getDadosPlanos();
-    getDadosProdutos();
+    // getDadosProdutos();
 });
 
 

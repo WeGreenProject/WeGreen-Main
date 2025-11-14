@@ -16,7 +16,7 @@ class Registo{
         $pontos_conf = 0;
         $tipo_utilizador_id = 2;
         $data_criacao = date('Y-m-d');
-        
+        $password = md5($password);
             $stmt = $conn->prepare("INSERT INTO Utilizadores 
                 (nome, email, nif, foto, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf, data_criacao)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");

@@ -8,7 +8,7 @@ function getProdutosHomem(){
         $msg = "";
         $row = "";
 
-        $sql = "SELECT produtos.* FROM produtos;";
+        $sql = "SELECT produtos.* FROM produtos where produtos.genero LIKE 'Homem';";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -20,7 +20,7 @@ function getProdutosHomem(){
                 $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
                 $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
                 $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                $msg .= "<a href='ProdutoHomemMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";

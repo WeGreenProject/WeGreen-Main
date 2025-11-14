@@ -21,7 +21,11 @@ function getDadosPerfil()
     alert( "Request failed: " + textStatus );
     });
 }
-function getProdutosAprovar(){
+function getProdutosAprovar(estado){
+
+    if (!estado) {
+        estado = 'Todos';
+    }
     
     if ( $.fn.DataTable.isDataTable('#productsAprovarTable') ) {
         $('#productsAprovarTable').DataTable().destroy();
@@ -29,8 +33,7 @@ function getProdutosAprovar(){
 
     let dados = new FormData();
     dados.append("op", 2);
-
-
+    dados.append("estado", estado);
     $.ajax({
     url: "src/controller/controllerProdutosAdmin.php",
     method: "POST",
@@ -51,6 +54,37 @@ function getProdutosAprovar(){
     .fail(function( jqXHR, textStatus ) {
     alert( "Request failed: " + textStatus );
 });
+
+}
+function getFiltro()
+{
+    let dados = new FormData();
+    dados.append("op",6);
+
+    $.ajax({
+    url: "src/controller/controllerProdutosAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#Filtros').html(msg);
+         $(".filter-btn").on("click", function() {
+            $(".filter-btn").removeClass("active");
+            $(this).addClass("active");
+
+        
+        });
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+    
 }
 function getProdutosPendentes(){
     
@@ -122,6 +156,7 @@ function getProdutosRejeitado()
     });
 }
 $(function() {
+    getFiltro();
     getProdutosRejeitado();
     getProdutosAprovado();
     getDadosPerfil();
