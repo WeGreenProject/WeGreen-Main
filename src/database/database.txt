@@ -1,6 +1,8 @@
 CREATE DATABASE WeGreen;
 USE WeGreen;
-
+-- ========================
+-- TABELA: Tipo_Utilizadores
+-- ========================
 CREATE TABLE Tipo_Utilizadores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(250) NOT NULL
@@ -11,7 +13,9 @@ INSERT INTO Tipo_Utilizadores (descricao) VALUES
 ('Cliente'),
 ('Anunciante');
 
-
+-- ========================
+-- TABELA: Planos
+-- ========================
 CREATE TABLE Planos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(200) NOT NULL,
@@ -26,7 +30,9 @@ INSERT INTO Planos (nome, preco, limite_produtos, rastreio_tipo, relatorio_pdf) 
 ('Premium', 25, 10, 'Basico', TRUE),
 ('Enterprise', 100, NULL, 'Avancado', TRUE);
 
-
+-- ========================
+-- TABELA: Ranking
+-- ========================
 CREATE TABLE Ranking (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(250),
@@ -38,7 +44,9 @@ INSERT INTO Ranking (nome, pontos) VALUES
 ('Ouro', 50),
 ('Diamante', 150);
 
-
+-- ========================
+-- TABELA: Utilizadores
+-- ========================
 CREATE TABLE Utilizadores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -59,7 +67,7 @@ INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, r
 VALUES 
 ('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,"src/img/pexels-beccacorreiaph-31095884.jpg"),
 ('João Silva', 'joao@wegreen.pt','cliente123', 2, 1, 1, 10,NULL),
-('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,NULL);
+('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,"src/img/pexels-olly-733872.jpg");
 
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
 VALUES 
@@ -68,22 +76,9 @@ VALUES
 ('Maria Luiza', 'Luiza@wegreen.pt','anunciante123', 3, 1, 3, 0,NULL),
 ('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,NULL);
 
-
-CREATE TABLE Loja (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(150) NOT NULL,
-    marca VARCHAR(150) NOT NULL,
-    preco DECIMAL(10,2) NOT NULL,
-    foto varchar(250) NOT NULL
-);
-
-INSERT INTO Loja (nome, marca, preco, foto) VALUES
-('Casaco Verde Pistácio', 'Naz', '139.90', "src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp"),
-('Ténis Azuis Vegan', 'Nea Vegan Shoes', '69.90', "src/img/MG_7966.webp"),
-('Calça de ganga em algodão', 'PlayUp', '64.00', "src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg"),
-('Mala Chloe Paddigton', 'Maria Lopes', '235.00', "src/img/Chloé Paddington bag.jpeg");
-
-
+-- ========================
+-- TABELA: Tipo_Produtos
+-- ========================
 CREATE TABLE Tipo_Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(100) NOT NULL
@@ -96,31 +91,66 @@ INSERT INTO Tipo_Produtos (descricao) VALUES
 ('Beleza'),
 ('Outros');
 
-
+-- ========================
+-- TABELA: Produtos
+-- ========================
 CREATE TABLE Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(150) NOT NULL,
-	descricão varchar(250),
     tipo_produto_id INT,
-    preco DECIMAL(10,2) NOT NULL, #Preco que queres vender (Custas - Preco = Lucro)
-	custo DECIMAL(10,2) NOT NULL, #Quanto custa o produto
-    foto VARCHAR(255) NOT NULL,
-    parceria varchar(250),
-    tamanho varchar(250),
+    preco DECIMAL(10,2),
+    foto VARCHAR(255),
+	genero VARCHAR(255),  
     anunciante_id INT,
+    designer_id INT DEFAULT NULL,
+    marca VARCHAR(30),
+    tamanho VARCHAR(30),
+    estado VARCHAR(20),
+    descricao VARCHAR(255),
     data_criacao DATE DEFAULT (CURDATE()),
-    estado varchar(250) NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (tipo_produto_id) REFERENCES Tipo_Produtos(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
 
-INSERT INTO Produtos (nome, tipo_produto_id, preco, foto, anunciante_id)
-VALUES 
-('T-Shirt Orgânica', 1, 19.99, 'tshirt.jpg', 3),
-('Tênis Sustentável', 2, 49.99, 'tenis.jpg', 3),
-('Relógio de Bambu', 3, 89.99, 'relogio.jpg', 3);
+INSERT INTO Produtos 
+(nome, tipo_produto_id, preco, foto, genero, designer_id, anunciante_id, marca, tamanho, estado, descricao)
+VALUES
+('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', NULL, 1, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.'),
+('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', NULL, 3, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.'),
+('Calças de ganga Low Rise', 2, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Homem', NULL, 3, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.'),
+('Botas pele', 3, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', NULL, 3, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.'),
+('Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', NULL, 3, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.'),
+('Leggings Yoga', 5, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', NULL, 3, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.'),
+('Casaco Desportivo Nike', 4, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', NULL, 3, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.'),
+('Sweatshirt North Face', 4, 18.00, 'src/img/image22.webp', 'Criança', NULL, 3, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.'),
+('Botas Timbaland', 3, 26.00, 'src/img/image66.webp', 'Criança', NULL, 3, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.'),
+('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', NULL, 3, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.'),
+('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/Sapatilhas_Ultraboost_5x_Preto_IH3110.avif', 'Homem', NULL, 3, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.'),
+('Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/bolsamichaelkros.webp', 'Mulher', NULL, 3, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.'),
+('Creme Hidratante Nivea', 5, 29.90, 'src/img/creme_nivea.jpg', 'Mulher', NULL, 3, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea para todos os tipos de pele, ideal para uso diário.'),
+('Fone de Ouvido Bose QuietComfort 35', 4, 899.00, 'src/img/s-l1200.webp', 'Homem', NULL, 3, 'Bose', 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.'),
+('Casaco Verde Pistachio', 1, 139.90, 'src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp', 'Mulher', NULL, 3, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.'),
+('Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', NULL, 3, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.'),
+('Calça de ganga em algodão', 2, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', NULL, 3, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.'),
+('Mala Chloe Paddigton', 5, 235.00, 'src/img/Chloé Paddington bag.jpeg', 'Mulher', NULL, 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.'),
+('Aneis feito de colher', 5, 8.00, 'src/img/c3e47d13835b4150d5c5b12242fbbab4.jpg', 'Mulher', 1, 3, 'AnaCarfts', 'Tamanho Único', 'Novo', 'Aneis feita com colheres.')
+('Colar Coração e Flor', 5, 15.00, 'src\img\9ee51071696bc0b089addeb4f0baaab9.jpg', 'Mulher', 1, 3, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar de coração e Flor feitas á mão.');
 
+CREATE TABLE Produto_Fotos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    produto_id INT NOT NULL,
+    foto VARCHAR(255) NOT NULL,
+    FOREIGN KEY (produto_id) REFERENCES Produtos(id) ON DELETE CASCADE
+);
+INSERT INTO Produto_Fotos (produto_id, foto) VALUES
+(1, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg'),
+(1, 'src/img/m83296720182_6.avif'),
+(1, 'src/img/m83296720182_5.avif');
 
+-- ========================
+-- TABELA: Mensagens
+-- ========================
 CREATE TABLE Mensagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     remetente_id INT,
@@ -139,7 +169,9 @@ INSERT INTO Mensagens (remetente_id, destinatario_id, mensagem)
 VALUES 
 (3, 2, 'Olá João! O seu pedido já foi enviado.');
 
-
+-- ========================
+-- TABELA: Rendimento
+-- ========================
 CREATE TABLE Rendimento (
     id INT AUTO_INCREMENT PRIMARY KEY,
     valor DECIMAL(10,2),
@@ -155,7 +187,9 @@ VALUES
 (5, 25,"Premium comprado!"),
 (null, 5,"Comissão cobrada!");
 
-
+-- ========================
+-- TABELA: Gastos
+-- ========================
 CREATE TABLE Gastos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     anunciante_id INT,
@@ -168,6 +202,10 @@ CREATE TABLE Gastos (
 INSERT INTO Gastos (anunciante_id, valor, descricao)
 VALUES (3, 50.00, 'Publicidade online');
 
+
+-- ========================
+-- TABELA: Transportadora
+-- ========================
 CREATE TABLE Transportadora (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome ENUM('CTT', 'DPD') NOT NULL
@@ -177,38 +215,45 @@ INSERT INTO Transportadora (nome) VALUES
 ('CTT'),
 ('DPD');
 
+-- ========================
+-- TABELA: Encomendas
+-- ========================
 CREATE TABLE Encomendas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     codigo_encomenda VARCHAR(50) UNIQUE,
     cliente_id INT,
     anunciante_id INT,
     transportadora_id INT,
+    produto_id int,
+    TipoProdutoNome int,
     data_envio DATE,
+    morada varchar(250),
     estado VARCHAR(250),
     plano_rastreio VARCHAR(250),
     FOREIGN KEY (cliente_id) REFERENCES Utilizadores(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (transportadora_id) REFERENCES Transportadora(id)
+    FOREIGN KEY (produto_id) REFERENCES Produtos(id),
+    FOREIGN KEY (transportadora_id) REFERENCES Transportadora(id),
+    FOREIGN KEY (TipoProdutoNome) REFERENCES Tipo_Produtos(id)
 );
-
-INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, data_envio, estado, plano_rastreio)
+INSERT INTO Encomendas 
+(codigo_encomenda, cliente_id, anunciante_id, transportadora_id, produto_id, TipoProdutoNome, data_envio, morada, estado, plano_rastreio)
 VALUES 
-('WG12345', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico');
+('WG12345', 2, 3, 1, 1, 1, CURDATE(), 'Rua das Flores 15, Lisboa', 'Pendente', 'Básico'),
+('WG12346', 2, 3, 1, 2, 1, CURDATE(), 'Av. do Mar 20, Porto', 'Entregue', 'Básico'),
+('WG12347', 7, 3, 2, 3, 2, CURDATE(), 'Rua Central 12, Coimbra', 'Pendente', 'Básico'),
+('WG12352', 2, 3, 1, 4, 3, CURDATE(), 'Rua Nova 8, Braga', 'Pendente', 'Básico'),
+('WG12353', 7, 3, 1, 5, 1, CURDATE(), 'Av. das Oliveiras 30, Setúbal', 'Entregue', 'Básico'),
+('WG12348', 2, 1, 1, 6, 5, CURDATE(), 'Rua Verde 5, Faro', 'Entregue', 'Avançado'),
+('WG12349', 7, 1, 2, 7, 4, CURDATE(), 'Rua do Sol 40, Lisboa', 'Pendente', 'Avançado'),
+('WG12354', 2, 1, 2, 1, 1, CURDATE(), 'Rua das Amendoeiras 22, Coimbra', 'Entregue', 'Avançado'),
+('WG12350', 2, 4, 1, 2, 1, CURDATE(), 'Av. dos Descobrimentos 50, Aveiro', 'Entregue', 'Básico'),
+('WG12351', 7, 4, 2, 3, 2, CURDATE(), 'Rua dos Cedros 18, Leiria', 'Cancelada', 'Básico'),
+('WG12355', 7, 4, 1, 4, 3, CURDATE(), 'Rua da Alegria 7, Viseu', 'Pendente', 'Básico');
 
-INSERT INTO Encomendas (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, data_envio, estado, plano_rastreio)
-VALUES 
-('WG12346', 2, 3, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12347', 7, 3, 2, CURDATE(), 'Em trânsito', 'Basico'),
-('WG12352', 2, 3, 1, CURDATE(), 'Em trânsito', 'Basico'),
-('WG12353', 7, 3, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12348', 2, 4, 1, CURDATE(), 'Entregue', 'Avancado'),
-('WG12349', 7, 4, 2, CURDATE(), 'Pendente', 'Avancado'),
-('WG12354', 2, 4, 2, CURDATE(), 'Entregue', 'Avancado'),
-('WG12350', 2, 5, 1, CURDATE(), 'Entregue', 'Basico'),
-('WG12351', 7, 5, 2, CURDATE(), 'Cancelada', 'Basico'),
-('WG12355', 7, 5, 1, CURDATE(), 'Pendente', 'Basico');
-
-
+-- ========================
+-- TABELA: Denuncias
+-- ========================
 CREATE TABLE Denuncias (
     id INT AUTO_INCREMENT PRIMARY KEY,
     denunciante_id INT,
@@ -222,6 +267,10 @@ CREATE TABLE Denuncias (
 );
 
 
+
+-- ========================
+-- TABELA: Historico_Produtos
+-- ========================
 CREATE TABLE Historico_Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     encomenda_id INT,
@@ -274,6 +323,5 @@ CREATE TABLE Planos_Ativos (
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
     FOREIGN KEY (plano_id) REFERENCES Planos(id)
 );
-
 INSERT INTO Planos_Ativos (anunciante_id, plano_id, data_inicio, ativo)
 VALUES (3, 2, CURDATE(), TRUE);

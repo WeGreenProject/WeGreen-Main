@@ -1,37 +1,41 @@
+<?php
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wegreen | Homem</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="src/css/style.css">
+    <title>Wegreen | Sweatshirt Billabong</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/style.css">
+      <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
-
+    <link rel="stylesheet" href="src/css/style.css">
+ 
     <script src="src/js/lib/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
      <header class="header-main text-white position-absolute w-100 z-3">
         <div class="container-fluid px-5">
             <nav class="navbar navbar-expand-lg py-3">
-                
-                <a class="navbar-brand me-4" href="index.html">
+               
+                <a class="navbar-brand me-4" href="#">
                     <img src="src/img/WeGreen-removebg-preview.png" alt="Wegreen Logo" class="logo-img">
                 </a>
-                
+               
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-
+ 
                 <div class="collapse navbar-collapse justify-content-start" id="navbarNav">
                     <ul class="navbar-nav mb-2 mb-lg-0">
-                        
+                       
                         <li class="nav-item dropdown mx-2">
                             <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mulher</a>
                             <ul class="dropdown-menu dropdown-menu-dark rounded-3">
@@ -42,7 +46,7 @@
                                 <li><a class="dropdown-item" href="#">Acessórios</a></li>
                             </ul>
                         </li>
-                        
+                       
                         <li class="nav-item dropdown mx-2">
                             <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Homem</a>
                             <ul class="dropdown-menu dropdown-menu-dark rounded-3">
@@ -52,7 +56,7 @@
                                 <li><a class="dropdown-item" href="#">Calçado</a></li>
                             </ul>
                         </li>
-
+ 
                         <li class="nav-item dropdown mx-2">
                             <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Crianças</a>
                             <ul class="dropdown-menu dropdown-menu-dark rounded-3">
@@ -65,10 +69,10 @@
                                 <li><a class="dropdown-item" href="#">Calçado</a></li>
                             </ul>
                         </li>
-                        
+                       
                         <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Designers</a></li>
                         <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Artesãos</a></li>
-                        
+                       
                         <li class="nav-item dropdown mx-2">
                             <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Marcas</a>
                             <ul class="dropdown-menu dropdown-menu-dark rounded-3">
@@ -81,16 +85,18 @@
                         </li>
                     </ul>
                 </div>
-                
+               
                 <div class="d-flex align-items-center ms-auto">
-                    
+                   
                     <form class="d-flex search-bar me-3" role="search">
                         <input class="form-control rounded-pill me-2 border-0 bg-secondary bg-opacity-25 text-white" type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
                         <button class="btn btn-outline-light rounded-pill" type="submit"><i class="bi bi-search"></i></button>
                     </form>
-
-                    <a class="nav-link text-white mx-2 fs-5" href="#"><i class="bi bi-bag"></i></a> 
-
+ 
+                      <a class="nav-link text-white mx-2 fs-5" href="#" id="btnCarrinho">
+                          <i class="bi bi-bag"></i>
+                      </a>
+ 
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="src/img/pexels-beccacorreiaph-31095884.jpg" class="rounded-circle profile-img-small me-1" alt="Perfil do Utilizador">
@@ -103,83 +109,143 @@
         </div>
     </header>
 <br>
-  <main class="container py-5 mt-5">
-    <h2 class="fw-bold text-center mb-5">Homem</h2>
-      <div class="row mb-4">
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="marcaSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Marca</option>
-        <option value="1">Nike</option>
-        <option value="2">Adidas</option>
-        <option value="3">GAP</option>
-        <option value="4">Billabong</option>
-        <option value="5">Levis</option>
-        <option value="6">Timbaland</option>
-      </select>
-    </div>
+ 
+        <main class="container my-5">
 
-     <div class="col-md-2 col-sm-6 mb-3">
-      <select id="precoSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Preço</option>
-        <option value="1">até €50</option>
-        <option value="2">€50 – €100</option>
-        <option value="3">€100 – €200</option>
-        <option value="4">Mais de €200</option>
-      </select>
+    <div class="col-md-6" id="Produto">
+ 
+ 
+    <div class="d-flex gap-3 mb-4">
+        <button
+    class="btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora"
+    data-id="1">
+    Comprar Agora
+    </button>
+ 
+      <button class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold">Chat com o vendedor</button>
     </div>
-
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="tamanhoSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Tamanho</option>
-        <option value="1">S</option>
-        <option value="2">M</option>
-        <option value="3">L</option>
-        <option value="4">XL</option>
-        <option value="5">XXL</option>
-        <option value="5">41</option>
-      </select>
-    </div>
-
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="corSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Cor</option>
-        <option value="1">Preto</option>
-        <option value="2">Azul</option>
-        <option value="3">Verde</option>
-        <option value="4">Branco</option>
-        <option value="5">Amarelo</option>
-        <option value="6">Vermelho</option>
-        <option value="7">Roxo</option>
-      </select>
-    </div>
-
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="estadoSelect" class="form-select rounded-pill fw-semibold" name="estado">
-        <option value="">Estado</option>
-        <option value="1">Como novo</option>
-        <option value="2">Excelente</option>
-        <option value="3">Bom</option>
-      </select>
-    </div>
-
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="materialSelect" class="form-select rounded-pill fw-semibold" name="material">
-        <option value="">Material</option>
-        <option value="1">Pele</option>
-        <option value="2">Ganga</option>
-        <option value="3">Algodão</option>
-        <option value="3">Poliester</option>
-      </select>
+ 
+    <div id="VendedorInfo" class="vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5">
+      <div class="d-flex align-items-center">
+        <div class="position-relative me-3">
+          <img src="src/img/pexels-olly-733872.jpg"
+               class="rounded-circle border border-2 border-success shadow-sm"
+               width="90" height="90"
+               style="object-fit: cover;">
+        </div>
+ 
+        <div>
+          <h5 class="fw-bold text-wegreen-accent mb-1">Beatriz Sousa</h5>
+          <div class="text-muted small mb-2 d-flex align-items-center">
+            <i class="bi bi-geo-alt-fill me-1 text-success"></i> Lisboa, Portugal
+          </div>
+          <div class="mb-2">
+            <span class="badge bg-success-subtle text-success border border-success fw-semibold rounded-pill px-3 py-1">
+              <i class="bi bi-patch-check-fill"></i> Top Vendedora
+            </span>
+          </div>
+ 
+          <div class="text-muted small mb-2">
+            Anúncios: <span class="fw-semibold text-dark">8</span> · Vendidos: <span class="fw-semibold text-dark">15</span>
+          </div>
+ 
+          <div class="text-muted small d-flex align-items-center">
+            <i class="bi bi-stars text-success me-1"></i> Pontos de Confiança:
+            <span class="fw-semibold text-dark ms-1">120</span>
+          </div>
+ 
+          <div class="progress my-2" style="height: 8px; border-radius: 8px; background-color: #e9f7ef;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 85%;"></div>
+          </div>
+          <div class="small text-success fw-semibold">Nível: 85%</div>
+        </div>
+      </div>
+ 
+      <div class="mt-3 mt-md-0">
+        <a href="perfil-vendedora.html"
+           class="btn btn-wegreen-accent rounded-pill fw-semibold shadow-sm px-4 py-2">
+          Ver Perfil1
+        </a>
+      </div>
     </div>
   </div>
-
-  <div id="listaProdutos" class="row g-4">
-
-    <div class="row g-4" id="ProdutoHomemVenda"></div>
-  </main>
-
-
-  <footer class="bg-dark text-white pt-5 pb-3 mt-5">
+</div>
+ 
+<div class="modal fade" id="modalProduto" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalNome"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <img id="modalFoto" src="" class="img-fluid mb-3">
+        <p>Preço: <span id="modalPreco"></span></p>
+        <p>Tamanho: <span id="modalTamanho"></span></p>
+        <p>Subtotal: <span id="modalSubtotal"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button id="modalComprarAgoraBotao" class="btn btn-success">Fazer Checkout</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+  <div id="ProdutosRelacionados" class="mt-5">
+    <h5 class="fw-bold mb-4">Produtos Relacionados</h5>
+    <div class="row g-4">
+     
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <img src="src/img/b7358d779d9fc865d22f428ec1641391.jpg" class="card-img-top rounded-top-4" alt="Botas Pele">
+          <div class="card-body text-center">
+            <h6 class="fw-bold mb-1">Botas Pele</h6>
+            <p class="text-muted mb-1">Ana Salazar · 38 · Como Novo</p>
+            <p class="fw-semibold">€79</p>
+            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <img src="src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg" class="card-img-top rounded-top-4" alt="Calças ganga">
+          <div class="card-body text-center">
+            <h6 class="fw-bold mb-1">Calças de ganga Low Rise</h6>
+            <p class="text-muted mb-1">NYWS · S · Excelente</p>
+            <p class="fw-semibold">€35,40</p>
+            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <img src="src/img/c5584a14a4d828c79754a5b553a3abe3.jpg" class="card-img-top rounded-top-4" alt="Casaco Nike">
+          <div class="card-body text-center">
+            <h6 class="fw-bold mb-1">Casaco Desportivo Nike</h6>
+            <p class="text-muted mb-1">Nike · L · Como Novo</p>
+            <p class="fw-semibold">€22,00</p>
+            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="col-md-3 col-sm-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <img src="src/img/58c4e54e715841986e82c05fb3506a0d.jpg" class="card-img-top rounded-top-4" alt="Blusão ganga">
+          <div class="card-body text-center">
+            <h6 class="fw-bold mb-1">Blusão de Ganga</h6>
+            <p class="text-muted mb-1">Miss Sixty · M · Excelente</p>
+            <p class="fw-semibold">€23,80</p>
+            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
+          </div>
+        </div>
+      </div>
+  </div>
+</main>
+ 
+ <footer class="bg-dark text-white pt-5 pb-3 mt-5">
     <div class="container">
       <div class="row gy-4 align-items-start">
         <div class="col-md-4 text-md-start">
@@ -197,7 +263,7 @@
             <a href="#" class="social-link text-wegreen-accent fs-5"><i class="bi bi-envelope"></i></a>
           </div>
         </div>
-
+ 
         <div class="col-md-3 text-md-start">
           <h5 class="fw-bold mb-3 text-wegreen-accent">Explorar</h5>
           <ul class="list-unstyled">
@@ -208,7 +274,7 @@
             <li><a href="#" class="footer-link text-white-50 text-decoration-none">Contactos</a></li>
           </ul>
         </div>
-
+ 
         <div class="col-md-3 text-md-start">
           <h5 class="fw-bold mb-3 text-wegreen-accent">Suporte</h5>
           <ul class="list-unstyled">
@@ -218,7 +284,7 @@
             <li><a href="#" class="footer-link text-white-50 text-decoration-none">Envios & Devoluções</a></li>
           </ul>
         </div>
-
+ 
         <div class="col-md-2 text-md-start">
           <h5 class="fw-bold mb-3 text-wegreen-accent">Newsletter</h5>
           <p class="text-white-50 small">Subscreve e recebe novidades sobre moda sustentável.</p>
@@ -231,15 +297,21 @@
       <hr class="my-4 border-secondary">
       <div class="text-center">
         <p class="mb-0 text-white-50">
-          &copy; 2025 <strong>Wegreen</strong> — Dê uma nova vida à moda, de forma consciente 
+          &copy; 2025 <strong>Wegreen</strong> — Dê uma nova vida à moda, de forma consciente
           | Desenvolvido por <strong>Jéssica Fernandes</strong> | <strong>Manuel Silvestre</strong> | <strong>Pedro Pereira</strong>
         </p>
       </div>
     </div>
   </footer>
-   
-    <script src="src/js/homem.js"></script>
-    <script src="src/js/homepage.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<?php 
+
+?>
+
+   <script src="src/js/homepage.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+ 
+</script>
+ 
 </body>
 </html>

@@ -5,18 +5,63 @@ session_start();
 $func = new DashboardAnunciante();
 
 if ($_POST['op'] == 1) {
-    $resp = $func->getDadosPlanos($_SESSION['utilizador'],$_SESSION['plano']);
+    $resp = $func->getDadosPlanos($_SESSION['utilizador'], $_SESSION['plano']);
     echo $resp;
-
 }
+
 if ($_POST['op'] == 2) {
     $resp = $func->CarregaProdutos($_SESSION['utilizador']);
     echo $resp;
-
 }
+
 if ($_POST['op'] == 3) {
     $resp = $func->CarregaPontos($_SESSION['utilizador']);
     echo $resp;
+}
+if ($_POST['op'] == 4) {
+    $resp = $func->getGastos($_SESSION['utilizador']);
+    echo $resp;
+}
 
+if ($_POST['op'] == 12) {
+        $resp = $func->getLucroTotal($_SESSION['utilizador']);
+    echo $resp;
+}
+
+if ($_POST['op'] == 5) {
+    $resp = $func->getVendasMensais($_SESSION['utilizador']);
+    echo json_encode($resp);
+}
+
+if ($_POST['op'] == 6) {
+    $resp = $func->getTopProdutos($_SESSION['utilizador']);
+    echo json_encode($resp);
+}
+
+if ($_POST['op'] == 7) {
+    $resp = $func->getProdutosRecentes($_SESSION['utilizador']);
+    echo $resp;
+}
+
+if ($_POST['op'] == 8) {
+    $resp = $func->getTodosProdutos($_SESSION['utilizador']);
+    echo $resp;
+}
+
+if ($_POST['op'] == 9) {
+    $resp = $func->getEvolucaoVendas($_SESSION['utilizador']);
+    echo json_encode($resp);
+}
+
+// op 10 - Lucro por Produto (JSON para gráfico)
+if ($_POST['op'] == 10) {
+    $resp = $func->getLucroPorProduto($_SESSION['utilizador']);
+    echo json_encode($resp);
+}
+
+// op 11 - Margem de Lucro (JSON para gráfico)
+if ($_POST['op'] == 11) {
+    $resp = $func->getMargemLucro($_SESSION['utilizador']);
+    echo json_encode($resp);
 }
 ?>

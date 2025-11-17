@@ -1,0 +1,110 @@
+<?php
+require_once 'connection.php';
+
+class Homem {
+
+function getProdutosHomem(){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT produtos.* FROM produtos where produtos.genero LIKE 'Homem';";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                $msg .= "<div class='col-md-3 col-sm-6'>";
+                $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+                $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
+                $msg .= "<div class='card-body text-center'>";
+                $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
+                $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
+                $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
+                $msg .= "<a href='ProdutoHomemMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+              }
+        $conn->close();
+        
+        return ($msg);
+
+    }
+}
+function getProdutoHomemMostrar($ID_Produto){
+        global $conn;
+        $msg = "";
+        $rowProduto = "";
+        $rowFoto = "";
+
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
+        $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE produto_id = $ID_Produto";
+        $result = $conn->query($sql);
+        $result2 = $conn->query($sql2);
+        if ($result->num_rows > 0) {
+              while ($rowProduto = $result->fetch_assoc()) {
+                $msg .= "<div class='col-md-6'>";
+                $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+                $msg .= "<div class='carousel-inner rounded-4 shadow-sm'>";
+                $msg .= "<div class='carousel-item active'>";
+                $msg .= "<img src='".$rowProduto["FotoProduto"]."' class='d-block w-100 rounded-4' alt='Blusa Custo Barcelona'>";
+                $msg .= "</div>";
+                while ($rowFoto = $result2->fetch_assoc()) {
+                $msg .= "<div class='carousel-item'>";
+                $msg .= "<img src='".$rowFoto["ProdutoFoto"]."' class='d-block w-100 rounded-4' alt='Blusa Custo Barcelona lateral'>";
+                $msg .= "</div>";
+                }
+                $msg .= "</div>";
+                $msg .= "<button class='carousel-control-prev' type='button' data-bs-target='#productGallery' data-bs-slide='prev'>";
+                $msg .= "<span class='carousel-control-prev-icon'></span>";
+                $msg .= "</button>";
+                $msg .= "<button class='carousel-control-next' type='button' data-bs-target='#productGallery' data-bs-slide='next'>";
+                $msg .= "<span class='carousel-control-next-icon'></span>";
+                $msg .= "</button>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+                $msg .= "<div class='col-md-6'>";
+                $msg .= "<h3 class='fw-bold mb-3'>".$rowProduto["nome"]."</h3>";
+                $msg .= "<p class='text-muted mb-2'>Marca: <span class='fw-semibold'>".$rowProduto["marca"]."</span></p>";
+                $msg .= "<p class='text-muted mb-2'>Tamanho: <span class='fw-semibold'>".$rowProduto["tamanho"]."</span></p>";
+                $msg .= "<p class='text-muted mb-2'>Estado: <span class='fw-semibold'>".$rowProduto["estado"]."</span></p>";
+                $msg .= "<h4 class='fw-bold text-success mb-3'>".$rowProduto["preco"]."€</h4>";
+                $msg .= "<p class='mb-4'>";
+                $msg .= "<p class='mb-4'>".$rowProduto["descricao"]."</p>";
+                $msg .= "<div class='d-flex gap-3 mb-4'>";
+                $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
+                $msg .= "data-id='".$rowProduto['id']."'>";
+                $msg .= "Comprar Agora</button>";
+                $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button>";
+                $msg .= "</div>";
+                $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
+                $msg .= "<div class='d-flex align-items-center'>";
+                $msg .= "<div class='position-relative me-3'>";
+                $msg .= "<img src='".$rowProduto["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm' width='90' height='90' style='object-fit: cover;'>";
+                $msg .= "</div>";
+                $msg .= "<div>";
+                $msg .= "<h5 class='fw-bold text-wegreen-accent mb-1'>".$rowProduto["NomeAnunciante"]."</h5>";
+                $msg .= "<div class='text-muted small mb-2 d-flex align-items-center'><i class='bi bi-geo-alt-fill me-1 text-success'></i> Lisboa, Portugal</div>";
+                $msg .= "<div class='mb-2'><span class='badge bg-success-subtle text-success border border-success fw-semibold rounded-pill px-3 py-1'><i class='bi bi-patch-check-fill'></i> Top Anunciante</span></div>";
+                $msg .= "<div class='text-muted small mb-2'>Anúncios: <span class='fw-semibold text-dark'>8</span> · Vendidos: <span class='fw-semibold text-dark'>15</span></div>";
+                $msg .= "<div class='text-muted small d-flex align-items-center'><i class='bi bi-stars text-success me-1'></i> Pontos de Confiança: <span class='fw-semibold text-dark ms-1'>".$rowProduto["PontosConfianca"]."</span></div>";
+                $msg .= "<div class='progress my-2' style='height: 8px; border-radius: 8px; background-color: #e9f7ef;'><div class='progress-bar bg-success' role='progressbar' style='width: 85%;'></div></div>";
+                $msg .= "<div class='small text-success fw-semibold'>Nível: 85%</div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='mt-3 mt-md-0'>";
+                $msg .= "<a href='perfil-vendedora.html' class='btn btn-wegreen-accent rounded-pill fw-semibold shadow-sm px-4 py-2'>Ver Perfil</a>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+              }
+        $conn->close();
+        
+        return ($msg);
+
+    }
+}
+}
+?>

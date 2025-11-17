@@ -94,6 +94,7 @@ function getGastos()
     });
 
 }
+
 function getVendasGrafico() {
     $.ajax({
         url: "src/controller/controllerDashboardAdmin.php",

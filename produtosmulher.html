@@ -7,6 +7,14 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link rel="stylesheet" href="src/css/style.css">
+      <link rel="stylesheet" href="src/css/lib/datatables.css">
+    <link rel="stylesheet" href="src/css/lib/select2.css">
+
+    <script src="src/js/lib/jquery.js"></script>
+    <script src="src/js/lib/datatables.js"></script>
+    <script src="src/js/lib/select2.js"></script>
+    <script src="src/js/lib/sweatalert.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
 
@@ -166,97 +174,7 @@
 
   <div id="listaProdutos" class="row g-4">
 
-    <div class="row g-4">
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/4aa0032639cfb631fe2d24df2baeb114.jpg" class="card-img-top rounded-top-4" alt="Blusa custo barcelona">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Blusa Colorida Custo Barcelona</h6>
-            <p class="text-muted mb-1">Custo Barcelona · S · Excelente </p>
-            <p class="fw-semibold">€15</p>
-            <a href="Produtoblusa.html" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg" class="card-img-top rounded-top-4" alt="Vestido">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Vestido Versace Coleção 2003</h6>
-            <p class="text-muted mb-1">Versace · S · Como Novo</p>
-            <p class="fw-semibold">€289,90</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg" class="card-img-top rounded-top-4" alt="Calças ganga">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Calças de ganga Low Rise </h6>
-            <p class="text-muted mb-1">NYWS · S · Excelente</p>
-            <p class="fw-semibold">€35,40</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/b7358d779d9fc865d22f428ec1641391.jpg" class="card-img-top rounded-top-4" alt="Botas Pele">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Botas pele</h6>
-            <p class="text-muted mb-1">Ana Salazar · 38 · Como Novo</p>
-            <p class="fw-semibold">€79</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/58c4e54e715841986e82c05fb3506a0d.jpg" class="card-img-top rounded-top-4" alt="Blusão ganga">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Blusão de ganga</h6>
-            <p class="text-muted mb-1">Miss Sixty · M · Excelente </p>
-            <p class="fw-semibold">€23,80</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/206af231b9b61956182afd1d73a47082.jpg"card-img-top rounded-top-4" alt="Leggings">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Leggings Yoga</h6>
-            <p class="text-muted mb-1">Abercrombie & Fitch · XS · Excelente</p>
-            <p class="fw-semibold">10,90</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/1c5af95e896564ebf09d600686c049ee.jpg" class="card-img-top rounded-top-4" alt="Vestido de Verão">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Vestido algodão de Verão</h6>
-            <p class="text-muted mb-1">PlayUp® · M · Bom</p>
-            <p class="fw-semibold">€35</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-          <img src="src/img/c5584a14a4d828c79754a5b553a3abe3.jpg" class="card-img-top rounded-top-4" alt="Casaco em Fibras Recicladas">
-          <div class="card-body text-center">
-            <h6 class="fw-bold mb-1">Casaco Desportivo Nike</h6>
-            <p class="text-muted mb-1">Nike · L · Como Novo</p>
-            <p class="fw-semibold">€22,00</p>
-            <a href="#" class="btn btn-wegreen-accent rounded-pill">Ver Produto</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="row g-4" id="ProdutoMulherVenda"></div>
   </main>
 
   <footer class="bg-dark text-white pt-5 pb-3 mt-5">
@@ -319,7 +237,7 @@
   </footer>
    
   <script src="src/js/mulher.js"></script>
-  
+  <script src="src/js/homepage.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
