@@ -69,6 +69,21 @@ VALUES
 ('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,NULL);
 
 
+CREATE TABLE Loja (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    marca VARCHAR(150) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+    foto varchar(250) NOT NULL
+);
+
+INSERT INTO Loja (nome, marca, preco, foto) VALUES
+('Casaco Verde Pistácio', 'Naz', '139.90', "src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp"),
+('Ténis Azuis Vegan', 'Nea Vegan Shoes', '69.90', "src/img/MG_7966.webp"),
+('Calça de ganga em algodão', 'PlayUp', '64.00', "src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg"),
+('Mala Chloe Paddigton', 'Maria Lopes', '235.00', "src/img/Chloé Paddington bag.jpeg");
+
+
 CREATE TABLE Tipo_Produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     descricao VARCHAR(100) NOT NULL
