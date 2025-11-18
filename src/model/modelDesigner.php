@@ -8,7 +8,7 @@ function getProdutosDesigner(){
         $msg = "";
         $row = "";
 
-        $sql = "SELECT produtos.* FROM produtos;";
+        $sql = "SELECT Produtos.* FROM Produtos where Produtos.designer_id LIKE '1';";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
