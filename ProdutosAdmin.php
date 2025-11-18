@@ -52,7 +52,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="vendas.php">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php">
                             <span class="nav-icon">🛍️</span>
                             <span class="nav-text">Vendas</span>
                         </a>

@@ -34,57 +34,55 @@
                     </div>
                 </div>
             </a>
-            <nav>
+                                    <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <button class="nav-link active">
-                            <span class=" nav-icon">📊</span>
+                        <a class="nav-link active" href="DashboardAdmin.php">
+                            <span class="nav-icon">📊</span>
                             <span class="nav-text">Dashboard</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link">
-                            <span class=" nav-icon">📦</span>
-                            <span class="nav-text">Produtos</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link">
-                            <span class="nav-icon">🛍️</span>
-                            <span class="nav-text">Vendas</span>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <a href="ProdutosAdmin.php" class="link-item">
-                            <button class="nav-link">
-                                <span class="nav-icon">🛒</span>
-                                <span class="nav-text">Aprovar Produtos</span>
-                            </button>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link">
+                        <a class="nav-link" href="produtos.php">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">Produtos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php">
+                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-text">Vendas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="ProdutosAdmin.php">
+                            <span class="nav-icon">🛒</span>
+                            <span class="nav-text">Aprovar Produtos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="analytics.php">
                             <span class="nav-icon">📈</span>
                             <span class="nav-text">Análises</span>
-                        </button>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link">
+                        <a class="nav-link" href="chats.php">
                             <span class="nav-icon">💬</span>
                             <span class="nav-text">Chats</span>
-                        </button>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link">
+                        <a class="nav-link" href="fornecedores.php">
                             <span class="nav-icon">🚚</span>
                             <span class="nav-text">Gestão de Fornecedores</span>
-                        </button>
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link">
+                        <a class="nav-link" href="settings.php">
                             <span class="nav-icon">⚙️</span>
                             <span class="nav-text">Configurações</span>
-                        </button>
+                        </a>
                     </li>
                 </ul>
             </nav>
