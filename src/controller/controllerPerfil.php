@@ -30,8 +30,4 @@ if ($_POST['op'] == 3) {
     }
 
 }
-if ($_POST['op'] == 5) {
-    $resp = $func->getProdutosMulher();
-    echo $resp;
-}
 ?>

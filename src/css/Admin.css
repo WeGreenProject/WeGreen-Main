@@ -92,6 +92,7 @@
         font-weight: 500;
         letter-spacing: 0.2px;
         position: relative;
+        text-decoration: none;
     }
 
     .nav-link::before {

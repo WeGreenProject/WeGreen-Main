@@ -134,7 +134,7 @@ VALUES
 ('Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', NULL, 3, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.'),
 ('Calça de ganga em algodão', 2, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', NULL, 3, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.'),
 ('Mala Chloe Paddigton', 5, 235.00, 'src/img/Chloé Paddington bag.jpeg', 'Mulher', NULL, 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.'),
-('Aneis feito de colher', 5, 8.00, 'src/img/c3e47d13835b4150d5c5b12242fbbab4.jpg', 'Mulher', 1, 3, 'AnaCarfts', 'Tamanho Único', 'Novo', 'Aneis feita com colheres.')
+('Aneis feito de colher', 5, 8.00, 'src/img/c3e47d13835b4150d5c5b12242fbbab4.jpg', 'Mulher', 1, 3, 'AnaCarfts', 'Tamanho Único', 'Novo', 'Aneis feita com colheres.'),
 ('Colar Coração e Flor', 5, 15.00, 'src\img\9ee51071696bc0b089addeb4f0baaab9.jpg', 'Mulher', 1, 3, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar de coração e Flor feitas á mão.');
 
 
