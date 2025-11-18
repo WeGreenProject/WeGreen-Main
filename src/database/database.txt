@@ -66,7 +66,7 @@ CREATE TABLE Utilizadores (
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
 VALUES 
 ('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,"src/img/pexels-beccacorreiaph-31095884.jpg"),
-('João Silva', 'joao@wegreen.pt','cliente123', 2, 1, 1, 10,NULL),
+('João Silva', 'joao@wegreen.pt', 'cliente123', 2, 1, 1, 10, 'src/img/pexels-stefanstefancik-91227.jpg'),
 ('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,"src/img/pexels-olly-733872.jpg");
 
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
@@ -118,24 +118,27 @@ INSERT INTO Produtos
 VALUES
 ('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', NULL, 1, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.'),
 ('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', NULL, 3, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.'),
-('Calças de ganga Low Rise', 2, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Homem', NULL, 3, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.'),
+('Calças de ganga Low Rise', 2, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', NULL, 3, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.'),
 ('Botas pele', 3, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', NULL, 3, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.'),
 ('Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', NULL, 3, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.'),
+('Sweatshirt Billabong', 1, 23.80, 'src/img/6fa73f19c9a53d2c3d32f4c7e8d84300.jpg', 'Homem', NULL, 3, 'Billabong', 'M', 'Excelente', 'Sweatshirt Azul e Amarela da  Billabong, nunca usado.'),
 ('Leggings Yoga', 5, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', NULL, 3, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.'),
-('Casaco Desportivo Nike', 4, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', NULL, 3, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.'),
+('Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', NULL, 2, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.'),
+('Casaco Desportivo Nike', 4, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', NULL, 2, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.'),
 ('Sweatshirt North Face', 4, 18.00, 'src/img/image22.webp', 'Criança', NULL, 3, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.'),
 ('Botas Timbaland', 3, 26.00, 'src/img/image66.webp', 'Criança', NULL, 3, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.'),
-('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', NULL, 3, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.'),
-('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/Sapatilhas_Ultraboost_5x_Preto_IH3110.avif', 'Homem', NULL, 3, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.'),
-('Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/bolsamichaelkros.webp', 'Mulher', NULL, 3, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.'),
-('Creme Hidratante Nivea', 5, 29.90, 'src/img/creme_nivea.jpg', 'Mulher', NULL, 3, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea para todos os tipos de pele, ideal para uso diário.'),
+('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', NULL, 2, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.'),
+('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/Adidas Ultraboost Light - lateral 2.jpg', 'Homem', NULL, 2, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.'),
+('Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/1298bdfb53f943dc29132b4684dbb507.jpg', 'Mulher', NULL, 3, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.'),
+('Creme Hidratante Nivea', 5, 29.90, 'src/img/b06b57ded4c5ded4bc7e600eada0649c.jpg', 'Mulher', NULL, 3, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea Edição Limitada de 2006 lacrado.'),
 ('Fone de Ouvido Bose QuietComfort 35', 4, 899.00, 'src/img/s-l1200.webp', 'Homem', NULL, 3, 'Bose', 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.'),
-('Casaco Verde Pistachio', 1, 139.90, 'src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp', 'Mulher', NULL, 3, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.'),
+('Calças de ganga Levis', 4, 19.00, 'src/img/63ee2e61813747ba02e97868eb523680.jpg', 'Homem', NULL, 2, 'Levis', 'XL', 'Novo', 'Calças de gnaga Levis nunca usadas com etiqueta.'),
+('Casaco Verde Pistachio', 1, 29.90, 'src/img/image.webp', 'Mulher', NULL, 3, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.'),
 ('Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', NULL, 3, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.'),
 ('Calça de ganga em algodão', 2, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', NULL, 3, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.'),
-('Mala Chloe Paddigton', 5, 235.00, 'src/img/Chloé Paddington bag.jpeg', 'Mulher', NULL, 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.'),
-('Aneis feito de colher', 5, 8.00, 'src/img/c3e47d13835b4150d5c5b12242fbbab4.jpg', 'Mulher', 1, 3, 'AnaCarfts', 'Tamanho Único', 'Novo', 'Aneis feita com colheres.')
-('Colar Coração e Flor', 5, 15.00, 'src\img\9ee51071696bc0b089addeb4f0baaab9.jpg', 'Mulher', 1, 3, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar de coração e Flor feitas á mão.');
+('Mala Chloe Paddigton', 5, 235.00, 'src/img/9e8e572724743ed9e7cea7a66c5aa07b.jpg', 'Mulher', NULL, 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.'),
+('Aneis feito de colher', 5, 8.00, 'src/img/c3e47d13835b4150d5c5b12242fbbab4.jpg', NULL, 1, 3, 'AnaCarfts', 'Tamanho Único', 'Novo', 'Aneis feita com colheres.'),
+('Colar Coração e Flor', 5, 15.00, 'src/img/9ee51071696bc0b089addeb4f0baaab9.jpg', NULL, 1, 3, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar de coração e Flor feitas á mão.');
 
 CREATE TABLE Produto_Fotos (
     id INT AUTO_INCREMENT PRIMARY KEY,
