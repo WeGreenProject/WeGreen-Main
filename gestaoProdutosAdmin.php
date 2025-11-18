@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendas - Painel Admin</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/AdminGestao.css">
-
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
 
+    <script src="src/js/lib/bootstrap.js"></script>
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
+
 <body>
     <div class="container">
         <aside class="sidebar">
@@ -26,7 +28,7 @@
                     <p>Painel do Administrador</p>
                 </div>
             </a>
-                        <nav>
+            <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
                         <a class="nav-link" href="DashboardAdmin.php">
@@ -35,13 +37,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="produtos.php">
+                        <a class="nav-link active" href="gestaoProdutosAdmin.php">
                             <span class="nav-icon">📦</span>
                             <span class="nav-text">Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="gestaoProdutosAdmin.php">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php">
                             <span class="nav-icon">🛍️</span>
                             <span class="nav-text">Vendas</span>
                         </a>
@@ -83,7 +85,7 @@
         <main class="main-content">
             <div class="page-header">
                 <h2>Gestão de Produtos</h2>
-                <p>Gerir todos as produtos na plataforma</p>
+                <p>Gerir todos os produtos na plataforma</p>
             </div>
 
             <div class="tabs-container">
@@ -96,9 +98,33 @@
                 <button class="tab-btn" onclick="switchTab('todas-vendas')">
                     🌐 Todos os Produtos
                 </button>
+                <button class="tab-btn " onclick="switchTab('Inativos')">
+                    🔎 Verificar Produtos
+                </button>
             </div>
 
-            <!-- Tab: Minhas Vendas -->
+
+            <div id="Inativos" class="tab-content">
+                <div class="table-container">
+                    <h3 style="margin-bottom: 20px; color: #ffd700;">🔎 Produtos Aguardando Verificação</h3>
+                    <table id="inativosTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Foto</th>
+                                <th>Nome</th>
+                                <th>Categoria</th>
+                                <th>Genero</th>
+                                <th>Total (€)</th>
+                                <th>Estado</th>
+                                <th>Info</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inativosBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div id="minhas-vendas" class="tab-content active">
                 <div class="table-container">
                     <h3 style="margin-bottom: 20px; color: #ffd700;">📋 Histórico de Meus Produtos</h3>
@@ -115,14 +141,11 @@
                                 <th>Marca</th>
                             </tr>
                         </thead>
-                        <tbody id="minhasVendasBody">
-                            
-                        </tbody>
+                        <tbody id="minhasVendasBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Tab: Adicionar Venda -->
             <div id="adicionar-venda" class="tab-content">
                 <div class="form-container">
                     <h3 style="margin-bottom: 30px; color: #ffd700;">➕ Novo Produto</h3>
@@ -151,6 +174,17 @@
                             </div>
                         </div>
 
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Marca</label>
+                                <input type="number" id="quantidade" min="1" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tamanho</label>
+                                <input type="number" id="preco" step="0.01" required>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label>Genero</label>
                             <select id="estado" required>
@@ -159,12 +193,15 @@
                                 <option value="Crianca">Criança</option>
                             </select>
                         </div>
-
                         <div class="form-group">
-                            <label>Observações</label>
-                            <textarea id="observacoes" rows="4" placeholder="Adicionar notas sobre a venda..."></textarea>
+                            <label>Foto</label>
+                            <input type="file" id="preco" step="0.01" required>
                         </div>
-
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <textarea id="observacoes" rows="4"
+                                placeholder="Adicionar notas sobre a descrição..."></textarea>
+                        </div>
                         <button type="submit" class="btn-primary" style="width: 100%;">
                             <span>✅</span>
                             Registar Venda
@@ -173,7 +210,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Todas as Vendas -->
             <div id="todas-vendas" class="tab-content">
                 <div class="table-container">
                     <h3 style="margin-bottom: 20px; color: #ffd700;">🌐 Base de Dados - Todas as Vendas</h3>
@@ -190,39 +226,201 @@
                                 <th>Marca</th>
                             </tr>
                         </thead>
-                        <tbody id="todasVendasBody">
-                            
-                        </tbody>
+                        <tbody id="todasVendasBody"></tbody>
                     </table>
                 </div>
             </div>
         </main>
     </div>
 
+    <!-- Modal de Verificação -->
+    <div class="modal fade" id="formEditInativo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <!-- AQUI FALTAVA -->
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2>🔍 Verificação de Produto</h2>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+
+                <div class="product-info-grid">
+                    <div class="info-item">
+                        <label>ID do Produto</label>
+                        <span id="numidproduto">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Nome do Produto</label>
+                        <span id="nomeproduto">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Categoria</label>
+                        <span id="categoriaproduto">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Marca</label>
+                        <span id="marcaproduto">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Tamanho</label>
+                        <span id="tamanhoproduto">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Preço</label>
+                        <span id="precoproduto">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Gênero</label>
+                        <span id="generoproduto">-</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Vendedor</label>
+                        <span id="vendedorproduto">-</span>
+                    </div>
+                </div>
+
+                <div class="photos-section">
+                    <h3>📸 Fotos do Produto</h3>
+                    <div class="photos-grid" id="photosGrid">
+                        <div class="photo-item">
+                            <img src="https://via.placeholder.com/300" alt="Foto Frontal"
+                                onclick="viewFullscreen(this)">
+                            <div class="photo-label">Foto Frontal</div>
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://via.placeholder.com/300" alt="Foto Traseira"
+                                onclick="viewFullscreen(this)">
+                            <div class="photo-label">Foto Traseira</div>
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://via.placeholder.com/300" alt="Etiqueta" onclick="viewFullscreen(this)">
+                            <div class="photo-label">Etiqueta</div>
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://via.placeholder.com/300" alt="Detalhes" onclick="viewFullscreen(this)">
+                            <div class="photo-label">Detalhes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-approve" id="btnAprovar" onclick="approveProduct()">✅ Aprovar Produto</button>
+                    <button class="btn-reject" onclick="rejectProduct()">❌ Rejeitar Produto</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
-        // Função para mudar de tab
-        function switchTab(tabId) {
-            // Remover active de todos os botões e conteúdos
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+    /*
 
-            // Adicionar active ao botão e conteúdo selecionado
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+        function openModal(productId) {
+            currentProductId = productId;
+            const produto = produtosData[productId];
+
+            if (!produto) return;
+
+            // Preencher informações do produto
+            document.getElementById('modal-id').textContent = produto.id;
+            document.getElementById('modal-nome').textContent = produto.nome;
+            document.getElementById('modal-categoria').textContent = produto.categoria;
+            document.getElementById('modal-marca').textContent = produto.marca;
+            document.getElementById('modal-tamanho').textContent = produto.tamanho;
+            document.getElementById('modal-preco').textContent = produto.preco;
+            document.getElementById('modal-genero').textContent = produto.genero;
+            document.getElementById('modal-vendedor').textContent = produto.vendedor;
+
+            // Carregar fotos
+            const photosGrid = document.getElementById('photosGrid');
+            photosGrid.innerHTML = '';
+
+            produto.fotos.forEach(foto => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `
+                        <img src="${foto.url}" alt="${foto.label}" onclick="viewFullscreen(this)">
+                        <div class="photo-label">${foto.label}</div>
+                    `;
+                photosGrid.appendChild(photoItem);
+            });
+
+            // Mostrar modal
+            document.getElementById('verificationModal').classList.add('active');
         }
 
-        // Função para obter badge de estado
-        function getStatusBadge(status) {
-            const statusMap = {
-                paid: { class: 'status-paid', text: 'Pago' },
-                pending: { class: 'status-pending', text: 'Pendente' },
-                cancelled: { class: 'status-cancelled', text: 'Cancelado' }
-            };
-            const s = statusMap[status];
-            return `<span class="status-badge ${s.class}">${s.text}</span>`;
+
+
+        // Aprovar produto
+        function approveProduct() {
+            if (!currentProductId) return;
+
+            Swal.fire({
+                title: 'Aprovar Produto?',
+                text: `Tem certeza que deseja aprovar o produto ${produtosData[currentProductId].nome}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00c851',
+                cancelButtonColor: '#ff4444',
+                confirmButtonText: 'Sim, aprovar!',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aqui você faria a chamada AJAX para aprovar o produto
+                    Swal.fire(
+                        'Aprovado!',
+                        'O produto foi aprovado com sucesso.',
+                        'success'
+                    );
+                    closeModal();
+                    // Atualizar tabela
+                }
+            });
         }
+
+        // Rejeitar produto
+        function rejectProduct() {
+            if (!currentProductId) return;
+
+            Swal.fire({
+                title: 'Rejeitar Produto?',
+                text: `Tem certeza que deseja rejeitar o produto ${produtosData[currentProductId].nome}?`,
+                icon: 'warning',
+                input: 'textarea',
+                inputPlaceholder: 'Motivo da rejeição...',
+                showCancelButton: true,
+                confirmButtonColor: '#ff4444',
+                cancelButtonColor: '#666',
+                confirmButtonText: 'Sim, rejeitar!',
+                cancelButtonText: 'Cancelar',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Por favor, informe o motivo da rejeição!';
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aqui você faria a chamada AJAX para rejeitar o produto
+                    Swal.fire(
+                        'Rejeitado!',
+                        'O produto foi rejeitado.',
+                        'success'
+                    );
+                    closeModal();
+                    // Atualizar tabela
+                }
+            });
+        }
+            */
     </script>
     <script src="src/js/gestaoProdutos.js"></script>
 </body>
+
 </html>

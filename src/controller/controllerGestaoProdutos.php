@@ -19,5 +19,12 @@ if ($_POST['op'] == 4) {
     $resp = $func->getListaCategoria();
     echo $resp;
 }
-
+if ($_POST['op'] == 5) {
+    $resp = $func->getInativos();
+    echo $resp;
+}
+if ($_POST['op'] == 6) {
+    $resp = $func->getDadosInativos($_POST['Produto_id']);
+    echo $resp;
+}
 ?>

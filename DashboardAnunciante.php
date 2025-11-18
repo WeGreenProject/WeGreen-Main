@@ -71,7 +71,6 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         </aside>
 
         <main class="main-content">
-            <!-- Dashboard -->
             <div id="dashboard" class="page active">
                 <div class="page-header">
                     <h2>Dashboard</h2>
@@ -111,7 +110,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 </div>
             </div>
 
-            <!-- Analytics -->
+
             <div id="analytics" class="page">
                 <div class="page-header">
                     <h2>Análises</h2>
@@ -144,34 +143,45 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         event.target.closest('.nav-link').classList.add('active');
     }
 
-    $(document).ready(function(){
+    $(document).ready(function() {
 
         // Carregar estatísticas principais
-        $.post('src/controller/controllerDashboardAnunciante.php', {op:3}, function(res){
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 3
+        }, function(res) {
             $('#PontosConfianca').html(res);
         });
-        $.post('src/controller/controllerDashboardAnunciante.php', {op:1}, function(res){
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 1
+        }, function(res) {
             $('#PlanosAtual').html(res);
         });
-        $.post('src/controller/controllerDashboardAnunciante.php', {op:2}, function(res){
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 2
+        }, function(res) {
             $('#ProdutoStock').html(res);
         });
-        $.post('src/controller/controllerDashboardAnunciante.php', {op:4}, function(res){
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 4
+        }, function(res) {
             $('#totalProfit').text(res);
         });
 
-        // Vendas Mensais
         $.ajax({
             url: 'src/controller/controllerDashboardAnunciante.php',
             method: 'POST',
-            data: { op: 5 },
+            data: {
+                op: 5
+            },
             dataType: 'json'
-        }).done(function(res){
+        }).done(function(res) {
             const ctx = document.getElementById('salesChart');
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set',
+                        'Out', 'Nov', 'Dez'
+                    ],
                     datasets: [{
                         label: 'Vendas (€)',
                         data: res,
@@ -181,7 +191,14 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         fill: true
                     }]
                 },
-                options: { responsive: true, plugins:{legend:{display:true}} }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
             });
         });
 
@@ -189,9 +206,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         $.ajax({
             url: 'src/controller/controllerDashboardAnunciante.php',
             method: 'POST',
-            data: { op: 6 },
+            data: {
+                op: 6
+            },
             dataType: 'json'
-        }).done(function(res){
+        }).done(function(res) {
             const ctx = document.getElementById('topProductsChart');
             new Chart(ctx, {
                 type: 'doughnut',
@@ -199,10 +218,19 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     labels: res.map(p => p.nome),
                     datasets: [{
                         data: res.map(p => p.vendidos),
-                        backgroundColor: ['#ffd700','#ffed4e','#ffe066','#ffc107','#ffda8f']
+                        backgroundColor: ['#ffd700', '#ffed4e', '#ffe066', '#ffc107',
+                            '#ffda8f'
+                        ]
                     }]
                 },
-                options: { responsive: true, plugins:{legend:{position:'bottom'}} }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
             });
         });
 
@@ -210,9 +238,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         $.ajax({
             url: 'src/controller/controllerDashboardAnunciante.php',
             method: 'POST',
-            data: { op: 7 },
+            data: {
+                op: 7
+            },
             dataType: 'html'
-        }).done(function(res){
+        }).done(function(res) {
             $('#recentProducts').html(res);
         });
 
@@ -220,9 +250,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         $.ajax({
             url: 'src/controller/controllerDashboardAnunciante.php',
             method: 'POST',
-            data: { op: 10 },
+            data: {
+                op: 10
+            },
             dataType: 'json'
-        }).done(function(res){
+        }).done(function(res) {
             const ctx = document.getElementById('profitChart');
             new Chart(ctx, {
                 type: 'polarArea',
@@ -230,10 +262,19 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     labels: res.map(p => p.nome),
                     datasets: [{
                         data: res.map(p => p.lucro),
-                        backgroundColor: ['#ffd700','#ffed4e','#ffe066','#ffc107','#ffda8f']
+                        backgroundColor: ['#ffd700', '#ffed4e', '#ffe066', '#ffc107',
+                            '#ffda8f'
+                        ]
                     }]
                 },
-                options: { responsive: true, plugins:{legend:{position:'bottom'}} }
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
             });
         });
 
@@ -241,9 +282,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         $.ajax({
             url: 'src/controller/controllerDashboardAnunciante.php',
             method: 'POST',
-            data: { op: 11 },
+            data: {
+                op: 11
+            },
             dataType: 'json'
-        }).done(function(res){
+        }).done(function(res) {
             const ctx = document.getElementById('marginChart');
             new Chart(ctx, {
                 type: 'bar',
@@ -257,10 +300,14 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 },
                 options: {
                     responsive: true,
-                    plugins:{legend:{display:false}},
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         y: {
-                            ticks:{
+                            ticks: {
                                 callback: v => v + '%'
                             }
                         }
@@ -277,4 +324,5 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     echo "sem permissão!";
 }
 ?>
+
 </html>
