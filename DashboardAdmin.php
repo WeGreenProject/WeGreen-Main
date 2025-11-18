@@ -34,7 +34,7 @@
                     </div>
                 </div>
             </a>
-                                    <nav>
+            <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
                         <a class="nav-link active" href="DashboardAdmin.php">
@@ -43,13 +43,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="produtos.php">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php">
                             <span class="nav-icon">📦</span>
                             <span class="nav-text">Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
+                        <a class="nav-link" href="vendas.php">
                             <span class="nav-icon">🛍️</span>
                             <span class="nav-text">Vendas</span>
                         </a>

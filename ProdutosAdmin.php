@@ -46,13 +46,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="produtos.php">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php">
                             <span class="nav-icon">📦</span>
                             <span class="nav-text">Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
+                        <a class="nav-link" href="vendas.php">
                             <span class="nav-icon">🛍️</span>
                             <span class="nav-text">Vendas</span>
                         </a>
@@ -113,7 +113,6 @@
                 </div>
             </div>
 
-            <!-- Filtros -->
             <div class="approval-filters" id="Filtros">
 
             </div>

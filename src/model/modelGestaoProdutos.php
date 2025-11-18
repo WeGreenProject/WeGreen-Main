@@ -28,7 +28,7 @@ class Vendas{
                 }
 
                 $msg .= "<tr>";
-                $msg .= "<th scope='row'>".$row['id']."</th>";
+                $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
                 $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
@@ -51,6 +51,72 @@ class Vendas{
         $conn->close();
 
         return ($msg);
+    }
+    function getInativos(){
+        global $conn;
+        $msg = "";
+        $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id AND produtos.ativo = 0;";
+        $result = $conn->query($sql);
+        $text = "";
+        $text2 = "";
+
+
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+
+                if($row['ativo'] == 1)
+                {
+                    $text = "Ativo";
+                    $text2 = 'status-approved';
+                }
+                else
+                {
+                    $text = "Inativo";
+                    $text2 = 'status-rejected';
+                }
+                $msg .= "<tr>";
+                $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
+                $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
+                $msg .= "<td>".$row['nome']."</td>";
+                $msg .= "<td>".$row['ProdutosNome']."</td>";
+                $msg .= "<td>".$row['genero']."</td>";
+                $msg .= "<td>".$row['preco']."€</td>";
+                $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
+                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Info</button></td>";  
+                $msg .= "</tr>";
+            }
+        } else {
+            $msg .= "<tr>";
+            $msg .= "<td>Sem Registos</td>";
+            $msg .= "<th scope='row'></th>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "</tr>";
+        }
+        $conn->close();
+
+        return ($msg);
+    }
+    function getDadosInativos($ID_Produto){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT Produtos.*,Tipo_Produtos.descricao FROM Produtos,Tipo_Produtos WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Produto_id =".$ID_Produto;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+        }
+
+        $conn->close();
+
+        return (json_encode($row));
+
     }
     function getProdutos(){
         global $conn;
@@ -76,7 +142,7 @@ class Vendas{
                 }
 
                 $msg .= "<tr>";
-                $msg .= "<th scope='row'>".$row['id']."</th>";
+                $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
                 $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
