@@ -162,12 +162,14 @@ function getDadosInativos(Produto_id){
     .done(function( msg ) {
 
         let obj = JSON.parse(msg);
-        $('#numFuncionarioEdit').val(obj.Produto_id);
-        $('#nomeEdit').val(obj.nome);
-        $('#telefoneEdit').val(obj.descricao);
-        $('#salarioEdit').val(obj.valor);
-        $('#nifEdit').val(obj.NIF);
-        $('#ID_TipoColaboradoresEdit').val(obj.ID_TipoColaboradores);
+        $('#numprodutoEdit').val(obj.Produto_id);
+        $('#nomeprodutoEdit').val(obj.nome);
+        $('#categoriaprodutoEdit').val(obj.categoria);
+        $('#marcaprodutoEdit').val(obj.marca);
+        $('#tamanhoprodutoEdit').val(obj.tamanho);
+        $('#precoprodutoEdit').val(obj.preco);
+        $('#generoprodutoEdit').val(obj.genero);
+        $('#vendedorprodutoEdit').val(obj.vendedor);
        $('#btnGuardar').attr("onclick","guardaEditFuncionario("+obj.Produto_id+")") 
         
        $('#formEditInativo').modal('show');

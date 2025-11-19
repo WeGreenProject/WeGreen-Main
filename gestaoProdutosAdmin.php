@@ -247,35 +247,35 @@
                 <div class="product-info-grid">
                     <div class="info-item">
                         <label>ID do Produto</label>
-                        <span id="numidproduto">-</span>
+                        <input type="text" class="form-control" id="numprodutoEdit" disabled>
                     </div>
                     <div class="info-item">
                         <label>Nome do Produto</label>
-                        <span id="nomeproduto">-</span>
+                        <input type="text" class="form-control" id="nomeprodutoEdit">
                     </div>
                     <div class="info-item">
                         <label>Categoria</label>
-                        <span id="categoriaproduto">-</span>
+                        <input type="text" class="form-control" id="categoriaprodutoEdit">
                     </div>
                     <div class="info-item">
                         <label>Marca</label>
-                        <span id="marcaproduto">-</span>
+                        <input type="text" class="form-control" id="marcaprodutoEdit">
                     </div>
                     <div class="info-item">
                         <label>Tamanho</label>
-                        <span id="tamanhoproduto">-</span>
+                        <input type="text" class="form-control" id="tamanhoprodutoEdit">
                     </div>
                     <div class="info-item">
                         <label>Preço</label>
-                        <span id="precoproduto">-</span>
+                        <input type="text" class="form-control" id="precoprodutoEdit">
                     </div>
                     <div class="info-item">
                         <label>Gênero</label>
-                        <span id="generoproduto">-</span>
+                        <input type="text" class="form-control" id="generoprodutoEdit">
                     </div>
                     <div class="info-item">
                         <label>Vendedor</label>
-                        <span id="vendedorproduto">-</span>
+                        <input type="text" class="form-control" id="vendedorprodutoEdit">
                     </div>
                 </div>
 
@@ -283,13 +283,11 @@
                     <h3>📸 Fotos do Produto</h3>
                     <div class="photos-grid" id="photosGrid">
                         <div class="photo-item">
-                            <img src="https://via.placeholder.com/300" alt="Foto Frontal"
-                                onclick="viewFullscreen(this)">
+                            <img src="https://via.placeholder.com/300" alt="Foto Frontal">
                             <div class="photo-label">Foto Frontal</div>
                         </div>
                         <div class="photo-item">
-                            <img src="https://via.placeholder.com/300" alt="Foto Traseira"
-                                onclick="viewFullscreen(this)">
+                            <img src="https://via.placeholder.com/300" alt="Foto Traseira">
                             <div class="photo-label">Foto Traseira</div>
                         </div>
                         <div class="photo-item">
