@@ -3,7 +3,7 @@ function getVendedor() {
     dados.append("op", 1); 
 
     $.ajax({
-        url: "src/controller/controllerVendedora.php",
+        url: "src/controller/controllerVendedor.php",
         method: "POST",
         data: dados,
         dataType: "html",
@@ -19,12 +19,11 @@ function getVendedor() {
     });
 }
 
-function getVendedoraPerfil() {
+function getPerfilVendedora() {
     let dados = new FormData();
     dados.append("op", 2); 
-
     $.ajax({
-        url: "src/controller/controllerVendedora.php",
+        url: "src/controller/controllerVendedor.php",
         method: "POST",
         data: dados,
         dataType: "html",
@@ -41,7 +40,7 @@ function getVendedoraPerfil() {
 }
 
 $(function() {
-    getVendedoraPerfil();
+    getPerfilVendedora();
     getVendedoraProdutos();
 });
 

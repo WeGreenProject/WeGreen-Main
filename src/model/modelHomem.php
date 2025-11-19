@@ -20,7 +20,7 @@ function getProdutosHomem(){
                 $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
                 $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
                 $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoHomemMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                $msg .= "<a href='ProdutoHomemMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
@@ -37,8 +37,8 @@ function getProdutoHomemMostrar($ID_Produto){
         $rowProduto = "";
         $rowFoto = "";
 
-        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
-        $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE produto_id = $ID_Produto";
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
+        $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = $ID_Produto";
         $result = $conn->query($sql);
         $result2 = $conn->query($sql2);
         if ($result->num_rows > 0) {
@@ -73,7 +73,7 @@ function getProdutoHomemMostrar($ID_Produto){
                 $msg .= "<p class='mb-4'>".$rowProduto["descricao"]."</p>";
                 $msg .= "<div class='d-flex gap-3 mb-4'>";
                 $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
-                $msg .= "data-id='".$rowProduto['id']."'>";
+                $msg .= "data-id='".$rowProduto['Produto_id']."'>";
                 $msg .= "Comprar Agora</button>";
                 $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button>";
                 $msg .= "</div>";
@@ -94,7 +94,7 @@ function getProdutoHomemMostrar($ID_Produto){
                 $msg .= "</div>";
 
                 $msg .= "<div class='mt-3 mt-md-0'>";
-                $msg .= "<a href='perfil-vendedora.html' class='btn btn-wegreen-accent rounded-pill fw-semibold shadow-sm px-4 py-2'>Ver Perfil</a>";
+                $msg .= "<a href='Vendedor.html' class='btn btn-wegreen-accent rounded-pill fw-semibold shadow-sm px-4 py-2'>Ver Perfil</a>";
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
