@@ -427,3 +427,29 @@ footer {
       header.header-main .logo-img{ height:52px; }
       main{ padding-top:100px; }
     }
+
+       .btn-lime {
+            background-color: #C8FF3D !important;
+            color: #000 !important;
+            border: none !important;
+            font-weight: 600;
+        }
+
+        .btn-lime:hover {
+            background-color: #b5f634 !important;
+            color: #000 !important;
+        }
+
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #198754;
+        }
+
+        .product-card img {
+            height: 250px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
