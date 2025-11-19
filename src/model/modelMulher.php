@@ -20,7 +20,7 @@ function getProdutosMulher(){
                 $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
                 $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
                 $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
@@ -36,20 +36,13 @@ function getProdutoMulherMostrar($ID_Produto){
         $msg = "";
         $rowProduto = "";
         $rowFoto = "";
-        
-        
-        $sql = "SELECT (SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id) AS TotalAnuncios, Produtos.foto AS FotoProduto, Produtos.*, utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca,utilizadores.foto AS FotoPerfil,ranking.nome AS RankingAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS Vendidos
-        FROM Produtos
-        JOIN utilizadores ON produtos.anunciante_id = utilizadores.id
-        JOIN ranking ON utilizadores.ranking_id = ranking.id
-        LEFT JOIN vendas ON utilizadores.id = vendas.anunciante_id AND produtos.id = vendas.produto_id
-        WHERE Produtos.id = $ID_Produto";
-        $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE produto_id = $ID_Produto";
+
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
+        $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = $ID_Produto";
         $result = $conn->query($sql);
         $result2 = $conn->query($sql2);
-      
-if ($result->num_rows > 0) {
-    while ($rowProduto = $result->fetch_assoc()) {
+        if ($result->num_rows > 0) {
+              while ($rowProduto = $result->fetch_assoc()) {
         $msg .= "<div class='col-md-6'>";
         $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
         
@@ -85,10 +78,11 @@ if ($result->num_rows > 0) {
         $msg .= "<p class='mb-4'>".$rowProduto["descricao"]."</p>";
         
         $msg .= "<div class='d-flex gap-3 mb-4'>";
-        $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' data-id='".$rowProduto['id']."'>Comprar Agora</button>";
+        $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
+        $msg .= "data-id='".$rowProduto['Produto_id']."'>";
+        $msg .= "Comprar Agora</button>";
         $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button>";
         $msg .= "</div>";
-        
         $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
         $msg .= "<div class='d-flex align-items-center'>";
         $msg .= "<div class='position-relative me-3'>";
@@ -97,20 +91,21 @@ if ($result->num_rows > 0) {
         $msg .= "<div>";
         $msg .= "<h5 class='fw-bold text-wegreen-accent mb-1'>".$rowProduto["NomeAnunciante"]."</h5>";
         $msg .= "<div class='text-muted small mb-2 d-flex align-items-center'><i class='bi bi-geo-alt-fill me-1 text-success'></i> Lisboa, Portugal</div>";
-        $msg .= "<div class='mb-2'><span class='badge bg-success-subtle text-success border border-success fw-semibold rounded-pill px-3 py-1'><i class='bi bi-patch-check-fill'></i> Rank: ".$rowProduto["RankingAnunciante"]."</span></div>";
-        $msg .= "<div class='text-muted small mb-2'>Anúncios: <span class='fw-semibold text-dark'>".$rowProduto["TotalAnuncios"]."</span> · Vendidos: <span class='fw-semibold text-dark'>".$rowProduto["Vendidos"]."</span></div>";
+        $msg .= "<div class='mb-2'><span class='badge bg-success-subtle text-success border border-success fw-semibold rounded-pill px-3 py-1'><i class='bi bi-patch-check-fill'></i> Top Anunciante</span></div>";
+        $msg .= "<div class='text-muted small mb-2'>Anúncios: <span class='fw-semibold text-dark'>8</span> · Vendidos: <span class='fw-semibold text-dark'>15</span></div>";
         $msg .= "<div class='text-muted small d-flex align-items-center'><i class='bi bi-stars text-success me-1'></i> Pontos de Confiança: <span class='fw-semibold text-dark ms-1'>".$rowProduto["PontosConfianca"]."</span></div>";
-        $msg .= "<div class='progress my-2' style='height: 8px; border-radius: 8px; background-color: #e9f7ef;'><div class='progress-bar bg-success' role='progressbar' style='width:" .$rowProduto["PontosConfianca"]."%;'></div></div>";
+        $msg .= "<div class='progress my-2' style='height: 8px; border-radius: 8px; background-color: #e9f7ef;'><div class='progress-bar bg-success' role='progressbar' style='width: 85%;'></div></div>";
+        $msg .= "<div class='small text-success fw-semibold'>Nível: 85%</div>";
         $msg .= "</div>";
         $msg .= "</div>";
-        $msg .= "<div class='mt-3 mt-md-0'>";
-        $msg .= "<a href='perfil-vendedora.html' class='btn btn-wegreen-accent rounded-pill fw-semibold shadow-sm px-4 py-2'>Ver Perfil</a>";
-        $msg .= "</div>";
-        $msg .= "</div>";
-        $msg .= "</div>";
-        $msg .= "</div>";
-    }
 
+        $msg .= "<div class='mt-3 mt-md-0'>";
+        $msg .= "<a href='Vendedor.html' class='btn btn-wegreen-accent rounded-pill fw-semibold shadow-sm px-4 py-2'>Ver Perfil</a>";
+        $msg .= "</div>";
+        $msg .= "</div>";
+        $msg .= "</div>";
+        $msg .= "</div>";
+        }
         $conn->close();
         
         return ($msg);

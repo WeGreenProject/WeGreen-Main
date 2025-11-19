@@ -4,11 +4,11 @@ require_once 'connection.php';
 
 class Vendedor {
 
-    function getPerfilVendedora() {
+    function getPerfilVendedora($utilizador_id) {
         global $conn;
         $msg = "";
 
-        $sql = "SELECT Vendedor.* FROM Vendedor";
+        $sql = "SELECT Utilizadores.* FROM Utilizadores";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -18,7 +18,7 @@ class Vendedor {
                 $msg .= "<section class='container my-5'>";
                 $msg .= "<div class='p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex justify-content-between align-items-center flex-wrap'>";
                 $msg .= "<div class='d-flex align-items-center'>";
-                $msg .= "<img src='".$row["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm me-3' width='110' height='110'>";
+                $msg .= "<img src='".$rowProduto["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm' width='110' height='110' style='object-fit: cover;'>";
                 $msg .= "<div>";
                 $msg .= "<h4 class='fw-bold text-success mb-1'>".$row["nome"]."</h4>";
                 $msg .= "<p class='text-muted mb-1 d-flex align-items-center'>";
@@ -38,12 +38,11 @@ class Vendedor {
         return $msg;
     }
 }
-
         function getProdutosVendedora() {
         global $conn;
         $msg = "";
 
-        $sql = "SELECT Produtos.* FROM Produtos WHERE Produtos.id_vendedor = 1"; 
+        $sql = "SELECT Produtos.* FROM Produtos WHERE Produtos.id = 1"; 
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
