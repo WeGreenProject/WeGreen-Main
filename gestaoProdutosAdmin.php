@@ -255,7 +255,9 @@
                     </div>
                     <div class="info-item">
                         <label>Categoria</label>
-                        <input type="text" class="form-control" id="categoriaprodutoEdit">
+                        <select name="" id="categoriaprodutoEdit">
+
+                        </select>
                     </div>
                     <div class="info-item">
                         <label>Marca</label>
@@ -275,35 +277,19 @@
                     </div>
                     <div class="info-item">
                         <label>Vendedor</label>
-                        <input type="text" class="form-control" id="vendedorprodutoEdit">
+                        <select name="" id="vendedorprodutoEdit">
+
+                        </select>
                     </div>
                 </div>
 
-                <div class="photos-section">
-                    <h3>📸 Fotos do Produto</h3>
-                    <div class="photos-grid" id="photosGrid">
-                        <div class="photo-item">
-                            <img src="https://via.placeholder.com/300" alt="Foto Frontal">
-                            <div class="photo-label">Foto Frontal</div>
-                        </div>
-                        <div class="photo-item">
-                            <img src="https://via.placeholder.com/300" alt="Foto Traseira">
-                            <div class="photo-label">Foto Traseira</div>
-                        </div>
-                        <div class="photo-item">
-                            <img src="https://via.placeholder.com/300" alt="Etiqueta" onclick="viewFullscreen(this)">
-                            <div class="photo-label">Etiqueta</div>
-                        </div>
-                        <div class="photo-item">
-                            <img src="https://via.placeholder.com/300" alt="Detalhes" onclick="viewFullscreen(this)">
-                            <div class="photo-label">Detalhes</div>
-                        </div>
-                    </div>
+                <div class="photos-section" id="fotos-section">
+
                 </div>
 
                 <div class="modal-actions">
-                    <button class="btn-approve" id="btnAprovar" onclick="approveProduct()">✅ Aprovar Produto</button>
-                    <button class="btn-reject" onclick="rejectProduct()">❌ Rejeitar Produto</button>
+                    <button class="btn-approve" id="btnGuardar">✅ Aprovar Produto</button>
+                    <button class=" btn-reject">❌ Rejeitar Produto</button>
                 </div>
 
             </div>
@@ -318,105 +304,6 @@
         event.target.classList.add('active');
         document.getElementById(tabId).classList.add('active');
     }
-    /*
-
-        function openModal(productId) {
-            currentProductId = productId;
-            const produto = produtosData[productId];
-
-            if (!produto) return;
-
-            // Preencher informações do produto
-            document.getElementById('modal-id').textContent = produto.id;
-            document.getElementById('modal-nome').textContent = produto.nome;
-            document.getElementById('modal-categoria').textContent = produto.categoria;
-            document.getElementById('modal-marca').textContent = produto.marca;
-            document.getElementById('modal-tamanho').textContent = produto.tamanho;
-            document.getElementById('modal-preco').textContent = produto.preco;
-            document.getElementById('modal-genero').textContent = produto.genero;
-            document.getElementById('modal-vendedor').textContent = produto.vendedor;
-
-            // Carregar fotos
-            const photosGrid = document.getElementById('photosGrid');
-            photosGrid.innerHTML = '';
-
-            produto.fotos.forEach(foto => {
-                const photoItem = document.createElement('div');
-                photoItem.className = 'photo-item';
-                photoItem.innerHTML = `
-                        <img src="${foto.url}" alt="${foto.label}" onclick="viewFullscreen(this)">
-                        <div class="photo-label">${foto.label}</div>
-                    `;
-                photosGrid.appendChild(photoItem);
-            });
-
-            // Mostrar modal
-            document.getElementById('verificationModal').classList.add('active');
-        }
-
-
-
-        // Aprovar produto
-        function approveProduct() {
-            if (!currentProductId) return;
-
-            Swal.fire({
-                title: 'Aprovar Produto?',
-                text: `Tem certeza que deseja aprovar o produto ${produtosData[currentProductId].nome}?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#00c851',
-                cancelButtonColor: '#ff4444',
-                confirmButtonText: 'Sim, aprovar!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Aqui você faria a chamada AJAX para aprovar o produto
-                    Swal.fire(
-                        'Aprovado!',
-                        'O produto foi aprovado com sucesso.',
-                        'success'
-                    );
-                    closeModal();
-                    // Atualizar tabela
-                }
-            });
-        }
-
-        // Rejeitar produto
-        function rejectProduct() {
-            if (!currentProductId) return;
-
-            Swal.fire({
-                title: 'Rejeitar Produto?',
-                text: `Tem certeza que deseja rejeitar o produto ${produtosData[currentProductId].nome}?`,
-                icon: 'warning',
-                input: 'textarea',
-                inputPlaceholder: 'Motivo da rejeição...',
-                showCancelButton: true,
-                confirmButtonColor: '#ff4444',
-                cancelButtonColor: '#666',
-                confirmButtonText: 'Sim, rejeitar!',
-                cancelButtonText: 'Cancelar',
-                inputValidator: (value) => {
-                    if (!value) {
-                        return 'Por favor, informe o motivo da rejeição!';
-                    }
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Aqui você faria a chamada AJAX para rejeitar o produto
-                    Swal.fire(
-                        'Rejeitado!',
-                        'O produto foi rejeitado.',
-                        'success'
-                    );
-                    closeModal();
-                    // Atualizar tabela
-                }
-            });
-        }
-            */
     </script>
     <script src="src/js/gestaoProdutos.js"></script>
 </body>

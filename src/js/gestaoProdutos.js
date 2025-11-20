@@ -111,6 +111,8 @@ function getListaVendedores(){
     .done(function( msg ) {
         console.log(msg);
          $('#listaVendedor').html(msg);
+         $('#vendedorprodutoEdit').html(msg);
+
     })
     
     .fail(function( jqXHR, textStatus ) {
@@ -135,6 +137,8 @@ function getListaCategoria(){
     .done(function( msg ) {
         console.log(msg);
          $('#listaCategoria').html(msg);
+        $('#categoriaprodutoEdit').html(msg);
+
     })
     
     .fail(function( jqXHR, textStatus ) {
@@ -160,17 +164,17 @@ function getDadosInativos(Produto_id){
     })
     
     .done(function( msg ) {
-
         let obj = JSON.parse(msg);
+        getFotosSection(obj.Produto_id);
         $('#numprodutoEdit').val(obj.Produto_id);
         $('#nomeprodutoEdit').val(obj.nome);
-        $('#categoriaprodutoEdit').val(obj.categoria);
+        $('#categoriaprodutoEdit').val(obj.tipo_produto_id);
         $('#marcaprodutoEdit').val(obj.marca);
         $('#tamanhoprodutoEdit').val(obj.tamanho);
         $('#precoprodutoEdit').val(obj.preco);
         $('#generoprodutoEdit').val(obj.genero);
-        $('#vendedorprodutoEdit').val(obj.vendedor);
-       $('#btnGuardar').attr("onclick","guardaEditFuncionario("+obj.Produto_id+")") 
+        $('#vendedorprodutoEdit').val(obj.anunciante_id);
+       $('#btnGuardar').attr("onclick", "guardaEditProduto(" + obj.Produto_id + ");");
         
        $('#formEditInativo').modal('show');
     })
@@ -178,19 +182,43 @@ function getDadosInativos(Produto_id){
     .fail(function( jqXHR, textStatus ) {
     alert( "Request failed: " + textStatus );
     });
-
-    
 }
+function getFotosSection(Produto_id){
 
-function guardaEditFuncionario(Produto_id) {
+
+    let dados = new FormData();
+    dados.append("op", 8);
+    dados.append("Produto_id", Produto_id);
+    $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+        $('#fotos-section').html(msg);
+        console.log(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
+function guardaEditProduto(Produto_id) {
     let dados = new FormData();
     dados.append("op", 7);
-    dados.append("numFuncionarioEdit", $('#numFuncionarioEdit').val());
-    dados.append("nomeEdit", $('#nomeEdit').val());
-    dados.append("telefoneEdit", $('#telefoneEdit').val());
-    dados.append("salarioEdit", $('#salarioEdit').val());
-    dados.append("nifEdit", $('#nifEdit').val());
-    dados.append("ID_TipoColaboradoresEdit", $('#ID_TipoColaboradoresEdit').val());
+    dados.append("numprodutoEdit", $('#numprodutoEdit').val());
+    dados.append("nomeprodutoEdit", $('#nomeprodutoEdit').val());
+    dados.append("categoriaprodutoEdit", $('#categoriaprodutoEdit').val());
+    dados.append("marcaprodutoEdit", $('#marcaprodutoEdit').val());
+    dados.append("tamanhoprodutoEdit", $('#tamanhoprodutoEdit').val());
+    dados.append("precoprodutoEdit", $('#precoprodutoEdit').val());
+    dados.append("generoprodutoEdit", $('#generoprodutoEdit').val());
+    dados.append("vendedorprodutoEdit", $('#vendedorprodutoEdit').val());
     dados.append("Produto_id", Produto_id);
 
     $.ajax({
@@ -203,17 +231,17 @@ function guardaEditFuncionario(Produto_id) {
         processData: false
     })
     .done(function(msg) {
-    $('#formEditFuncionario').modal('hide');
+    $('#formEditInativo').modal('hide');
         
         let obj = JSON.parse(msg);
         if(obj.flag) {
-            alerta("Fornecedor", obj.msg, "success");
+            alerta("Inativo", obj.msg, "success");
             alerta2(obj.msg,"success");
-            getListaFuncionario();
+            getInativos();
             myModal.hide();
         } else {
             alerta2(obj.msg,"error");
-            alerta("Fornecedor", obj.msg, "error");
+            alerta("Inativo", obj.msg, "error");
         }
         console.log(msg);
     })
@@ -221,7 +249,45 @@ function guardaEditFuncionario(Produto_id) {
         alert("Request failed: " + textStatus);
     });
 }
+function alerta(titulo,msg,icon){
+    Swal.fire({
+        position: 'center',
+        icon: icon,
+        title: titulo,
+        text: msg,
+        showConfirmButton: true,
+
+      })
+}
+function alerta2(msg,icon)
+{
+  let customClass = '';
+  if (icon === 'success') {
+    customClass = 'toast-success';
+  } else if (icon === 'error') {
+    customClass = 'toast-error';
+  }
+  const Toast = Swal.mixin({
+  toast: true,
+  position: "top-end",
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+      customClass: {
+      popup: 'custom-toast'
+    },
+  didOpen: (toast) => {
+    toast.onmouseenter = Swal.stopTimer;
+    toast.onmouseleave = Swal.resumeTimer;
+  }
+});
+Toast.fire({
+  icon: icon,
+  title: msg
+});
+}
 $(function() {
+    getFotosSection();
     getInativos();
     getListaCategoria();
     getListaVendedores();
