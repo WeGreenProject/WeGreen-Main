@@ -82,7 +82,7 @@ class Vendas{
                 $msg .= "<td>".$row['genero']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Info</button></td>";  
+                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Editar</button></td>";  
                 $msg .= "</tr>";
             }
         } else {
@@ -106,7 +106,7 @@ class Vendas{
         $msg = "";
         $row = "";
 
-        $sql = "SELECT Produtos.*,Tipo_Produtos.descricao FROM Produtos,Tipo_Produtos WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Produto_id =".$ID_Produto;
+        $sql = "SELECT Produtos.*,Tipo_Produtos.id As Valuecategoria,utilizadores.nome As vendedor FROM Produtos,Tipo_Produtos,Utilizadores WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = Produtos.anunciante_id AND Produto_id =".$ID_Produto;
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -182,6 +182,78 @@ class Vendas{
         } else {
                 $msg .= "<option value='-1'>Selecionar cliente...</option>";
                 $msg .= "<option value='1'>Sem Registos</option>";
+        }
+        $conn->close();
+
+        return ($msg);
+    }
+    function guardaEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
+        
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+
+        $sql = "UPDATE Produtos 
+        SET nome = '".$nome."', 
+            tipo_produto_id = '".$categoria."', 
+            marca = '".$marca."', 
+            tamanho = '".$tamanho."', 
+            preco = '".$preco."', 
+            genero = '".$genero."', 
+            anunciante_id = '".$vendedor."', 
+            ativo = 1 
+        WHERE Produto_id = ".$Produto_id;   
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Aprovado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+
+    }
+    function getFotosSection($Produto_id)
+    {
+        global $conn;
+        $msg = "";
+        $Produto_id = intval($Produto_id);
+        $sql = "SELECT * FROM produto_fotos WHERE produto_id = ".$Produto_id;
+        $result = $conn->query($sql);
+        $text = "";
+        $text2 = "";
+        $labels = [
+            "Foto Frontal",
+            "Foto Traseira",
+            "Etiqueta",
+            "Detalhes"
+            ];
+
+        if ($result->num_rows > 0) {
+            $msg .= "<h3>📸 Fotos do Produto</h3>";
+            $msg .= "<div class='photos-grid' id='photosGrid'>";
+            $i = 0;
+            while($row = $result->fetch_assoc()) {
+                $msg .= "<div class='photo-item'>";
+                $msg .= "<img src=".$row["foto"]." alt='Foto Frontal'>";
+                $msg .= "<div class='photo-label'>".$labels[$i]."</div>";
+                $msg .= "</div>";
+
+                $i++;
+            }
+            $msg .= "</div>";   
+        } else {
+                $msg .= "<h3>📸 Não existem fotos</h3>";
         }
         $conn->close();
 

@@ -921,3 +921,13 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        .swal2-popup.custom-toast {
+background-color: #4CAF50 !important;
+color: white !important;
+width: 400px  !important; 
+}
+.swal2-popup.toast-error {
+background-color: #f44336 !important;
+color: white !important;
+width: 400px !important;
+}
