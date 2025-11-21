@@ -34,6 +34,9 @@ class Vendedor {
                 $msg .= "</div>"; 
                 $msg .= "</div>"; 
         }
+        $conn->close();
+        
+        return ($msg);
 
     }
 }
@@ -63,8 +66,11 @@ class Vendedor {
 
             $msg .= "</div></section>";
         }
+                $msg .= "</div></section>";
+        $conn->close();
+        
+        return ($msg);
 
-        $msg .= "</div></section>";
     }
 }
 ?>

@@ -111,6 +111,23 @@ class Vendas{
 
         return ($msg);
     }
+    function getDadosProduto($ID_Produto){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT Produtos.*,Tipo_Produtos.id As Valuecategoria,utilizadores.nome As vendedor FROM Produtos,Tipo_Produtos,Utilizadores WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = Produtos.anunciante_id AND Produto_id =".$ID_Produto;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+        }
+
+        $conn->close();
+
+        return (json_encode($row));
+
+    }
     function getDadosInativos($ID_Produto){
         global $conn;
         $msg = "";
@@ -165,6 +182,7 @@ class Vendas{
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
                 $msg .= "<td>".$row['marca']."</td>";  
+                $msg .= "<td><button class='btn-info' onclick='getDadosProduto(".$row['Produto_id'].")'>ℹ️ Editar</button><br><br><button class='btn-info' onclick='getDesativacao(".$row['Produto_id'].")'>❌ Desativar</button></td>";  
                 $msg .= "</tr>";
             }
         } else {
@@ -247,6 +265,41 @@ class Vendas{
             genero = '".$genero."', 
             anunciante_id = '".$vendedor."', 
             ativo = 1 
+        WHERE Produto_id = ".$Produto_id;   
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Aprovado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+
+    }
+    function guardaDadosEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
+        
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+
+        $sql = "UPDATE Produtos 
+        SET nome = '".$nome."', 
+            tipo_produto_id = '".$categoria."', 
+            marca = '".$marca."', 
+            tamanho = '".$tamanho."', 
+            preco = '".$preco."', 
+            genero = '".$genero."', 
+            anunciante_id = '".$vendedor."'
         WHERE Produto_id = ".$Produto_id;   
 
         if ($conn->query($sql) === TRUE) {

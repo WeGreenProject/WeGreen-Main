@@ -91,6 +91,84 @@ function getProdutos(){
 });
 
 }
+function getDadosProduto(Produto_id){
+
+
+    let dados = new FormData();
+    dados.append("op", 10);
+    dados.append("Produto_id", Produto_id);
+
+    $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+
+        let obj = JSON.parse(msg);
+        getFotosSection(obj.Produto_id);
+        $('#numprodutoEdit').val(obj.Produto_id);
+        $('#nomeprodutoEdit').val(obj.nome);
+        $('#categoriaprodutoEdit').val(obj.tipo_produto_id);
+        $('#marcaprodutoEdit').val(obj.marca);
+        $('#tamanhoprodutoEdit').val(obj.tamanho);
+        $('#precoprodutoEdit').val(obj.preco);
+        $('#generoprodutoEdit').val(obj.genero);
+        $('#vendedorprodutoEdit').val(obj.anunciante_id);
+       $('#btnGuardar2').attr("onclick", "guardaDadosEditProduto(" + obj.Produto_id + ");");
+        
+       $('#formEditInativo2').modal('show');
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
+function guardaDadosEditProduto(Produto_id) {
+    let dados = new FormData();
+    dados.append("op", 11);
+    dados.append("numprodutoEdit", $('#numprodutoEdit').val());
+    dados.append("nomeprodutoEdit", $('#nomeprodutoEdit').val());
+    dados.append("categoriaprodutoEdit", $('#categoriaprodutoEdit').val());
+    dados.append("marcaprodutoEdit", $('#marcaprodutoEdit').val());
+    dados.append("tamanhoprodutoEdit", $('#tamanhoprodutoEdit').val());
+    dados.append("precoprodutoEdit", $('#precoprodutoEdit').val());
+    dados.append("generoprodutoEdit", $('#generoprodutoEdit').val());
+    dados.append("vendedorprodutoEdit", $('#vendedorprodutoEdit').val());
+    dados.append("Produto_id", Produto_id);
+
+    $.ajax({
+        url: "src/controller/controllerGestaoProdutos.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(msg) {
+    $('#formEditInativo2').modal('hide');
+        
+        let obj = JSON.parse(msg);
+        if(obj.flag) {
+            alerta("Inativo", obj.msg, "success");
+            alerta2(obj.msg,"success");
+            getProdutos();
+        } else {
+            alerta2(obj.msg,"error");
+            alerta("Inativo", obj.msg, "error");
+        }
+        console.log(msg);
+    })
+    .fail(function(jqXHR, textStatus) {
+        alert("Request failed: " + textStatus);
+    });
+}
 function getListaVendedores(){
     let dados = new FormData();
     dados.append("op", 3);
@@ -236,7 +314,6 @@ function guardaEditProduto(Produto_id) {
             alerta("Inativo", obj.msg, "success");
             alerta2(obj.msg,"success");
             getInativos();
-            myModal.hide();
         } else {
             alerta2(obj.msg,"error");
             alerta("Inativo", obj.msg, "error");
@@ -270,7 +347,6 @@ function rejeitaEditProduto(Produto_id) {
             alerta("Inativo", obj.msg, "success");
             alerta2(obj.msg,"success");
             getInativos();
-            myModal.hide();
         } else {
             alerta2(obj.msg,"error");
             alerta("Inativo", obj.msg, "error");
