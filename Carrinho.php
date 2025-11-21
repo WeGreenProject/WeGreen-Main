@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +10,7 @@
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -40,9 +41,9 @@
                         <h3>Produtos no Carrinho</h3>
                         <button class="btn-text" onclick="limparCarrinho()">Limpar Tudo</button>
                     </div>
-                    
+
                     <div id="cartItems" class="cart-items">
-                        <!-- Items carregados via AJAX -->
+
                     </div>
 
                     <div id="emptyCart" class="empty-cart" style="display: none;">
@@ -57,17 +58,17 @@
                 <div class="cart-summary">
                     <div class="summary-card">
                         <h3>Resumo do Pedido</h3>
-                        
+
                         <div class="summary-row">
                             <span>Subtotal:</span>
                             <span id="subtotal">€0.00</span>
                         </div>
-                        
+
                         <div class="summary-row">
                             <span>Envio:</span>
                             <span id="shipping">€5.00</span>
                         </div>
-                        
+
                         <div class="summary-row highlight">
                             <span>Total:</span>
                             <span id="total">€0.00</span>
@@ -99,4 +100,5 @@
 
     <script src="src/js/carrinho.js"></script>
 </body>
+
 </html>
