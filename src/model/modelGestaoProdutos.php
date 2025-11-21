@@ -21,6 +21,11 @@ class Vendas{
                     $text = "Ativo";
                     $text2 = 'status-approved';
                 }
+                else if($row['ativo'] == 2)
+                {
+                    $text = "Rejeitado";
+                    $text2 = 'status-rejected';
+                }
                 else
                 {
                     $text = "Inativo";
@@ -68,6 +73,11 @@ class Vendas{
                 {
                     $text = "Ativo";
                     $text2 = 'status-approved';
+                }
+                else if($row['ativo'] == 2)
+                {
+                    $text = "Rejeitado";
+                    $text2 = 'status-rejected';
                 }
                 else
                 {
@@ -135,6 +145,11 @@ class Vendas{
                     $text = "Ativo";
                     $text2 = 'status-approved';
                 }
+                else if($row['ativo'] == 2)
+                {
+                    $text = "Rejeitado";
+                    $text2 = 'status-rejected';
+                }
                 else
                 {
                     $text = "Inativo";
@@ -186,6 +201,34 @@ class Vendas{
         $conn->close();
 
         return ($msg);
+    }
+    function rejeitaEditProduto($Produto_id){
+        
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+
+        $sql = "UPDATE Produtos 
+        SET ativo = 2 WHERE Produto_id = ".$Produto_id;   
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Rejeitado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+
     }
     function guardaEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
         
