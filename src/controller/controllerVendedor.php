@@ -5,10 +5,12 @@ $func = new Vendedor();
 $utilizador_id = 1;
 
 if ($_POST['op'] == 1) {
-    echo $func->getProdutosVendedora($utilizador_id);
+    $resp = $func->getPerfilVendedora($_POST["utilizadorID"]);
+    echo $resp;
 }
 
 if ($_POST['op'] == 2) {
-    echo $func->getPerfilVendedora($utilizador_id);
+    $resp = $func->getProdutosVendedora($_POST["produto_id"]);
+    echo $resp;
 }
 ?>

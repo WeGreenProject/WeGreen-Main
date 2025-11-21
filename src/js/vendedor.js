@@ -1,6 +1,9 @@
 function getVendedor() {
     let dados = new FormData();
     dados.append("op", 1); 
+    const params = new URLSearchParams(window.location.search);
+    const utilizadorID = params.get("id");
+    dados.append("utilizadorID", utilizadorID); 
 
     $.ajax({
         url: "src/controller/controllerVendedor.php",
@@ -41,6 +44,6 @@ function getPerfilVendedora() {
 }
 
 $(function() {
+    //getPerfilVendedora();
     getVendedor();
-    getPerfilVendedora();
 });
