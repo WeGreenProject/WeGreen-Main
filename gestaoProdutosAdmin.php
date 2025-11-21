@@ -212,7 +212,7 @@
 
             <div id="todas-vendas" class="tab-content">
                 <div class="table-container">
-                    <h3 style="margin-bottom: 20px; color: #ffd700;">🌐 Base de Dados - Todas as Vendas</h3>
+                    <h3 style="margin-bottom: 20px; color: #ffd700;">🌐 Base de Dados - Todas os Produtos</h3>
                     <table id="todasVendasTable">
                         <thead>
                             <tr>
@@ -224,6 +224,7 @@
                                 <th>Total (€)</th>
                                 <th>Estado</th>
                                 <th>Marca</th>
+                                <th>Ação</th>
                             </tr>
                         </thead>
                         <tbody id="todasVendasBody"></tbody>
@@ -234,6 +235,66 @@
     </div>
 
     <!-- Modal de Verificação -->
+    <div class="modal fade" id="formEditInativo2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <!-- AQUI FALTAVA -->
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h2>Editar Produto</h2>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+
+                <div class="product-info-grid">
+                    <div class="info-item">
+                        <label>ID do Produto</label>
+                        <input type="text" class="form-control" id="numprodutoEdit" disabled>
+                    </div>
+                    <div class="info-item">
+                        <label>Nome do Produto</label>
+                        <input type="text" class="form-control" id="nomeprodutoEdit">
+                    </div>
+                    <div class="info-item">
+                        <label>Categoria</label>
+                        <select name="" id="categoriaprodutoEdit">
+
+                        </select>
+                    </div>
+                    <div class="info-item">
+                        <label>Marca</label>
+                        <input type="text" class="form-control" id="marcaprodutoEdit">
+                    </div>
+                    <div class="info-item">
+                        <label>Tamanho</label>
+                        <input type="text" class="form-control" id="tamanhoprodutoEdit">
+                    </div>
+                    <div class="info-item">
+                        <label>Preço</label>
+                        <input type="text" class="form-control" id="precoprodutoEdit">
+                    </div>
+                    <div class="info-item">
+                        <label>Gênero</label>
+                        <input type="text" class="form-control" id="generoprodutoEdit">
+                    </div>
+                    <div class="info-item">
+                        <label>Vendedor</label>
+                        <select name="" id="vendedorprodutoEdit">
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="photos-section" id="fotos-section">
+
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-approve" id="btnGuardar2">✅ Salvar Alterações</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="formEditInativo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <!-- AQUI FALTAVA -->
@@ -295,7 +356,6 @@
             </div>
         </div>
     </div>
-
     <script>
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));

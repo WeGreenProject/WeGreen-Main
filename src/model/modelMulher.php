@@ -8,7 +8,7 @@ function getProdutosMulher(){
         $msg = "";
         $row = "";
 
-        $sql = "SELECT Produtos.* FROM Produtos where Produtos.genero LIKE 'Mulher';";
+        $sql = "SELECT Produtos.* FROM Produtos where Produtos.genero LIKE 'Mulher' AND produtos.ativo = 1;";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {

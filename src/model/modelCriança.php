@@ -3,7 +3,7 @@ require_once 'connection.php';
 
 class Criança {
 
-function getProdutosCriança($ID_Produto){
+function getProdutosCriança(){
         global $conn;
         $msg = "";
         $row = "";

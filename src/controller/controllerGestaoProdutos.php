@@ -48,4 +48,21 @@ if ($_POST['op'] == 9) {
     $resp = $func->rejeitaEditProduto($_POST['Produto_id']);
     echo $resp;
 }
+if ($_POST['op'] == 10) {
+    $resp = $func->getDadosProduto($_POST['Produto_id']);
+    echo $resp;
+}
+if ($_POST['op'] == 11) {
+    $resp = $func->guardaDadosEditProduto(
+        $_POST['nomeprodutoEdit'],
+        $_POST['categoriaprodutoEdit'],
+        $_POST['marcaprodutoEdit'],
+        $_POST['tamanhoprodutoEdit'],
+        $_POST['precoprodutoEdit'],
+        $_POST['generoprodutoEdit'],
+        $_POST['vendedorprodutoEdit'],
+        $_POST['Produto_id']
+    );
+    echo $resp;
+}
 ?>
