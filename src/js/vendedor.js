@@ -24,7 +24,8 @@ function getVendedor() {
 
 function getPerfilVendedora() {
     let dados = new FormData();
-    dados.append("op", 2); 
+    dados.append("op", 2);  // ✔ CORRIGIDO
+
     $.ajax({
         url: "src/controller/controllerVendedor.php",
         method: "POST",
@@ -46,4 +47,3 @@ $(function() {
     //getPerfilVendedora();
     getVendedor();
 });
-

@@ -35,7 +35,6 @@ class Vendedor {
                 $msg .= "</div>"; 
         }
 
-        return $msg;
     }
 }
         function getProdutosVendedora($produto_id) {
@@ -65,7 +64,7 @@ class Vendedor {
             $msg .= "</div></section>";
         }
 
-        return $msg;
+        $msg .= "</div></section>";
     }
 }
 ?>
