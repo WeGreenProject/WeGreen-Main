@@ -19,7 +19,6 @@ function getMinhasVendas(){
     })
     
     .done(function( msg ) {
-
         $('#minhasVendasBody').html(msg);
         $('#minhasVendasTable').DataTable();
         
@@ -51,7 +50,6 @@ function getInativos(){
     })
     
     .done(function( msg ) {
-
         $('#inativosBody').html(msg);
         $('#inativosTable').DataTable();
         
@@ -83,7 +81,6 @@ function getProdutos(){
     })
     
     .done(function( msg ) {
-
         $('#todasVendasBody').html(msg);
         $('#todasVendasTable').DataTable();
         
@@ -164,6 +161,7 @@ function getDadosInativos(Produto_id){
     })
     
     .done(function( msg ) {
+
         let obj = JSON.parse(msg);
         getFotosSection(obj.Produto_id);
         $('#numprodutoEdit').val(obj.Produto_id);
@@ -174,8 +172,8 @@ function getDadosInativos(Produto_id){
         $('#precoprodutoEdit').val(obj.preco);
         $('#generoprodutoEdit').val(obj.genero);
         $('#vendedorprodutoEdit').val(obj.anunciante_id);
-       $('#btnGuardar').attr("onclick", "guardaEditProduto(" + obj.Produto_id + ");");
-        
+       $('#btnGuardar').attr("onclick", "alerta3(" + obj.Produto_id + ");");
+        $('#btnRejeitar').attr("onclick", "rejeitaEditProduto(" + obj.Produto_id + ");");
        $('#formEditInativo').modal('show');
     })
     
@@ -249,6 +247,40 @@ function guardaEditProduto(Produto_id) {
         alert("Request failed: " + textStatus);
     });
 }
+function rejeitaEditProduto(Produto_id) {
+    let dados = new FormData();
+    dados.append("op", 9);
+
+    dados.append("Produto_id", Produto_id);
+
+    $.ajax({
+        url: "src/controller/controllerGestaoProdutos.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(msg) {
+    $('#formEditInativo').modal('hide');
+        
+        let obj = JSON.parse(msg);
+        if(obj.flag) {
+            alerta("Inativo", obj.msg, "success");
+            alerta2(obj.msg,"success");
+            getInativos();
+            myModal.hide();
+        } else {
+            alerta2(obj.msg,"error");
+            alerta("Inativo", obj.msg, "error");
+        }
+        console.log(msg);
+    })
+    .fail(function(jqXHR, textStatus) {
+        alert("Request failed: " + textStatus);
+    });
+}
 function alerta(titulo,msg,icon){
     Swal.fire({
         position: 'center',
@@ -286,6 +318,22 @@ Toast.fire({
   title: msg
 });
 }
+function alerta3(Produto_id) {
+    Swal.fire({
+        title: "Tens a certeza?",
+        text: "Queres mesmo guardar as alterações?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sim, guardar!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            guardaEditProduto(Produto_id);
+        }
+    });
+}
+
 $(function() {
     getFotosSection();
     getInativos();

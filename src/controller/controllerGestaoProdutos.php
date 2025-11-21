@@ -44,4 +44,8 @@ if ($_POST['op'] == 8) {
     $resp = $func->getFotosSection($_POST['Produto_id']);
     echo $resp;
 }
+if ($_POST['op'] == 9) {
+    $resp = $func->rejeitaEditProduto($_POST['Produto_id']);
+    echo $resp;
+}
 ?>

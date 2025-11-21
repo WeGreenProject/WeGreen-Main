@@ -289,7 +289,7 @@
 
                 <div class="modal-actions">
                     <button class="btn-approve" id="btnGuardar">✅ Aprovar Produto</button>
-                    <button class=" btn-reject">❌ Rejeitar Produto</button>
+                    <button class=" btn-reject" id="btnRejeitar">❌ Rejeitar Produto</button>
                 </div>
 
             </div>
