@@ -40,38 +40,41 @@ class Vendedor {
 
     }
 }
-        function getProdutosVendedora($produto_id) {
-        global $conn;
-        $msg = "";
+    function getProdutosVendedora($utilizador_id) {
+    global $conn;
+    $msg = "";
 
-        $sql = "SELECT Produtos.* FROM Produtos WHERE Produtos.id = .$produto_id"; 
-        $result = $conn->query($sql);
+    $sql = "SELECT Produtos.* FROM Produtos WHERE Produtos.anunciante_id = " . $utilizador_id . " AND Produtos.ativo = 1"; 
+    $result = $conn->query($sql);
 
-        if ($result->num_rows > 0) {
-            $msg .= "<section class='container my-5'><div class='row g-4'>";
+    if ($result->num_rows > 0) {
+        $msg .= "<section class='container my-5'><div class='row g-4'>";
 
-            while ($row = $result->fetch_assoc()) {
-                $msg .= "<div class='col-md-4'>";
-                $msg .= "<div class='card border-0 shadow rounded-4'>";
-                $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
-                $msg .= "<div class='card-body'>";
-                $msg .= "<h5 class='fw-bold'>".$row["nome"]."</h5>";
-                $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-                $msg .= "<p class='fw-bold text-success'>".$row["preco"]."€</p>";
-                $msg .= "<a href='Vendedor.html?id=".$row['id']."' class='btn btn-lime rounded-pill w-100'>Ver Produto</a>";
-                $msg .= "</div>";
-                $msg .= "</div>";
-                $msg .= "</div>";
-            }
-
-            $msg .= "</div></section>";
+        while ($row = $result->fetch_assoc()) {
+            $msg .= "<div class='col-md-4'>";
+            $msg .= "<div class='card border-0 shadow rounded-4'>";
+            $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
+            $msg .= "<div class='card-body'>";
+            $msg .= "<h5 class='fw-bold'>".$row["nome"]."</h5>";
+            $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
+            $msg .= "<p class='fw-bold text-success'>".$row["preco"]."€</p>";
+            $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-lime rounded-pill w-100'>Ver Produto</a>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+            $msg .= "</div>";
         }
-                $msg .= "</div></section>";
-        $conn->close();
-        
-        return ($msg);
 
+        $msg .= "</div></section>";
+    } else {
+        $msg .= "<section class='container my-5'>";
+        $msg .= "<div class='alert alert-info text-center'>Este vendedor ainda não tem produtos à venda.</div>";
+        $msg .= "</section>";
     }
+    
+    $conn->close();
+    
+    return ($msg);
+}
 }
 ?>
 ?>
