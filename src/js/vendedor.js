@@ -15,16 +15,20 @@ function getVendedor() {
         processData: false
     })
     .done(function(msg) {
-        $('#ProdutosVendedora').html(msg);
+        $('#PerfilVendedora').html(msg); 
     })
     .fail(function(jqXHR, textStatus) {
         alert("Request failed: " + textStatus);
     });
 }
 
-function getPerfilVendedora() {
+function getProdutosVendedora() { 
     let dados = new FormData();
     dados.append("op", 2);
+    const params = new URLSearchParams(window.location.search);
+    const utilizadorID = params.get("id");
+    dados.append("utilizadorID", utilizadorID);
+
     $.ajax({
         url: "src/controller/controllerVendedor.php",
         method: "POST",
@@ -35,7 +39,7 @@ function getPerfilVendedora() {
         processData: false
     })
     .done(function(msg) {
-        $('#PerfilVendedora').html(msg);
+        $('#ProdutosVendedora').html(msg);
     })
     .fail(function(jqXHR, textStatus) {
         alert("Request failed: " + textStatus);
@@ -43,6 +47,6 @@ function getPerfilVendedora() {
 }
 
 $(function() {
-    //getPerfilVendedora();
-    getVendedor();
+    getVendedor(); 
+    getProdutosVendedora(); 
 });

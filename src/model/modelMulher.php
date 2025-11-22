@@ -104,6 +104,9 @@ function getProdutoMulherMostrar($ID_Produto){
         $msg .= "</div>";
         $msg .= "</div>";
         $msg .= "</div>";
+
+        $msg .= "<div class='mt-3 mt-md-0'>";
+
         }
         $conn->close();
         
