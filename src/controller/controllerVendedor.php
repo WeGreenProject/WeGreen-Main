@@ -8,7 +8,7 @@ if ($_POST['op'] == 1) {
     echo $resp;
 }
 if ($_POST['op'] == 2) {
-    $resp = $func->getProdutosVendedora($_POST["produto_id"]);
+    $resp = $func->getProdutosVendedora($_POST["utilizadorID"]); 
     echo $resp;
 }
 ?>
