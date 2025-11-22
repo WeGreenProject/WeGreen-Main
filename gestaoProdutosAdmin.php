@@ -162,7 +162,16 @@
                                 </select>
                             </div>
                         </div>
-
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nome Produto</label>
+                                <input type="text" id="nomeprod" min="1" value="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Estado</label>
+                                <input type="text" id="estadoprod" step="0.01" required>
+                            </div>
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Quantidade</label>
@@ -177,11 +186,11 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Marca</label>
-                                <input type="number" id="quantidade" min="1" value="1" required>
+                                <input type="text" id="marca" min="1" value="1" required>
                             </div>
                             <div class="form-group">
                                 <label>Tamanho</label>
-                                <input type="number" id="preco" step="0.01" required>
+                                <input type="text" id="tamanho" step="0.01" required>
                             </div>
                         </div>
 
@@ -195,16 +204,16 @@
                         </div>
                         <div class="form-group">
                             <label>Foto</label>
-                            <input type="file" id="preco" step="0.01" required>
+                            <input type="file" id="fotoProduto" step="0.01" required>
                         </div>
                         <div class="form-group">
                             <label>Descrição</label>
                             <textarea id="observacoes" rows="4"
                                 placeholder="Adicionar notas sobre a descrição..."></textarea>
                         </div>
-                        <button type="submit" class="btn-primary" style="width: 100%;">
+                        <button type="button" class="btn-primary" onclick="adicionarProdutos()" style="width: 100%;">
                             <span>✅</span>
-                            Registar Venda
+                            Registar Produto
                         </button>
                     </form>
                 </div>
@@ -242,49 +251,49 @@
 
                 <div class="modal-header">
                     <h2>Editar Produto</h2>
-                    <button class="modal-close" onclick="closeModal()">×</button>
+                    <button type="button" class="modal-close" data-bs-dismiss="modal">×</button>
                 </div>
 
-                <div class="product-info-grid">
+                <div class=" product-info-grid">
                     <div class="info-item">
                         <label>ID do Produto</label>
-                        <input type="text" class="form-control" id="numprodutoEdit" disabled>
+                        <input type="text" class="form-control" id="numprodutoEdit2" disabled>
                     </div>
                     <div class="info-item">
                         <label>Nome do Produto</label>
-                        <input type="text" class="form-control" id="nomeprodutoEdit">
+                        <input type="text" class="form-control" id="nomeprodutoEdit2">
                     </div>
                     <div class="info-item">
                         <label>Categoria</label>
-                        <select name="" id="categoriaprodutoEdit">
+                        <select name="" id="categoriaprodutoEdit2">
 
                         </select>
                     </div>
                     <div class="info-item">
                         <label>Marca</label>
-                        <input type="text" class="form-control" id="marcaprodutoEdit">
+                        <input type="text" class="form-control" id="marcaprodutoEdit2">
                     </div>
                     <div class="info-item">
                         <label>Tamanho</label>
-                        <input type="text" class="form-control" id="tamanhoprodutoEdit">
+                        <input type="text" class="form-control" id="tamanhoprodutoEdit2">
                     </div>
                     <div class="info-item">
                         <label>Preço</label>
-                        <input type="text" class="form-control" id="precoprodutoEdit">
+                        <input type="text" class="form-control" id="precoprodutoEdit2">
                     </div>
                     <div class="info-item">
                         <label>Gênero</label>
-                        <input type="text" class="form-control" id="generoprodutoEdit">
+                        <input type="text" class="form-control" id="generoprodutoEdit2">
                     </div>
                     <div class="info-item">
                         <label>Vendedor</label>
-                        <select name="" id="vendedorprodutoEdit">
+                        <select name="" id="vendedorprodutoEdit2">
 
                         </select>
                     </div>
                 </div>
 
-                <div class="photos-section" id="fotos-section">
+                <div class="photos-section" id="fotos-section2">
 
                 </div>
 
@@ -297,12 +306,11 @@
     </div>
     <div class="modal fade" id="formEditInativo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <!-- AQUI FALTAVA -->
             <div class="modal-content">
 
                 <div class="modal-header">
                     <h2>🔍 Verificação de Produto</h2>
-                    <button class="modal-close" onclick="closeModal()">×</button>
+                    <button class="modal-close" type="button" class="modal-close" data-bs-dismiss="modal">×</button>
                 </div>
 
                 <div class="product-info-grid">

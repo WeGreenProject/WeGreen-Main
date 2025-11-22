@@ -1,0 +1,60 @@
+Foto recebida: Array
+(
+    [name] => HBhYL2zkfH2aH4E0RE9ZZPryZfApBr.jpg
+    [full_path] => HBhYL2zkfH2aH4E0RE9ZZPryZfApBr.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php6E32.tmp
+    [error] => 0
+    [size] => 202068
+)
+
+Entrou na condição de upload
+is_uploaded_file OK
+Tentando mover para: C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1123_20251122160504.jpg
+SUCCESS: Arquivo movido com sucesso!
+CONFIRMADO: Arquivo existe em C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1123_20251122160504.jpg
+Foto recebida: Array
+(
+    [name] => 92ccc97b017d054a2b58f89e11618870.jpg
+    [full_path] => 92ccc97b017d054a2b58f89e11618870.jpg
+    [type] => image/jpeg
+    [tmp_name] => C:\xampp\tmp\php584B.tmp
+    [error] => 0
+    [size] => 379205
+)
+
+Entrou na condição de upload
+is_uploaded_file OK
+Tentando mover para: C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1324_20251122160815.jpg
+SUCCESS: Arquivo movido com sucesso!
+CONFIRMADO: Arquivo existe em C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1324_20251122160815.jpg
+Foto recebida: Array
+(
+    [name] => bandit.PNG
+    [full_path] => bandit.PNG
+    [type] => image/png
+    [tmp_name] => C:\xampp\tmp\phpE7F9.tmp
+    [error] => 0
+    [size] => 1429367
+)
+
+Entrou na condição de upload
+is_uploaded_file OK
+Tentando mover para: C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1234_20251122160852.png
+SUCCESS: Arquivo movido com sucesso!
+CONFIRMADO: Arquivo existe em C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1234_20251122160852.png
+Foto recebida: Array
+(
+    [name] => Deus.png
+    [full_path] => Deus.png
+    [type] => image/png
+    [tmp_name] => C:\xampp\tmp\phpB472.tmp
+    [error] => 0
+    [size] => 1189578
+)
+
+Entrou na condição de upload
+is_uploaded_file OK
+Tentando mover para: C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1123_20251122160944.png
+SUCCESS: Arquivo movido com sucesso!
+CONFIRMADO: Arquivo existe em C:\xampp\htdocs\WeGreen-Main\src\model/src/img/produto_1123_20251122160944.png

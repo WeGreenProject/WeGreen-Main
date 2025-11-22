@@ -60,6 +60,33 @@ function getInativos(){
 });
 
 }
+function getDesativacao(produto_id)
+{
+
+    let dados = new FormData();
+    dados.append("op", 12);
+    dados.append("produto_id",produto_id)
+
+    $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) { 
+        let obj = JSON.parse(msg);
+        alerta2(obj.msg,"success");
+        getProdutos();
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+});
+}
 function getProdutos(){
 
     
@@ -112,14 +139,14 @@ function getDadosProduto(Produto_id){
 
         let obj = JSON.parse(msg);
         getFotosSection(obj.Produto_id);
-        $('#numprodutoEdit').val(obj.Produto_id);
-        $('#nomeprodutoEdit').val(obj.nome);
-        $('#categoriaprodutoEdit').val(obj.tipo_produto_id);
-        $('#marcaprodutoEdit').val(obj.marca);
-        $('#tamanhoprodutoEdit').val(obj.tamanho);
-        $('#precoprodutoEdit').val(obj.preco);
-        $('#generoprodutoEdit').val(obj.genero);
-        $('#vendedorprodutoEdit').val(obj.anunciante_id);
+        $('#numprodutoEdit2').val(obj.Produto_id);
+        $('#nomeprodutoEdit2').val(obj.nome);
+        $('#categoriaprodutoEdit2').val(obj.tipo_produto_id);
+        $('#marcaprodutoEdit2').val(obj.marca);
+        $('#tamanhoprodutoEdit2').val(obj.tamanho);
+        $('#precoprodutoEdit2').val(obj.preco);
+        $('#generoprodutoEdit2').val(obj.genero);
+        $('#vendedorprodutoEdit2').val(obj.anunciante_id);
        $('#btnGuardar2').attr("onclick", "guardaDadosEditProduto(" + obj.Produto_id + ");");
         
        $('#formEditInativo2').modal('show');
@@ -132,14 +159,14 @@ function getDadosProduto(Produto_id){
 function guardaDadosEditProduto(Produto_id) {
     let dados = new FormData();
     dados.append("op", 11);
-    dados.append("numprodutoEdit", $('#numprodutoEdit').val());
-    dados.append("nomeprodutoEdit", $('#nomeprodutoEdit').val());
-    dados.append("categoriaprodutoEdit", $('#categoriaprodutoEdit').val());
-    dados.append("marcaprodutoEdit", $('#marcaprodutoEdit').val());
-    dados.append("tamanhoprodutoEdit", $('#tamanhoprodutoEdit').val());
-    dados.append("precoprodutoEdit", $('#precoprodutoEdit').val());
-    dados.append("generoprodutoEdit", $('#generoprodutoEdit').val());
-    dados.append("vendedorprodutoEdit", $('#vendedorprodutoEdit').val());
+    dados.append("numprodutoEdit2", $('#numprodutoEdit2').val());
+    dados.append("nomeprodutoEdit2", $('#nomeprodutoEdit2').val());
+    dados.append("categoriaprodutoEdit2", $('#categoriaprodutoEdit2').val());
+    dados.append("marcaprodutoEdit2", $('#marcaprodutoEdit2').val());
+    dados.append("tamanhoprodutoEdit2", $('#tamanhoprodutoEdit2').val());
+    dados.append("precoprodutoEdit2", $('#precoprodutoEdit2').val());
+    dados.append("generoprodutoEdit2", $('#generoprodutoEdit2').val());
+    dados.append("vendedorprodutoEdit2", $('#vendedorprodutoEdit2').val());
     dados.append("Produto_id", Produto_id);
 
     $.ajax({
@@ -187,6 +214,7 @@ function getListaVendedores(){
         console.log(msg);
          $('#listaVendedor').html(msg);
          $('#vendedorprodutoEdit').html(msg);
+         $('#vendedorprodutoEdit2').html(msg);
 
     })
     
@@ -213,6 +241,7 @@ function getListaCategoria(){
         console.log(msg);
          $('#listaCategoria').html(msg);
         $('#categoriaprodutoEdit').html(msg);
+        $('#categoriaprodutoEdit2').html(msg);
 
     })
     
@@ -253,6 +282,7 @@ function getDadosInativos(Produto_id){
        $('#btnGuardar').attr("onclick", "alerta3(" + obj.Produto_id + ");");
         $('#btnRejeitar').attr("onclick", "rejeitaEditProduto(" + obj.Produto_id + ");");
        $('#formEditInativo').modal('show');
+
     })
     
     .fail(function( jqXHR, textStatus ) {
@@ -277,6 +307,7 @@ function getFotosSection(Produto_id){
     
     .done(function( msg ) {
         $('#fotos-section').html(msg);
+        $('#fotos-section2').html(msg);
         console.log(msg);
     })
     
@@ -314,6 +345,7 @@ function guardaEditProduto(Produto_id) {
             alerta("Inativo", obj.msg, "success");
             alerta2(obj.msg,"success");
             getInativos();
+            getMeusProdutos();
         } else {
             alerta2(obj.msg,"error");
             alerta("Inativo", obj.msg, "error");
@@ -354,6 +386,55 @@ function rejeitaEditProduto(Produto_id) {
         console.log(msg);
     })
     .fail(function(jqXHR, textStatus) {
+        alert("Request failed: " + textStatus);
+    });
+}
+function adicionarProdutos(){
+
+    let dados = new FormData();
+    dados.append("op", 13);
+    dados.append("listaVendedor", $('#listaVendedor').val());
+    dados.append("listaCategoria", $('#listaCategoria').val());
+    dados.append("nomeprod", $('#nomeprod').val());
+    dados.append("estadoprod", $('#estadoprod').val());
+    dados.append("quantidade", $('#quantidade').val());
+    dados.append("preco", $('#preco').val());
+    dados.append("marca", $('#marca').val());
+    dados.append("tamanho", $('#tamanho').val());
+    dados.append("selectestado", $('#estado').val());
+    dados.append("foto", $('#fotoProduto').prop('files')[0]);
+
+    // Debug - ver o que está a ser enviado
+    console.log("Dados a enviar:");
+    for (let pair of dados.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+
+    $.ajax({
+        url: "src/controller/controllerGestaoProdutos.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(msg) {
+        console.log("Resposta do servidor:", msg);
+            let obj = JSON.parse(msg);
+            if(obj.flag) {
+                alerta("Sucesso", obj.msg, "success");
+                alerta2(obj.msg,"success");
+                getProdutos();
+                $('#addVendaForm')[0].reset();
+            } else {
+                alerta2(obj.msg,"error");
+                alerta("Erro", obj.msg, "error");
+            }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("Erro AJAX:", textStatus, errorThrown);
+        console.log("Resposta:", jqXHR.responseText);
         alert("Request failed: " + textStatus);
     });
 }

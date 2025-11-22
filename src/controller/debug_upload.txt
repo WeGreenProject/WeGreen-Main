@@ -1,0 +1,12 @@
+Foto recebida: Array
+(
+    [name] => Deus.png
+    [full_path] => Deus.png
+    [type] => image/png
+    [tmp_name] => C:\xampp\tmp\php9248.tmp
+    [error] => 0
+    [size] => 1189578
+)
+
+Entrou na condição de upload
+is_uploaded_file OK
