@@ -80,6 +80,13 @@
                     </li>
                 </ul>
             </nav>
+            <div class="user-profile">
+                <div class="profile-info" id="ProfileUser">
+                </div>
+                <button class="profile-settings-btn" onclick="showPage('settings')" title="Configurações">
+                    <span>⚙️</span>
+                </button>
+            </div>
         </aside>
 
         <main class="main-content">
@@ -374,6 +381,7 @@
     }
     </script>
     <script src="src/js/gestaoProdutos.js"></script>
+
 </body>
 
 </html>

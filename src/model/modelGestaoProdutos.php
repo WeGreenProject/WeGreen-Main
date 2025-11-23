@@ -353,7 +353,44 @@ function adicionarProdutos($listaVendedor, $listaCategoria, $nomeprod, $estadopr
 
     return $resp;
 }
+function getDadosPerfil($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT * from utilizadores where id =".$ID_User;
+        
+        $result = $conn->query($sql);
 
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    
+                    $msg  = "<div class='profile-avatar'>";
+                    $msg .= "<img src='" .$row["foto"]. "' alt='User Photo' id='userPhoto'>";
+                    $msg .= "<span class='avatar-placeholder'>👤</span>";
+                    $msg .= "</div>";
+                    $msg  .= "<div class='profile-details'>";
+                    $msg .= "<div class='profile-name'>".$row["nome"]."</div>";
+                    $msg .= "<div class='profile-role'>Administrador</div>";
+                    $msg .= "</div>";
+                }
+            }
+            else
+            {
+                    $msg .= "<div class='profile-avatar'>";
+                    $msg .= "<img src='src/img/default_user.png' alt='Erro a encontrar foto' id='userPhoto'>";
+                    $msg .= "<span class='avatar-placeholder'>👤</span>";
+                    $msg .= "</div>";
+
+                    $msg .= "<div class='profile-details'>";
+                    $msg .= "<div class='profile-name'>Erro a encontrar nome</div>";
+                    $msg .= "<div class='profile-role'>Administrador</div>";
+                    $msg .= "</div>";
+            }
+        $conn->close();
+        
+        return ($msg);
+
+    }
 function uploads($foto, $nome){
     
     $dirFisico = __DIR__ . "/../img/";

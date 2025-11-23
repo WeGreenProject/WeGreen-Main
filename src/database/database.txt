@@ -329,3 +329,25 @@ CREATE TABLE Planos_Ativos (
 );
 INSERT INTO Planos_Ativos (anunciante_id, plano_id, data_inicio, ativo)
 VALUES (3, 2, CURDATE(), TRUE);
+
+CREATE TABLE Fornecedores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome varchar(250),
+    descricao varchar(250),
+    tipo_produtos_id INT NOT NULL,
+    email varchar(250),
+    telefone varchar(250),
+    morada varchar(250),
+    FOREIGN KEY (tipo_produtos_id) REFERENCES tipo_produtos(id)
+);
+INSERT INTO Fornecedores (nome, descricao, tipo_produtos_id, email, telefone, morada) VALUES
+('ModaCenter', 'Fornecedor de vestuário masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
+
+('FootWorld', 'Fornecedor de sapatilhas e calçado desportivo', 2, 'info@footworld.pt', '934567890', 'Av. Central 45, Porto'),
+
+('AccessoriArt', 'Fornecedor de bijuteria e acessórios de moda', 3, 'suporte@accessoriart.com', '965432187', 'Rua do Comércio 22, Braga'),
+
+('BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
+
+('MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
+

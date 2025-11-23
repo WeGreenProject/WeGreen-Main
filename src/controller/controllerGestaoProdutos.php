@@ -87,4 +87,8 @@ if ($_POST['op'] == 13) {
     );
     echo $resp;
 }
+if ($_POST['op'] == 14) {
+    $resp = $func->getDadosPerfil($_SESSION['utilizador']);
+    echo $resp;
+}
 ?>

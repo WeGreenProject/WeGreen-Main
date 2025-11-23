@@ -404,11 +404,7 @@ function adicionarProdutos(){
     dados.append("selectestado", $('#estado').val());
     dados.append("foto", $('#fotoProduto').prop('files')[0]);
 
-    // Debug - ver o que está a ser enviado
-    console.log("Dados a enviar:");
-    for (let pair of dados.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
-    }
+
 
     $.ajax({
         url: "src/controller/controllerGestaoProdutos.php",
@@ -437,6 +433,30 @@ function adicionarProdutos(){
         console.log("Resposta:", jqXHR.responseText);
         alert("Request failed: " + textStatus);
     });
+}
+function getDadosPerfil()
+{
+    let dados = new FormData();
+    dados.append("op", 14);
+
+    $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#ProfileUser').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
 }
 function alerta(titulo,msg,icon){
     Swal.fire({
@@ -498,4 +518,5 @@ $(function() {
     getListaVendedores();
     getProdutos();
     getMinhasVendas();
+    getDadosPerfil();
 });
