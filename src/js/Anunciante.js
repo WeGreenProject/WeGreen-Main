@@ -1,7 +1,3 @@
-// ========================
-// FUNÇÕES PARA CARREGAR DADOS
-// ========================
-
 function getDadosPlanos() {
     let dados = new FormData();
     dados.append("op", 1);
