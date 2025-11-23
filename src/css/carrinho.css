@@ -51,7 +51,7 @@ body {
 
 .logo h1 {
     font-size: 24px;
-    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    background: linear-gradient(135deg, #6ce170 0%, #ffed4e 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
