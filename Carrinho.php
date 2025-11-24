@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrinho de Compras - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="src/css/carrinho.css">
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
 </head>
 
 <body>
-    <div class="container">
-        <!-- Header -->
+    <div class="container py-4">
+
         <header class="header">
             <div class="header-content">
                 <a href="index.html" class="logo">
@@ -21,76 +22,75 @@
                     <h1>WeGreen</h1>
                 </a>
                 <nav class="nav">
-                    <a href="carrinho.php" class="active">Carrinho</a>
+                    <a href="carrinho.html" class="active">Carrinho</a>
                     <a href="perfil.html">Perfil</a>
                 </nav>
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div class="page-header">
-                <h2>🛒 Carrinho de Compras</h2>
-                <p>Reveja os seus produtos antes de finalizar a compra</p>
+                <h2>Carrinho de Compras</h2>
+                <p>Reveja os seus produtos antes de finalizar o Checkout</p>
             </div>
 
-            <div class="cart-layout">
-                <!-- Produtos no Carrinho -->
-                <div class="cart-section">
-                    <div class="section-header">
-                        <h3>Produtos no Carrinho</h3>
-                        <button class="btn-text" onclick="limparCarrinho()">Limpar Tudo</button>
-                    </div>
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="cart-section">
+                        <div class="section-header">
+                            <h3>Produtos no Carrinho</h3>
+                            <button class="btn-text" onclick="limparCarrinho()">Limpar Tudo</button>
+                        </div>
 
-                    <div id="cartItems" class="cart-items">
+                        <div id="Carrinho" class="Carrinho">
 
-                    </div>
-
-                    <div id="emptyCart" class="empty-cart" style="display: none;">
-                        <div class="empty-icon">🛍️</div>
-                        <h3>Seu carrinho está vazio</h3>
-                        <p>Adicione produtos incríveis da nossa loja!</p>
-                        <a href="index.html" class="btn-primary">Ir às Compras</a>
+                        </div>
+                        <div id="emptyCart" class="empty-cart" style="display: none;">
+                            <div class="empty-icon">🛍️</div>
+                            <h3>O carrinho está vazio</h3>
+                            <a href="index.html" class="btn btn-primary">Ir às Compras</a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Resumo do Pedido -->
-                <div class="cart-summary">
-                    <div class="summary-card">
-                        <h3>Resumo do Pedido</h3>
 
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span id="subtotal">€0.00</span>
+                <div class="col-lg-4">
+                    <div class="ResumoPedido">
+                        <div class="summary-card">
+                            <h3>Resumo do Pedido</h3>
+
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span id="subtotal">€0.00</span>
+                            </div>
+
+                            <div class="summary-row">
+                                <span>Envio:</span>
+                                <span id="shipping">€5.00</span>
+                            </div>
+
+                            <div class="summary-row highlight">
+                                <span>Total:</span>
+                                <span id="total">€0.00</span>
+                            </div>
+
+                            <button class="btn-checkout mt-3" onclick="irParaCheckout()">
+                                <span>Finalizar Checkout</span>
+                                <span>→</span>
+                            </button>
+
+                            <div class="secure-checkout">
+                                <span>🔒</span>
+                                <span>Pagamento 100% Seguro</span>
+                            </div>
                         </div>
 
-                        <div class="summary-row">
-                            <span>Envio:</span>
-                            <span id="shipping">€5.00</span>
-                        </div>
-
-                        <div class="summary-row highlight">
-                            <span>Total:</span>
-                            <span id="total">€0.00</span>
-                        </div>
-
-                        <button class="btn-checkout" onclick="irParaCheckout()">
-                            Finalizar Compra
-                            <span>→</span>
-                        </button>
-
-                        <div class="secure-checkout">
-                            <span>🔒</span>
-                            <span>Pagamento 100% Seguro</span>
-                        </div>
-                    </div>
-
-                    <!-- Cupão de Desconto -->
-                    <div class="coupon-card">
-                        <h4>Tem um cupão?</h4>
-                        <div class="coupon-input">
-                            <input type="text" id="couponCode" placeholder="Código do cupão">
-                            <button onclick="aplicarCupao()">Aplicar</button>
+                        <div class="AplicarCupao">
+                            <h4>Tem um cupão?</h4>
+                            <div class="coupon-input">
+                                <input type="text" id="couponCode" class="form-control" placeholder="Código do cupão">
+                                <button onclick="aplicarCupao()">Aplicar</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,8 @@
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="src/js/homepage.js"></script>
     <script src="src/js/carrinho.js"></script>
 </body>
-
 </html>

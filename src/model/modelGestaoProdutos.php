@@ -182,7 +182,7 @@ class Vendas{
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
                 $msg .= "<td>".$row['marca']."</td>";  
-                $msg .= "<td><button class='btn-info' onclick='getDadosProduto(".$row['Produto_id'].")'>ℹ️ Editar</button><br><br><button class='btn-info' onclick='getDesativacao(".$row['Produto_id'].")'>❌ Desativar</button></td>";  
+                $msg .= "<td><button class='btn-info' onclick='getDadosProduto(".$row['Produto_id'].")'>ℹ️ Editar</button><br><br><button class='btn-info' id='btnDesativar'onclick='getDesativacao(".$row['Produto_id'].")'>❌ Desativar</button></td>";  
                 $msg .= "</tr>";
             }
         } else {
@@ -219,6 +219,35 @@ class Vendas{
         $conn->close();
 
         return ($msg);
+    }
+    function getDesativacao($Produto_id){
+        
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+
+        $sql = "UPDATE Produtos 
+                SET ativo = 0 
+                WHERE Produto_id = " . $Produto_id; 
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Desativado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+
     }
     function rejeitaEditProduto($Produto_id){
         
@@ -284,6 +313,127 @@ class Vendas{
         return($resp);
 
     }
+function adicionarProdutos($listaVendedor, $listaCategoria, $nomeprod, $estadoprod, $quantidade, $preco, $marca, $tamanho, $selectestado, $foto){
+    
+    global $conn;
+    $msg = "";
+    $flag = true;
+    $sql = "";
+
+    $resp = $this->uploads($foto, $nomeprod);
+    $resp = json_decode($resp, TRUE);
+
+    if($resp['flag']){
+        $sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, anunciante_id, marca, tamanho, estado, nome, ativo, genero, descricao) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 'Descrição do produto')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sdsssssss", $listaCategoria, $preco, $resp['target'], $listaVendedor, $marca, $tamanho, $estadoprod, $nomeprod, $selectestado);
+    } else {
+        $sql = "INSERT INTO Produtos (tipo_produto_id, preco, anunciante_id, marca, tamanho, estado, nome, ativo, genero, descricao) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, 'Descrição do produto')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sdssssss", $listaCategoria, $preco, $listaVendedor, $marca, $tamanho, $estadoprod, $nomeprod, $selectestado);
+    }
+
+    if ($stmt->execute()) {
+        $msg = "Produto adicionado com sucesso!";
+    } else {
+        $flag = false;
+        $msg = "Error: " . $stmt->error;
+        $this->wFicheiroError(date("Y-m-d H:i:s")." - ".$stmt->error);
+    }
+    $stmt->close();
+   
+    $resp = json_encode(array(
+        "flag" => $flag,
+        "msg" => $msg
+    ));
+      
+    $conn->close();
+
+    return $resp;
+}
+function getDadosPerfil($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT * from utilizadores where id =".$ID_User;
+        
+        $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    
+                    $msg  = "<div class='profile-avatar'>";
+                    $msg .= "<img src='" .$row["foto"]. "' alt='User Photo' id='userPhoto'>";
+                    $msg .= "<span class='avatar-placeholder'>👤</span>";
+                    $msg .= "</div>";
+                    $msg  .= "<div class='profile-details'>";
+                    $msg .= "<div class='profile-name'>".$row["nome"]."</div>";
+                    $msg .= "<div class='profile-role'>Administrador</div>";
+                    $msg .= "</div>";
+                }
+            }
+            else
+            {
+                    $msg .= "<div class='profile-avatar'>";
+                    $msg .= "<img src='src/img/default_user.png' alt='Erro a encontrar foto' id='userPhoto'>";
+                    $msg .= "<span class='avatar-placeholder'>👤</span>";
+                    $msg .= "</div>";
+
+                    $msg .= "<div class='profile-details'>";
+                    $msg .= "<div class='profile-name'>Erro a encontrar nome</div>";
+                    $msg .= "<div class='profile-role'>Administrador</div>";
+                    $msg .= "</div>";
+            }
+        $conn->close();
+        
+        return ($msg);
+
+    }
+function uploads($foto, $nome){
+    
+    $dirFisico = __DIR__ . "/../img/";
+    $dirWeb = "src/img/";  
+    $flag = false;
+    $targetBD = "";
+
+    // DEBUG
+    file_put_contents('debug_upload.txt', "Foto recebida: " . print_r($foto, true) . "\n", FILE_APPEND);
+
+    if(!is_dir($dirFisico)){
+        if(!mkdir($dirFisico, 0777, TRUE)){
+            die("Erro não é possível criar o diretório");
+        }
+    }
+    
+    if(isset($foto) && is_array($foto) && !empty($foto['tmp_name']) && $foto['error'] === 0){
+        file_put_contents('debug_upload.txt', "Entrou na condição de upload\n", FILE_APPEND);
+        
+        if(is_uploaded_file($foto['tmp_name'])){
+            file_put_contents('debug_upload.txt', "is_uploaded_file OK\n", FILE_APPEND);
+            $fonte = $foto['tmp_name'];
+            $ficheiro = $foto['name'];
+            $end = explode(".", $ficheiro);
+            $extensao = end($end);
+    
+            $nomeLimpo = preg_replace('/[^a-zA-Z0-9]/', '_', $nome);
+            $newName = "produto_" . $nomeLimpo . "_" . date("YmdHis") . "." . $extensao;
+    
+            $targetFisico = $dirFisico . $newName;
+            $targetBD = $dirWeb . $newName;
+    
+            $flag = move_uploaded_file($fonte, $targetFisico);
+
+        }
+    }
+    
+    return json_encode(array(
+        "flag" => $flag,
+        "target" => $targetBD
+    ));
+}
+
     function guardaDadosEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
         
         global $conn;
