@@ -143,6 +143,9 @@ function getProdutoMulherMostrar($ID_Produto){
             
             $msg .= "</div>"; 
             $msg .= "</div>"; 
+
+        $msg .= "<div class='mt-3 mt-md-0'>";
+
         }
     } else {
         $msg = "<p class='text-center text-muted'>Produto não encontrado.</p>";
