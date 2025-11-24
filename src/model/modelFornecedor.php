@@ -196,5 +196,54 @@ function removerFornecedores($ID_Fornecedores){
         return (json_encode($row));
 
     }
+function guardaEditDadosFornecedores($nome, $categoria, $email, $telefone, $morada, $descricao, $ID_Fornecedor){
+
+    global $conn;
+    $flag = true;
+    $msg = "";
+
+    $sql = "UPDATE Fornecedores 
+            SET nome = ?, 
+                tipo_produtos_id = ?, 
+                email = ?, 
+                telefone = ?, 
+                morada = ?, 
+                descricao = ?
+            WHERE id = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if(!$stmt){
+        return json_encode([
+            "flag" => false,
+            "msg" => "Erro na preparação: " . $conn->error
+        ]);
+    }
+
+    $stmt->bind_param("sissssi", 
+        $nome, 
+        $categoria,
+        $email, 
+        $telefone, 
+        $morada, 
+        $descricao, 
+        $ID_Fornecedor
+    );
+
+    if($stmt->execute()){
+        $msg = "Editado com Sucesso";
+    } else {
+        $flag = false;
+        $msg = "Erro na execução: " . $stmt->error;
+    }
+
+    $stmt->close();
+
+    return json_encode([
+        "flag" => $flag,
+        "msg"  => $msg
+    ]);
+}
+
 }
 ?>
