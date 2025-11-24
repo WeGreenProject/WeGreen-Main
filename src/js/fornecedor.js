@@ -57,7 +57,7 @@ function getFornecedores(){
 function adicionarFornecedor() {
     let dados = new FormData();
 
-    $('#supplierModal').fadeIn();
+    $('#formadicionarFornecedor').fadeIn();
 
     $.ajax({
         url: "src/controller/controllerFornecedor.php",
@@ -97,22 +97,58 @@ function getDadosFornecedores(ID_Fornecedores){
         let obj = JSON.parse(msg);
         $('#numfornecedorEdit').val(obj.id);
         $('#fornecedorNomeEdit').val(obj.nome);
-        $('#fornecedorCategoriaEdit').val(obj.Categoria);
+        $('#fornecedorCategoriaEdit').val(obj.tipo_produtos_id);
         $('#fornecedorEmailEdit').val(obj.email);
         $('#fornecedortelefoneEdit').val(obj.telefone);
         $('#fornecedorSedeEdit').val(obj.morada);
         $('#observacoesEdit').val(obj.descricao);
-        $('#formEditClientes').modal('show');
-       $('#btnGuardar3').attr("onclick","guardaEditClientes("+obj.ID_Cliente+")") 
+       $('#btnGuardar3').attr("onclick","guardaEditDadosFornecedores("+obj.id+")") 
        
-       $('#formEditFornecedores').modal('show')
+       $('#formEditFornecedores').fadeIn();
     })
     
     .fail(function( jqXHR, textStatus ) {
     alert( "Request failed: " + textStatus );
     });
+}
+function guardaEditDadosFornecedores(id)
+{
+    let dados = new FormData();
+    dados.append("op", 67);
+    dados.append("id", id);
+dados.append("fornecedorNomeEdit", $('#fornecedorNomeEdit').val());
+dados.append("fornecedorCategoriaEdit", $('#fornecedorCategoriaEdit').val()); // tipo_produtos_id
+dados.append("fornecedorEmailEdit", $('#fornecedorEmailEdit').val());
+dados.append("fornecedorTelefoneEdit", $('#fornecedorTelefoneEdit').val());
+dados.append("fornecedorSedeEdit", $('#fornecedorSedeEdit').val()); // morada
+dados.append("observacoesEdit", $('#observacoesEdit').val()); // descricao
 
-    
+        $.ajax({
+        url: "src/controller/controllerFornecedor.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(msg) {
+        $('#formEditFornecedores').fadeOut('hide');
+            
+            let obj = JSON.parse(msg);
+            if(obj.flag) {
+                alerta("Fornecedor", obj.msg, "success");
+                getFornecedores();
+            } else {
+                alerta("Fornecedor", obj.msg, "error");
+            }
+            console.log(msg);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("Erro AJAX:", textStatus, errorThrown);
+        console.log("Resposta:", jqXHR.responseText);
+        alert("Request failed: " + textStatus);
+    });
 }
 function guardaAdicionarFornecedor()
 {
@@ -135,7 +171,7 @@ function guardaAdicionarFornecedor()
         processData: false
     })
     .done(function(msg) {
-        $('#supplierModal').fadeOut('hide');
+        $('#formadicionarFornecedor').fadeOut('hide');
             
             let obj = JSON.parse(msg);
             if(obj.flag) {
@@ -168,7 +204,9 @@ function getListaCategoria(){
     
     .done(function( msg ) {
         console.log(msg);
+        
          $('#fornecedorCategoria').html(msg);
+         $('#fornecedorCategoriaEdit').html(msg);
     })
     
     .fail(function( jqXHR, textStatus ) {

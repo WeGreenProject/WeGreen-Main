@@ -35,4 +35,16 @@ if ($_POST['op'] == 9) {
     $resp = $func->getDadosFornecedores($_POST['id']);
     echo $resp;
 }
+if ($_POST['op'] == 67) {
+    $resp = $func->guardaEditDadosFornecedores(
+        $_POST['fornecedorNomeEdit'],
+        $_POST['fornecedorCategoriaEdit'],
+        $_POST['fornecedorEmailEdit'],
+        $_POST['fornecedorTelefoneEdit'],
+        $_POST['fornecedorSedeEdit'],
+        $_POST['observacoesEdit'],
+        $_POST['id']
+    );
+    echo $resp;
+}
 ?>
