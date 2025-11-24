@@ -13,7 +13,7 @@ class Produto{
         $result = $conn->query($sql);
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
-                    $msg .= "<img src='" >. $row["foto"] ."'>";
+                    $msg .= "<img src='" . $row["foto"] . "'>";
                     $msg  = "<h3 class='fw-bold mb-3'>".$row["nome"]."</h3>";
                     $msg .= "<p class='text-muted mb-2'>Tamanho: <span class='fw-semibold'>".$row["tamanho"]."</span></p>";
                     $msg .= "<p class='text-muted mb-2'>Estado: <span class='fw-semibold'>".$row["estado"]."</span></p>";
