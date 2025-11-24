@@ -53,17 +53,174 @@ function getFornecedores(){
 });
 
 }
-    function getIconForCategory(category) {
-        const icons = {
-            'Eletrônicos': '💻',
-            'Alimentos': '🍎',
-            'Têxtil': '👕',
-            'Materiais': '🔧',
-            'Serviços': '⚙️'
-        };
-        return icons[category] || '📦';
-    }
+
+function adicionarFornecedor() {
+    let dados = new FormData();
+
+    $('#supplierModal').fadeIn();
+
+    $.ajax({
+        url: "src/controller/controllerFornecedor.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function() {
+       $('#btnGuardar2').attr("onclick", "guardaAdicionarFornecedor();");
+    })
+    .fail(function(jqXHR, textStatus) {
+        console.log("Resposta:", jqXHR.responseText);
+    });
+}
+function getDadosFornecedores(ID_Fornecedores){
+
+
+    let dados = new FormData();
+    dados.append("op", 9);
+    dados.append("id", ID_Fornecedores);
+
+    $.ajax({
+    url: "src/controller/controllerFornecedor.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+
+        let obj = JSON.parse(msg);
+        $('#numfornecedorEdit').val(obj.id);
+        $('#fornecedorNomeEdit').val(obj.nome);
+        $('#fornecedorCategoriaEdit').val(obj.Categoria);
+        $('#fornecedorEmailEdit').val(obj.email);
+        $('#fornecedortelefoneEdit').val(obj.telefone);
+        $('#fornecedorSedeEdit').val(obj.morada);
+        $('#observacoesEdit').val(obj.descricao);
+        $('#formEditClientes').modal('show');
+       $('#btnGuardar3').attr("onclick","guardaEditClientes("+obj.ID_Cliente+")") 
+       
+       $('#formEditFornecedores').modal('show')
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+    
+}
+function guardaAdicionarFornecedor()
+{
+    let dados = new FormData();
+    dados.append("op", 4);
+    dados.append("fornecedorNome", $('#fornecedorNome').val());
+    dados.append("fornecedorCategoria", $('#fornecedorCategoria').val());
+    dados.append("fornecedorEmail", $('#fornecedorEmail').val());
+    dados.append("fornecedortelefone", $('#fornecedortelefone').val());
+    dados.append("fornecedorSede", $('#fornecedorSede').val());
+    dados.append("observacoes", $('#observacoes').val());
+
+        $.ajax({
+        url: "src/controller/controllerFornecedor.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(msg) {
+        $('#supplierModal').fadeOut('hide');
+            
+            let obj = JSON.parse(msg);
+            if(obj.flag) {
+                alerta("Fornecedor", obj.msg, "success");
+                getFornecedores();
+            } else {
+                alerta("Fornecedor", obj.msg, "error");
+            }
+            console.log(msg);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        console.error("Erro AJAX:", textStatus, errorThrown);
+        console.log("Resposta:", jqXHR.responseText);
+        alert("Request failed: " + textStatus);
+    });
+}
+function getListaCategoria(){
+    let dados = new FormData();
+    dados.append("op", 5);
+
+    $.ajax({
+    url: "src/controller/controllerFornecedor.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })  
+    
+    .done(function( msg ) {
+        console.log(msg);
+         $('#fornecedorCategoria').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
+function alerta(titulo,msg,icon){
+    Swal.fire({
+        position: 'center',
+        icon: icon,
+        title: titulo,
+        text: msg,
+        showConfirmButton: true,
+
+      })
+}
+function removerFornecedores(id){
+
+    let dados = new FormData();
+    dados.append("op", 6);
+    dados.append("id", id);
+
+    $.ajax({
+    url: "src/controller/controllerFornecedor.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+
+        let obj = JSON.parse(msg);
+        if(obj.flag){
+            alerta("Fornecedor", obj.msg, "success");
+            getFornecedores();    
+        }else{
+            alerta("Fornecedor", obj.msg, "success");  
+        }
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
 $(function() {
+    getListaCategoria();
     getFornecedores();
     getDadosPerfil();
 });

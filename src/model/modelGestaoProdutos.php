@@ -340,7 +340,7 @@ function adicionarProdutos($listaVendedor, $listaCategoria, $nomeprod, $estadopr
     } else {
         $flag = false;
         $msg = "Error: " . $stmt->error;
-        $this->wFicheiroError(date("Y-m-d H:i:s")." - ".$stmt->error);
+        #$this->wFicheiroError(date("Y-m-d H:i:s")." - ".$stmt->error);
     }
     $stmt->close();
    
