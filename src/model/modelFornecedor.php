@@ -53,34 +53,33 @@ class Fornecedor{
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
-$msg .= "<tr>";
+            $msg .= "<tr>";
+            $msg .= "<td>";
+            $msg .= "    <div class='supplier-info'>";
+            $msg .= "        <div class='supplier-avatar'>💻</div>";
+            $msg .= "        <div class='supplier-details'>";
+            $msg .= "            <div class='supplier-name'>".$row["nome"]."</div>";
+            $msg .= "            <div class='supplier-category'>".$row["Categoria"]."</div>";
+            $msg .= "        </div>";
+            $msg .= "    </div>";
+            $msg .= "</td>";
+            $msg .= "<td>";
+            $msg .= "    <div>".$row["email"]."</div>";
+            $msg .= "    <div style='color:#888; font-size:13px; margin-top:4px;'>".$row["telefone"]."</div>";
+            $msg .= "</td>";
+            
+            $msg .= "<td>";
+            $msg .= "<div>".$row["morada"]."</div>";
+            $msg .= "</td>";
 
-// 1ª COLUNA — INFO DO FORNECEDOR
-$msg .= "<td>";
-$msg .= "    <div class='supplier-info'>";
-$msg .= "        <div class='supplier-avatar'>💻</div>"; // ou outro ícone
-$msg .= "        <div class='supplier-details'>";
-$msg .= "            <div class='supplier-name'>".$row["nome"]."</div>";
-$msg .= "            <div class='supplier-category'>".$row["Categoria"]."</div>";
-$msg .= "        </div>";
-$msg .= "    </div>";
-$msg .= "</td>";
 
-// 2ª COLUNA — EMAIL + TELEFONE
-$msg .= "<td>";
-$msg .= "    <div>".$row["email"]."</div>";
-$msg .= "    <div style='color:#888; font-size:13px; margin-top:4px;'>".$row["telefone"]."</div>";
-$msg .= "</td>";
-
-// 6ª COLUNA — BOTÕES
-$msg .= "<td>";
-$msg .= "    <div class='action-buttons'>";
-$msg .= "        <button class='btn-icon btn-edit' onclick='editSupplier(".$row["id"].")' title='Editar'>✏️</button>";
-$msg .= "        <button class='btn-icon btn-delete' onclick='deleteSupplier(".$row["id"].")' title='Excluir'>🗑️</button>";
-$msg .= "    </div>";
-$msg .= "</td>";
-
-$msg .= "</tr>";
+            $msg .= "<td>";
+            $msg .= "<div class='action-buttons'>";
+            $msg .= "<button class='btn-icon btn-edit' onclick='editSupplier(".$row["id"].")' title='Editar'>✏️</button>";
+            $msg .= "<button class='btn-icon btn-delete' onclick='deleteSupplier(".$row["id"].")' title='Excluir'>🗑️</button>";
+            $msg .= "</div>";
+            $msg .= "</td>";
+            $msg .= "</tr>";
             }
         } else {
             $msg .= "<tr>";

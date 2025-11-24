@@ -122,15 +122,15 @@ function getProdutoMulherMostrar($ID_Produto){
             $msg .= "<div class='row g-4'>";
             
             if ($result3 && $result3->num_rows > 0) {
-                while ($rowRelated = $result3->fetch_assoc()) {
+                while ($rowRelacionados = $result3->fetch_assoc()) {
                     $msg .= "<div class='col-md-3 col-sm-6'>";
                     $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
-                    $msg .= "<img src='".$rowRelated["foto"]."' class='card-img-top rounded-top-4' alt='".htmlspecialchars($rowRelated["nome"])."' style='height: 300px; object-fit: cover;'>";
+                    $msg .= "<img src='".$rowRelacionados["foto"]."' class='card-img-top rounded-top-4' alt='".$rowRelacionados["nome"]."' style='height: 300px; object-fit: cover;'>";
                     $msg .= "<div class='card-body text-center'>";
-                    $msg .= "<h6 class='fw-bold mb-1'>".htmlspecialchars($rowRelated["nome"])."</h6>";
-                    $msg .= "<p class='text-muted mb-1'>".htmlspecialchars($rowRelated["marca"])." · ".htmlspecialchars($rowRelated["tamanho"])." · ".htmlspecialchars($rowRelated["estado"])."</p>";
-                    $msg .= "<p class='fw-semibold'>€".number_format($rowRelated["preco"], 2, ',', '.')."</p>";
-                    $msg .= "<a href='ProdutoMulherMostrar.html?id=".$rowRelated["Produto_id"]."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                    $msg .= "<h6 class='fw-bold mb-1'>".$rowRelacionados["nome"]."</h6>";
+                    $msg .= "<p class='text-muted mb-1'>".$rowRelacionados["marca"]." · ".($rowRelacionados["tamanho"])." · ".$rowRelacionados["estado"]."</p>";
+                    $msg .= "<p class='fw-semibold'>€".$rowRelacionados["preco"]. "€</p>";
+                    $msg .= "<a href='ProdutoMulherMostrar.html?id=".$rowRelacionados["Produto_id"]."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
                     $msg .= "</div>";
                     $msg .= "</div>";
                     $msg .= "</div>";
