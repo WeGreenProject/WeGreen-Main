@@ -4,7 +4,7 @@ require_once 'connection.php';
 
 class Carrinho {
 
-    function getCarrinho( $utilizador_id) {
+    function getCarrinho($utilizador_id) {
         global $conn;
         $msg = "";
     
@@ -67,74 +67,72 @@ class Carrinho {
         
         return $msg;
     }
+        function getResumoPedido() {
+            global $conn;
+            $msg = "";
+            $subtotal = 0;
+            $shipping = 5.00;
+            $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : 1;
 
-    function getResumoPedido() {
-        global $conn;
-        $msg = "";
-        $subtotal = 0;
-        $shipping = 5.00;
-        
-        session_start();
-        $utilizador_id = isset($_SESSION['utilizador_id']) ? $_SESSION['utilizador_id'] : 1;
-        
-        $sql = "SELECT 
-                    Produtos.preco,
-                    Carrinho_Itens.quantidade
-                FROM Carrinho_Itens
-                INNER JOIN Produtos ON Carrinho_Itens.produto_id = Produtos.Produto_id
-                WHERE Carrinho_Itens.utilizador_id = $utilizador_id 
-                AND Produtos.ativo = 1";
-        
-        $result = $conn->query($sql);
-        
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $subtotal += $row["preco"] * $row["quantidade"];
+            $sql = "SELECT 
+                        Produtos.preco,
+                        Carrinho_Itens.quantidade
+                    FROM Carrinho_Itens
+                    INNER JOIN Produtos ON Carrinho_Itens.produto_id = Produtos.Produto_id
+                    WHERE Carrinho_Itens.utilizador_id = $utilizador_id 
+                    AND Produtos.ativo = 1";
+
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $subtotal += $row["preco"] * $row["quantidade"];
+                }
             }
+
+            $total = $subtotal + $shipping;
+
+            $msg .= "<div class='summary-card'>";
+            $msg .= "<h3>Resumo do Pedido</h3>";
+
+            $msg .= "<div class='summary-row'>";
+            $msg .= "<span>Subtotal:</span>";
+            $msg .= "<span id='subtotal'>€".$subtotal."</span>";
+            $msg .= "</div>";
+
+            $msg .= "<div class='summary-row'>";
+            $msg .= "<span>Envio:</span>";
+            $msg .= "<span id='shipping'>€".$shipping."</span>";
+            $msg .= "</div>";
+
+            $msg .= "<div class='summary-row highlight'>";
+            $msg .= "<span>Total:</span>";
+            $msg .= "<span id='total'>€".$total."</span>";
+            $msg .= "</div>";
+
+            $msg .= "<button class='btn-checkout mt-3' onclick='irParaCheckout()'>";
+            $msg .= "<span>Finalizar Checkout</span>";
+            $msg .= "<span>→</span>";
+            $msg .= "</button>";
+
+            $msg .= "<div class='secure-checkout'>";
+            $msg .= "<span>🔒</span>";
+            $msg .= "<span>Pagamento 100% Seguro</span>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+
+            $msg .= "<div class='AplicarCupao'>";
+            $msg .= "<h4>Tem um cupão?</h4>";
+            $msg .= "<div class='coupon-input'>";
+            $msg .= "<input type='text' id='couponCode' class='form-control' placeholder='Código do cupão'>";
+            $msg .= "<button onclick='aplicarCupao()'>Aplicar</button>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+
+            return $msg;
         }
-        
-        $total = $subtotal + $shipping;
-        
-        $msg .= "<div class='summary-card'>";
-        $msg .= "<h3>Resumo do Pedido</h3>";
-        
-        $msg .= "<div class='summary-row'>";
-        $msg .= "<span>Subtotal:</span>";
-        $msg .= "<span id='subtotal'>€".$subtotal."</span>";
-        $msg .= "</div>";
-        
-        $msg .= "<div class='summary-row'>";
-        $msg .= "<span>Envio:</span>";
-        $msg .= "<span id='shipping'>€".$shipping."</span>";
-        $msg .= "</div>";
-        
-        $msg .= "<div class='summary-row highlight'>";
-        $msg .= "<span>Total:</span>";
-        $msg .= "<span id='total'>€".$total."</span>";
-        $msg .= "</div>";
-        
-        $msg .= "<button class='btn-checkout mt-3' onclick='irParaCheckout()'>";
-        $msg .= "<span>Finalizar Checkout</span>";
-        $msg .= "<span>→</span>";
-        $msg .= "</button>";
-        
-        $msg .= "<div class='secure-checkout'>";
-        $msg .= "<span>🔒</span>";
-        $msg .= "<span>Pagamento 100% Seguro</span>";
-        $msg .= "</div>";
-        $msg .= "</div>";
-        
-        $msg .= "<div class='AplicarCupao'>";
-        $msg .= "<h4>Tem um cupão?</h4>";
-        $msg .= "<div class='coupon-input'>";
-        $msg .= "<input type='text' id='couponCode' class='form-control' placeholder='Código do cupão'>";
-        $msg .= "<button onclick='aplicarCupao()'>Aplicar</button>";
-        $msg .= "</div>";
-        $msg .= "</div>";
-        
-        return $msg;
-    }
-    
+
+
     function adicionarAoCarrinho($produto_id, $quantidade = 1) {
         global $conn;
         session_start();
