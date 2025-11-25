@@ -64,7 +64,7 @@ class Vendedor {
             $msg .= "<section class='container my-5'><div class='row g-4'>";
 
             while ($row = $result->fetch_assoc()) {
-                $msg .= "<div class='col-md-4'>";
+                $msg .= "<div class='col-md-3'>";
                 $msg .= "<div class='card border-0 shadow rounded-4'>";
                 $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."' style='height: 300px; object-fit: cover;'>";
                 $msg .= "<div class='card-body'>";
