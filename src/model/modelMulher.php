@@ -7,7 +7,7 @@ class Mulher {
     global $conn;
     $msg = "";
 
-    $sql = "SELECT marca FROM Produtos WHERE genero LIKE 'Mulher' AND ativo = 1 AND marca IS NOT NULL ORDER BY marca ASC;";
+    $sql = "SELECT marca FROM Produtos WHERE Produto.genero LIKE 'Mulher' AND ativo = 1 AND marca IS NOT NULL ORDER BY marca ASC;";
     $result = $conn->query($sql);
 
     $msg .= "<option value=''>Marca</option>";

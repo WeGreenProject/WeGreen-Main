@@ -87,14 +87,30 @@ function getProdutoMulherMostrar()
 }
 
 function comprarAgora(produtoId) {
-    console.log('Produto ID:', produtoId);
-    
-    Swal.fire({
-        title: 'Sucesso!',
-        text: 'Produto adicionado ao carrinho',
-        icon: 'success',
-        confirmButtonColor: '#28a745',
-        confirmButtonText: 'OK'
+
+    let dados = new FormData();
+    dados.append("op", 7);
+    dados.append("produto_id", produtoId);
+
+    $.ajax({
+        url: "src/controller/controllerCarrinho.php",
+        method: "POST",
+        data: dados,
+        contentType: false,
+        processData: false
+    })
+    .done(function() {
+
+        Swal.fire({
+            title: 'Sucesso!',
+            text: 'Produto adicionado ao carrinho',
+            icon: 'success',
+            confirmButtonColor: '#28a745',
+            confirmButtonText: 'OK'
+        }).then(() => {
+            window.location.href = 'carrinho.html?id=' + produtoId;
+        });
+
     });
 }
 
