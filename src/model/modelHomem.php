@@ -3,12 +3,22 @@ require_once 'connection.php';
 
 class Homem {
 
-function getProdutosHomem(){
+function getProdutosHomem($categoria,$tamanho,$estado){
         global $conn;
         $msg = "";
         $row = "";
 
-        $sql = "SELECT produtos.* FROM produtos where produtos.genero LIKE 'Homem' AND produtos.ativo = 1;";
+        $sql = "SELECT produtos.* FROM produtos where produtos.genero LIKE 'Homem' AND produtos.ativo = 1";
+        
+        if (isset($tamanho) && $tamanho != "" && $tamanho != "-1") {
+            $sql .= " AND tamanho = '$tamanho'";
+        }
+        if (isset($estado) && $estado != "" && $estado != "-1") {
+            $sql .= " AND estado = '$estado'";
+        }
+        if (isset($categoria) && $categoria != "" && $categoria != "-1") {
+            $sql .= " AND tipo_produto_id = '$categoria'";
+        }
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -30,6 +40,81 @@ function getProdutosHomem(){
         return ($msg);
 
     }
+}
+function getFiltrosHomemCategoria() {
+    global $conn;
+    $msg = "";
+    
+    $sql = "SELECT id AS ValueProduto, descricao AS NomeProduto FROM tipo_produtos";
+    $result = $conn->query($sql);
+
+    $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+    
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $msg .= "<option value='".$row["ValueProduto"]."'>".$row["NomeProduto"]."</option>";
+        }
+    } else {
+        $msg .= "<option value='1'>Sem Registos</option>";
+    }
+    
+    $conn->close();
+    return $msg;
+}
+    function getFiltrosHomemTamanho(){
+        
+        global $conn;
+        $msg = "";
+        $sql = "SELECT DISTINCT tamanho AS NomeTamanho,
+                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Homem' ORDER BY tamanho;";
+
+        $result = $conn->query($sql);
+
+
+        $msg .= "<option value='-1'>Selecionar o Tamanho...</option>";
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+
+                $msg .= "<option value=".$row["ValueTamanho"].">".$row["NomeTamanho"]."</option>";
+            }
+        } else {
+                $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+                $msg .= "<option value='1'>Sem Registos</option>";
+        }
+        $conn->close();
+
+        return ($msg);
+    
+    
+    $conn->close();
+    return ($msg);
+}
+    function getFiltrosHomemEstado(){
+        
+        global $conn;
+        $msg = "";
+        $sql = "SELECT DISTINCT estado AS NomeEstado,
+                estado AS ValueEstado FROM Produtos WHERE genero = 'Homem' ORDER BY estado;";
+        $result = $conn->query($sql);
+
+
+        $msg .= "<option value='-1'>Selecionar Estado...</option>";
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+
+                $msg .= "<option value='".$row["ValueEstado"]."'>".$row["NomeEstado"]."</option>";
+            }
+        } else {
+                $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+                $msg .= "<option value='1'>Sem Registos</option>";
+        }
+        $conn->close();
+
+        return ($msg);
+    
+    
+    $conn->close();
+    return ($msg);
 }
 function getProdutoHomemMostrar($ID_Produto){
     global $conn;

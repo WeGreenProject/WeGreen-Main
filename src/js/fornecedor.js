@@ -117,11 +117,11 @@ function guardaEditDadosFornecedores(id)
     dados.append("op", 67);
     dados.append("id", id);
 dados.append("fornecedorNomeEdit", $('#fornecedorNomeEdit').val());
-dados.append("fornecedorCategoriaEdit", $('#fornecedorCategoriaEdit').val()); // tipo_produtos_id
+dados.append("fornecedorCategoriaEdit", $('#fornecedorCategoriaEdit').val());
 dados.append("fornecedorEmailEdit", $('#fornecedorEmailEdit').val());
 dados.append("fornecedorTelefoneEdit", $('#fornecedorTelefoneEdit').val());
-dados.append("fornecedorSedeEdit", $('#fornecedorSedeEdit').val()); // morada
-dados.append("observacoesEdit", $('#observacoesEdit').val()); // descricao
+dados.append("fornecedorSedeEdit", $('#fornecedorSedeEdit').val());
+dados.append("observacoesEdit", $('#observacoesEdit').val());
 
         $.ajax({
         url: "src/controller/controllerFornecedor.php",
