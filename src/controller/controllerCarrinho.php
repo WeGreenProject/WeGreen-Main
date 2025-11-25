@@ -35,10 +35,34 @@ if ($_POST['op'] == 5) {
 
 if ($_POST['op'] == 6) {
     $codigo = $_POST['codigo'];
-    if ($codigo == 'WEGREEN10') {
-        echo "Cupão aplicado com sucesso! Desconto de 10%.";
+    if (strtoupper($codigo) == 'WEGREEN10') {
+        $_SESSION['cupao_desconto'] = 10;
+        echo "sucesso|Cupão aplicado com sucesso! Desconto de 10%.";
     } else {
-        echo "Cupão inválido ou expirado.";
+        echo "erro|Cupão inválido ou expirado.";
     }
 }
+
+if ($_POST['op'] == 7) {
+    $produto_id = $_POST['produto_id'];
+    $resp = $func->adicionarAoCarrinho($produto_id);
+    echo $resp;
+}
+
+if ($_POST['op'] == 8) {
+    unset($_SESSION['cupao_desconto']);
+    echo "Cupão removido com sucesso.";
+}
+
+if ($_POST['op'] == 9) {
+    // Verificar se há produtos no carrinho
+    $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : 1;
+    
+    $sql = "SELECT COUNT(*) as total FROM Carrinho_Itens WHERE utilizador_id = $utilizador_id";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    
+    echo json_encode(['tem_produtos' => $row['total'] > 0]);
+}
+
 ?>

@@ -185,6 +185,26 @@ body {
     justify-content: center;
 }
 
+.item-details h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+.item-meta {
+    color: #888;
+    font-size: 14px;
+    margin: 0;
+}
+
+.item-price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffd700;
+    margin: 0;
+}
+
 .item-name {
     font-size: 18px;
     font-weight: 600;
@@ -207,59 +227,79 @@ body {
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-end;
+    gap: 10px;
 }
 
-.item-price {
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffd700;
-}
-
+/* CORREÇÃO FINAL: Botões de quantidade */
 .quantity-control {
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: rgba(255, 215, 0, 0.1);
+    gap: 12px;
+    background: transparent;
     border-radius: 8px;
     padding: 5px;
 }
 
-.quantity-btn {
-    background: rgba(255, 215, 0, 0.2);
+.quantity-control button {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
     border: none;
-    color: #ffd700;
-    width: 30px;
-    height: 30px;
+    color: #000;
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 }
 
-.quantity-btn:hover {
-    background: rgba(255, 215, 0, 0.3);
+.quantity-control button:hover {
+    background: linear-gradient(135deg, #ffed4e 0%, #fffb99 100%);
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
 }
 
-.quantity-value {
-    min-width: 30px;
+.quantity-control span {
+    min-width: 35px;
     text-align: center;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    background: rgba(255, 215, 0, 0.1);
+    padding: 6px 10px;
+    border-radius: 6px;
 }
 
-.remove-btn {
-    background: none;
-    border: none;
+/* CORREÇÃO FINAL: Botão do lixo */
+.btn-remove {
+    background: rgba(255, 68, 68, 0.15);
+    border: 1px solid rgba(255, 68, 68, 0.4);
     color: #ff4444;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
-    margin-top: 10px;
-    transition: color 0.3s;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
 }
 
-.remove-btn:hover {
-    color: #ff6666;
+.btn-remove:hover {
+    background: rgba(255, 68, 68, 0.3);
+    border-color: #ff6666;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+}
+
+.btn-remove i {
+    color: #ff4444;
+    font-size: 18px;
 }
 
 /* Empty Cart */
@@ -292,7 +332,8 @@ body {
 }
 
 .summary-card,
-.coupon-card {
+.coupon-card,
+.AplicarCupao {
     background: rgba(26, 26, 26, 0.6);
     border: 1px solid rgba(255, 215, 0, 0.1);
     border-radius: 16px;
@@ -300,7 +341,8 @@ body {
 }
 
 .summary-card h3,
-.coupon-card h4 {
+.coupon-card h4,
+.AplicarCupao h4 {
     font-size: 20px;
     margin-bottom: 20px;
 }

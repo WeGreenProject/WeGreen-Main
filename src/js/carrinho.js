@@ -175,14 +175,16 @@ function aplicarCupao() {
             Swal.fire({
                 icon: 'success',
                 title: 'Cupão aplicado!',
-                text: msg
+                text: 'Desconto de 10% aplicado ao seu carrinho',
+                showConfirmButton: true,
+                timer: 2000
             });
             getResumoPedido();
         } else {
             Swal.fire({
                 icon: 'error',
                 title: 'Cupão inválido',
-                text: msg
+                text: 'O código inserido não é válido ou já expirou.'
             });
         }
     })
@@ -191,8 +193,78 @@ function aplicarCupao() {
     });
 }
 
+function removerCupao() {
+    Swal.fire({
+        title: 'Remover cupão?',
+        text: "O desconto será removido do carrinho.",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ffd700',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim, remover',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let dados = new FormData();
+            dados.append("op", 8);
+
+            $.ajax({
+                url: "src/controller/controllerCarrinho.php",
+                method: "POST",
+                data: dados,
+                dataType: "html",
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+            .done(function(msg) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Removido!',
+                    text: 'Cupão removido com sucesso.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                getResumoPedido();
+            })
+            .fail(function(jqXHR, textStatus) {
+                alert("Request failed: " + textStatus);
+            });
+        }
+    });
+}
+
 function irParaCheckout() {
-    window.location.href = 'checkout.html';
+    let dados = new FormData();
+    dados.append("op", 9);
+
+    $.ajax({
+        url: "src/controller/controllerCarrinho.php",
+        method: "POST",
+        data: dados,
+        dataType: "json",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(response) {
+        if (response.tem_produtos) {
+            window.location.href = 'checkout_stripe.php';
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Carrinho Vazio',
+                text: 'Adicione produtos ao carrinho antes de finalizar a compra!'
+            });
+        }
+    })
+    .fail(function(jqXHR, textStatus) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro',
+            text: 'Ocorreu um erro. Tente novamente.'
+        });
+    });
 }
 
 $(function() {
