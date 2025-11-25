@@ -109,35 +109,25 @@
 
     <div class="row mb-4">
             <div class="col-md-2 col-sm-6 mb-3">
-                <select id="marcaSelect" class="form-select rounded-pill fw-semibold">
-                    <option value="">Marca</option>
-                    
-                     </select>
-            </div>
-
-            <div class="col-md-2 col-sm-6 mb-3">
-                <select id="precoSelect" class="form-select rounded-pill fw-semibold">
-                    <option value="">Preço</option>
-                    
+                <select id="CategoriaSelect" class="form-select rounded-pill fw-semibold">
+                  <option value='-1'>Selecionar Categoria...</option>
                 </select>
             </div>
 
             <div class="col-md-2 col-sm-6 mb-3">
                 <select id="tamanhoSelect" class="form-select rounded-pill fw-semibold">
-                    <option value="">Tamanho</option>
-
+                  <option value='-1'>Selecionar o Tamanho...</option>
                 </select>
             </div>
 
             <div class="col-md-2 col-sm-6 mb-3">
                 <select id="estadoSelect" class="form-select rounded-pill fw-semibold">
-                    <option value="">Estado</option>
-    
+                    <option value="-1">Selecionar Estado...</option>
                 </select>
             </div>
 
             <div class="col-md-2 col-sm-6 mb-3">
-                <button id="limparFiltros" class="btn btn-wegreen-accent rounded-pill w-100 fw-semibold">
+                <button id="limparFiltros" class="btn btn-wegreen-accent rounded-pill w-100 fw-semibold" onclick="getFiltrosLimparFiltro()">
                     Limpar Filtros
                 </button>
             </div>

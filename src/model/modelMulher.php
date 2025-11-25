@@ -3,70 +3,99 @@ require_once 'connection.php';
 
 class Mulher {
 
-    function getFiltrosMulher(){
+function getFiltrosMulherCategoria() {
     global $conn;
     $msg = "";
-
-    $sql = "SELECT marca FROM Produtos WHERE Produto.genero LIKE 'Mulher' AND ativo = 1 AND marca IS NOT NULL ORDER BY marca ASC;";
+    
+    $sql = "SELECT id AS ValueProduto, descricao AS NomeProduto FROM tipo_produtos";
     $result = $conn->query($sql);
 
-    $msg .= "<option value=''>Marca</option>";
+    $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+    
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
-            $msg .= "<option value='".$row["marca"]."'>".$row["marca"]."</option>";
+            $msg .= "<option value='".$row["ValueProduto"]."'>".$row["NomeProduto"]."</option>";
         }
     } else {
-        $msg .= "<option value=''>Marca</option>";
-        $msg .= "<option value=''>Sem Registos</option>";
+        $msg .= "<option value='1'>Sem Registos</option>";
     }
     
-    
-    $msg .= "<option value=''>Preço</option>";
-    $msg .= "<option value='0-20'>Até 20€</option>";
-    $msg .= "<option value='20-50'>20€ - 50€</option>";
-    $msg .= "<option value='50-100'>50€ - 100€</option>";
-    $msg .= "<option value='100-200'>100€ - 200€</option>";
-    $msg .= "<option value='200-999999'>Mais de 200€</option>";
-    
-    $msg .= "|||SEPARADOR|||";
-    
-    $sql = "SELECT tamanho FROM Produtos WHERE Produtgenero LIKE 'Mulher' AND ativo = 1 AND tamanho IS NOT NULL ORDER BY tamanho ASC;";
-    $result = $conn->query($sql);
+    $conn->close();
+    return $msg;
+}
+    function getFiltrosMulherTamanho(){
+        
+        global $conn;
+        $msg = "";
+        $sql = "SELECT DISTINCT tamanho AS NomeTamanho,
+                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Mulher' ORDER BY tamanho;";
 
-    $msg .= "<option value=''>Tamanho</option>";
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $msg .= "<option value='".$row["tamanho"]."'>".$row["tamanho"]."</option>";
+        $result = $conn->query($sql);
+
+
+        $msg .= "<option value='-1'>Selecionar o Tamanho...</option>";
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+
+                $msg .= "<option value=".$row["ValueTamanho"].">".$row["NomeTamanho"]."</option>";
+            }
+        } else {
+                $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+                $msg .= "<option value='1'>Sem Registos</option>";
         }
-    } else {
-        $msg .= "<option value=''>Tamanho</option>";
-        $msg .= "<option value=''>Sem Registos</option>";
-    }
+        $conn->close();
+
+        return ($msg);
     
-
-    $sql = "SELECT estado FROM Produtos WHERE genero LIKE 'Mulher' AND ativo = 1 AND estado IS NOT NULL ORDER BY estado ASC;";
-    $result = $conn->query($sql);
-
-    $msg .= "<option value=''>Estado</option>";
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $msg .= "<option value='".$row["estado"]."'>".$row["estado"]."</option>";
-        }
-    } else {
-        $msg .= "<option value=''>Estado</option>";
-        $msg .= "<option value=''>Sem Registos</option>";
-    }
     
     $conn->close();
     return ($msg);
 }
+    function getFiltrosMulherEstado(){
+        
+        global $conn;
+        $msg = "";
+        $sql = "SELECT DISTINCT estado AS NomeEstado,
+                estado AS ValueEstado FROM Produtos WHERE genero = 'Mulher' ORDER BY estado;";
+        $result = $conn->query($sql);
 
-function getProdutosMulher(){
+
+        $msg .= "<option value='-1'>Selecionar Estado...</option>";
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+
+                $msg .= "<option value='".$row["ValueEstado"]."'>".$row["NomeEstado"]."</option>";
+            }
+        } else {
+                $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+                $msg .= "<option value='1'>Sem Registos</option>";
+        }
+        $conn->close();
+
+        return ($msg);
+    
+    
+    $conn->close();
+    return ($msg);
+}
+function getProdutosMulher($categoria,$tamanho,$estado){
     global $conn;
     $msg = "";
 
-    $sql = "SELECT * FROM Produtos WHERE genero LIKE 'Mulher' AND ativo = 1;";
+    $sql = "SELECT * FROM Produtos WHERE ativo = 1 AND genero='Mulher'";
+
+        if (isset($tamanho) && $tamanho != "" && $tamanho != "-1") {
+            $sql .= " AND tamanho = '$tamanho'";
+        }
+        if (isset($estado) && $estado != "" && $estado != "-1") {
+            $sql .= " AND estado = '$estado'";
+        }
+        if (isset($categoria) && $categoria != "" && $categoria != "-1") {
+            $sql .= " AND tipo_produto_id = '$categoria'";
+        }
+
     $result = $conn->query($sql);
+
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -78,15 +107,16 @@ function getProdutosMulher(){
             $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
             $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
             $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
-            $msg .= "</div>";
-            $msg .= "</div>";
-            $msg .= "</div>";
+            $msg .= "</div></div></div>";
         }
+    } else {
+        $msg = "<p class='text-center text-muted'>Produto não encontrado.</p>";
     }
-    
+
     $conn->close();
-    return ($msg);
+    return $msg;
 }
+
 
 function getProdutoMulherMostrar($ID_Produto){
     global $conn;

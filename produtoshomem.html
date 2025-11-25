@@ -106,72 +106,31 @@
   <main class="container py-5 mt-5">
     <h2 class="fw-bold text-center mb-5">Homem</h2>
       <div class="row mb-4">
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="marcaSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Marca</option>
-        <option value="1">Nike</option>
-        <option value="2">Adidas</option>
-        <option value="3">GAP</option>
-        <option value="4">Billabong</option>
-        <option value="5">Levis</option>
-        <option value="6">Timbaland</option>
-      </select>
-    </div>
+    <div class="row mb-4">
+            <div class="col-md-2 col-sm-6 mb-3">
+                <select id="CategoriaSelect" class="form-select rounded-pill fw-semibold">
+                  <option value='-1'>Selecionar Categoria...</option>
+                </select>
+            </div>
 
-     <div class="col-md-2 col-sm-6 mb-3">
-      <select id="precoSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Preço</option>
-        <option value="1">até €50</option>
-        <option value="2">€50 – €100</option>
-        <option value="3">€100 – €200</option>
-        <option value="4">Mais de €200</option>
-      </select>
-    </div>
+            <div class="col-md-2 col-sm-6 mb-3">
+                <select id="tamanhoSelect" class="form-select rounded-pill fw-semibold">
+                  <option value='-1'>Selecionar o Tamanho...</option>
+                </select>
+            </div>
 
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="tamanhoSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Tamanho</option>
-        <option value="1">S</option>
-        <option value="2">M</option>
-        <option value="3">L</option>
-        <option value="4">XL</option>
-        <option value="5">XXL</option>
-        <option value="5">41</option>
-      </select>
-    </div>
+            <div class="col-md-2 col-sm-6 mb-3">
+                <select id="estadoSelect" class="form-select rounded-pill fw-semibold">
+                    <option value="-1">Selecionar Estado...</option>
+                </select>
+            </div>
 
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="corSelect" class="form-select rounded-pill fw-semibold">
-        <option value="">Cor</option>
-        <option value="1">Preto</option>
-        <option value="2">Azul</option>
-        <option value="3">Verde</option>
-        <option value="4">Branco</option>
-        <option value="5">Amarelo</option>
-        <option value="6">Vermelho</option>
-        <option value="7">Roxo</option>
-      </select>
-    </div>
-
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="estadoSelect" class="form-select rounded-pill fw-semibold" name="estado">
-        <option value="">Estado</option>
-        <option value="1">Como novo</option>
-        <option value="2">Excelente</option>
-        <option value="3">Bom</option>
-      </select>
-    </div>
-
-    <div class="col-md-2 col-sm-6 mb-3">
-      <select id="materialSelect" class="form-select rounded-pill fw-semibold" name="material">
-        <option value="">Material</option>
-        <option value="1">Pele</option>
-        <option value="2">Ganga</option>
-        <option value="3">Algodão</option>
-        <option value="3">Poliester</option>
-      </select>
-    </div>
-  </div>
+            <div class="col-md-2 col-sm-6 mb-3">
+                <button id="limparFiltros" class="btn btn-wegreen-accent rounded-pill w-100 fw-semibold" onclick="getFiltrosLimparFiltro()">
+                    Limpar Filtros
+                </button>
+            </div>
+        </div>
 
   <div id="listaProdutos" class="row g-4">
 

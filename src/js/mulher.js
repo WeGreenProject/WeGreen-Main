@@ -1,4 +1,4 @@
-function getFiltrosMulher()
+function getFiltrosMulherCategoria()
 {
     let dados = new FormData();
     dados.append("op",1);
@@ -14,23 +14,80 @@ function getFiltrosMulher()
     })
     .done(function( msg ) {
         console.log(msg);
-        $('#marcaSelect').html(msg);
-        $('#precoSelect').html(msg);
-        $('#tamanhoSelect').html(msg);
-        $('#estadoSelect').html(msg);
+        $('#CategoriaSelect').html(msg);
 
     })
     
     .fail(function( jqXHR, textStatus ) {
     alert( "Request failed: " + textStatus );
     });
-
 }
-
-function getProdutosMulher()
+function getFiltrosMulherTamanho()
 {
     let dados = new FormData();
+    dados.append("op",7);
+
+    $.ajax({
+    url: "src/controller/controllerMulher.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    .done(function( msg ) {
+        console.log(msg);
+        $('#tamanhoSelect').html(msg);
+
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
+function getFiltrosMulherEstado()
+{
+    let dados = new FormData();
+    dados.append("op",8);
+
+    $.ajax({
+    url: "src/controller/controllerMulher.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    .done(function( msg ) {
+        console.log(msg);
+        $('#estadoSelect').html(msg);
+
+
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
+function getFiltrosLimparFiltro() {
+    $("#CategoriaSelect").val('-1');
+    $("#tamanhoSelect").val('-1');
+    $("#estadoSelect").val('-1');
+    getProdutosMulher();
+}
+function getProdutosMulher()
+{
+    let categoria = $("#CategoriaSelect").val();
+    let tamanho = $("#tamanhoSelect").val();
+    let estado = $("#estadoSelect").val();
+
+    let dados = new FormData();
     dados.append("op", 2);
+    dados.append("categoria", categoria);
+    dados.append("tamanho", tamanho);
+    dados.append("estado", estado);
     $.ajax({
     url: "src/controller/controllerMulher.php",
     method: "POST",
@@ -43,6 +100,7 @@ function getProdutosMulher()
     
     .done(function( msg ) {
          $('#ProdutoMulherVenda').html(msg);
+
     })
     
     .fail(function( jqXHR, textStatus ) {
@@ -117,4 +175,10 @@ function comprarAgora(produtoId) {
 $(function() {
     getProdutoMulherMostrar();
     getProdutosMulher();
+    getFiltrosMulherCategoria();
+    getFiltrosMulherTamanho();
+    getFiltrosMulherEstado();
+     $("#CategoriaSelect, #tamanhoSelect, #estadoSelect").on('change', function() {
+        getProdutosMulher();
+    });
 });
