@@ -126,7 +126,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=premium&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
@@ -143,7 +143,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=enterprise&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>"; // fecha row
@@ -205,7 +205,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=enterprise&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>";
@@ -250,7 +250,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=premium&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
@@ -318,7 +318,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=premium&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
@@ -335,7 +335,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=enterprise&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>"; // fecha row
@@ -397,7 +397,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=enterprise&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>";
@@ -442,7 +442,7 @@ class Perfil{
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Rastreio de encomendas avançado</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios por PDF</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=premium&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
