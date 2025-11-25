@@ -3,34 +3,91 @@ require_once 'connection.php';
 
 class Mulher {
 
-function getProdutosMulher(){
-        global $conn;
-        $msg = "";
-        $row = "";
+    function getFiltrosMulher(){
+    global $conn;
+    $msg = "";
 
-        $sql = "SELECT Produtos.* FROM Produtos where Produtos.genero LIKE 'Mulher' AND produtos.ativo = 1;";
-        $result = $conn->query($sql);
+    $sql = "SELECT marca FROM Produtos WHERE genero LIKE 'Mulher' AND ativo = 1 AND marca IS NOT NULL ORDER BY marca ASC;";
+    $result = $conn->query($sql);
 
-        if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                $msg .= "<div class='col-md-3 col-sm-6'>";
-                $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
-                $msg .= "<img src='".$row["foto"]."' height='340px'class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
-                $msg .= "<div class='card-body text-center'>";
-                $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
-                $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-                $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
-                $msg .= "</div>";
-                $msg .= "</div>";
-                $msg .= "</div>";
-              }
-        $conn->close();
-        
-        return ($msg);
-
+    $msg .= "<option value=''>Marca</option>";
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $msg .= "<option value='".$row["marca"]."'>".$row["marca"]."</option>";
+        }
+    } else {
+        $msg .= "<option value=''>Marca</option>";
+        $msg .= "<option value=''>Sem Registos</option>";
     }
+    
+    
+    $msg .= "<option value=''>Preço</option>";
+    $msg .= "<option value='0-20'>Até 20€</option>";
+    $msg .= "<option value='20-50'>20€ - 50€</option>";
+    $msg .= "<option value='50-100'>50€ - 100€</option>";
+    $msg .= "<option value='100-200'>100€ - 200€</option>";
+    $msg .= "<option value='200-999999'>Mais de 200€</option>";
+    
+    $msg .= "|||SEPARADOR|||";
+    
+    $sql = "SELECT tamanho FROM Produtos WHERE Produtgenero LIKE 'Mulher' AND ativo = 1 AND tamanho IS NOT NULL ORDER BY tamanho ASC;";
+    $result = $conn->query($sql);
+
+    $msg .= "<option value=''>Tamanho</option>";
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $msg .= "<option value='".$row["tamanho"]."'>".$row["tamanho"]."</option>";
+        }
+    } else {
+        $msg .= "<option value=''>Tamanho</option>";
+        $msg .= "<option value=''>Sem Registos</option>";
+    }
+    
+
+    $sql = "SELECT estado FROM Produtos WHERE genero LIKE 'Mulher' AND ativo = 1 AND estado IS NOT NULL ORDER BY estado ASC;";
+    $result = $conn->query($sql);
+
+    $msg .= "<option value=''>Estado</option>";
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $msg .= "<option value='".$row["estado"]."'>".$row["estado"]."</option>";
+        }
+    } else {
+        $msg .= "<option value=''>Estado</option>";
+        $msg .= "<option value=''>Sem Registos</option>";
+    }
+    
+    $conn->close();
+    return ($msg);
 }
+
+function getProdutosMulher(){
+    global $conn;
+    $msg = "";
+
+    $sql = "SELECT * FROM Produtos WHERE genero LIKE 'Mulher' AND ativo = 1;";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $msg .= "<div class='col-md-3 col-sm-6'>";
+            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+            $msg .= "<img src='".$row["foto"]."' height='340px' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
+            $msg .= "<div class='card-body text-center'>";
+            $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
+            $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
+            $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
+            $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+        }
+    }
+    
+    $conn->close();
+    return ($msg);
+}
+
 function getProdutoMulherMostrar($ID_Produto){
     global $conn;
     $msg = "";
@@ -92,10 +149,10 @@ function getProdutoMulherMostrar($ID_Produto){
             $msg .= "<div class='d-flex gap-3 mb-4'>";
             $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
             $msg .= "data-id='".$rowProduto['Produto_id']."'>";
-            $msg .= "Comprar Agora</button>";
+            $msg .= "Comprar Agora";
+            $msg .= "</button>";
             $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button>";
             $msg .= "</div>";
-            
             $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
             $msg .= "<div class='d-flex align-items-center'>";
             $msg .= "<div class='position-relative me-3'>";

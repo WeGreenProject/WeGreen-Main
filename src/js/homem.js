@@ -41,15 +41,32 @@ function getProdutoHomemMostrar()
     processData: false
     })
     
-    .done(function( msg ) {
+    done(function( msg ) {
         console.log(msg);
          $('#ProdutoInfo').html(msg);
+
+         $('.btnComprarAgora').on('click', function() {
+            const produtoId = $(this).data('id');
+            comprarAgora(produtoId);
+        });
     })
     
     .fail(function( jqXHR, textStatus ) {
     alert( "Request failed: " + textStatus );
     });
 
+}
+
+function comprarAgora(produtoId) {
+    console.log('Produto ID:', produtoId);
+    
+    Swal.fire({
+        title: 'Sucesso!',
+        text: 'Produto adicionado ao carrinho',
+        icon: 'success',
+        confirmButtonColor: '#28a745',
+        confirmButtonText: 'OK'
+    });
 }
 $(function() {
     getProdutoHomemMostrar();

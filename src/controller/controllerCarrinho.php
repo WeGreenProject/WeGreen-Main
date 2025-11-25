@@ -1,10 +1,12 @@
 <?php
+session_start();
 include_once '../model/modelCarrinho.php';
 
 $func = new Carrinho();
 
+
 if ($_POST['op'] == 1) {
-    $resp = $func->getCarrinho();
+    $resp = $func->getCarrinho($_SESSION['utilizador']);
     echo $resp;
 }
 
