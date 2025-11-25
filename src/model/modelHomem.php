@@ -45,7 +45,7 @@ function getFiltrosHomemCategoria() {
     global $conn;
     $msg = "";
     
-    $sql = "SELECT id AS ValueProduto, descricao AS NomeProduto FROM tipo_produtos";
+    $sql = "SELECT id AS ValueProduto, tipo_produtos.descricao AS NomeProduto FROM tipo_produtos,Produtos where Produtos.ativo = 1 AND tipo_produtos.id = Produtos.tipo_produto_id group by tipo_produtos.id;";
     $result = $conn->query($sql);
 
     $msg .= "<option value='-1'>Selecionar Categoria...</option>";
@@ -66,7 +66,7 @@ function getFiltrosHomemCategoria() {
         global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT tamanho AS NomeTamanho,
-                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Homem' ORDER BY tamanho;";
+                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Homem' ORDER BY tamanho AND Produtos.ativo = 1;";
 
         $result = $conn->query($sql);
 
@@ -94,7 +94,7 @@ function getFiltrosHomemCategoria() {
         global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT estado AS NomeEstado,
-                estado AS ValueEstado FROM Produtos WHERE genero = 'Homem' ORDER BY estado;";
+                estado AS ValueEstado FROM Produtos WHERE genero = 'Homem' ORDER BY estado AND Produtos.ativo = 1;";
         $result = $conn->query($sql);
 
 

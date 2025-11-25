@@ -8,7 +8,7 @@ function getProdutosCriança($categoria,$tamanho,$estado){
         $msg = "";
         $row = "";
 
-        $sql = "SELECT Produtos.* FROM Produtos where Produtos.genero LIKE 'Crianca'";
+        $sql = "SELECT Produtos.* FROM Produtos where Produtos.genero LIKE 'Criança' AND Produtos.ativo = 1 ";
         
         if (isset($tamanho) && $tamanho != "" && $tamanho != "-1") {
             $sql .= " AND tamanho = '$tamanho'";
@@ -36,9 +36,9 @@ function getProdutosCriança($categoria,$tamanho,$estado){
                 $msg .= "</div>";
                 $msg .= "</div>";
     }
-        $conn->close();
+    $conn->close();
         
-        return ($msg);
+    return ($msg);
 
     }
 }
@@ -46,7 +46,7 @@ function getFiltrosCriancaCategoria() {
     global $conn;
     $msg = "";
     
-    $sql = "SELECT id AS ValueProduto, descricao AS NomeProduto FROM tipo_produtos";
+    $sql = "SELECT id AS ValueProduto, tipo_produtos.descricao AS NomeProduto FROM tipo_produtos,Produtos where Produtos.ativo = 1 AND tipo_produtos.id = Produtos.tipo_produto_id group by tipo_produtos.id;";
     $result = $conn->query($sql);
 
     $msg .= "<option value='-1'>Selecionar Categoria...</option>";
@@ -67,7 +67,7 @@ function getFiltrosCriancaCategoria() {
         global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT tamanho AS NomeTamanho,
-                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Homem' ORDER BY tamanho;";
+                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Criança' ORDER BY tamanho AND Produtos.ativo = 1;";
 
         $result = $conn->query($sql);
 
@@ -95,7 +95,7 @@ function getFiltrosCriancaCategoria() {
         global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT estado AS NomeEstado,
-                estado AS ValueEstado FROM Produtos WHERE genero = 'Homem' ORDER BY estado;";
+                estado AS ValueEstado FROM Produtos WHERE genero = 'Criança' ORDER BY estado AND Produtos.ativo = 1;";
         $result = $conn->query($sql);
 
 
