@@ -178,7 +178,8 @@ function getProdutoCriançaMostrar($ID_Produto){
             $msg .= "<div class='d-flex gap-3 mb-4'>";
             $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
             $msg .= "data-id='".$rowProduto['Produto_id']."'>";
-            $msg .= "Comprar Agora</button>";
+            $msg .= "Comprar Agora";
+            $msg .= "</button>";
             $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button>";
             $msg .= "</div>";
             

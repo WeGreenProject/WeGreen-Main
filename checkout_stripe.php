@@ -8,7 +8,6 @@ require_once 'src/model/modelCheckout.php';
 $func = new Checkout();
 $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : 1;
 
-// Buscar produtos do carrinho
 $produtos = $func->getProdutosCarrinho($utilizador_id);
 
 if (empty($produtos)) {
@@ -16,7 +15,6 @@ if (empty($produtos)) {
     exit;
 }
 
-// Construir line_items para o Stripe
 $line_items = [];
 foreach ($produtos as $produto) {
     $valorCents = intval(round($produto['preco'] * 100));
@@ -26,7 +24,7 @@ foreach ($produtos as $produto) {
             'currency' => 'eur',
             'product_data' => [
                 'name' => $produto['nome'],
-                'images' => [$produto['foto']], // Stripe aceita URLs de imagens
+                'images' => [$produto['foto']], 
             ],
             'unit_amount' => $valorCents,
         ],
@@ -34,7 +32,6 @@ foreach ($produtos as $produto) {
     ];
 }
 
-// Adicionar taxa de envio
 $line_items[] = [
     'price_data' => [
         'currency' => 'eur',
@@ -47,7 +44,6 @@ $line_items[] = [
     'quantity' => 1,
 ];
 
-// Aplicar desconto se houver cupão
 $discounts = [];
 if (isset($_SESSION['cupao_desconto']) && $_SESSION['cupao_desconto'] > 0) {
     // Criar cupom no Stripe
