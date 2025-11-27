@@ -165,8 +165,7 @@ function comprarAgora(produtoId) {
             icon: 'success',
             confirmButtonColor: '#28a745',
             confirmButtonText: 'OK'
-        }).then(() => {
-            window.location.href = 'carrinho.html?id=' + produtoId;
+
         });
 
     });
