@@ -76,8 +76,6 @@ function adicionarFornecedor() {
     });
 }
 function getDadosFornecedores(ID_Fornecedores){
-
-
     let dados = new FormData();
     dados.append("op", 9);
     dados.append("id", ID_Fornecedores);

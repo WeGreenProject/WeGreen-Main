@@ -3,44 +3,50 @@ require_once 'connection.php';
 
 class Criança {
 
-function getProdutosCriança($categoria,$tamanho,$estado){
-        global $conn;
-        $msg = "";
-        $row = "";
+function getProdutosCriança($categoria, $tamanho, $estado)
+{
+    global $conn;
+    $msg = "";
+    $sql = "SELECT Produtos.* 
+            FROM Produtos 
+            WHERE genero = 'Criança' 
+            AND ativo = 1";
 
-        $sql = "SELECT Produtos.* FROM Produtos where Produtos.genero LIKE 'Criança' AND Produtos.ativo = 1 ";
-        
-        if (isset($tamanho) && $tamanho != "" && $tamanho != "-1") {
-            $sql .= " AND tamanho = '$tamanho'";
-        }
-        if (isset($estado) && $estado != "" && $estado != "-1") {
-            $sql .= " AND estado = '$estado'";
-        }
-        if (isset($categoria) && $categoria != "" && $categoria != "-1") {
-            $sql .= " AND tipo_produto_id = '$categoria'";
-        }
-        
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                $msg .= "<div class='col-md-3 col-sm-6'>";
-                $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
-                $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
-                $msg .= "<div class='card-body text-center'>";
-                $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
-                $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-                $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoCriançaMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
-                $msg .= "</div>";
-                $msg .= "</div>";
-                $msg .= "</div>";
+    if ($tamanho !== "" && $tamanho !== "-1") {
+        $sql .= " AND tamanho = '$tamanho'";
     }
-    $conn->close();
-        
-    return ($msg);
 
+    if ($estado !== "" && $estado !== "-1") {
+        $sql .= " AND estado = '$estado'";
     }
+
+    if ($categoria !== "" && $categoria !== "-1") {
+        $sql .= " AND tipo_produto_id = '$categoria'";
+    }
+
+    $result = $conn->query($sql);
+
+    if ($result && $result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+            $msg .= "<div class='col-md-3 col-sm-6'>";
+            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+            $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
+            $msg .= "<div class='card-body text-center'>";
+            $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
+            $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
+            $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
+            $msg .= "<a href='ProdutoCriançaMostrar.html?id=".$row["Produto_id"]."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+        }
+
+    } else {
+        $msg = "<p class='text-center text-muted'>Produto não encontrado.</p>";
+    }
+
+    return $msg;
 }
 function getFiltrosCriancaCategoria() {
     global $conn;
