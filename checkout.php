@@ -28,10 +28,10 @@ $session = \Stripe\Checkout\Session::create([
         'quantity' => 1, 
     ]], 
     'mode' => 'payment', 
-    'success_url' => 'http://localhost/wegreen-main/sucess.php?session_id={CHECKOUT_SESSION_ID}&plano_id=' . $planoId, 
+    'success_url' => 'http://localhost/wegreen-main/sucess.php?session_id={CHECKOUT_SESSION_ID}&plano_id=' . $planoId . '&utilizador_id=' . $_SESSION["utilizador"], 
     'cancel_url' => 'http://localhost/wegreen-main/cancelado.php', 
     'metadata' => [ 
-        'utilizador' => $_SESSION["utilizador"], 
+        'utilizador_id' => $_SESSION["utilizador"], 
         'plano_id' => $planoId 
     ] 
 ]); 

@@ -18,7 +18,7 @@
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
 
-    <style>
+     <style>
         * {
             margin: 0;
             padding: 0;
@@ -41,7 +41,7 @@
             max-width: 700px;
             width: 100%;
             background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-            border: 2px solid #ffd700;
+            border: 2px solid #90c207;
             border-radius: 20px;
             padding: 50px 40px;
             text-align: center;
@@ -63,7 +63,7 @@
         .success-icon {
             width: 120px;
             height: 120px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            background: linear-gradient(135deg, #90c207 0%, #90c207 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -88,7 +88,7 @@
 
         .success-title {
             font-size: 36px;
-            color: #ffd700;
+            color: #90c207;
             margin-bottom: 15px;
             font-weight: 700;
         }
@@ -147,7 +147,7 @@
         }
 
         .plan-premium {
-            background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
+            background: linear-gradient(90deg, #90c207 0%, #90c207 100%);
             color: #000;
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
@@ -164,7 +164,7 @@
 
         .confirmation-info {
             background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #ffd700;
+            border: 1px solid #90c207;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 30px;
@@ -172,7 +172,7 @@
 
         .confirmation-info p {
             font-size: 14px;
-            color: #ffd700;
+            color: #90c207;
             line-height: 1.6;
             margin: 0;
         }
@@ -201,7 +201,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
+            background: linear-gradient(90deg, #90c207 0%, #90c207 100%);
             color: #000;
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
@@ -213,8 +213,8 @@
 
         .btn-secondary {
             background: transparent;
-            color: #ffd700;
-            border: 2px solid #ffd700;
+            color: #90c207;
+            border: 2px solid #90c207;
         }
 
         .btn-secondary:hover {
@@ -265,7 +265,7 @@
         <div class="order-details">
             <div class="detail-row">
                 <span class="detail-label">Cliente</span>
-                <span class="detail-value" id="customerName">João Silva</span>
+                <span class="detail-value" id="customerName">Admin Wegreen</span>
             </div>
             
             <div class="detail-row" id="planoConfirmado">
@@ -284,16 +284,16 @@
         </div>
 
         <div class="confirmation-info">
-            <p>📧 Enviámos um email de confirmação com todos os detalhes da sua compra e instruções para aceder ao seu plano.</p>
+            <p> Enviámos um email de confirmação com todos os detalhes da sua compra e instruções para aceder ao seu plano.</p>
         </div>
 
         <div class="action-buttons">
             <a href="#" class="btn btn-primary">
-                <span class="btn-icon">🚀</span>
+                <span class="btn-icon"></span>
                 <span>Aceder ao Dashboard</span>
             </a>
             <a href="#" class="btn btn-secondary">
-                <span class="btn-icon">📄</span>
+                <span class="btn-icon"></span>
                 <span>Ver Fatura</span>
             </a>
         </div>
