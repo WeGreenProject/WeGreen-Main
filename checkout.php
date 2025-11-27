@@ -11,8 +11,8 @@ if($valorCents <= 0){
     die("Erro: preço inválido. Valor recebido = " . htmlspecialchars($_GET['preco'])); 
 } 
  
-$planoId = ($plano === 'enterprise') ? 3 : 2; 
-$nomeProduto = ($plano === 'enterprise') ? 'Plano Enterprise' : 'Plano Premium'; 
+$planoId = ($plano === 'eco') ? 3 : 2; 
+$nomeProduto = ($plano === 'eco') ? 'Plano Profissional Eco +' : 'Plano Crescimento Circular'; 
  
 $session = \Stripe\Checkout\Session::create([ 
     'payment_method_types' => ['card'],  
