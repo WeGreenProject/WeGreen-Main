@@ -82,7 +82,7 @@ function getProdutoCriançaMostrar()
         contentType: false,
         processData: false
     })
-    .done(function() {
+       .done(function() {
 
         Swal.fire({
             title: 'Sucesso!',
@@ -90,11 +90,9 @@ function getProdutoCriançaMostrar()
             icon: 'success',
             confirmButtonColor: '#28a745',
             confirmButtonText: 'OK'
-        }).then(() => {
-            window.location.href = 'carrinho.html?id=' + produtoId;
+        })
         });
 
-    });
 }
 
 }
