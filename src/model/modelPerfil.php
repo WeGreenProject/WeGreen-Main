@@ -1,3 +1,4 @@
+
 <?php
 
 require_once 'connection.php';
@@ -368,11 +369,10 @@ class Perfil{
                 $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO PREMIUM ===
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
-                $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Crescimento Circular</h4>";
+                $msg .= "<h4 class='fw-bold mb-3 text-white'>Plano Crescimento Circular</h4>";
                 $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
