@@ -1,19 +1,13 @@
-<?php
-    session_start();
-
-    if($_SESSION['tipo'] == 1){ 
-?>
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprovação de Produtos - Fashion Store</title>
+    <title>Perfil do Admin - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/AdminProdutos.css">
-    <link rel="stylesheet" href="src/css/Admin.css">
-
+    <link rel="stylesheet" href="src/css/perfilAdmin.css">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
 
@@ -21,19 +15,18 @@
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
-
 
 <body>
     <div class="container">
+        <!-- Sidebar -->
         <aside class="sidebar">
             <a href="index.html" style="text-decoration: none;">
                 <div class="logo">
                     <span class="logo-icon">👔</span>
                     <div class="logo-text">
-                        <h1>Fashion Store</h1>
-                        <p>Painel do Administrador</p>
+                        <h1>Wegreen</h1>
+                        <p>Painel do Adminstrador</p>
                     </div>
                 </div>
             </a>
@@ -58,7 +51,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="aprovar.php">
+                        <a class="nav-link" href="ProdutosAdmin.php">
                             <span class="nav-icon">🛒</span>
                             <span class="nav-text">Aprovar Produtos</span>
                         </a>
@@ -82,7 +75,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="perfilAdmin.php">
+                        <a class="nav-link active" href="perfilAdmin.php">
                             <span class="nav-icon">⚙️</span>
                             <span class="nav-text">Configurações</span>
                         </a>
@@ -99,55 +92,27 @@
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="main-content">
             <div class="page-header">
-                <h2>Aprovar Produtos</h2>
-                <p>Revise e aprove produtos pendentes de fornecedores</p>
+                <h2>Meu Perfil</h2>
+                <p>Gerencie suas informações pessoais e configurações de conta</p>
             </div>
 
-            <div class="approval-stats">
-                <div class="approval-stat-card" id="Pendentes">
-                </div>
-                <div class="approval-stat-card" id="Aprovados">
-                </div>
-                <div class="approval-stat-card" id="Rejeitados">
-                </div>
-            </div>
-
-            <div class="approval-filters" id="Filtros">
+            <div class="profile-container" id="PerfilAdminInicial">
 
             </div>
-            <div class="table-container">
-                <table id="tableAprovar" class="display">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nome Encomenda</th>
-                            <th>Preço</th>
-                            <th>Anunciante</th>
-                            <th>Cliente</th>
-                            <th>Plano</th>
-                            <th>Tipo_produto</th>
-                            <th>Data</th>
-                            <th>Morada</th>
-                            <th>Status</th>
-                            <th>Aceitar</th>
-                            <th>Recusar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productsAprovarTable">
-                    </tbody>
-                </table>
+
+            <!-- Profile Content Grid -->
+            <div class="profile-content-grid">
+                <!-- Personal Information -->
+                <div class="profile-section" id="PerfilInfo">
+
+                </div>
             </div>
         </main>
     </div>
+    <script src="src/js/PerfilAdmin.js"></script>
 </body>
-<?php
-}else{
-echo "sem permissão!";
-}
-
-?>
-<script src="src/js/ProdutosAdmin.js"></script>
 
 </html>

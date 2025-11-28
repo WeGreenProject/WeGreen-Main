@@ -79,7 +79,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="settings.php">
+                        <a class="nav-link" href="perfilAdmin.php">
                             <span class="nav-icon">⚙️</span>
                             <span class="nav-text">Configurações</span>
                         </a>
