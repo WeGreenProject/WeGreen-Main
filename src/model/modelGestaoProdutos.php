@@ -398,9 +398,6 @@ function uploads($foto, $nome){
     $flag = false;
     $targetBD = "";
 
-    // DEBUG
-    file_put_contents('debug_upload.txt', "Foto recebida: " . print_r($foto, true) . "\n", FILE_APPEND);
-
     if(!is_dir($dirFisico)){
         if(!mkdir($dirFisico, 0777, TRUE)){
             die("Erro não é possível criar o diretório");
