@@ -157,7 +157,7 @@ function comprarAgora(produtoId) {
         contentType: false,
         processData: false
     })
-    .done(function() {
+       .done(function() {
 
         Swal.fire({
             title: 'Sucesso!',
@@ -165,10 +165,9 @@ function comprarAgora(produtoId) {
             icon: 'success',
             confirmButtonColor: '#28a745',
             confirmButtonText: 'OK'
-
+        })
         });
 
-    });
 }
 
 $(function() {
