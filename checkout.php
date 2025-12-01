@@ -13,6 +13,9 @@ if($valorCents <= 0){
  
 $planoId = ($plano === 'eco') ? 3 : 2; 
 $nomeProduto = ($plano === 'eco') ? 'Plano Profissional Eco +' : 'Plano Crescimento Circular'; 
+
+$planoIdInverso = ($plano === 'eco') ? 2 : 3; 
+$nomeProdutoInverso = ($plano === 'eco') ? 'Plano Crescimento Circular' : 'Plano Profissional Eco +'; 
  
 $session = \Stripe\Checkout\Session::create([ 
     'payment_method_types' => ['card'],  
@@ -28,11 +31,13 @@ $session = \Stripe\Checkout\Session::create([
         'quantity' => 1, 
     ]], 
     'mode' => 'payment', 
-    'success_url' => 'http://localhost/wegreen-main/sucess.php?session_id={CHECKOUT_SESSION_ID}&plano_id=' . $planoId . '&utilizador_id=' . $_SESSION["utilizador"], 
+    'success_url' => 'http://localhost/wegreen-main/sucess.php?session_id={CHECKOUT_SESSION_ID}&plano_id=' . $planoId, 
     'cancel_url' => 'http://localhost/wegreen-main/cancelado.php', 
     'metadata' => [ 
-        'utilizador_id' => $_SESSION["utilizador"], 
-        'plano_id' => $planoId 
+        'utilizador' => $_SESSION["utilizador"], 
+        'plano_id' => $planoId,
+        'plano_anterior_id' => $planoIdInverso,
+        'plano_anterior_nome' => $nomeProdutoInverso
     ] 
 ]); 
  

@@ -1,28 +1,29 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wegreen | Mulher</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="src/css/style.css">
-      <link rel="stylesheet" href="src/css/lib/datatables.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wegreen | Suporte</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+    <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
+    <link rel="stylesheet" href="src/css/style.css">
 
     <script src="src/js/lib/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 <body>
-
-  <header class="header-main text-white position-absolute w-100 z-3">
+<header class="header-main text-white position-absolute w-100 z-3">
         <div class="container-fluid px-5">
             <nav class="navbar navbar-expand-lg py-3">
                 
-                <a class="navbar-brand me-4" href="index.html">
+                <a class="navbar-brand me-4" href="#">
                     <img src="src/img/WeGreen-removebg-preview.png" alt="Wegreen Logo" class="logo-img">
                 </a>
                 
@@ -67,7 +68,7 @@
                             </ul>
                         </li>
                         
-                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="produtosDesigner.html">Designers</a></li>
+                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Designers</a></li>
                         <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="#">Artesãos</a></li>
                         
                         <li class="nav-item dropdown mx-2">
@@ -78,7 +79,7 @@
                                 <li><a class="dropdown-item" href="#">PlayUp®</a></li>
                                 <li><a class="dropdown-item" href="#">Vintage for a Cause</a></li>
                                 <li><a class="dropdown-item" href="#">Isto®</a></li>
-                            <</ul>
+                            </ul>
                         </li>
                          <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="suporte.html">Suporte</a></li>
                     </ul>
@@ -93,7 +94,7 @@
                         <button class="btn btn-outline-light rounded-pill" type="submit"><i class="bi bi-search"></i></button>
                     </form>
 
-                    <a class="nav-link text-white mx-2 fs-5" href="#"><i class="bi bi-bag"></i></a> 
+                    <a class="nav-link text-white mx-2 fs-5" href="Carrinho.html"><i class="bi bi-bag"></i></a> 
 
                     <div class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -106,42 +107,106 @@
             </nav>
         </div>
     </header>
-<br>
-  <main class="container py-5 mt-5">
-    <h2 class="fw-bold text-center mb-5">Mulher</h2>
 
-    <div class="row mb-4">
-            <div class="col-md-2 col-sm-6 mb-3">
-                <select id="CategoriaSelect" class="form-select rounded-pill fw-semibold">
-                  <option value='-1'>Selecionar Categoria...</option>
-                </select>
-            </div>
+<section class="container-fluid px-0 mt-5 pt-5">
+    <div class="row g-3">
+        <div class="col-12 col-md-6 col-lg-4">
+            <img src="src/img/download (1).jpeg" class="img-fluid rounded-4 w-100" alt="">
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <img src="src/img/download.jpeg" class="img-fluid rounded-4 w-100" alt="">
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <img src="src/img/download (5).jpeg" class="img-fluid rounded-4 w-100" alt="">
+        </div>
 
-            <div class="col-md-2 col-sm-6 mb-3">
-                <select id="tamanhoSelect" class="form-select rounded-pill fw-semibold">
-                  <option value='-1'>Selecionar o Tamanho...</option>
-                </select>
-            </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <img src="src/img/pexels-ron-lach-8396317.jpg" class="img-fluid rounded-4 w-100" alt="">
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <img src="src/img/pexels-tima-miroshnichenko-6765521.jpg" class="img-fluid rounded-4 w-100" alt="">
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <img src="src/img/pexels-cottonbro-6068961.jpg" class="img-fluid rounded-4 w-100" alt="">
+        </div>
+    </div>
+</section>
 
-            <div class="col-md-2 col-sm-6 mb-3">
-                <select id="estadoSelect" class="form-select rounded-pill fw-semibold">
-                    <option value="-1">Selecionar Estado...</option>
-                </select>
-            </div>
+<section class="text-center py-5">
+    <h1 class="fw-bold" style="font-size: 3rem;">Suporte Wegreen</h1>
+    <p class="text-muted lead mt-2">Estamos aqui para ajudar a navegar no marketplace sustentável e colaborativo.</p>
+</section>
 
-            <div class="col-md-2 col-sm-6 mb-3">
-                <button id="limparFiltros" class="btn btn-wegreen-accent rounded-pill w-100 fw-semibold" onclick="getFiltrosLimparFiltro()">
-                    Limpar Filtros
+<section class="container py-4">
+    <div class="row g-4">
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <button class="w-100 py-3 rounded-3 fw-bold border-0"
+            style="background:#90c207; color:black;">
+                Recuperar Palavra-Passe
+            </button>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <button class="w-100 py-3 rounded-3 fw-bold border-0"
+            style="background:#90c207; color:black;">
+                Ajuda com Login e Conta
+            </button>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <button class="w-100 py-3 rounded-3 fw-bold border-0"
+            style="background:#90c207; color:black;">
+                Suporte a Anunciantes
+            </button>
+        </div>
+
+        <div class="col-12 col-md-6 col-lg-3">
+            <button class="w-100 py-3 rounded-3 fw-bold border-0"
+            style="background:#90c207; color:black;">
+                Contactar Suporte
+            </button>
+        </div>
+
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row g-4">
+
+        <div class="col-12 col-lg-6">
+            <div class="p-4 border rounded-4 h-100 bg-white shadow-sm">
+                <h4 class="fw-bold mb-3">Acesso ao Dashboard</h4>
+                <p class="mb-2"><strong>Administrador:</strong> Acesso total ao painel de gestão, anúncios, pagamentos e utilizadores.</p>
+                <p><strong>Anunciante:</strong> Gerem os próprios produtos, encomendas, estatísticas e perfil.</p>
+                <button class="mt-3 px-4 py-2 rounded-3 fw-bold border-0"
+                style="background:#90c207; color:black;">
+                    Saber mais
                 </button>
             </div>
         </div>
 
-  <div id="listaProdutos" class="row g-4">
+        <div class="col-12 col-lg-6">
+            <div class="p-4 border rounded-4 h-100 bg-white shadow-sm">
+                <h4 class="fw-bold mb-3">Perguntas Frequentes (FAQ)</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2">• Como criar um anúncio sustentável?</li>
+                    <li class="mb-2">• Como funciona a verificação de vendedores?</li>
+                    <li class="mb-2">• Que métodos de pagamento existem?</li>
+                    <li class="mb-2">• Como devolver uma encomenda?</li>
+                </ul>
+                <button class="mt-3 px-4 py-2 rounded-3 fw-bold border-0"
+                style="background:#90c207; color:black;">
+                    Ver todas as FAQ
+                </button>
+            </div>
+        </div>
 
-    <div class="row g-4" id="ProdutoMulherVenda"></div>
-  </main>
+    </div>
 
-  <footer class="bg-dark text-white pt-5 pb-3 mt-5">
+    </section>
+
+    <footer class="bg-dark text-white pt-5 pb-3 mt-5">
     <div class="container">
       <div class="row gy-4 align-items-start">
         <div class="col-md-4 text-md-start">
@@ -199,9 +264,7 @@
       </div>
     </div>
   </footer>
-   
-  <script src="src/js/mulher.js"></script>
-  <script src="src/js/homepage.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="src/js/homepage.js"></script>
 </body>
 </html>

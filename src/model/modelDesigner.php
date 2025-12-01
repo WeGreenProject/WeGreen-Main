@@ -3,16 +3,15 @@ require_once 'connection.php';
 
 class Designer {
 
-function getProdutosDesigner(){
+    function getProdutosDesigner(){
         global $conn;
         $msg = "";
-        $row = "";
 
-        $sql = "SELECT Produtos.* FROM Produtos where Produtos.designer_id LIKE '1';";
+        $sql = "SELECT * FROM Produtos WHERE designer_id IS NOT NULL AND ativo = 1";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
+            while ($row = $result->fetch_assoc()) {
                 $msg .= "<div class='col-md-3 col-sm-6'>";
                 $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
                 $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
@@ -20,29 +19,33 @@ function getProdutosDesigner(){
                 $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
                 $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
                 $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoDesignerMostrar.html?id=".$row['id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                $msg .= "<a href='ProdutoDesignerMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
-              }
-        $conn->close();
+            }
+        } else {
+            $msg = "<div class='col-12'><p class='text-center text-muted'>Nenhum produto de designer encontrado.</p></div>";
+        }
         
-        return ($msg);
-
+        $conn->close();
+        return $msg;
     }
-}
-function getProdutoDesignerMostrar($ID_Produto){
+
+
+    function getProdutoDesignerMostrar($ID_Produto){
         global $conn;
         $msg = "";
         $rowProduto = "";
         $rowFoto = "";
 
-        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil FROM Produtos,utilizadores WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id";
         $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE produto_id = $ID_Produto";
         $result = $conn->query($sql);
         $result2 = $conn->query($sql2);
+        
         if ($result->num_rows > 0) {
-              while ($rowProduto = $result->fetch_assoc()) {
+            while ($rowProduto = $result->fetch_assoc()) {
                 $msg .= "<div class='col-md-6'>";
                 $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
                 $msg .= "<div class='carousel-inner rounded-4 shadow-sm'>";
@@ -50,9 +53,9 @@ function getProdutoDesignerMostrar($ID_Produto){
                 $msg .= "<img src='".$rowProduto["FotoProduto"]."' class='d-block w-100 rounded-4' alt='Blusa Custo Barcelona'>";
                 $msg .= "</div>";
                 while ($rowFoto = $result2->fetch_assoc()) {
-                $msg .= "<div class='carousel-item'>";
-                $msg .= "<img src='".$rowFoto["ProdutoFoto"]."' class='d-block w-100 rounded-4' alt='Blusa Custo Barcelona lateral'>";
-                $msg .= "</div>";
+                    $msg .= "<div class='carousel-item'>";
+                    $msg .= "<img src='".$rowFoto["ProdutoFoto"]."' class='d-block w-100 rounded-4' alt='Blusa Custo Barcelona lateral'>";
+                    $msg .= "</div>";
                 }
                 $msg .= "</div>";
                 $msg .= "<button class='carousel-control-prev' type='button' data-bs-target='#productGallery' data-bs-slide='prev'>";
@@ -73,7 +76,7 @@ function getProdutoDesignerMostrar($ID_Produto){
                 $msg .= "<p class='mb-4'>".$rowProduto["descricao"]."</p>";
                 $msg .= "<div class='d-flex gap-3 mb-4'>";
                 $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
-                $msg .= "data-id='".$rowProduto['id']."'>";
+                $msg .= "data-id='".$rowProduto['Produto_id']."'>";
                 $msg .= "Comprar Agora</button>";
                 $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button>";
                 $msg .= "</div>";
@@ -99,12 +102,11 @@ function getProdutoDesignerMostrar($ID_Produto){
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
-              }
-        $conn->close();
+            }
+        }
         
-        return ($msg);
-
+        $conn->close();
+        return $msg;
     }
-}
 }
 ?>
