@@ -3,35 +3,119 @@ require_once 'connection.php';
 
 class Designer {
 
-    function getProdutosDesigner(){
+    function getFiltrosDesignerCategoria() {
+    global $conn;
+    $msg = "";
+    
+    $sql = "SELECT id AS ValueProduto, tipo_produtos.descricao AS NomeProduto FROM tipo_produtos,Produtos where Produtos.ativo = 1 AND tipo_produtos.id = Produtos.tipo_produto_id group by tipo_produtos.id;";
+    $result = $conn->query($sql);
+
+    $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+    
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $msg .= "<option value='".$row["ValueProduto"]."'>".$row["NomeProduto"]."</option>";
+        }
+    } else {
+        $msg .= "<option value='1'>Sem Registos</option>";
+    }
+    
+    $conn->close();
+    return $msg;
+}
+    function getFiltrosDesignerTamanho(){
+        
         global $conn;
         $msg = "";
+        $sql = "SELECT DISTINCT tamanho AS NomeTamanho,
+                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Mulher' ORDER BY tamanho AND Produtos.ativo = 1;";
 
-        $sql = "SELECT * FROM Produtos WHERE designer_id IS NOT NULL AND ativo = 1";
         $result = $conn->query($sql);
 
+
+        $msg .= "<option value='-1'>Selecionar o Tamanho...</option>";
         if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $msg .= "<div class='col-md-3 col-sm-6'>";
-                $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
-                $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
-                $msg .= "<div class='card-body text-center'>";
-                $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
-                $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-                $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-                $msg .= "<a href='ProdutoDesignerMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
-                $msg .= "</div>";
-                $msg .= "</div>";
-                $msg .= "</div>";
+            while($row = $result->fetch_assoc()) {
+
+                $msg .= "<option value=".$row["ValueTamanho"].">".$row["NomeTamanho"]."</option>";
             }
         } else {
-            $msg = "<div class='col-12'><p class='text-center text-muted'>Nenhum produto de designer encontrado.</p></div>";
+                $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+                $msg .= "<option value='1'>Sem Registos</option>";
         }
-        
         $conn->close();
-        return $msg;
+
+        return ($msg);
+    
+    
+    $conn->close();
+    return ($msg);
+}
+    function getFiltrosDesignerEstado(){
+        
+        global $conn;
+        $msg = "";
+        $sql = "SELECT DISTINCT estado AS NomeEstado,
+                estado AS ValueEstado FROM Produtos WHERE genero = 'Mulher' ORDER BY estado AND Produtos.ativo = 1;";
+        $result = $conn->query($sql);
+
+
+        $msg .= "<option value='-1'>Selecionar Estado...</option>";
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+
+                $msg .= "<option value='".$row["ValueEstado"]."'>".$row["NomeEstado"]."</option>";
+            }
+        } else {
+                $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+                $msg .= "<option value='1'>Sem Registos</option>";
+        }
+        $conn->close();
+
+        return ($msg);
+    
+    
+    $conn->close();
+    return ($msg);
+}
+function getProdutosDesigner($categoria,$tamanho,$estado){
+    global $conn;
+    $msg = "";
+
+    $sql = "SELECT * FROM Produtos WHERE ativo = 1 AND genero IS NULL AND designer_id IS  NOT NULL";
+
+        if (isset($tamanho) && $tamanho != "" && $tamanho != "-1") {
+            $sql .= " AND tamanho = '$tamanho'";
+        }
+        if (isset($estado) && $estado != "" && $estado != "-1") {
+            $sql .= " AND estado = '$estado'";
+        }
+        if (isset($categoria) && $categoria != "" && $categoria != "-1") {
+            $sql .= " AND tipo_produto_id = '$categoria'";
+        }
+
+    $result = $conn->query($sql);
+
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $msg .= "<div class='col-md-3 col-sm-6'>";
+            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+            $msg .= "<img src='".$row["foto"]."' height='340px' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
+            $msg .= "<div class='card-body text-center'>";
+            $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
+            $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
+            $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
+            $msg .= "<a href='ProdutoDesignerMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+            $msg .= "</div></div></div>";
+        }
+    } else {
+        $msg = "<p class='text-center text-muted'>Produto não encontrado.</p>";
     }
 
+    $conn->close();
+    return $msg;
+}
 
     function getProdutoDesignerMostrar($ID_Produto){
         global $conn;
