@@ -17,16 +17,16 @@ class Checkout {
                 {
                     $msg .= "<span class='detail-label'>Plano Adquirido</span>";
                     $msg .= "<span class='plan-badge plan-premium' id='planBadge'>";
-                    $msg .= "<span class='plan-icon'>👑</span>";
-                    $msg .= "<span id='planName'>Premium</span>";
+                    $msg .= "<span class='plan-icon'></span>";
+                    $msg .= "<span id='planName'>Crescimento Circular</span>";
                     $msg .= "</span>";
                 }
                 else if($plano == 3)
                 {
                     $msg .= "<span class='detail-label'>Plano Adquirido</span>";
                     $msg .= "<span class='plan-badge plan-premium' id='planBadge'>";
-                    $msg .= "<span class='plan-icon'>💼</span>";
-                    $msg .= "<span id='planName'>Enterprise</span>";
+                    $msg .= "<span class='plan-icon'></span>";
+                    $msg .= "<span id='planName'>Profissional Eco +</span>";
                     $msg .= "</span>";
                 }
             }

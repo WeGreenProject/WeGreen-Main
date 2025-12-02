@@ -1,42 +1,7 @@
 <?php
     session_start();
-    require_once 'src/model/connection.php';
 
-    if($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 2){ 
-    
-    // Buscar informações do utilizador
-    $utilizador_id = isset($_GET['utilizador_id']) ? intval($_GET['utilizador_id']) : $_SESSION['utilizador'];
-    $plano_id = isset($_GET['plano_id']) ? intval($_GET['plano_id']) : 0;
-    
-    $nomeUtilizador = "Cliente";
-    $nomePlano = "";
-    
-    $sql = "SELECT nome FROM Utilizadores WHERE id = " . $utilizador_id;
-    $result = $conn->query($sql);
-    
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $nomeUtilizador = $row['nome'];
-    }
-    
-    // Buscar nome do plano
-    $sqlPlano = "SELECT nome FROM Planos WHERE id = " . $plano_id;
-    $resultPlano = $conn->query($sqlPlano);
-    
-    if ($resultPlano->num_rows > 0) {
-        $rowPlano = $resultPlano->fetch_assoc();
-        $nomePlano = $rowPlano['nome'];
-    }
-    
-    // Inserir na tabela Planos_Ativos
-    $dataInicio = date('Y-m-d');
-    $sqlInsert = "INSERT INTO Planos_Ativos (anunciante_id, plano_id, data_inicio, ativo) 
-                  VALUES ($utilizador_id, $plano_id, '$dataInicio', 1)";
-    $conn->query($sqlInsert);
-    
-    // Atualizar plano_id do utilizador
-    $sqlUpdate = "UPDATE Utilizadores SET plano_id = $plano_id WHERE id = $utilizador_id";
-    $conn->query($sqlUpdate);
+    if($_SESSION['tipo'] == 1 ||$_SESSION['tipo'] == 2){ 
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -44,7 +9,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagamento Confirmado</title>
-    <link rel="stylesheet" href="src/css/lib/datatables.css">
+        <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
 
     <script src="src/js/lib/bootstrap.js"></script>
@@ -98,7 +63,7 @@
         .success-icon {
             width: 120px;
             height: 120px;
-            background: linear-gradient(135deg, #90c207 0%, #90c207 100%);
+            background: linear-gradient(135deg, #90c207 0%, ##90c207 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -295,32 +260,26 @@
         <div class="success-icon">✓</div>
         
         <h1 class="success-title">Pagamento Confirmado!</h1>
-        <p class="success-subtitle">Obrigado <strong><?php echo htmlspecialchars($nomeUtilizador); ?></strong> pela sua compra. O seu pagamento foi processado com sucesso.</p>
+        <p class="success-subtitle">Obrigado pela sua compra Admin Wegreen. O seu pagamento foi processado com sucesso.</p>
 
         <div class="order-details">
             <div class="detail-row">
                 <span class="detail-label">Cliente</span>
-                <span class="detail-value"><?php echo htmlspecialchars($nomeUtilizador); ?></span>
+                <span class="detail-value" id="customerName">Admin Wegreen</span>
             </div>
             
-            <div class="detail-row">
-                <span class="detail-label">Plano</span>
-                <span class="detail-value">
-                    <span class="plan-badge <?php echo ($plano_id == 3) ? 'plan-eco' : 'plan-crescentecircular'; ?>">
-                        <span class="plan-icon"><?php echo ($plano_id == 3) ? '💼' : '👑'; ?></span>
-                        <span><?php echo htmlspecialchars($nomePlano); ?></span>
-                    </span>
-                </span>
+            <div class="detail-row" id="planoConfirmado">
+                
             </div>
             
             <div class="detail-row">
                 <span class="detail-label">Data da Compra</span>
-                <span class="detail-value"><?php echo date('d \d\e F, Y'); ?></span>
+                <span class="detail-value" id="purchaseDate">28 de Novembro, 2025</span>
             </div>
             
             <div class="detail-row">
                 <span class="detail-label">Número do Pedido</span>
-                <span class="detail-value">#ORD-<?php echo date('Y'); ?>-<?php echo str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT); ?></span>
+                <span class="detail-value" id="orderNumber">#ORD-2025-0001</span>
             </div>
         </div>
 
@@ -329,7 +288,12 @@
         </div>
 
         <div class="action-buttons">
+        
             <a href="index.html" class="btn btn-primary">
+                <span class="btn-icon"></span>
+                <span>Voltar no site</span>
+             </a>
+            <a href="DashboardAdmin.php" class="btn btn-primary">
                 <span class="btn-icon"></span>
                 <span>Aceder ao Dashboard</span>
             </a>
@@ -339,11 +303,46 @@
             </a>
         </div>
     </div>
+
+    <script>
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const customerName = getUrlParameter('name') || 'João Silva';
+            const plan = getUrlParameter('plan') || 'premium';
+            const orderNumber = getUrlParameter('order') || '#ORD-2025-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            
+            document.getElementById('customerName').textContent = customerName;
+            
+            const planBadge = document.getElementById('planBadge');
+            const planName = document.getElementById('planName');
+            
+            if (plan.toLowerCase() === 'enterprise') {
+                planBadge.className = 'plan-badge plan-enterprise';
+                planBadge.innerHTML = '<span class="plan-icon">💼</span><span>Enterprise</span>';
+            } else {
+                planBadge.className = 'plan-badge plan-premium';
+                planBadge.innerHTML = '<span class="plan-icon">👑</span><span>Premium</span>';
+            }
+            
+            const today = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('purchaseDate').textContent = today.toLocaleDateString('pt-PT', dateOptions);
+            
+            document.getElementById('orderNumber').textContent = orderNumber;
+        });
+    </script>
 </body>
 </html>
+<script src="src/js/checkout.js"></script>
 <?php
-    $conn->close();
-} else {
+}else{
     echo "sem permissão!";
 }
+
 ?>

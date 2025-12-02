@@ -450,8 +450,8 @@ class Perfil{
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
-                $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Profissional Eco+ </h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h4 class='ffw-bold mb-3 text-white'>Plano Profissional Eco+ </h4>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5  fw-bold mb-3 text-whitetext-muted'>/mês</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";

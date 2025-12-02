@@ -82,7 +82,7 @@ function getProdutosMulher($categoria,$tamanho,$estado){
     global $conn;
     $msg = "";
 
-    $sql = "SELECT * FROM Produtos WHERE ativo = 1 AND genero='Mulher'";
+    $sql = "SELECT * FROM Produtos WHERE ativo = 1 AND genero='Mulher' AND designer_id IS NULL";
 
         if (isset($tamanho) && $tamanho != "" && $tamanho != "-1") {
             $sql .= " AND tamanho = '$tamanho'";

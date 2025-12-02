@@ -1,0 +1,50 @@
+.wg-title { 
+        font-size: 3.2rem; 
+        font-weight: 800; 
+        letter-spacing: -1px; 
+    }
+
+    .wg-subtitle { 
+        font-size: 1.25rem; 
+        color: #555; 
+    }
+
+    .wg-btn { 
+        background: #90c207; 
+        color: black; 
+        border: 0; 
+        padding: 18px 20px; 
+        font-size: 1rem; 
+        font-weight: 700; 
+        border-radius: 16px; 
+        transition: 0.25s ease; 
+    }
+
+    .wg-btn:hover { 
+        opacity: .85; 
+        transform: translateY(-2px); 
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+    .wg-card { 
+        border-radius: 22px; 
+        padding: 40px; 
+        background: #fff; 
+        border: 1px solid #eee; 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.06); 
+        transition: 0.3s ease; 
+    }
+
+    .wg-card:hover { 
+        transform: translateY(-6px); 
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12); 
+    }
+
+    .wg-card h4 { 
+        font-weight: 800; 
+        margin-bottom: 1rem; 
+    }
+
+    .wg-card ul li { 
+        font-size: 1.05rem; 
+    }

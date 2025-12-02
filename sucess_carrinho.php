@@ -265,7 +265,7 @@
         <div class="order-details">
             <div class="detail-row">
                 <span class="detail-label">Cliente</span>
-                <span class="detail-value" id="customerName">Admin Wegreen</span>
+                <span class="detail-value">Admin Wegreen</span>
             </div>
             
             <div class="detail-row" id="planoConfirmado">
@@ -274,7 +274,7 @@
             
             <div class="detail-row">
                 <span class="detail-label">Data da Compra</span>
-                <span class="detail-value" id="purchaseDate">25 de Novembro, 2025</span>
+                <span class="detail-value" id="purchaseDate">28 de Novembro, 2025</span>
             </div>
             
             <div class="detail-row">
@@ -288,7 +288,12 @@
         </div>
 
         <div class="action-buttons">
-            <a href="#" class="btn btn-primary">
+            <a href="index.html" class="btn btn-primary">
+                <span class="btn-icon"></span>
+                <span>Voltar ao homapage</span>
+            </a>
+
+            <a href="DashboardAdmin.php" class="btn btn-primary">
                 <span class="btn-icon"></span>
                 <span>Aceder ao Dashboard</span>
             </a>
