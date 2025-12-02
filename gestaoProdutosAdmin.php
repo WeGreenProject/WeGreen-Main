@@ -73,7 +73,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="settings.php">
+                        <a class="nav-link" href="perfilAdmin.php">
                             <span class="nav-icon">⚙️</span>
                             <span class="nav-text">Configurações</span>
                         </a>
@@ -83,7 +83,8 @@
             <div class="user-profile">
                 <div class="profile-info" id="ProfileUser">
                 </div>
-                <button class="profile-settings-btn" onclick="showPage('settings')" title="Configurações">
+                <button class="profile-settings-btn" onclick="window.location.href='perfilAdmin.php'"
+                    title="Configurações">
                     <span>⚙️</span>
                 </button>
             </div>
