@@ -36,6 +36,25 @@ function getFiltrosLimparFiltro() {
     $("#estadoSelect").val('-1');
     getProdutosHomem();
 }
+function ErrorSession() {
+
+    alerta("Inicie Sessão", "É necessario iniciar sessão avançar!","error");
+}
+function ErrorSession2() {
+
+    alerta("Mesma Pessoa", "Não pode conversa com voce mesmo!","error");
+
+}
+function alerta(titulo,msg,icon){
+    Swal.fire({
+        position: 'center',
+        icon: icon,
+        title: titulo,
+        text: msg,
+        showConfirmButton: true,
+
+      })
+}
 function getProdutoHomemMostrar()
 {
     const params = new URLSearchParams(window.location.search);

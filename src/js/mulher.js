@@ -130,8 +130,7 @@ function getProdutoMulherMostrar()
     
     .done(function( msg ) {
         console.log(msg);
-         $('#ProdutoInfo').html(msg);
-
+        $('#ProdutoInfo').html(msg);
          $('.btnComprarAgora').on('click', function() {
             const produtoId = $(this).data('id');
             comprarAgora(produtoId);
@@ -141,6 +140,15 @@ function getProdutoMulherMostrar()
     .fail(function( jqXHR, textStatus ) {
     alert( "Request failed: " + textStatus );
     });
+
+}
+function ErrorSession() {
+
+    alerta("Inicie Sessão", "É necessario iniciar sessão avançar!","error");
+}
+function ErrorSession2() {
+
+    alerta("Mesma Pessoa", "Não pode conversa com voce mesmo!","error");
 
 }
 
@@ -169,7 +177,16 @@ function comprarAgora(produtoId) {
         });
 
 }
+function alerta(titulo,msg,icon){
+    Swal.fire({
+        position: 'center',
+        icon: icon,
+        title: titulo,
+        text: msg,
+        showConfirmButton: true,
 
+      })
+}
 $(function() {
     getProdutoMulherMostrar();
     getProdutosMulher();

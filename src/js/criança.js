@@ -165,6 +165,25 @@ function getFiltrosCriancaEstado()
     alert( "Request failed: " + textStatus );
     });
 }
+function ErrorSession() {
+
+    alerta("Inicie Sessão", "É necessario iniciar sessão avançar!","error");
+}
+function ErrorSession2() {
+
+    alerta("Mesma Pessoa", "Não pode conversa com voce mesmo!","error");
+
+}
+function alerta(titulo,msg,icon){
+    Swal.fire({
+        position: 'center',
+        icon: icon,
+        title: titulo,
+        text: msg,
+        showConfirmButton: true,
+
+      })
+}
 $(function() {
     getProdutoCriançaMostrar();
     getProdutosCriança();
