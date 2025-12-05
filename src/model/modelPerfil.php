@@ -1,4 +1,3 @@
-
 <?php
 
 require_once 'connection.php';
@@ -64,6 +63,38 @@ class Perfil{
             $msg .= "<h6 class='mb-0 text-wegreen-accent'>Dectetamos um erro na sua conta!</h6>";
             $msg .= "</div></li>";
             $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
+        }
+        $conn->close();
+        
+        return ($msg);
+
+    }
+        function PerfilDoUtilizador($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * FROM Utilizadores WHERE id = " . $ID_User;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                $msg  = "<a class='nav-link dropdown-toggle d-flex align-items-center' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'>";
+                $msg .= "<img src='".$row["foto"]."' class='rounded-circle profile-img-small me-1' alt='Perfil do Utilizador'>";
+                $msg .= "</a>";
+                $msg .= "<ul class='dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3' id='PerfilTipo'>";
+                $msg .= "</ul>";
+
+            }
+            
+        }
+        else
+        {
+                $msg  = "<a class='nav-link dropdown-toggle d-flex align-items-center' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'>";
+                $msg .= "<img src='src/img/pexels-beccacorreiaph-31095884.jpg' class='rounded-circle profile-img-small me-1' alt='Perfil do Utilizador'>";
+                $msg .= "</a>";
+                $msg .= "<ul class='dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3' id='PerfilTipo'>";
+                $msg .= "</ul>";
         }
         $conn->close();
         

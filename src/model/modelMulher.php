@@ -181,7 +181,7 @@ function getProdutoMulherMostrar($ID_Produto){
             $msg .= "data-id='".$rowProduto['Produto_id']."'>";
             $msg .= "Comprar Agora";
 	        $msg .= "</button>";
-            $msg .= "<a href='ChatAnunciante.php'><button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button></a>";
+            $msg .= "<a href='ChatAnunciante.php?id=".$rowProduto['Produto_id']."&nome=".$rowProduto['IdUtilizador']."'><button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button></a>";
             $msg .= "</div>";
             $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
             $msg .= "<div class='d-flex align-items-center'>";
