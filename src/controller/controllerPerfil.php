@@ -30,4 +30,22 @@ if ($_POST['op'] == 3) {
     }
 
 }
+if ($_POST['op'] == 10) {
+    if(isset($_SESSION['utilizador']))
+    {
+        $resp = $func->PerfilDoUtilizador($_SESSION['utilizador']);
+        echo $resp;
+    }
+    else
+    {
+        echo "                        
+        <a class='nav-link dropdown-toggle d-flex align-items-center' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
+        <img src='src/img/pexels-beccacorreiaph-31095884.jpg' class='rounded-circle profile-img-small me-1' alt='Perfil do Utilizador'>
+        </a>
+        <ul class='dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3' id='PerfilTipo'>
+        </ul>
+        ";
+    }
+
+}
 ?>
