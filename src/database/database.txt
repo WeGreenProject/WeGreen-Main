@@ -189,19 +189,22 @@ CREATE TABLE Mensagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     remetente_id INT,
     destinatario_id INT,
+    produto_id INT,
     mensagem TEXT NOT NULL,
-    seen BOOLEAN DEFAULT FALSE,
-    edited BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (remetente_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (destinatario_id) REFERENCES Utilizadores(id)
+    FOREIGN KEY (destinatario_id) REFERENCES Utilizadores(id),
+	FOREIGN KEY (produto_id) REFERENCES Produtos(produto_id)
 );
 
--- Mensagem exemplo
 INSERT INTO Mensagens (remetente_id, destinatario_id, mensagem)
 VALUES 
 (3, 2, 'Olá João! O seu pedido já foi enviado.');
+
+INSERT INTO Mensagens (remetente_id, destinatario_id, produto_id,mensagem)
+VALUES 
+(1, 3, 5,'Olá eu sou a Luiza');
 
 -- ========================
 -- TABELA: Rendimento
