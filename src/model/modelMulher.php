@@ -106,7 +106,7 @@ function getProdutosMulher($categoria,$tamanho,$estado){
             $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
             $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
             $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
-            $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+            $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
             $msg .= "</div></div></div>";
         }
     } else {
@@ -224,7 +224,7 @@ function getProdutoMulherMostrar($ID_Produto){
                     $msg .= "<h6 class='fw-bold mb-1'>".$rowRelacionados["nome"]."</h6>";
                     $msg .= "<p class='text-muted mb-1'>".$rowRelacionados["marca"]." · ".($rowRelacionados["tamanho"])." · ".$rowRelacionados["estado"]."</p>";
                     $msg .= "<p class='fw-semibold'>€".$rowRelacionados["preco"]. "€</p>";
-                    $msg .= "<a href='ProdutoMulherMostrar.html?id=".$rowRelacionados["Produto_id"]."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                    $msg .= "<a href='ProdutoMulherMostrar.html?id=".$rowRelacionados["Produto_id"]."' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
                     $msg .= "</div>";
                     $msg .= "</div>";
                     $msg .= "</div>";

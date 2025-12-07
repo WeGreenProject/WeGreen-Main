@@ -6,8 +6,13 @@ $func = new Carrinho();
 
 
 if ($_POST['op'] == 1) {
-    $resp = $func->getCarrinho($_SESSION['utilizador']);
-    echo $resp;
+    $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : null;
+    if ($utilizador_id === null) {
+        echo "<div class='empty-cart'><div class='empty-icon'>🛍️</div><h3>O carrinho está vazio</h3><a href='index.html' class='btn btn-primary'>Ir às Compras</a></div>";
+    } else {
+        $resp = $func->getCarrinho($utilizador_id);
+        echo $resp;
+    }
 }
 
 if ($_POST['op'] == 2) {
@@ -55,14 +60,20 @@ if ($_POST['op'] == 8) {
 }
 
 if ($_POST['op'] == 9) {
-    // Verificar se há produtos no carrinho
-    $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : 1;
+    $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : null;
     
-    $sql = "SELECT COUNT(*) as total FROM Carrinho_Itens WHERE utilizador_id = $utilizador_id";
-    $result = $conn->query($sql);
-    $row = $result->fetch_assoc();
-    
-    echo json_encode(['tem_produtos' => $row['total'] > 0]);
+    if ($utilizador_id === null) {
+        echo json_encode(['tem_produtos' => false]);
+    } else {
+        global $conn;
+        require_once '../model/connection.php';
+        
+        $sql = "SELECT COUNT(*) as total FROM Carrinho_Itens WHERE utilizador_id = $utilizador_id";
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+        
+        echo json_encode(['tem_produtos' => $row['total'] > 0]);
+    }
 }
 
 ?>

@@ -1,20 +1,20 @@
- /* Variáveis de Cor (ajuste conforme seu style.css) */
+
         :root {
             --wegreen-dark: #fffdfd;
-            --wegreen-accent: #A6D90C; /* Verde Lima */
+            --wegreen-accent: #A6D90C; 
         }
         .bg-wegreen-dark { background-color: var(--wegreen-dark) !important; }
         .text-wegreen-accent { color: var(--wegreen-accent) !important; }
         .bg-wegreen-accent { background-color: var(--wegreen-accent) !important; }
         
-        /* Estilo do Botão Verde Lima e Texto Preto */
+
         .btn-wegreen-accent {
             background-color: var(--wegreen-accent);
             border-color: var(--wegreen-accent);
             transition: background-color 0.3s, border-color 0.3s;
         }
         .btn-wegreen-accent:hover {
-            background-color: #90c207; /* Tonalidade levemente mais escura no hover */
+            background-color: #90c207; 
             border-color: #90c207;
         }
 
@@ -23,8 +23,10 @@
             top: 3.5rem; /* Posição ajustada após a top-bar */
         }
         .logo-img {
-            height: 120px; /* Tamanho da logo */
-        }
+    height: 120px; 
+    width: auto;   /* mantém a proporção correta */
+}
+
         .profile-img-small {
             width: 50px;
             height: 50px;
