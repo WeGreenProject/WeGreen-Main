@@ -142,6 +142,7 @@ function ConsumidorRes()
     .done(function( msg ) {
         let obj = JSON.parse(msg);
         if(obj.flag){
+            alerta("Mensagem Enviada!", obj.msg, "success");
             ChatMensagens();   
             $('#messageInput').val(''); 
         }else{
