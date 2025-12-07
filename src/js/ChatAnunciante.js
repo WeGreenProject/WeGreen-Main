@@ -120,6 +120,7 @@ function PerfilDoAnunciante()
 }
 function ConsumidorRes()
 {
+    const sendBtn = document.getElementById('sendBtn');
     const params = new URLSearchParams(window.location.search);
     const nomeAnunciante = params.get("nome");
     const produtoID = params.get("id");
@@ -142,9 +143,8 @@ function ConsumidorRes()
     .done(function( msg ) {
         let obj = JSON.parse(msg);
         if(obj.flag){
-            alerta("Mensagem Enviada!", obj.msg, "success");
             ChatMensagens();   
-            $('#messageInput').val(''); 
+            $('#messageInput').val('').trigger('input');
         }else{
             alerta("Mensagem não enviada!", obj.msg, "success");  
         }
@@ -165,6 +165,14 @@ function alerta(titulo,msg,icon){
 
       })
 }
+$(document).on('input', '#messageInput', function () {
+    const sendBtn = document.getElementById('sendBtn');
+
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+
+    sendBtn.disabled = this.value.trim() === '';
+});
 $(function() {
     ChatMensagens();
     PerfilDoAnunciante();
