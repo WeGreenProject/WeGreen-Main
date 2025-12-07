@@ -37,7 +37,7 @@ function getProdutosHomem($categoria, $tamanho, $estado) {
             $msg .= "<h6 class='fw-bold mb-1'>" . $row["nome"] . "</h6>";
             $msg .= "<p class='text-muted mb-1'>" . $row["marca"] . " · " . $row["tamanho"] . " · " . $row["estado"] . "</p>";
             $msg .= "<p class='fw-semibold'>" . $row["preco"] . "€</p>";
-            $msg .= "<a href='ProdutoHomemMostrar.html?id=" . $row['Produto_id'] . "' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+            $msg .= "<a href='ProdutoHomemMostrar.html?id=" . $row['Produto_id'] . "' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
             $msg .= "</div>";
             $msg .= "</div>";
             $msg .= "</div>";
@@ -232,7 +232,7 @@ function getProdutoHomemMostrar($ID_Produto){
                     $msg .= "<h6 class='fw-bold mb-1'>".htmlspecialchars($rowRelated["nome"])."</h6>";
                     $msg .= "<p class='text-muted mb-1'>".htmlspecialchars($rowRelated["marca"])." · ".htmlspecialchars($rowRelated["tamanho"])." · ".htmlspecialchars($rowRelated["estado"])."</p>";
                     $msg .= "<p class='fw-semibold'>€".number_format($rowRelated["preco"], 2, ',', '.')."</p>";
-                    $msg .= "<a href='ProdutoHomemMostrar.html?id=".$rowRelated["Produto_id"]."' class='btn btn-wegreen-accent rounded-pill'>Ver Produto</a>";
+                    $msg .= "<a href='ProdutoHomemMostrar.html?id=".$rowRelated["Produto_id"]."' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
                     $msg .= "</div>";
                     $msg .= "</div>";
                     $msg .= "</div>";

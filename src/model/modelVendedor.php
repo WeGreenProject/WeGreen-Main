@@ -71,7 +71,7 @@ class Vendedor {
                 $msg .= "<h5 class='fw-bold'>".$row["nome"]."</h5>";
                 $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
                 $msg .= "<p class='fw-bold text-success fs-5'>€".number_format($row["preco"], 2, ',', '.')."</p>";
-                $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-wegreen-accent rounded-pill w-100'>Ver Produto</a>";
+                $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
