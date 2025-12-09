@@ -72,6 +72,12 @@ if ($_POST['op'] == 13) {
     echo $resp;
 }
 
+// op 14 - Limite de Produtos
+if ($_POST['op'] == 14) {
+    $resp = $func->getLimiteProdutos($_SESSION['utilizador']);
+    echo $resp;
+}
+
 // op 15 - Buscar Produto por ID
 if ($_POST['op'] == 15) {
     $resp = $func->getProdutoById($_POST['id']);
@@ -184,6 +190,12 @@ if ($_POST['op'] == 30) {
         $_POST['senha_atual'],
         $_POST['senha_nova']
     );
+    echo $resp;
+}
+
+// op 31 - Obter estatísticas de produtos
+if ($_POST['op'] == 31) {
+    $resp = $func->getEstatisticasProdutos($_SESSION['utilizador']);
     echo $resp;
 }
 ?>

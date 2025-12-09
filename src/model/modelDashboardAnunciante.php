@@ -97,6 +97,30 @@ class DashboardAnunciante {
         return $msg;
     }
 
+    function getEstatisticasProdutos($ID_User) {
+        global $conn;
+
+        $sql = "SELECT
+                    COUNT(*) as total,
+                    SUM(CASE WHEN ativo = 1 THEN 1 ELSE 0 END) as ativos,
+                    SUM(CASE WHEN ativo = 0 THEN 1 ELSE 0 END) as inativos,
+                    SUM(CASE WHEN stock < 5 THEN 1 ELSE 0 END) as stockBaixo
+                FROM Produtos
+                WHERE anunciante_id = $ID_User";
+
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
+
+        $stats = array(
+            'total' => (int)$row['total'],
+            'ativos' => (int)$row['ativos'],
+            'inativos' => (int)$row['inativos'],
+            'stockBaixo' => (int)$row['stockBaixo']
+        );
+
+        return json_encode($stats);
+    }
+
     function getGastos($ID_User){
     global $conn;
 
@@ -276,14 +300,13 @@ class DashboardAnunciante {
         $sql = "SELECT p.limite_produtos, COUNT(pr.Produto_id) as current
                 FROM Utilizadores u
                 JOIN Planos p ON u.plano_id = p.id
-                LEFT JOIN Produtos pr ON pr.anunciante_id = u.id AND pr.ativo = 1
+                LEFT JOIN Produtos pr ON pr.anunciante_id = u.id
                 WHERE u.id = $ID_User
                 GROUP BY u.id";
         $result = $conn->query($sql);
         $row = $result->fetch_assoc();
 
-        $conn->close();
-        return json_encode(['max' => $row['limite_produtos'] ?? 0, 'current' => $row['current'] ?? 0]);
+        return json_encode(['max' => (int)($row['limite_produtos'] ?? 0), 'current' => (int)($row['current'] ?? 0)]);
     }
 
     function getProdutoById($id) {
