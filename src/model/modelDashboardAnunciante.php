@@ -14,20 +14,23 @@ class DashboardAnunciante {
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 if ($plano == 1) {
-                    $msg  = "<div class='stat-icon'>⭐</div>";
+                    $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
+                    $msg .= "<div class='stat-content'>";
                     $msg .= "<div class='stat-label'>Plano Atual</div>";
-                    $msg .= "<div class='plan-badge'>Free</div>";
-                    $msg .= "<div class='stat-change'>Plano Atual Infinito</div>";
+                    $msg .= "<div class='stat-value'>Free</div>";
+                    $msg .= "</div>";
                 } else if ($plano == 2) {
-                    $msg  = "<div class='stat-icon'>⭐</div>";
+                    $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
+                    $msg .= "<div class='stat-content'>";
                     $msg .= "<div class='stat-label'>Plano Atual</div>";
-                    $msg .= "<div class='plan-badge'>Premium</div>";
-                    $msg .= "<div class='stat-change'>Renovação em 23 dias</div>";
+                    $msg .= "<div class='stat-value'>Premium</div>";
+                    $msg .= "</div>";
                 } else if ($plano == 3) {
-                    $msg  = "<div class='stat-icon'>⭐</div>";
+                    $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
+                    $msg .= "<div class='stat-content'>";
                     $msg .= "<div class='stat-label'>Plano Atual</div>";
-                    $msg .= "<div class='plan-badge'>EnterPrise</div>";
-                    $msg .= "<div class='stat-change'>Renovação em 23 dias</div>";
+                    $msg .= "<div class='stat-value'>Enterprise</div>";
+                    $msg .= "</div>";
                 }
             }
         } else {
@@ -49,15 +52,17 @@ class DashboardAnunciante {
         $result = $conn->query($sql);
 
         if ($row = $result->fetch_assoc()) {
-            $msg  = "<div class='stat-icon'>📦</div>";
+            $msg  = "<div class='stat-icon'><i class='fas fa-box'></i></div>";
+            $msg .= "<div class='stat-content'>";
             $msg .= "<div class='stat-label'>Produtos em Stock</div>";
             $msg .= "<div class='stat-value'>".$row["StockProdutos"]."</div>";
-            $msg .= "<div class='stat-change'>+3 produtos novos</div>";
+            $msg .= "</div>";
         } else {
-            $msg  = "<div class='stat-icon'>📦</div>";
+            $msg  = "<div class='stat-icon'><i class='fas fa-box'></i></div>";
+            $msg .= "<div class='stat-content'>";
             $msg .= "<div class='stat-label'>Produtos em Stock</div>";
-            $msg .= "<div class='plan-badge'>Erro a Encontrar Produtos</div>";
-            $msg .= "<div class='stat-change'>+3 produtos novos</div>";
+            $msg .= "<div class='stat-value'>0</div>";
+            $msg .= "</div>";
         }
 
         $conn->close();
@@ -75,44 +80,50 @@ class DashboardAnunciante {
         $result = $conn->query($sql);
 
         if ($row = $result->fetch_assoc()) {
-            $msg  = "<div class='stat-icon'>🎯</div>";
-            $msg .= "<div class='stat-label'>Pontos de Confiança</div>";
+            $msg  = "<div class='stat-icon'><i class='fas fa-star'></i></div>";
+            $msg .= "<div class='stat-content'>";
+            $msg .= "<div class='stat-label'>Pontos Confiança</div>";
             $msg .= "<div class='stat-value'>".$row['pontos_conf']."</div>";
-            $msg .= "<div class='stat-change'>↑ Baseado nas suas vendas</div>";
+            $msg .= "</div>";
         } else {
-            $msg  = "<div class='stat-icon'>🎯</div>";
-            $msg .= "<div class='stat-label'>Pontos de Confiança</div>";
-            $msg .= "<div class='stat-value'>Pontos de Confiança não encontrado!</div>";
-            $msg .= "<div class='stat-change'>↑ Baseado nas suas vendas</div>";
+            $msg  = "<div class='stat-icon'><i class='fas fa-star'></i></div>";
+            $msg .= "<div class='stat-content'>";
+            $msg .= "<div class='stat-label'>Pontos Confiança</div>";
+            $msg .= "<div class='stat-value'>0</div>";
+            $msg .= "</div>";
         }
 
         $conn->close();
         return $msg;
     }
 
-    function getGastos(){
+    function getGastos($ID_User){
     global $conn;
 
     $msg = "";
 
-    $sql = "SELECT SUM(gastos.valor) AS TotalGastos FROM gastos";
-    $result = $conn->query($sql);
-
-    $novos = $this->getNovosGastos();
+    $sql = "SELECT SUM(gastos.valor) AS TotalGastos FROM gastos WHERE anunciante_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $ID_User);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result && $result->num_rows > 0) {
         $row = $result->fetch_assoc();
 
-        $msg  = "<div class='stat-icon'>💸</div>";
+        $msg  = "<div class='stat-icon'><i class='fas fa-wallet'></i></div>";
+        $msg .= "<div class='stat-content'>";
         $msg .= "<div class='stat-label'>Gastos Totais</div>";
-        $msg .= "<div class='stat-value'>".$row['TotalGastos']."€</div>";
-        $msg .= "<div class='stat-change'>+ ".$novos."€ gastos recentes</div>";
+        $msg .= "<div class='stat-value'>€".number_format($row['TotalGastos'], 2, ',', '.')."</div>";
+        $msg .= "</div>";
 
     } else {
 
-        $msg  = "<div class='stat-icon'>💸</div>";
+        $msg  = "<div class='stat-icon'><i class='fas fa-wallet'></i></div>";
+        $msg .= "<div class='stat-content'>";
         $msg .= "<div class='stat-label'>Gastos Totais</div>";
-        $msg .= "<div class='stat-value'>Nenhum gasto encontrado</div>";
+        $msg .= "<div class='stat-value'>€0,00</div>";
+        $msg .= "</div>";
 
     }
 
@@ -143,7 +154,7 @@ class DashboardAnunciante {
 
         $sql = "SELECT p.nome, SUM(v.quantidade) AS vendidos
                 FROM Vendas v
-                JOIN Produtos p ON v.produto_id = p.id
+                JOIN Produtos p ON v.produto_id = p.Produto_id
                 WHERE v.anunciante_id = $ID_User
                 GROUP BY v.produto_id
                 ORDER BY vendidos DESC
@@ -164,7 +175,7 @@ class DashboardAnunciante {
 
         $sql = "SELECT p.nome, SUM(v.lucro) AS lucro_total
                 FROM Vendas v
-                JOIN Produtos p ON v.produto_id = p.id
+                JOIN Produtos p ON v.produto_id = p.Produto_id
                 WHERE v.anunciante_id = $ID_User
                 GROUP BY v.produto_id";
         $result = $conn->query($sql);
@@ -183,7 +194,7 @@ class DashboardAnunciante {
 
         $sql = "SELECT p.nome, SUM(v.lucro) AS lucro, SUM(v.valor) AS total_vendas
                 FROM Vendas v
-                JOIN Produtos p ON v.produto_id = p.id
+                JOIN Produtos p ON v.produto_id = p.Produto_id
                 WHERE v.anunciante_id = $ID_User
                 GROUP BY v.produto_id";
         $result = $conn->query($sql);
@@ -277,21 +288,77 @@ class DashboardAnunciante {
 
     function getProdutoById($id) {
         global $conn;
-        $sql = "SELECT * FROM Produtos WHERE Produto_id = $id";
-        $result = $conn->query($sql);
+        $sql = "SELECT * FROM Produtos WHERE Produto_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $produto = $result->fetch_assoc();
 
-        $conn->close();
         return json_encode($produto);
     }
 
     function deleteProduto($id) {
         global $conn;
-        $sql = "DELETE FROM Produtos WHERE Produto_id = $id";
-        $conn->query($sql);
+        $sql = "DELETE FROM Produtos WHERE Produto_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
 
-        $conn->close();
         return "Produto removido";
+    }
+
+    function atualizarAtivoEmMassa($ids, $ativo) {
+        global $conn;
+        if (empty($ids) || !is_array($ids)) {
+            return false;
+        }
+
+        $marcadores = implode(',', array_fill(0, count($ids), '?'));
+        $sql = "UPDATE Produtos SET ativo = ? WHERE Produto_id IN ($marcadores)";
+        $stmt = $conn->prepare($sql);
+
+        $tipos = 'i' . str_repeat('i', count($ids));
+        $parametros = array_merge([$ativo], $ids);
+        $stmt->bind_param($tipos, ...$parametros);
+
+        $resultado = $stmt->execute();
+        return $resultado;
+    }
+
+    function removerProdutosEmMassa($ids) {
+        global $conn;
+        if (empty($ids) || !is_array($ids)) {
+            return false;
+        }
+
+        $marcadores = implode(',', array_fill(0, count($ids), '?'));
+        $sql = "DELETE FROM Produtos WHERE Produto_id IN ($marcadores)";
+        $stmt = $conn->prepare($sql);
+
+        $tipos = str_repeat('i', count($ids));
+        $stmt->bind_param($tipos, ...$ids);
+
+        $resultado = $stmt->execute();
+        return $resultado;
+    }
+
+    function alterarEstadoEmMassa($ids, $estado) {
+        global $conn;
+        if (empty($ids) || !is_array($ids)) {
+            return false;
+        }
+
+        $marcadores = implode(',', array_fill(0, count($ids), '?'));
+        $sql = "UPDATE Produtos SET estado = ? WHERE Produto_id IN ($marcadores)";
+        $stmt = $conn->prepare($sql);
+
+        $tipos = 's' . str_repeat('i', count($ids));
+        $parametros = array_merge([$estado], $ids);
+        $stmt->bind_param($tipos, ...$parametros);
+
+        $resultado = $stmt->execute();
+        return $resultado;
     }
 
     function updateProduto($id, $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao) {
@@ -310,6 +377,314 @@ class DashboardAnunciante {
 
         $conn->close();
         return "Produto adicionado";
+    }
+
+    function getReceitaTotal($ID_User, $periodo = 'all') {
+        global $conn;
+        $dateFilter = "";
+        if ($periodo == 'month') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        } elseif ($periodo == 'year') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+        }
+        $sql = "SELECT SUM(valor) AS total FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $total = $row['total'] ?? 0;
+        $stmt->close();
+        return (float)$total;
+    }
+
+    function getTotalPedidos($ID_User, $periodo = 'all') {
+        global $conn;
+        $dateFilter = "";
+        if ($periodo == 'month') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        } elseif ($periodo == 'year') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+        }
+        $sql = "SELECT COUNT(*) AS total FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $total = $row['total'] ?? 0;
+        $stmt->close();
+        return (int)$total;
+    }
+
+    function getTicketMedio($ID_User, $periodo = 'all') {
+        global $conn;
+        $dateFilter = "";
+        if ($periodo == 'month') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        } elseif ($periodo == 'year') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+        }
+        $sql = "SELECT SUM(valor) AS total, COUNT(*) AS count FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $total = $row['total'] ?? 0;
+        $count = $row['count'] ?? 0;
+        $ticket = $count > 0 ? $total / $count : 0;
+        $stmt->close();
+        return round((float)$ticket, 2);
+    }
+
+    function getMargemLucroGeral($ID_User, $periodo = 'all') {
+        global $conn;
+        $dateFilter = "";
+        if ($periodo == 'month') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        } elseif ($periodo == 'year') {
+            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+        }
+        $sql = "SELECT (SUM(lucro) / SUM(valor)) * 100 AS margem FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $margem = $row['margem'] ?? 0;
+        $stmt->close();
+        return round((float)$margem, 2);
+    }
+
+    function getVendasPorCategoria($ID_User, $periodo = 'all') {
+        global $conn;
+        $dados = [];
+        $dateFilter = "";
+        if ($periodo == 'month') {
+            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        } elseif ($periodo == 'year') {
+            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+        }
+        $sql = "SELECT tp.descricao AS categoria, SUM(v.quantidade) AS vendas, SUM(v.valor) AS receita FROM Vendas v JOIN Produtos p ON v.produto_id = p.Produto_id JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id WHERE v.anunciante_id = ?" . $dateFilter . " GROUP BY tp.id ORDER BY receita DESC";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $dados[] = ['categoria' => $row['categoria'], 'vendas' => (int)$row['vendas'], 'receita' => (float)$row['receita']];
+        }
+        $stmt->close();
+        return $dados;
+    }
+
+    function getReceitaDiaria($ID_User, $periodo = 'all') {
+        global $conn;
+        $dados = [];
+
+        if ($periodo == 'month') {
+            // Dados diários dos últimos 30 dias
+            $sql = "SELECT DATE(data_venda) AS data, SUM(valor) AS receita FROM Vendas WHERE anunciante_id = ? AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(data_venda) ORDER BY data ASC";
+        } elseif ($periodo == 'year') {
+            // Dados mensais dos últimos 12 meses
+            $sql = "SELECT DATE_FORMAT(data_venda, '%Y-%m') AS data, SUM(valor) AS receita FROM Vendas WHERE anunciante_id = ? AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) GROUP BY DATE_FORMAT(data_venda, '%Y-%m') ORDER BY data ASC";
+        } else {
+            // Dados mensais de todo o período
+            $sql = "SELECT DATE_FORMAT(data_venda, '%Y-%m') AS data, SUM(valor) AS receita FROM Vendas WHERE anunciante_id = ? GROUP BY DATE_FORMAT(data_venda, '%Y-%m') ORDER BY data ASC";
+        }
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $dados[] = ['data' => $row['data'], 'receita' => (float)$row['receita']];
+        }
+        $stmt->close();
+        return $dados;
+    }
+
+    function getRelatoriosProdutos($ID_User, $periodo = 'all') {
+        global $conn;
+        $dados = [];
+        $dateFilter = "";
+        if ($periodo == 'month') {
+            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        } elseif ($periodo == 'year') {
+            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+        }
+        $sql = "SELECT p.nome AS produto, SUM(v.quantidade) AS vendas, SUM(v.valor) AS receita, SUM(v.lucro) AS lucro FROM Vendas v JOIN Produtos p ON v.produto_id = p.Produto_id WHERE v.anunciante_id = ?" . $dateFilter . " GROUP BY p.Produto_id ORDER BY receita DESC LIMIT 10";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $dados[] = ['produto' => $row['produto'], 'vendas' => (int)$row['vendas'], 'receita' => (float)$row['receita'], 'lucro' => (float)$row['lucro']];
+        }
+        $stmt->close();
+        return $dados;
+    }
+
+    // ========================
+    // FUNÇÕES DE PERFIL
+    // ========================
+
+    function getDadosPerfil($ID_User) {
+        global $conn;
+
+        $sql = "SELECT u.id, u.nome, u.email, u.nif, u.telefone, u.morada, u.foto, u.pontos_conf, u.plano_id,
+                       r.nome AS ranking_nome, r.pontos AS ranking_pontos_necessarios,
+                       p.nome AS plano_nome, p.preco AS plano_preco, p.limite_produtos AS plano_limite,
+                       COUNT(DISTINCT pr.Produto_id) AS total_produtos
+                FROM utilizadores u
+                LEFT JOIN ranking r ON u.ranking_id = r.id
+                LEFT JOIN planos p ON u.plano_id = p.id
+                LEFT JOIN produtos pr ON pr.anunciante_id = u.id
+                WHERE u.id = ?
+                GROUP BY u.id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            $stmt->close();
+            $conn->close();
+            return json_encode($row);
+        }
+
+        $stmt->close();
+        $conn->close();
+        return json_encode(['error' => 'Utilizador não encontrado']);
+    }
+
+    function atualizarPerfil($ID_User, $nome, $email, $telefone = null, $nif = null, $morada = null) {
+        global $conn;
+
+        // Validações
+        if (empty($nome) || strlen($nome) < 3) {
+            return json_encode(['success' => false, 'message' => 'Nome deve ter no mínimo 3 caracteres']);
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return json_encode(['success' => false, 'message' => 'Email inválido']);
+        }
+
+        if (!empty($nif) && !preg_match('/^[0-9]{9}$/', $nif)) {
+            return json_encode(['success' => false, 'message' => 'NIF deve conter exatamente 9 dígitos']);
+        }
+
+        if (!empty($telefone) && !preg_match('/^[0-9]{9}$/', $telefone)) {
+            return json_encode(['success' => false, 'message' => 'Telefone deve conter exatamente 9 dígitos']);
+        }
+
+        // Verificar se email já existe (exceto o próprio utilizador)
+        $sqlCheck = "SELECT id FROM utilizadores WHERE email = ? AND id != ?";
+        $stmtCheck = $conn->prepare($sqlCheck);
+        $stmtCheck->bind_param("si", $email, $ID_User);
+        $stmtCheck->execute();
+        $resultCheck = $stmtCheck->get_result();
+
+        if ($resultCheck->num_rows > 0) {
+            $stmtCheck->close();
+            $conn->close();
+            return json_encode(['success' => false, 'message' => 'Email já está em uso']);
+        }
+        $stmtCheck->close();
+
+        // Atualizar com todos os campos incluindo morada
+        $sql = "UPDATE utilizadores SET nome = ?, email = ?, nif = ?, telefone = ?, morada = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssssi", $nome, $email, $nif, $telefone, $morada, $ID_User);
+
+        if ($stmt->execute()) {
+            $stmt->close();
+            $conn->close();
+            return json_encode(['success' => true, 'message' => 'Perfil atualizado com sucesso']);
+        }
+
+        $stmt->close();
+        $conn->close();
+        return json_encode(['success' => false, 'message' => 'Erro ao atualizar perfil']);
+    }
+
+    function atualizarFotoPerfil($ID_User, $foto) {
+        global $conn;
+
+        $targetDir = "src/img/";
+        $fileName = time() . '_' . basename($foto["name"]);
+        $targetFile = $targetDir . $fileName;
+        $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+
+        // Verificar se é imagem
+        $check = getimagesize($foto["tmp_name"]);
+        if ($check === false) {
+            return json_encode(['success' => false, 'message' => 'Ficheiro não é uma imagem']);
+        }
+
+        // Verificar tamanho (max 5MB)
+        if ($foto["size"] > 5000000) {
+            return json_encode(['success' => false, 'message' => 'Ficheiro muito grande (máx 5MB)']);
+        }
+
+        // Permitir apenas certos formatos
+        if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+            return json_encode(['success' => false, 'message' => 'Apenas JPG, JPEG, PNG, GIF e WEBP são permitidos']);
+        }
+
+        if (move_uploaded_file($foto["tmp_name"], $targetFile)) {
+            $sql = "UPDATE utilizadores SET foto = ? WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("si", $targetFile, $ID_User);
+
+            if ($stmt->execute()) {
+                $stmt->close();
+                $conn->close();
+                return json_encode(['success' => true, 'message' => 'Foto atualizada com sucesso', 'foto' => $targetFile]);
+            }
+            $stmt->close();
+        }
+
+        $conn->close();
+        return json_encode(['success' => false, 'message' => 'Erro ao fazer upload da foto']);
+    }
+
+    function alterarPassword($ID_User, $senha_atual, $senha_nova) {
+        global $conn;
+
+        // Verificar senha atual
+        $sql = "SELECT password FROM utilizadores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            // Comparar senha (assumindo que está armazenada em texto plano - NOTA: deveria usar password_hash)
+            if ($row['password'] !== $senha_atual) {
+                $stmt->close();
+                $conn->close();
+                return json_encode(['success' => false, 'message' => 'Senha atual incorreta']);
+            }
+
+            // Atualizar senha
+            $sqlUpdate = "UPDATE utilizadores SET password = ? WHERE id = ?";
+            $stmtUpdate = $conn->prepare($sqlUpdate);
+            $stmtUpdate->bind_param("si", $senha_nova, $ID_User);
+
+            if ($stmtUpdate->execute()) {
+                $stmtUpdate->close();
+                $stmt->close();
+                $conn->close();
+                return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso']);
+            }
+            $stmtUpdate->close();
+        }
+
+        $stmt->close();
+        $conn->close();
+        return json_encode(['success' => false, 'message' => 'Erro ao alterar senha']);
     }
 
 }
