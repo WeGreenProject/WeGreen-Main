@@ -10,6 +10,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fornecedores - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/fornecedores.css">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
@@ -36,50 +38,50 @@
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="DashboardAdmin.php">
-                            <span class="nav-icon">📊</span>
+                        <a class="nav-link active" href="DashboardAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                             <span class="nav-text">Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon">📦</span>
+                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
                             <span class="nav-text">Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="vendas.php">
-                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
                             <span class="nav-text">Vendas</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="ProdutosAdmin.php">
-                            <span class="nav-icon">🛒</span>
+                            <span class="nav-icon"><i class="fas fa-check-circle"></i></span>
                             <span class="nav-text">Aprovar Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="analytics.php">
-                            <span class="nav-icon">📈</span>
+                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
                             <span class="nav-text">Análises</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="chats.php">
-                            <span class="nav-icon">💬</span>
+                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="fornecedores.php">
-                            <span class="nav-icon">🚚</span>
+                        <a class="nav-link" href="fornecedores.php">
+                            <span class="nav-icon"><i class="fas fa-truck"></i></span>
                             <span class="nav-text">Gestão de Fornecedores</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="settings.php">
-                            <span class="nav-icon">⚙️</span>
+                        <a class="nav-link" href="perfilAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
                             <span class="nav-text">Configurações</span>
                         </a>
                     </li>

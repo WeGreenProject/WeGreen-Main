@@ -1,101 +1,109 @@
-<?php
-    session_start();
-
-    if($_SESSION['tipo'] == 1){ 
-?>
 <!DOCTYPE html>
 <html lang="pt">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Adminstrador - Fashion Store</title>
+    <title>Dashboard Administrador - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/Admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="src/css/admin.css">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 </head>
 
 <body>
     <div class="container">
         <aside class="sidebar">
-            <a href="index.html" style="text-decoration: none;">
-                <div class="logo">
-                    <span class="logo-icon">👔</span>
-                    <div class="logo-text">
-                        <h1>Wegreen</h1>
-                        <p>Painel do Adminstrador</p>
-                    </div>
+            <a href="index.html" class="logo">
+                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+                <div class="logo-text">
+                    <h1>WeGreen</h1>
+                    <p>Painel do Administrador</p>
                 </div>
             </a>
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
                         <a class="nav-link active" href="DashboardAdmin.php">
-                            <span class="nav-icon">📊</span>
+                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                             <span class="nav-text">Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon">📦</span>
+                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
                             <span class="nav-text">Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="vendas.php">
-                            <span class="nav-icon">🛍️</span>
+                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
                             <span class="nav-text">Vendas</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="ProdutosAdmin.php">
-                            <span class="nav-icon">🛒</span>
+                            <span class="nav-icon"><i class="fas fa-check-circle"></i></span>
                             <span class="nav-text">Aprovar Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="analytics.php">
-                            <span class="nav-icon">📈</span>
+                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
                             <span class="nav-text">Análises</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="chats.php">
-                            <span class="nav-icon">💬</span>
+                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="fornecedores.php">
-                            <span class="nav-icon">🚚</span>
+                            <span class="nav-icon"><i class="fas fa-truck"></i></span>
                             <span class="nav-text">Gestão de Fornecedores</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="perfilAdmin.php">
-                            <span class="nav-icon">⚙️</span>
+                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
                             <span class="nav-text">Configurações</span>
                         </a>
                     </li>
                 </ul>
             </nav>
-            <div class="user-profile">
-                <div class="profile-info" id="ProfileUser">
-                </div>
-                <button class="profile-settings-btn" onclick="showPage('settings')" title="Configurações">
-                    <span>⚙️</span>
-                </button>
-            </div>
         </aside>
 
         <main class="main-content">
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <i class="navbar-icon fas fa-chart-line"></i>
+                    <h2 class="navbar-title">Dashboard</h2>
+                </div>
+                <div class="navbar-right">
+                    <button class="navbar-icon-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="navbar-user">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <span class="user-name">Administrador</span>
+                            <span class="user-role">Admin</span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #4a5568;"></i>
+                    </div>
+                </div>
+            </nav>
+
             <div id="dashboard" class="page active">
                 <div class="page-header">
                     <h2>Dashboard</h2>
@@ -104,26 +112,28 @@
 
                 <div class="stats-grid">
                     <div class="stat-card" id="RendimentosCard">
+
                     </div>
                     <div class="stat-card" id="GastosCard">
                     </div>
                     <div class="stat-card" id="UtilizadoresCard">
                     </div>
                     <div class="stat-card" id="PlanosAtivos">
+
                     </div>
                 </div>
 
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3>Vendas 🔥</h3>
+                            <h3><i class="fas fa-fire"></i> Vendas Mensais</h3>
                             <p>Evolução do lucro nos últimos meses</p>
                         </div>
                         <canvas id="salesChart"></canvas>
                     </div>
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3>Top Produtos</h3>
+                            <h3><i class="fas fa-star"></i> Top Produtos</h3>
                             <p>Produtos mais vendidos</p>
                         </div>
                         <canvas id="topProductsChart"></canvas>
@@ -132,10 +142,52 @@
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3>Produtos Recentes</h3>
+                        <h3><i class="fas fa-clock"></i> Produtos Recentes</h3>
                         <p>Últimos produtos adicionados</p>
                     </div>
-                    <div id="recentProducts"></div>
+                    <div id="recentProducts">
+                        <table class="recent-products-table">
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Preço</th>
+                                    <th>Stock</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><img src="https://via.placeholder.com/50" alt="Produto" class="product-thumb">
+                                    </td>
+                                    <td><strong>Camisa Eco</strong></td>
+                                    <td>Vestuário</td>
+                                    <td class="price-tag">€45.99</td>
+                                    <td>23</td>
+                                    <td>Hoje</td>
+                                </tr>
+                                <tr>
+                                    <td><img src="https://via.placeholder.com/50" alt="Produto" class="product-thumb">
+                                    </td>
+                                    <td><strong>Calças Sustentáveis</strong></td>
+                                    <td>Vestuário</td>
+                                    <td class="price-tag">€59.99</td>
+                                    <td>15</td>
+                                    <td>Ontem</td>
+                                </tr>
+                                <tr>
+                                    <td><img src="https://via.placeholder.com/50" alt="Produto" class="product-thumb">
+                                    </td>
+                                    <td><strong>Ténis Reciclados</strong></td>
+                                    <td>Calçado</td>
+                                    <td class="price-tag">€79.99</td>
+                                    <td>8</td>
+                                    <td>Há 2 dias</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -145,61 +197,38 @@
                         <h2>Produtos</h2>
                         <p>Gerir todos os seus produtos</p>
                     </div>
-                    <button class="btn-primary" onclick="openModal()">
-                        <span>➕</span>
+                    <button class="btn-primary" onclick="alert('Adicionar Produto')">
+                        <i class="fas fa-plus"></i>
                         Adicionar Produto
                     </button>
                 </div>
-                <div class="products-grid" id="productsGrid"></div>
+                <div class="products-grid" id="productsGrid">
+                    <div class="product-card">
+                        <div class="product-image"><i class="fas fa-tshirt"></i></div>
+                        <div class="product-name">Camisa Sustentável</div>
+                        <div class="product-desc">Algodão orgânico 100% sustentável</div>
+                        <div class="product-info">
+                            <div class="product-info-row">
+                                <span class="product-info-label">Preço</span>
+                                <span class="product-info-value">€45.99</span>
+                            </div>
+                            <div class="product-info-row">
+                                <span class="product-info-label">Stock</span>
+                                <span class="product-info-value">23</span>
+                            </div>
+                            <div class="product-info-row">
+                                <span class="product-info-label">Lucro</span>
+                                <span class="product-info-value product-profit">€15.50</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
 
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Adicionar Produto</h3>
-                <button class="close-btn" onclick="closeModal()">×</button>
-            </div>
-            <form id="productForm">
-                <div class="form-group">
-                    <label>Nome do Produto</label>
-                    <input type="text" id="productName" required placeholder="Ex: Camisa Casual">
-                </div>
-                <div class="form-group">
-                    <label>Descrição</label>
-                    <textarea id="productDesc" rows="3" placeholder="Descrição do produto..."></textarea>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Preço (€)</label>
-                        <input type="number" id="productPrice" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Custo (€)</label>
-                        <input type="number" id="productCost" step="0.01" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Stock Inicial</label>
-                    <input type="number" id="productStock" required>
-                </div>
-                <div class="form-group">
-                    <label>Ícone (emoji)</label>
-                    <input type="text" id="productIcon" value="👔" maxlength="2">
-                </div>
-                <button type="submit" class="btn-primary" style="width: 100%;">Adicionar Produto</button>
-            </form>
-        </div>
-    </div>
+
 </body>
-<?php 
-}else{
-    echo "sem permissão!";
-}
-
-?>
-
 <script src="src/js/Adminstrador.js"></script>
 
 </html>

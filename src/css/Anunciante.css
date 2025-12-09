@@ -2334,7 +2334,7 @@
             font-size: 13px;
         }
     }
-        }
+        
 
         .gallery-main {
             height: 300px;
@@ -2343,4 +2343,4 @@
         .modal-view-right {
             grid-template-columns: 1fr;
         }
-    }
+    
