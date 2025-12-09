@@ -285,7 +285,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             <div id="products" class="page">
     <div class="page-actions">
         <div class="actions-left">
-            <button id="addProductBtn" class="btn btn-primary">Adicionar Produto</button>
+            <button id="addProductBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Produto</button>
         </div>
         <div class="actions-right">
             <span id="productLimit"></span>
@@ -330,13 +330,13 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             <thead>
                 <tr>
                     <th><input type="checkbox" id="selectAll"></th>
-                    <th>Foto</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
-                    <th>Preço (€)</th>
-                    <th>Stock</th>
-                    <th>Estado</th>
-                    <th>Ativo</th>
+                    <th><i class="fas fa-image"></i> Foto</th>
+                    <th><i class="fas fa-tag"></i> Nome</th>
+                    <th><i class="fas fa-box"></i> Tipo</th>
+                    <th><i class="fas fa-euro-sign"></i> Preço (€)</th>
+                    <th><i class="fas fa-warehouse"></i> Stock</th>
+                    <th><i class="fas fa-info-circle"></i> Estado</th>
+                    <th><i class="fas fa-toggle-on"></i> Ativo</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -344,80 +344,13 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     </div>
 </div>
 
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3 id="modalTitle">Adicionar Produto</h3>
-        <form id="productForm">
-            <input type="hidden" id="productId">
-            <div class="form-row">
-                <div class="form-col">
-                    <label>Nome</label>
-                    <input type="text" id="nome" required>
-                </div>
-                <div class="form-col">
-                    <label>Tipo</label>
-                    <select id="tipo_produto_id" required></select>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-col">
-                    <label>Preço</label>
-                    <input type="number" step="0.01" id="preco" required>
-                </div>
-                <div class="form-col">
-                    <label>Stock</label>
-                    <input type="number" id="stock" min="0">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-col">
-                    <label>Marca</label>
-                    <input type="text" id="marca">
-                </div>
-                <div class="form-col">
-                    <label>Tamanho</label>
-                    <input type="text" id="tamanho">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-col">
-                    <label>Estado</label>
-                    <select id="estado">
-                        <option>Excelente</option>
-                        <option>Como Novo</option>
-                        <option>Novo</option>
-                    </select>
-                </div>
-                <div class="form-col">
-                    <label>Género</label>
-                    <select id="genero">
-                        <option>Mulher</option>
-                        <option>Homem</option>
-                        <option>Criança</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row-full">
-                <label>Descrição</label>
-                <textarea id="descricao" rows="3"></textarea>
-            </div>
-            <div class="form-row-full">
-                <label>Fotos (até 5 imagens)</label>
-                <input type="file" id="foto" accept="image/*" multiple>
-                <small style="color: #666; margin-top: 5px; display: block;">Selecione até 5 fotos do produto</small>
-            </div>
-            <div id="photoPreview" class="photo-preview"></div>
-            <button type="submit" class="btn-primary">Salvar</button>
-        </form>
-    </div>
-</div>
-
 <!-- Modal Alterar Senha -->
 <div id="passwordModal" class="modal">
     <div class="modal-content" style="max-width: 500px;">
-        <span class="close" onclick="closePasswordModal()">&times;</span>
-        <h3>Alterar Senha</h3>
+        <div class="modal-header">
+            <h3>Alterar Senha</h3>
+            <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
+        </div>
         <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
             <div class="form-group">
                 <label>Senha Atual</label>
@@ -485,7 +418,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     datasets: [{
                         label: 'Vendas (unidades)',
                         data: data.map(d => d.vendas),
-                        backgroundColor: '#A6D90C'
+                        backgroundColor: '#A6D90C',
+                        borderColor: '#2d3748',
+                        borderWidth: 1
                     }]
                 },
                 options: {
@@ -531,8 +466,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         label: chartLabel,
                         data: data.map(d => d.receita),
                         borderColor: '#A6D90C',
-                        backgroundColor: chartType === 'bar' ? '#A6D90C' : 'rgba(166, 217, 12, 0.2)',
-                        borderWidth: 2
+                        backgroundColor: chartType === 'bar' ? '#A6D90C' : 'rgba(166, 217, 12, 0.15)',
+                        borderWidth: 2,
+                        hoverBackgroundColor: '#90c207'
                     }]
                 },
                 options: {
@@ -569,9 +505,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 chartConfig.data.datasets[0].fill = true;
                 chartConfig.data.datasets[0].pointRadius = data.length <= 3 ? 6 : 3;
                 chartConfig.data.datasets[0].pointHoverRadius = data.length <= 3 ? 8 : 5;
-                chartConfig.data.datasets[0].pointBackgroundColor = '#A6D90C';
-                chartConfig.data.datasets[0].pointBorderColor = '#fff';
+                chartConfig.data.datasets[0].pointBackgroundColor = '#2d3748';
+                chartConfig.data.datasets[0].pointBorderColor = '#A6D90C';
                 chartConfig.data.datasets[0].pointBorderWidth = 2;
+                chartConfig.data.datasets[0].pointHoverBackgroundColor = '#A6D90C';
+                chartConfig.data.datasets[0].pointHoverBorderColor = '#2d3748';
             }
 
             window.dailyRevenueChart = new Chart(ctx, chartConfig);
@@ -726,23 +664,12 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         $.post('src/controller/controllerDashboardAnunciante.php', { op: 15, id: id }, function(dados) {
             console.log('Dados recebidos:', dados);
             if (dados && dados.Produto_id) {
-                $('#productId').val(dados.Produto_id);
-                $('#nome').val(dados.nome);
-                $('#tipo_produto_id').val(dados.tipo_produto_id);
-                $('#preco').val(dados.preco);
-                $('#stock').val(dados.stock);;
-                $('#marca').val(dados.marca);
-                $('#tamanho').val(dados.tamanho);
-                $('#estado').val(dados.estado);
-                $('#genero').val(dados.genero);
-                $('#descricao').val(dados.descricao);
-                $('#modalTitle').text('Editar Produto');
-                $('#productModal').addClass('active');
+                abrirModalProduto('Editar Produto', dados);
             } else {
-                alert('Erro ao carregar dados do produto');
+                Swal.fire('Erro', 'Erro ao carregar dados do produto', 'error');
             }
         }, 'json').fail(function() {
-            alert('Erro na requisição');
+            Swal.fire('Erro', 'Erro na requisição', 'error');
         });
     }
 
@@ -973,26 +900,80 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             dataType: 'json'
         }).done(function(res) {
             const ctx = document.getElementById('salesChart');
-            new Chart(ctx, {
-                type: 'line',
+            
+            // Destruir gráfico anterior se existir
+            if (window.salesChartInstance) {
+                window.salesChartInstance.destroy();
+            }
+            
+            // Limpar o canvas completamente
+            ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+            
+            const colors = ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748'];
+            const hoverColors = ['#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c'];
+            
+            window.salesChartInstance = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set',
-                        'Out', 'Nov', 'Dez'
-                    ],
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
                     datasets: [{
                         label: 'Vendas (€)',
                         data: res,
-                        borderColor: '#A6D90C',
-                        backgroundColor: 'rgba(166, 217, 12, 0.2)',
-                        tension: 0.3,
-                        fill: true
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        hoverBackgroundColor: hoverColors
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: true,
                     plugins: {
                         legend: {
-                            display: true
+                            display: true,
+                            labels: {
+                                color: '#2d3748',
+                                font: {
+                                    size: 13,
+                                    weight: 600
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#2d3748',
+                            titleColor: '#A6D90C',
+                            bodyColor: '#ffffff',
+                            borderColor: '#A6D90C',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Vendas: €' + context.parsed.y.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '€' + value;
+                                },
+                                color: '#2d3748'
+                            },
+                            grid: {
+                                color: 'rgba(45, 55, 72, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#2d3748'
+                            },
+                            grid: {
+                                display: false
+                            }
                         }
                     }
                 }
@@ -1015,14 +996,42 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     labels: res.map(p => p.nome),
                     datasets: [{
                         data: res.map(p => p.vendidos),
-                        backgroundColor: ['#A6D90C', '#90c207', '#7cb342', '#6ba643', '#5a9234']
+                        backgroundColor: ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        hoverBorderWidth: 3
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                color: '#2d3748',
+                                font: {
+                                    size: 12,
+                                    weight: 500
+                                },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#2d3748',
+                            titleColor: '#A6D90C',
+                            bodyColor: '#ffffff',
+                            borderColor: '#A6D90C',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.parsed + ' un (' + percentage + '%)';
+                                }
+                            }
                         }
                     }
                 }
@@ -1057,9 +1066,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     labels: res.map(p => p.nome),
                     datasets: [{
                         data: res.map(p => p.lucro),
-                        backgroundColor: ['#A6D90C', '#90c207', '#7cb342', '#6ba643', '#5a9234'],
+                        backgroundColor: ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C'],
                         borderWidth: 2,
-                        borderColor: '#1a1a1a'
+                        borderColor: '#ffffff',
+                        hoverBorderWidth: 3
                     }]
                 },
                 options: {
@@ -1105,7 +1115,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     datasets: [{
                         label: 'Margem (%)',
                         data: res.map(p => p.margem),
-                        backgroundColor: '#A6D90C'
+                        backgroundColor: '#A6D90C',
+                        borderColor: '#2d3748',
+                        borderWidth: 1,
+                        hoverBackgroundColor: '#90c207'
                     }]
                 },
                 options: {
@@ -1264,30 +1277,130 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         // Adicionar Produto
         $('#addProductBtn').click(function() {
             if ($(this).prop('disabled')) return alert('Limite de produtos atingido!');
-            $('#modalTitle').text('Adicionar Produto');
-            $('#productForm')[0].reset();
-            $('#productModal').addClass('active');
+            abrirModalProduto('Adicionar Produto');
         });
 
-        // Salvar Produto
-        $('#productForm').submit(function(e) {
-            e.preventDefault();
-            let formData = new FormData(this);
-            formData.append('op', $('#productId').val() ? 17 : 18);
-            $.ajax({
-                url: 'src/controller/controllerDashboardAnunciante.php',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false
-            }).done(function() {
-                $('#productModal').removeClass('active');
-                carregarProdutos();
+        // Função para abrir modal de produto com SweetAlert2
+        function abrirModalProduto(titulo, dados = {}) {
+            Swal.fire({
+                title: titulo,
+                html: `
+                    <form id="productFormSwal" style="text-align: left;">
+                        <input type="hidden" id="productId" value="${dados.Produto_id || ''}">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label>Nome</label>
+                                <input type="text" id="nome" value="${dados.nome || ''}" required>
+                            </div>
+                            <div class="form-col">
+                                <label>Tipo</label>
+                                <select id="tipo_produto_id" required></select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label>Preço</label>
+                                <input type="number" step="0.01" id="preco" value="${dados.preco || ''}" required>
+                            </div>
+                            <div class="form-col">
+                                <label>Stock</label>
+                                <input type="number" id="stock" value="${dados.stock || ''}" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label>Marca</label>
+                                <input type="text" id="marca" value="${dados.marca || ''}">
+                            </div>
+                            <div class="form-col">
+                                <label>Tamanho</label>
+                                <input type="text" id="tamanho" value="${dados.tamanho || ''}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label>Estado</label>
+                                <select id="estado">
+                                    <option ${dados.estado === 'Excelente' ? 'selected' : ''}>Excelente</option>
+                                    <option ${dados.estado === 'Como Novo' ? 'selected' : ''}>Como Novo</option>
+                                    <option ${dados.estado === 'Novo' ? 'selected' : ''}>Novo</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label>Género</label>
+                                <select id="genero">
+                                    <option ${dados.genero === 'Mulher' ? 'selected' : ''}>Mulher</option>
+                                    <option ${dados.genero === 'Homem' ? 'selected' : ''}>Homem</option>
+                                    <option ${dados.genero === 'Criança' ? 'selected' : ''}>Criança</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row-full">
+                            <label>Descrição</label>
+                            <textarea id="descricao" rows="3">${dados.descricao || ''}</textarea>
+                        </div>
+                        <div class="form-row-full">
+                            <label>Fotos (até 5 imagens)</label>
+                            <input type="file" id="foto" accept="image/*" multiple>
+                            <small style="color: #666; margin-top: 5px; display: block;">Selecione até 5 fotos do produto</small>
+                        </div>
+                        <div id="photoPreview" class="photo-preview"></div>
+                    </form>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                width: 700,
+                customClass: {
+                    popup: 'product-modal-view',
+                    htmlContainer: 'modal-view-wrapper',
+                    confirmButton: 'btn-primary',
+                    cancelButton: 'btn-secondary'
+                },
+                didOpen: () => {
+                    // Carregar tipos de produto no select
+                    carregarTiposProduto();
+                    if (dados.tipo_produto_id) {
+                        setTimeout(() => $('#tipo_produto_id').val(dados.tipo_produto_id), 100);
+                    }
+                },
+                preConfirm: () => {
+                    const formData = new FormData();
+                    formData.append('op', $('#productId').val() ? 17 : 18);
+                    formData.append('id', $('#productId').val());
+                    formData.append('nome', $('#nome').val());
+                    formData.append('tipo_produto_id', $('#tipo_produto_id').val());
+                    formData.append('preco', $('#preco').val());
+                    formData.append('stock', $('#stock').val());
+                    formData.append('marca', $('#marca').val());
+                    formData.append('tamanho', $('#tamanho').val());
+                    formData.append('estado', $('#estado').val());
+                    formData.append('genero', $('#genero').val());
+                    formData.append('descricao', $('#descricao').val());
+                    
+                    const files = $('#foto')[0].files;
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('foto[]', files[i]);
+                    }
+
+                    return $.ajax({
+                        url: 'src/controller/controllerDashboardAnunciante.php',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    }).then(() => {
+                        carregarProdutos();
+                        return true;
+                    }).catch(() => {
+                        Swal.showValidationMessage('Erro ao salvar produto');
+                        return false;
+                    });
+                }
             });
-        });
+        }
 
-        // Fechar Modal
-        $('.close').click(() => $('#productModal').removeClass('active'));
+        // Salvar Produto - REMOVIDO (agora é tratado no preConfirm do SweetAlert2)
 
         // Verificar plano do utilizador para mostrar botão upgrade
         verificarPlanoUpgrade();
