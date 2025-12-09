@@ -52,6 +52,7 @@ CREATE TABLE Utilizadores (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     nif VARCHAR(20),
+    `morada` varchar(255) DEFAULT NULL,
     telefone VARCHAR(50),
     foto varchar(250),
     password VARCHAR(255) NOT NULL,
@@ -119,7 +120,7 @@ CREATE TABLE Produtos (
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
 INSERT INTO Produtos 
-(nome, tipo_produto_id, preco, foto, genero, designer_id, anunciante_id, marca, tamanho, estado, descricao,ativo,stock)
+(nome, tipo_produto_id, preco, foto, genero, designer_id, anunciante_id, marca, tamanho, estado, descricao,ativo)
 VALUES
 ('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', NULL, 1, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.',0),
 #('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', NULL, 3, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.',1,1),
@@ -330,26 +331,29 @@ VALUES
 (10, 'Entregue', 'Envio concluído.'),
 (11, 'Pendente', 'Aguardando confirmação de pagamento.');
 
-CREATE TABLE Vendas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    encomenda_id INT,
-    anunciante_id INT NOT NULL,
-    produto_id INT NULL,
-    quantidade INT DEFAULT 1,
-    valor DECIMAL(10,2),
-    lucro DECIMAL(10,2),
-    data_venda DATE DEFAULT (CURDATE()),
-    FOREIGN KEY (encomenda_id) REFERENCES Encomendas(id),
-    FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (produto_id) REFERENCES Produtos(Produto_id)
-);
-INSERT INTO Vendas (encomenda_id, anunciante_id, produto_id, quantidade, valor, lucro)
-VALUES
-(1, 3, 1, 2, 39.98, 2.40),
-(2, 3, 3, 1, 89.99, 5.40),  
-(3, 3, 2, 1, 49.99, 3.00),  
-(4, 4, 3, 3, 269.97, 16.20), 
-(5, 4, 2, 1, 49.99, 3.00); 
+CREATE TABLE `vendas` (
+  `id` int(11) NOT NULL,
+  `encomenda_id` int(11) DEFAULT NULL,
+  `anunciante_id` int(11) NOT NULL,
+  `produto_id` int(11) DEFAULT NULL,
+  `quantidade` int(11) DEFAULT 1,
+  `valor` decimal(10,2) DEFAULT NULL,
+  `lucro` decimal(10,2) DEFAULT NULL,
+  `data_venda` date DEFAULT curdate()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `vendas`
+--
+
+INSERT INTO `vendas` (`id`, `encomenda_id`, `anunciante_id`, `produto_id`, `quantidade`, `valor`, `lucro`, `data_venda`) VALUES
+(1, 1, 3, 1, 2, 39.98, 2.40, '2025-12-06'),
+(2, 2, 3, 3, 1, 89.99, 5.40, '2025-12-06'),
+(3, 3, 3, 2, 1, 49.99, 3.00, '2025-12-06'),
+(4, 4, 4, 3, 3, 269.97, 16.20, '2025-12-06'),
+(5, 5, 4, 2, 1, 49.99, 3.00, '2025-12-06'),
+(6, NULL, 3, 1, 2, 100.00, 20.00, '2025-12-08'),
+(7, NULL, 3, 2, 1, 50.00, 10.00, '2025-12-07');
 
 CREATE TABLE Planos_Ativos (
     id INT AUTO_INCREMENT PRIMARY KEY,

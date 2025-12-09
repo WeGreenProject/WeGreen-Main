@@ -324,10 +324,9 @@ function adicionarProdutos($listaVendedor, $listaCategoria, $nomeprod, $estadopr
     $resp = json_decode($resp, TRUE);
 
     if($resp['flag']){
-        $sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, anunciante_id, marca, tamanho, estado, nome, ativo, genero, descricao) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 'Descrição do produto')";
+$sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, genero,anunciante_id, marca, tamanho, estado, descricao, ativo, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sdsssssss", $listaCategoria, $preco, $resp['target'], $listaVendedor, $marca, $tamanho, $estadoprod, $nomeprod, $selectestado);
+        $stmt->bind_param("sdssissssii", $listaCategoria, $preco, $resp['target'], $genero,$listaVendedor, $marca, $tamanho, $estadoprod, $descricao, $ativo,$quantidade);
     } else {
         $sql = "INSERT INTO Produtos (tipo_produto_id, preco, anunciante_id, marca, tamanho, estado, nome, ativo, genero, descricao) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, 'Descrição do produto')";
