@@ -268,46 +268,36 @@
     </ul>
 
     <div class="d-flex justify-content-center flex-wrap gap-2 mb-5">
-      <select class="form-select filtro" aria-label="Filtrar por categoria">
-        <option selected>Categoria</option>
-        <option value="1">Roupa</option>
-        <option value="2">Calçado</option>
-        <option value="3">Acessórios</option>
+      <select class="form-select filtro" aria-label="Filtrar por categoria" id="CategoriaSelect">
+        <option value='-1'>Categoria</option>
       </select>
 
-      <select class="form-select filtro" aria-label="Filtrar por preço">
-        <option selected>Preço</option>
-        <option value="1">Até €30</option>
-        <option value="2">€30 - €60</option>
-        <option value="3">Mais de €60</option>
+      <select class="form-select filtro" aria-label="Filtrar por preço" id="tamanhoSelect">
+          <option value='-1'>Tamanho</option>
       </select>
 
-      <select class="form-select filtro" aria-label="Filtrar por marca">
-        <option selected>Marca</option>
-        <option>Nea Vegan Shoes</option>
-        <option>Naz</option>
-        <option>PlayUp</option>
-        <option>Segunda Mão</option>
+      <select class="form-select filtro" aria-label="Filtrar por marca" id="estadoSelect">
+          <option value="-1">Estado</option>
       </select>
     </div>
 
     <div class="tab-content" id="produtoTabsContent">
 
-      <div class="tab-pane fade show active" id="todos" role="tabpanel">
-        <div class="row g-4">
+      <div class="tab-pane fade show active" role="tabpanel">
+        <div class="row g-4" id="ProdutosDestaques">
 
-        <div class="col-md-3 col-sm-6">
-        <a href="#" class="text-decoration-none text-dark">
-            <div class="card produto-card h-100 text-center">
-            <img src="src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp" class="card-img-top" alt="Casaco Verde Pistácio">
-            <div class="card-body">
-                <h5 class="card-title">Casaco Verde Pistácio</h5>
-                <p class="card-text text-muted">By <strong>Naz</strong></p>
-                <p class="preco fw-bold">€139,90</p>
-            </div>
-            </div>
-        </a>
-        </div>
+          <div class="col-md-3 col-sm-6">
+            <a href="#" class="text-decoration-none text-dark">
+                <div class="card produto-card h-100 text-center">
+                <img src="src/img/claudia-alpaca-pistachio-jumpernaz-6377511.webp" class="card-img-top" alt="Casaco Verde Pistácio">
+                <div class="card-body">
+                    <h5 class="card-title">Casaco Verde Pistácio</h5>
+                    <p class="card-text text-muted">By <strong>Naz</strong></p>
+                    <p class="preco fw-bold">€139,90</p>
+                </div>
+                </div>
+            </a>
+          </div>
 
           <div class="col-md-3 col-sm-6">
             <div class="card produto-card h-100 text-center">
