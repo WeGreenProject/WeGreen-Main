@@ -68,8 +68,15 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         <main class="main-content">
             <nav class="top-navbar">
                 <div class="navbar-left">
-                    <i class="navbar-icon fas fa-chart-line" id="pageIcon"></i>
-                    <h2 class="navbar-title" id="pageTitle">Dashboard</h2>
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">
+                            <i class="fas fa-home"></i> WeGreen
+                        </span>
+                        <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                        <span class="breadcrumb-item active" id="pageBreadcrumb">
+                            <i class="navbar-icon fas fa-chart-line" id="pageIcon"></i> Dashboard
+                        </span>
+                    </div>
                 </div>
                 <div class="navbar-right">
                     <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="mostrarPlanosUpgrade()" style="display: none;">
@@ -288,9 +295,15 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             <button id="addProductBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Produto</button>
         </div>
         <div class="actions-right">
-            <span id="productLimit"></span>
             <button id="exportProductsBtn" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
         </div>
+    </div>
+
+    <div class="stats-grid stats-grid-compact" id="productStats">
+        <div class="stat-card stat-card-compact" id="totalProdutosCard"></div>
+        <div class="stat-card stat-card-compact" id="produtosAtivosCard"></div>
+        <div class="stat-card stat-card-compact" id="produtosInativosCard"></div>
+        <div class="stat-card stat-card-compact" id="stockCriticoCard"></div>
     </div>
 
     <div id="bulkActions" class="bulk-actions" style="display: none;">
@@ -549,7 +562,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             target.closest('.nav-link').classList.add('active');
         }
 
-        // Atualizar título e ícone da navbar
+        // Atualizar breadcrumb e ícone da navbar
         const paginas = {
             'dashboard': { titulo: 'Dashboard', icone: 'fa-chart-line' },
             'products': { titulo: 'Gestão de Produtos', icone: 'fa-tshirt' },
@@ -558,7 +571,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             'profile': { titulo: 'Meu Perfil', icone: 'fa-user' }
         };
         const pagina = paginas[pageId] || paginas['dashboard'];
-        document.getElementById('pageTitle').textContent = pagina.titulo;
+        document.getElementById('pageBreadcrumb').innerHTML = `<i class="navbar-icon fas ${pagina.icone}" id="pageIcon"></i> ${pagina.titulo}`;
         document.getElementById('pageIcon').className = 'navbar-icon fas ' + pagina.icone;
 
         // Carregar dados específicos da página
@@ -737,6 +750,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 $.post('src/controller/controllerDashboardAnunciante.php', { op: 17, ids: ids, ativo: 1 }, function() {
                     Swal.fire('Sucesso!', 'Produtos ativados.', 'success');
                     carregarProdutos();
+                    carregarEstatisticasProdutos();
                 });
             }
         });
@@ -756,6 +770,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 $.post('src/controller/controllerDashboardAnunciante.php', { op: 17, ids: ids, ativo: 0 }, function() {
                     Swal.fire('Sucesso!', 'Produtos desativados.', 'success');
                     carregarProdutos();
+                    carregarEstatisticasProdutos();
                 });
             }
         });
@@ -778,6 +793,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 $.post('src/controller/controllerDashboardAnunciante.php', { op: 18, ids: ids }, function() {
                     Swal.fire('Removido!', 'Produtos removidos com sucesso.', 'success');
                     carregarProdutos();
+                    carregarEstatisticasProdutos();
                 });
             }
         });
@@ -900,18 +916,18 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             dataType: 'json'
         }).done(function(res) {
             const ctx = document.getElementById('salesChart');
-            
+
             // Destruir gráfico anterior se existir
             if (window.salesChartInstance) {
                 window.salesChartInstance.destroy();
             }
-            
+
             // Limpar o canvas completamente
             ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
-            
+
             const colors = ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748'];
             const hoverColors = ['#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c'];
-            
+
             window.salesChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1264,15 +1280,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             doc.save('produtos_' + new Date().toISOString().split('T')[0] + '.pdf');
         });
 
-        // Verificar Limite de Produtos
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 14 }, function(limite) {
-            console.log('Limite recebido:', limite);
-            $('#productLimit').text(`Produtos: ${limite.current}/${limite.max}`);
-            if (limite.current >= limite.max) {
-                console.log('Desabilitando botão');
-                $('#addProductBtn').prop('disabled', true).css({'background-color': '#ccc', 'cursor': 'not-allowed', 'opacity': '0.6'});
-            }
-        }, 'json');
+        // Carregar estatísticas de produtos (inclui limite)
+        carregarEstatisticasProdutos();
 
         // Adicionar Produto
         $('#addProductBtn').click(function() {
@@ -1377,7 +1386,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     formData.append('estado', $('#estado').val());
                     formData.append('genero', $('#genero').val());
                     formData.append('descricao', $('#descricao').val());
-                    
+
                     const files = $('#foto')[0].files;
                     for (let i = 0; i < files.length; i++) {
                         formData.append('foto[]', files[i]);
@@ -1391,6 +1400,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         contentType: false
                     }).then(() => {
                         carregarProdutos();
+                        carregarEstatisticasProdutos();
                         return true;
                     }).catch(() => {
                         Swal.showValidationMessage('Erro ao salvar produto');
@@ -1738,6 +1748,87 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     function closePasswordModal() {
         $('#passwordModal').removeClass('active');
         $('#passwordForm')[0].reset();
+    }
+
+    // ========================
+    // ESTATÍSTICAS DE PRODUTOS
+    // ========================
+
+    function carregarEstatisticasProdutos() {
+        // Carregar estatísticas
+        $.post('src/controller/controllerDashboardAnunciante.php', { op: 31 }, function(stats) {
+            console.log('Stats recebidas:', stats);
+
+            // Card Produtos Ativos
+            $('#produtosAtivosCard').html(`
+                <div class='stat-icon'><i class='fas fa-check-circle' style='color: #A6D90C;'></i></div>
+                <div class='stat-content'>
+                    <div class='stat-label'>Produtos Ativos</div>
+                    <div class='stat-value' style='color: #A6D90C;'>${stats.ativos}</div>
+                </div>
+            `);
+
+            // Card Produtos Inativos
+            $('#produtosInativosCard').html(`
+                <div class='stat-icon'><i class='fas fa-exclamation-circle' style='color: #A6D90C;'></i></div>
+                <div class='stat-content'>
+                    <div class='stat-label'>Produtos Inativos</div>
+                    <div class='stat-value' style='color: #fbbf24;'>${stats.inativos}</div>
+                </div>
+            `);
+
+            // Card Stock Crítico
+            $('#stockCriticoCard').html(`
+                <div class='stat-icon'><i class='fas fa-exclamation-triangle' style='color: #A6D90C;'></i></div>
+                <div class='stat-content'>
+                    <div class='stat-label'>Stock Crítico (&lt;5)</div>
+                    <div class='stat-value' style='color: #ef4444;'>${stats.stockBaixo}</div>
+                </div>
+            `);
+
+            // Card Total de Produtos (será completado com limite)
+            $('#totalProdutosCard').html(`
+                <div class='stat-icon'><i class='fas fa-box' style='color: #A6D90C;'></i></div>
+                <div class='stat-content'>
+                    <div class='stat-label'>Total de Produtos</div>
+                    <div class='stat-value'>${stats.total}</div>
+                    <div class='stat-progress' id='totalProgress'></div>
+                </div>
+            `);
+
+            console.log('Elemento #totalProgress criado:', $('#totalProgress').length > 0);
+
+            // Carregar limite de produtos (depois de criar o elemento #totalProgress)
+            $.post('src/controller/controllerDashboardAnunciante.php', { op: 14 }, function(limite) {
+                console.log('Limite recebido:', limite);
+
+                const percentagem = (limite.current / limite.max) * 100;
+                let corBarra = '#A6D90C'; // Verde
+                if (percentagem >= 90) corBarra = '#ef4444'; // Vermelho
+                else if (percentagem >= 70) corBarra = '#fbbf24'; // Amarelo
+
+                console.log('Percentagem:', percentagem, 'Cor:', corBarra);
+
+                // Adicionar barra de progresso ao card Total
+                const progressHTML = `
+                    <div class='stat-progress-bar'>
+                        <div class='stat-progress-fill' style='width: ${percentagem}%; background-color: ${corBarra};'></div>
+                    </div>
+                `;
+
+                console.log('HTML da barra:', progressHTML);
+                $('#totalProgress').html(progressHTML);
+                console.log('Barra inserida, conteúdo de #totalProgress:', $('#totalProgress').html());
+
+                if (limite.current >= limite.max) {
+                    $('#addProductBtn').prop('disabled', true).css({'background-color': '#ccc', 'cursor': 'not-allowed', 'opacity': '0.6'});
+                }
+            }, 'json').fail(function(xhr, status, error) {
+                console.error('Erro ao carregar limite:', error, xhr.responseText);
+            });
+        }, 'json').fail(function(xhr, status, error) {
+            console.error('Erro ao carregar estatísticas:', error, xhr.responseText);
+        });
     }
 
     </script>
