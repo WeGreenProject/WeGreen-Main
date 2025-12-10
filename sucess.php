@@ -290,9 +290,9 @@
         <div class="action-buttons">
         
             <a href="index.html" class="btn btn-primary">
-                <span class="btn-icon"></span>
+                <span class="btn-icon">🚀</span>
                 <span>Voltar no site</span>
-             </a>
+    </a>
             <a href="DashboardAdmin.php" class="btn btn-primary">
                 <span class="btn-icon"></span>
                 <span>Aceder ao Dashboard</span>
