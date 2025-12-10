@@ -77,7 +77,7 @@ VALUES
 ('Matilde Mayer', 'Matilde@wegreen.pt','anunciante123', 3, 2, 3, 350,"src/img/pexels-beccacorreiaph-31095531.jpg"),
 ('Carlos Pereira', 'Carlos@wegreen.pt','anunciante123', 3, 1, 3, 98,"src/img/pexels-rb-audiovisual-1819481.jpg"),
 ('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,"src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg"),
-('Solange Jewels', 'Solange@wegreen.pt','anunciante123', 3, 2, 3, 350,"src/img/solanges.jpeg");
+('Solange Jewels', 'Solange@wegreen.pt','anunciante123', 3, 2, 3, 350,"src/img/pexels-victor-dubugras.jpg");
 
 -- ========================
 -- TABELA: Tipo_Produtos
@@ -93,8 +93,8 @@ INSERT INTO Tipo_Produtos (descricao) VALUES
 ('Acessórios'),
 ('Beleza'),
 ('Outros'),
+('Design'),
 ('Artesanato');
-
 
 -- ========================
 -- TABELA: Produtos
@@ -130,7 +130,8 @@ VALUES
 ('Leggings Yoga', 1, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', NULL, 3, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.',1),
 ('Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', NULL, 2, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.',1),
 ('Casaco Desportivo Nike', 1, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', NULL, 2, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.',1),
-('Sweatshirt North Face', 1, 18.00, 'src/img/northface.webp', 'Criança', NULL, 2, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.',1),
+('Sweatshirt North Face', 1, 18.00, 'src/img/northfacem.jpeg', 'Criança', NULL, 2, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.',1),
+('Vestido Florido', 1, 20.00, 'src/img/435e5ceb4782b9d64d6fd8f6b98b8c43.jpg', 'Criança', NULL, 2, 'Kiabi', '7 anos', 'Excelente', 'Vestido Florido com ganga da Kiabi nunca usada, com etiqueta.',1),
 ('Botas Timbaland', 2, 26.00, 'src/img/TimberlandUnisexBoots.jpeg', 'Criança', NULL, 3, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.',1),
 ('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', NULL, 2, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.',1),
 ('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/AdidasMenSneakers.jpeg', 'Homem', NULL, 2, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.',1),
@@ -140,12 +141,13 @@ VALUES
 ('Calças de ganga Levis', 1, 19.00, 'src/img/LeviJeans.jpeg', 'Homem', NULL, 2, 'Levis', 'XL', 'Novo', 'Calças de gnaga Levis nunca usadas com etiqueta.',1),
 ('Casaco Verde Pistachio', 1, 29.90, 'src/img/image.webp', 'Mulher', NULL, 3, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.',1),
 ('Ténis Adidas Samba', 2, 69.90, 'src/img/f2e6b550dbf350fed5c1145c79d9224f.jpg', 'Mulher', NULL, 3, 'Adidas', '38', 'Novo', 'Tênis Rosa da Adidas Samba, novos na caixa.',1),
-('Calça de ganga em algodão', 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', NULL, 3, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.',1),
+('Calça de ganga em algodão', 1, 64.00, 'src/img/calcaboy.jpeg', 'Criança', NULL, 3, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.',1),
 ('Aneis feito de colher', 3, 8.00, 'src/img/b3fc34c50a03f2eec63563fbd2e6efe9.jpg', 'Mulher', 1, 3, 'AnaCarfts', 'Tamanho Único', 'Novo', 'Aneis feita com colheres.', 1),
 ('Colar Animal Edition', 3, 15.00, 'src/img/animalcross.jpeg', 'Mulher', 1, 4, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar com missangas coloridas e daltamata coleção Animal Cross.', 1),
 ('Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 1, 5, 'MatildeMayer', 'Tamanho Único', 'Novo', 'Mala branca de missangas feita á mão.', 1),
-('Colar Cruz', 3, 12.00, 'src/img/cora-pursley-dupe.jpeg', 'Mulher', 1, 8, 'SolangeJewels', 'Tamanho Único', 'Novo', 'Colar com cruz.', 1),
-('T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 1, 6, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', 1),
+('Chocker Rosa', 3, 12.00, 'src/img/chocker.jpeg', 'Mulher', 1, 8, 'SolangeJewels', 'Tamanho Único', 'Novo', 'Chocker Rosa de missangas da coleção Fairytale.', 1),
+('T-shirt Cult Classic', 6, 25.00, 'src/img/ccult.jpeg', 'Homem', 1, 6, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', 1),
+('Copo Palhaço Ceramica', 7, 15.00, 'src/img/download (12).jpeg', 'Mulher', 1, 4, 'HeartKnows', 'Tamanho Único', 'Novo', 'Copo Palhaço de Ceramica.', 1),
 ('Mala Chloe Paddigton', 5, 235.00, 'src/img/9e8e572724743ed9e7cea7a66c5aa07b.jpg', 'Mulher', NULL, 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.',1);
 
 CREATE TABLE Produto_Fotos (

@@ -102,9 +102,9 @@ function getProdutosDesigner($categoria,$tamanho,$estado){
             $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
             $msg .= "<img src='".$row["foto"]."' height='340px' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
             $msg .= "<div class='card-body text-center'>";
-            $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
+            $msg .= "<h6 class='mb-1'>".$row["nome"]."</h6>";
             $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-            $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
+            $msg .= "<p class='fw-bold text-success'>" . $row["preco"] . "€ <span class='fw-normal'>(com IVA)</span></p>";
             $msg .= "<a href='ProdutoDesignerMostrar.html?id=".$row['Produto_id']."' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
             $msg .= "</div></div></div>";
         }
