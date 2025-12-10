@@ -52,11 +52,11 @@ CREATE TABLE Utilizadores (
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     nif VARCHAR(20),
-    `morada` varchar(255) DEFAULT NULL,
     telefone VARCHAR(50),
     foto varchar(250),
     password VARCHAR(255) NOT NULL,
     tipo_utilizador_id INT,
+    `morada` varchar(255) DEFAULT NULL,
     plano_id INT,
     ranking_id INT,
     pontos_conf INT DEFAULT 0,
@@ -115,7 +115,7 @@ CREATE TABLE Produtos (
     descricao VARCHAR(255),
     data_criacao DATE DEFAULT (CURDATE()),
     ativo BOOLEAN DEFAULT TRUE,
-    stock int DEFAULT 1,
+    stock INT DEFAULT 1,
     FOREIGN KEY (tipo_produto_id) REFERENCES Tipo_Produtos(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
@@ -123,7 +123,7 @@ INSERT INTO Produtos
 (nome, tipo_produto_id, preco, foto, genero, designer_id, anunciante_id, marca, tamanho, estado, descricao,ativo)
 VALUES
 ('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', NULL, 1, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.',0),
-#('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', NULL, 3, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.',1,1),
+#('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', NULL, 3, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.',1),
 ('Conjunto Blusa Saia', 1, 39.90, 'src/img/8d33d7eabd4faf7d5bf2305c7808e2b5.jpg', 'Mulher', NULL, 4, 'Custo Barcelona', 'S', 'Como Novo', 'Conjunto de Saia e Blusa Custo Barcelona, nunca usada.',1),
 ('Calças de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', NULL, 1, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.',1),
 ('Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', NULL, 3, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.',1),
@@ -133,8 +133,8 @@ VALUES
 ('Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', NULL, 2, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.',1),
 ('Casaco Desportivo Nike', 1, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', NULL, 2, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.',1),
 ('Sweatshirt North Face', 1, 18.00, 'src/img/northfacem.jpeg', 'Criança', NULL, 2, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.',1),
-('Vestido Florido', 1, 20.00, 'src/img/435e5ceb4782b9d64d6fd8f6b98b8c43.jpg', 'Criança', NULL, 2, 'Kiabi', '7 anos', 'Excelente', 'Vestido Florido com ganga da Kiabi nunca usada, com etiqueta.',1),
-('Botas Timbaland', 2, 26.00, 'src/img/TimberlandUnisexBoots.jpeg', 'Criança', NULL, 3, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.',1),
+('Vestido Florido', 1, 20.00, 'src/img/435e5ceb4782b9d64d6fd8f6b98b8c43.jpg', 'Criança', NULL, 4, 'Kiabi', '7 anos', 'Excelente', 'Vestido Florido com ganga da Kiabi nunca usada, com etiqueta.',1),
+('Botas Timbaland', 2, 26.00, 'src/img/TimberlandUnisexBoots.jpeg', 'Criança', NULL, 2, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.',1),
 ('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', NULL, 2, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.',1),
 ('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/AdidasMenSneakers.jpeg', 'Homem', NULL, 2, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.',1),
 ('Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/1298bdfb53f943dc29132b4684dbb507.jpg', 'Mulher', NULL, 3, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.',1),
@@ -333,6 +333,10 @@ VALUES
 (10, 'Entregue', 'Envio concluído.'),
 (11, 'Pendente', 'Aguardando confirmação de pagamento.');
 
+--
+-- Estrutura da tabela `vendas`
+--
+
 CREATE TABLE `vendas` (
   `id` int(11) NOT NULL,
   `encomenda_id` int(11) DEFAULT NULL,
@@ -390,4 +394,3 @@ INSERT INTO Fornecedores (nome, descricao, tipo_produtos_id, email, telefone, mo
 ('BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
 
 ('MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
-
