@@ -138,73 +138,167 @@
 </section>
 
 <section class="container py-4">
-    <div class="row g-4">
+<div class="accordion" id="accordionExample">
 
-        <div class="col-12 col-md-6 col-lg-3">
-            <button class="w-100 py-3 rounded-3 fw-bold border-0"
-            style="background:#90c207; color:black;">
-                Recuperar Palavra-Passe
-            </button>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-3">
-            <button class="w-100 py-3 rounded-3 fw-bold border-0"
-            style="background:#90c207; color:black;">
-                Ajuda com Login e Conta
-            </button>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-3">
-            <button class="w-100 py-3 rounded-3 fw-bold border-0"
-            style="background:#90c207; color:black;">
-                Suporte a Anunciantes
-            </button>
-        </div>
-
-        <div class="col-12 col-md-6 col-lg-3">
-            <button class="w-100 py-3 rounded-3 fw-bold border-0"
-            style="background:#90c207; color:black;">
-                Contactar Suporte
-            </button>
-        </div>
-
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Recuperar Palavra-Passe
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Se tiver dificuldades em aceder à sua conta, esta secção explica como recuperar rapidamente o acesso.</p>
+        <ul>
+          <li>Introduza o seu e-mail na página de recuperação.</li>
+          <li>Receberá um link para criar uma nova palavra-passe.</li>
+          <li>Verifique também o spam caso não encontre a mensagem na caixa de entrada.</li>
+          <li>O link tem validade limitada, por isso utilize-o o quanto antes.</li>
+        </ul>
+      </div>
     </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingTwo">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Ajuda com Login e Conta
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Encontrará aqui orientações para resolver problemas de acesso e gestão da conta.</p>
+        <ul>
+          <li>Confirme que o e-mail está corretamente escrito.</li>
+          <li>Verifique se a palavra-passe corresponde à mais recente.</li>
+          <li>Se criou a conta com Google ou Apple, utilize o mesmo método para entrar.</li>
+          <li>Se continuar com dificuldades, o suporte pode verificar o estado da sua conta.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingThree">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Comprar
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Um guia completo para todo o processo de compra na plataforma.</p>
+        <ul>
+          <li><strong>Comprar:</strong> Selecione o produto, escolha as opções desejadas e finalize a compra.</li>
+          <li><strong>Métodos de pagamento:</strong> Disponibilizamos cartão, MBWay e outras opções seguras.</li>
+          <li><strong>Cancelar encomenda:</strong> Possível enquanto o vendedor ainda não enviou o produto.</li>
+          <li><strong>Processo de compra:</strong> Após o pagamento, o vendedor prepara o envio e pode acompanhar tudo no painel.</li>
+          <li><strong>Envio e entrega:</strong> Cada vendedor define o prazo. Receberá um código de rastreio quando o produto for enviado.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingFour">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+        Como Podemos Ajudá-lo
+      </button>
+    </h2>
+    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Esta secção reúne as principais áreas em que o suporte pode ajudar.</p>
+        <ul>
+          <li>Dúvidas sobre pagamentos e transações.</li>
+          <li>Questões sobre encomendas ou entregas.</li>
+          <li>Problemas no acesso à conta.</li>
+          <li>Questões sobre vendedores ou anúncios.</li>
+          <li>Sugestões e melhoria da experiência na plataforma.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingFive">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+        Gerencie a sua Conta
+      </button>
+    </h2>
+    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Todas as opções relacionadas à gestão da sua conta estão reunidas aqui.</p>
+        <ul>
+          <li>Alterar dados pessoais ou e-mail.</li>
+          <li>Atualizar moradas.</li>
+          <li>Consultar histórico de compras.</li>
+          <li>Eliminar a conta, se assim desejar.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingSix">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+        Como Entrar
+      </button>
+    </h2>
+    <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Escolha a forma de acesso mais conveniente.</p>
+        <ul>
+          <li>Login com e-mail e palavra-passe.</li>
+          <li>Acesso através de conta Google.</li>
+          <li>Acesso através de conta Apple.</li>
+          <li>Se criou conta com Google ou Apple, utilize sempre o mesmo método.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingSeven">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+        Ajuda com o Perfil
+      </button>
+    </h2>
+    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Encontre aqui tudo o que pode personalizar no seu perfil.</p>
+        <ul>
+          <li>Alterar fotografia e nome.</li>
+          <li>Gerir notificações e preferências.</li>
+          <li>Ver avaliações recebidas (para utilizadores vendedores).</li>
+          <li>Atualizar palavra-passe.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingEight">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+        Configurações da Conta
+      </button>
+    </h2>
+    <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>Aqui estão todas as definições essenciais de segurança e personalização.</p>
+        <ul>
+          <li>Gerir privacidade e segurança.</li>
+          <li>Configurar notificações por e-mail.</li>
+          <li>Alterar idioma e preferências gerais.</li>
+          <li>Gerir métodos de pagamento guardados.</li>
+          <li>Encerrar sessões ativas caso suspeite de atividade incomum.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
 </section>
-
-<section class="container py-5">
-    <div class="row g-4">
-
-        <div class="col-12 col-lg-6">
-            <div class="p-4 border rounded-4 h-100 bg-white shadow-sm">
-                <h4 class="fw-bold mb-3">Acesso ao Dashboard</h4>
-                <p class="mb-2"><strong>Administrador:</strong> Acesso total ao painel de gestão, anúncios, pagamentos e utilizadores.</p>
-                <p><strong>Anunciante:</strong> Gerem os próprios produtos, encomendas, estatísticas e perfil.</p>
-                <button class="mt-3 px-4 py-2 rounded-3 fw-bold border-0"
-                style="background:#90c207; color:black;">
-                    Saber mais
-                </button>
-            </div>
-        </div>
-
-        <div class="col-12 col-lg-6">
-            <div class="p-4 border rounded-4 h-100 bg-white shadow-sm">
-                <h4 class="fw-bold mb-3">Perguntas Frequentes (FAQ)</h4>
-                <ul class="list-unstyled">
-                    <li class="mb-2">• Como criar um anúncio sustentável?</li>
-                    <li class="mb-2">• Como funciona a verificação de vendedores?</li>
-                    <li class="mb-2">• Que métodos de pagamento existem?</li>
-                    <li class="mb-2">• Como devolver uma encomenda?</li>
-                </ul>
-                <button class="mt-3 px-4 py-2 rounded-3 fw-bold border-0"
-                style="background:#90c207; color:black;">
-                    Ver todas as FAQ
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-    </section>
 
     <footer class="bg-dark text-white pt-5 pb-3 mt-5">
     <div class="container">
