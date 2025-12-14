@@ -92,9 +92,9 @@
                 <button class="tab-btn active" onclick="switchTab('minhas-vendas')">
                     <i class="fas fa-list"></i> Meus Produtos
                 </button>
-                <button class="tab-btn" onclick="switchTab('adicionar-venda')">
+                <!-- <button class="tab-btn" onclick="switchTab('adicionar-venda')">
                     <i class="fas fa-plus-circle"></i> Adicionar Produto
-                </button>
+                </button> -->
                 <button class="tab-btn" onclick="switchTab('todas-vendas')">
                     <i class="fas fa-globe"></i> Todos os Produtos
                 </button>
