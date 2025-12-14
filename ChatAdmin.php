@@ -111,12 +111,7 @@
 
             <div class="chat-container">
                 <div class="conversations-panel">
-                    <div class="conversations-header">
-                        <h3>Conversas</h3>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Pesquisar conversas..." id="searchInput">
-                        </div>
+                    <div class="conversations-header" id="PesquisarInput">
                     </div>
                     <div class="conversations-list" id="ListaCliente">
 
@@ -136,134 +131,36 @@
                 </div>
 
                 <div class="chat-panel" id="FaixaPessoa">
-
-                </div>
-
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message">
-                        <div class="message-avatar">M</div>
-                        <div class="message-content">
-                            <div class="message-bubble">
-                                Olá, preciso de ajuda com um pedido
+                    <div id="chatContent" style="display: flex; flex: 1; flex-direction: column;">
+                        <div class="chat-header">
+                            <div class="chat-header-info">
+                                <div class="chat-user-avatar" id="chatUserAvatar">
+                                    <img src="src/img/default-avatar.png" alt="User">
+                                </div>
+                                <div class="chat-user-details">
+                                    <h4 id="chatUserName">Não Encontrado - Selecione uma conversa</h4>
+                                </div>
                             </div>
-                            <div class="message-time">10:28</div>
-                        </div>
-                    </div>
-
-                    <div class="message">
-                        <div class="message-avatar">M</div>
-                        <div class="message-content">
-                            <div class="message-bubble">
-                                Fiz uma encomenda há 3 dias e ainda não recebi informações sobre o envio
+                            <div class="chat-actions">
+                                <button class="chat-action-btn" title="Arquivar">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                                <button class="chat-action-btn" title="Informações">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <button class="chat-action-btn" title="Mais opções">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
                             </div>
-                            <div class="message-time">10:30</div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="chat-input-container">
-                    <div class="chat-input-wrapper">
-                        <div class="chat-input-tools">
-                            <button class="input-tool-btn" title="Anexar ficheiro">
-                                <i class="fas fa-paperclip"></i>
-                            </button>
-                            <button class="input-tool-btn" title="Emoji">
-                                <i class="fas fa-smile"></i>
-                            </button>
+                        <div class="chat-messages" id="chatMessages">
+
                         </div>
-                        <textarea class="chat-input" id="messageInput" placeholder="Escreva sua mensagem..."
-                            rows="1"></textarea>
-                        <button class="send-btn" id="sendBtn">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                        <div class="chat-input-container" id="BotaoEscrever">
+                        </div>
                     </div>
                 </div>
-            </div>
-    </div>
-    </div>
-    </main>
+        </main>
     </div>
     <script src="src/js/ChatAdmin.js"></script>
-    <script>
-    // Auto-resize textarea
-    const messageInput = document.getElementById('messageInput');
-    messageInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-    });
-
-    // Send message
-    const sendBtn = document.getElementById('sendBtn');
-    sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
-    function sendMessage() {
-        const message = messageInput.value.trim();
-        if (!message) return;
-
-        const chatMessages = document.getElementById('chatMessages');
-
-        const now = new Date();
-        const timeString = now.getHours().toString().padStart(2, '0') + ':' +
-            now.getMinutes().toString().padStart(2, '0');
-
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message sent';
-        messageDiv.innerHTML = `
-                <div class="message-avatar">A</div>
-                <div class="message-content">
-                    <div class="message-bubble">${message}</div>
-                    <div class="message-time">${timeString}</div>
-                </div>
-            `;
-
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        messageInput.value = '';
-        messageInput.style.height = 'auto';
-    }
-
-    // Search conversations
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const conversations = document.querySelectorAll('.conversation-item');
-
-        conversations.forEach(conv => {
-            const name = conv.querySelector('.conversation-name').textContent.toLowerCase();
-            const preview = conv.querySelector('.conversation-preview').textContent.toLowerCase();
-
-            if (name.includes(searchTerm) || preview.includes(searchTerm)) {
-                conv.style.display = 'flex';
-            } else {
-                conv.style.display = 'none';
-            }
-        });
-    });
-
-    // Switch conversations
-    const conversationItems = document.querySelectorAll('.conversation-item');
-    conversationItems.forEach(item => {
-        item.addEventListener('click', function() {
-            conversationItems.forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-
-            const userName = this.querySelector('.conversation-name').textContent;
-            const userInitial = userName.charAt(0);
-
-            document.getElementById('chatUserName').textContent = userName;
-            document.getElementById('chatUserAvatar').textContent = userInitial;
-
-            const unreadBadge = this.querySelector('.conversation-unread');
-            if (unreadBadge) {
-                unreadBadge.remove();
-            }
-        });
-    });
-    </script>
