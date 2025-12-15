@@ -149,8 +149,7 @@ VALUES
 ('Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 1, 5, 'MatildeMayer', 'Tamanho Único', 'Novo', 'Mala branca de missangas feita á mão.', 1),
 ('Chocker Rosa', 3, 12.00, 'src/img/chocker.jpeg', 'Mulher', 1, 8, 'SolangeJewels', 'Tamanho Único', 'Novo', 'Chocker Rosa de missangas da coleção Fairytale.', 1),
 ('T-shirt Cult Classic', 6, 25.00, 'src/img/ccult.jpeg', 'Homem', 1, 6, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', 1),
-('Copo Palhaço Ceramica', 7, 15.00, 'src/img/download (12).jpeg', 'Mulher', 1, 4, 'HeartKnows', 'Tamanho Único', 'Novo', 'Copo Palhaço de Ceramica.', 1),
-('Mala Chloe Paddigton', 5, 235.00, 'src/img/9e8e572724743ed9e7cea7a66c5aa07b.jpg', 'Mulher', NULL, 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.',1);
+('Copo Palhaço Ceramica', 7, 15.00, 'src/img/download (12).jpeg', 'Mulher', 1, 4, 'HeartKnows', 'Tamanho Único', 'Novo', 'Copo Palhaço de Ceramica.', 1);
 
 CREATE TABLE Produto_Fotos (
     id INT AUTO_INCREMENT PRIMARY KEY,

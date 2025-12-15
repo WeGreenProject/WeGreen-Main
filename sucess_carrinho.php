@@ -274,7 +274,7 @@
             
             <div class="detail-row">
                 <span class="detail-label">Data da Compra</span>
-                <span class="detail-value" id="purchaseDate">28 de Novembro, 2025</span>
+                <span class="detail-value" id="purchaseDate">10 de Dezembro, 2025</span>
             </div>
             
             <div class="detail-row">

@@ -541,7 +541,7 @@
                                 class="bi bi-search"></i></button>
                     </form>
 
-                    <a class="nav-link text-white mx-2 fs-5" href="#"><i class="bi bi-bag"></i></a>
+                    <a class="nav-link text-white mx-2 fs-5" href="Carrinho.html"><i class="bi bi-bag"></i></a>
 
                     <div class="nav-item dropdown" id="Perfil_do_Utilizador">
                     </div>

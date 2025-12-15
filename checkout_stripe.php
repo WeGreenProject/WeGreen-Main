@@ -46,7 +46,6 @@ $line_items[] = [
 
 $discounts = [];
 if (isset($_SESSION['cupao_desconto']) && $_SESSION['cupao_desconto'] > 0) {
-    // Criar cupom no Stripe
     $coupon = \Stripe\Coupon::create([
         'percent_off' => $_SESSION['cupao_desconto'],
         'duration' => 'once',
