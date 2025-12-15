@@ -394,3 +394,22 @@ INSERT INTO Fornecedores (nome, descricao, tipo_produtos_id, email, telefone, mo
 ('BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
 
 ('MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
+
+CREATE TABLE MensagensAdmin (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    remetente_id INT,
+    destinatario_id INT,
+    mensagem TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (remetente_id) REFERENCES Utilizadores(id),
+    FOREIGN KEY (destinatario_id) REFERENCES Utilizadores(id)
+);
+
+INSERT INTO MensagensAdmin (remetente_id, destinatario_id, mensagem)
+VALUES 
+(2, 1, 'Olá João! O seu pedido já foi enviado.');
+
+INSERT INTO MensagensAdmin (remetente_id, destinatario_id,mensagem)
+VALUES 
+(1, 2, 'Olá eu sou a Luiza');

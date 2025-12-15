@@ -264,7 +264,6 @@
             <div class="modal fade" id="formEditInativo2" tabindex="-1" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-lg">
-                    <!-- AQUI FALTAVA -->
                     <div class="modal-content">
 
                         <div class="modal-header">

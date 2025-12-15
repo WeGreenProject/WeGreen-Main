@@ -61,7 +61,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="chats.php">
+                        <a class="nav-link" href="Chatadmin.php">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
@@ -126,8 +126,8 @@
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3><i class="fas fa-fire"></i> Vendas Mensais</h3>
-                            <p>Evolução do lucro nos últimos meses</p>
+                            <h3><i class="fas fa-fire"></i> Gastos e Rendimentos</h3>
+                            <p>Evolução nos últimos meses</p>
                         </div>
                         <canvas id="salesChart"></canvas>
                     </div>
@@ -142,49 +142,23 @@
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fas fa-clock"></i> Produtos Recentes</h3>
+                        <h3><i class="fas fa-clock"></i> Produtos ainda para verificar</h3>
                         <p>Últimos produtos adicionados</p>
                     </div>
-                    <div id="recentProducts">
+                    <div id="ProdutosInativosTable">
                         <table class="recent-products-table">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Foto</th>
                                     <th>Nome</th>
                                     <th>Categoria</th>
                                     <th>Preço</th>
                                     <th>Stock</th>
-                                    <th>Data</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td><img src="https://via.placeholder.com/50" alt="Produto" class="product-thumb">
-                                    </td>
-                                    <td><strong>Camisa Eco</strong></td>
-                                    <td>Vestuário</td>
-                                    <td class="price-tag">€45.99</td>
-                                    <td>23</td>
-                                    <td>Hoje</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="https://via.placeholder.com/50" alt="Produto" class="product-thumb">
-                                    </td>
-                                    <td><strong>Calças Sustentáveis</strong></td>
-                                    <td>Vestuário</td>
-                                    <td class="price-tag">€59.99</td>
-                                    <td>15</td>
-                                    <td>Ontem</td>
-                                </tr>
-                                <tr>
-                                    <td><img src="https://via.placeholder.com/50" alt="Produto" class="product-thumb">
-                                    </td>
-                                    <td><strong>Ténis Reciclados</strong></td>
-                                    <td>Calçado</td>
-                                    <td class="price-tag">€79.99</td>
-                                    <td>8</td>
-                                    <td>Há 2 dias</td>
-                                </tr>
+                            <tbody id="ProdutosInativosBody">
+                               
                             </tbody>
                         </table>
                     </div>
@@ -230,5 +204,5 @@
 
 </body>
 <script src="src/js/Adminstrador.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </html>
