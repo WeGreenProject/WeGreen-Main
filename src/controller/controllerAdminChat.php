@@ -52,4 +52,8 @@ if ($_POST['op'] == 7) {
     $resp = $func->pesquisarChat($_POST["pesquisa"]);
     echo $resp;
 }
+if ($_POST['op'] == 8) {
+    $resp = $func->getInativos();
+    echo $resp;
+}
 ?>
