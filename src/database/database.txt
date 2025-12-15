@@ -56,7 +56,7 @@ CREATE TABLE Utilizadores (
     foto varchar(250),
     password VARCHAR(255) NOT NULL,
     tipo_utilizador_id INT,
-    `morada` varchar(255) DEFAULT NULL,
+    morada varchar(255) DEFAULT NULL,
     plano_id INT,
     ranking_id INT,
     pontos_conf INT DEFAULT 0,
