@@ -128,7 +128,6 @@ function ChatMensagens($ID_Anunciante,$ID_Consumidor,$ID_Produto){
         global $conn;
         $msg = "";
         $row = "";
-    //Anunciante
     $sqlFoto2 = "SELECT foto As PerfilAnunciante FROM Utilizadores WHERE id = $ID_Anunciante";
     $resultFoto2 = $conn->query($sqlFoto2);
     $fotoPerfil2 = "";
@@ -138,7 +137,7 @@ function ChatMensagens($ID_Anunciante,$ID_Consumidor,$ID_Produto){
         $fotoPerfil2 = $rowFoto2["PerfilAnunciante"];
     }
 
-    //Consumidor
+
     $sqlFoto = "SELECT foto FROM Utilizadores WHERE id = $ID_Consumidor";
     $resultFoto = $conn->query($sqlFoto);
     $fotoPerfil = "";
@@ -162,7 +161,7 @@ ORDER BY id ASC;";
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
                 $hora = date("H:i", strtotime($row["created_at"]));
-                if ($row["destinatario_id"] == $ID_Consumidor) {
+                if ($row["remetente_id"] == $ID_Consumidor) {
                     $msg .= "<div class='message-wrapper sent'>";
                     $msg .= "<div class='message-content'>";
                     $msg .= "<div class='message-bubble'>";
