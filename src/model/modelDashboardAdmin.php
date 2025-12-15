@@ -215,16 +215,27 @@ function getVendasGrafico() {
     global $conn;
     $dados1 = [];
     $dados2 = [];
+    $dados3 = [];
     $msg = "";
     $flag = false;
 
-    $sql = "SELECT Produtos.nome as Descricao,vendas.lucro As Saldo from Produtos,vendas where Produtos.id = vendas.produto_id;";
+        $meses = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+
+
+    $sql = "SELECT rendimento.valor As ValorRendimentos,rendimento.data_registo As RegistoRendimento,gastos.data_registo As RegistoGastos,gastos.valor As ValorGastos from rendimento,gastos;";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $dados1[] = $row['Descricao'];
-            $dados2[] = $row['Saldo'];
+            $dataGastos = strtotime($row['RegistoGastos']);
+             $mesGastos = date('n', $dataGastos);
+              $mesGastos = $meses[$mesGastos - 1];
+            $dados1[] = $mesGastos;
+            $dados2[] = $row['ValorRendimentos'];
+            $dados3[] = $row['ValorGastos'];
         }
         $flag = true;
     } else {
@@ -235,12 +246,67 @@ function getVendasGrafico() {
         "flag" => $flag,
         "msg" => $msg,
         "dados1" => $dados1,
-        "dados2" => $dados2
+        "dados2" => $dados2,
+        "dados3" => $dados3
     ));
 
     $conn->close();
     return $resp;
 }
+    function getInativos(){
+        global $conn;
+        $msg = "";
+        $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id AND produtos.ativo = 0;";
+        $result = $conn->query($sql);
+        $text = "";
+        $text2 = "";
+
+
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+
+                if($row['ativo'] == 1)
+                {
+                    $text = "Ativo";
+                    $text2 = 'status-approved';
+                }
+                else if($row['ativo'] == 2)
+                {
+                    $text = "Rejeitado";
+                    $text2 = 'status-rejected';
+                }
+                else
+                {
+                    $text = "Inativo";
+                    $text2 = 'status-rejected';
+                }
+                $msg .= "<tr>";
+                $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
+                $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
+                $msg .= "<td>".$row['nome']."</td>";
+                $msg .= "<td>".$row['ProdutosNome']."</td>";
+                $msg .= "<td>".$row['preco']."€</td>";
+                $msg .= "<td>".$row['stock']."</td>";
+                $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
+                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Editar</button></td>";  
+                $msg .= "</tr>";
+            }
+        } else {
+            $msg .= "<tr>";
+            $msg .= "<td>Sem Registos</td>";
+            $msg .= "<th scope='row'></th>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "</tr>";
+        }
+        $conn->close();
+
+        return ($msg);
+    }
 function getTopTipoGrafico() {
     global $conn;
     $dados1 = [];
@@ -248,15 +314,13 @@ function getTopTipoGrafico() {
     $msg = "";
     $flag = false;
 
-    $sql = "SELECT 
-    tp.descricao AS Tipo_Produto, SUM(v.quantidade) AS Total_Vendido FROM Vendas v JOIN Produtos p ON v.produto_id = p.id JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id
-    GROUP BY tp.id ORDER BY Total_Vendido DESC;";
+    $sql = "SELECT tipo_produtos.descricao As Tipo_Produto,count(*) As Vendido from vendas,tipo_produtos,produtos where produtos.produto_id = tipo_produtos.id AND produtos.produto_id = vendas.produto_id group BY tipo_produtos.descricao;";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $dados1[] = $row['Tipo_Produto'];
-            $dados2[] = $row['Total_Vendido'];
+            $dados2[] = $row['Vendido'];
         }
         $flag = true;
     } else {

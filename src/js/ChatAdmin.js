@@ -116,7 +116,7 @@ function getBotao(id) {
     });
 }
 function pesquisarChat() {
-    const termo = document.getElementById("searchChat").value;
+    const termo = document.getElementById("searchInput").value;
 
     let dados = new FormData();
     dados.append("op", 7);
@@ -140,8 +140,7 @@ function pesquisarChat() {
     });
 }
 $(function() {
-
-        getConversas();
+    getConversas();
     getSideBar();
-pesquisarChat();
+    pesquisarChat();
 });

@@ -63,7 +63,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="chats.php">
+                        <a class="nav-link active" href="Chatadmin.php">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
@@ -134,9 +134,7 @@
                     <div id="chatContent" style="display: flex; flex: 1; flex-direction: column;">
                         <div class="chat-header">
                             <div class="chat-header-info">
-                                <div class="chat-user-avatar" id="chatUserAvatar">
-                                    <img src="src/img/default-avatar.png" alt="User">
-                                </div>
+
                                 <div class="chat-user-details">
                                     <h4 id="chatUserName">Não Encontrado - Selecione uma conversa</h4>
                                 </div>
