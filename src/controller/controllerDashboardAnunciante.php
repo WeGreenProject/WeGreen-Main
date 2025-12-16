@@ -1,4 +1,10 @@
 <?php
+// Desabilitar exibição de erros para evitar quebrar JSON
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../../error.log');
+
 include_once '../model/modelDashboardAnunciante.php';
 session_start();
 
@@ -101,26 +107,101 @@ if ($_POST['op'] == 16) {
     echo $resp;
 }
 
-// op 17 - Ativar/Desativar múltiplos produtos
+// op 17 - Atualizar Produto (Editar)
 if ($_POST['op'] == 17) {
+    $id = $_POST['id'];
+    $nome = $_POST['nome'];
+    $tipo_produto_id = $_POST['tipo_produto_id'];
+    $preco = $_POST['preco'];
+    $stock = $_POST['stock'] ?? 0;
+    $marca = $_POST['marca'] ?? '';
+    $tamanho = $_POST['tamanho'] ?? '';
+    $estado = $_POST['estado'];
+    $genero = $_POST['genero'];
+    $descricao = $_POST['descricao'] ?? '';
+
+    // Processar fotos se existirem
+    $fotos = [];
+    if (isset($_FILES['foto']) && !empty($_FILES['foto']['name'][0])) {
+        foreach ($_FILES['foto']['name'] as $key => $filename) {
+            if ($_FILES['foto']['error'][$key] === 0) {
+                $tmpName = $_FILES['foto']['tmp_name'][$key];
+                $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                $newFilename = uniqid() . '_' . time() . '.' . $extension;
+                $uploadPath = __DIR__ . '/../img/' . $newFilename;
+
+                if (move_uploaded_file($tmpName, $uploadPath)) {
+                    $fotos[] = 'src/img/' . $newFilename;
+                }
+            }
+        }
+    }
+
+    $resp = $func->atualizarProduto($id, $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $fotos);
+    echo json_encode(['success' => true, 'message' => $resp]);
+}
+
+// op 18 - Adicionar Produto (Novo)
+if ($_POST['op'] == 18) {
+    try {
+        $nome = $_POST['nome'] ?? '';
+        $tipo_produto_id = $_POST['tipo_produto_id'] ?? 0;
+        $preco = $_POST['preco'] ?? 0;
+        $stock = $_POST['stock'] ?? 0;
+        $marca = $_POST['marca'] ?? '';
+        $tamanho = $_POST['tamanho'] ?? '';
+        $estado = $_POST['estado'] ?? '';
+        $genero = $_POST['genero'] ?? '';
+        $descricao = $_POST['descricao'] ?? '';
+        $anunciante_id = $_SESSION['utilizador'];
+
+        // Processar upload de fotos
+        $fotos = [];
+        if (isset($_FILES['foto']) && !empty($_FILES['foto']['name'][0])) {
+            $uploadDir = __DIR__ . '/../img/';
+
+            // Verificar se o diretório existe
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            foreach ($_FILES['foto']['name'] as $key => $filename) {
+                if ($_FILES['foto']['error'][$key] === UPLOAD_ERR_OK) {
+                    $tmpName = $_FILES['foto']['tmp_name'][$key];
+                    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                    $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+                    if (in_array($extension, $allowedExt)) {
+                        $newFilename = uniqid() . '_' . time() . '.' . $extension;
+                        $uploadPath = $uploadDir . $newFilename;
+
+                        if (move_uploaded_file($tmpName, $uploadPath)) {
+                            $fotos[] = 'src/img/' . $newFilename;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Verificar se tem pelo menos uma foto
+        if (empty($fotos)) {
+            echo json_encode(['success' => false, 'message' => 'É necessário adicionar pelo menos uma foto']);
+            exit;
+        }
+
+        $resp = $func->insertProduto($nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $fotos);
+        echo json_encode(['success' => true, 'message' => $resp]);
+    } catch (Exception $e) {
+        error_log('Erro ao adicionar produto: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Erro ao adicionar produto: ' . $e->getMessage()]);
+    }
+}
+
+// op 19 - Ativar/Desativar múltiplos produtos
+if ($_POST['op'] == 19) {
     $ids = $_POST['ids'];
     $ativo = $_POST['ativo'];
     $resp = $func->atualizarAtivoEmMassa($ids, $ativo);
-    echo json_encode(['success' => $resp]);
-}
-
-// op 18 - Remover múltiplos produtos
-if ($_POST['op'] == 18) {
-    $ids = $_POST['ids'];
-    $resp = $func->removerProdutosEmMassa($ids);
-    echo json_encode(['success' => $resp]);
-}
-
-// op 19 - Alterar estado de múltiplos produtos
-if ($_POST['op'] == 19) {
-    $ids = $_POST['ids'];
-    $estado = $_POST['estado'];
-    $resp = $func->alterarEstadoEmMassa($ids, $estado);
     echo json_encode(['success' => $resp]);
 }
 
@@ -226,6 +307,13 @@ if ($_POST['op'] == 34) {
     $encomenda_id = $_POST['encomenda_id'];
     $resp = $func->getHistoricoEncomenda($encomenda_id);
     echo $resp;
+}
+
+// op 36 - Remover produtos em massa
+if ($_POST['op'] == 36) {
+    $ids = $_POST['ids'];
+    $resp = $func->removerProdutosEmMassa($ids);
+    echo json_encode(['success' => $resp]);
 }
 
 // Fechar conexão global no final

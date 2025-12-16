@@ -411,7 +411,6 @@ function renderProfitChart() {
   }).done(function (resp) {
     const ctx = document.getElementById("profitChart");
     if (!ctx) {
-      console.warn("Elemento profitChart não encontrado");
       return;
     }
     if (window.profitChartInstance) window.profitChartInstance.destroy();
@@ -463,7 +462,6 @@ function renderMarginChart() {
   }).done(function (resp) {
     const ctx = document.getElementById("marginChart");
     if (!ctx) {
-      console.warn("Elemento marginChart não encontrado");
       return;
     }
     if (window.marginChartInstance) window.marginChartInstance.destroy();
@@ -931,54 +929,6 @@ function editarSelecionado() {
   editarProduto(ids[0]);
 }
 
-function ativarEmMassa() {
-  const ids = obterProdutosSelecionados();
-  if (ids.length === 0) return;
-  Swal.fire({
-    title: `Ativar ${ids.length} produtos?`,
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Sim",
-    cancelButtonText: "Cancelar",
-  }).then((resultado) => {
-    if (resultado.isConfirmed) {
-      $.post(
-        "src/controller/controllerDashboardAnunciante.php",
-        { op: 17, ids: ids, ativo: 1 },
-        function () {
-          Swal.fire("Sucesso!", "Produtos ativados.", "success");
-          carregarProdutos();
-          carregarEstatisticasProdutos();
-        }
-      );
-    }
-  });
-}
-
-function desativarEmMassa() {
-  const ids = obterProdutosSelecionados();
-  if (ids.length === 0) return;
-  Swal.fire({
-    title: `Desativar ${ids.length} produtos?`,
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonText: "Sim",
-    cancelButtonText: "Cancelar",
-  }).then((resultado) => {
-    if (resultado.isConfirmed) {
-      $.post(
-        "src/controller/controllerDashboardAnunciante.php",
-        { op: 17, ids: ids, ativo: 0 },
-        function () {
-          Swal.fire("Sucesso!", "Produtos desativados.", "success");
-          carregarProdutos();
-          carregarEstatisticasProdutos();
-        }
-      );
-    }
-  });
-}
-
 function removerEmMassa() {
   const ids = obterProdutosSelecionados();
   if (ids.length === 0) return;
@@ -995,50 +945,11 @@ function removerEmMassa() {
     if (resultado.isConfirmed) {
       $.post(
         "src/controller/controllerDashboardAnunciante.php",
-        { op: 18, ids: ids },
+        { op: 36, ids: ids },
         function () {
           Swal.fire("Removido!", "Produtos removidos com sucesso.", "success");
           carregarProdutos();
           carregarEstatisticasProdutos();
-        }
-      );
-    }
-  });
-}
-
-function alterarEstadoEmMassa() {
-  const ids = obterProdutosSelecionados();
-  if (ids.length === 0) return;
-  Swal.fire({
-    title: `Alterar estado de ${ids.length} produtos?`,
-    input: "select",
-    inputOptions: {
-      Novo: "Novo",
-      "Como Novo": "Como Novo",
-      Excelente: "Excelente",
-    },
-    inputPlaceholder: "Selecione o estado",
-    showCancelButton: true,
-    confirmButtonText: "Alterar",
-    cancelButtonText: "Cancelar",
-    confirmButtonColor: "#A6D90C",
-    inputValidator: (value) => {
-      if (!value) {
-        return "Precisa selecionar um estado!";
-      }
-    },
-  }).then((resultado) => {
-    if (resultado.isConfirmed) {
-      $.post(
-        "src/controller/controllerDashboardAnunciante.php",
-        { op: 19, ids: ids, estado: resultado.value },
-        function () {
-          Swal.fire(
-            "Sucesso!",
-            `Estado alterado para "${resultado.value}".`,
-            "success"
-          );
-          carregarProdutos();
         }
       );
     }
@@ -1478,21 +1389,40 @@ function abrirModalProduto(titulo, dados = {}) {
         contentType: false,
       })
         .then((response) => {
-          carregarProdutos();
-          carregarEstatisticasProdutos();
-          Swal.fire({
-            icon: "success",
-            title: "Produto salvo!",
-            text: "O produto foi adicionado com sucesso.",
-            confirmButtonText: "OK",
-            timer: 2000,
-          });
-          return true;
+          let dados;
+          try {
+            dados =
+              typeof response === "string" ? JSON.parse(response) : response;
+          } catch (e) {
+            console.error("Erro ao processar resposta:", e);
+            Swal.showValidationMessage(
+              "Erro ao processar resposta do servidor"
+            );
+            return false;
+          }
+
+          if (dados.success) {
+            carregarProdutos();
+            carregarEstatisticasProdutos();
+            Swal.fire({
+              icon: "success",
+              title: "Produto salvo!",
+              text: dados.message || "O produto foi adicionado com sucesso.",
+              confirmButtonText: "OK",
+              timer: 2000,
+            });
+            return true;
+          } else {
+            Swal.showValidationMessage(
+              dados.message || "Erro ao guardar produto"
+            );
+            return false;
+          }
         })
         .catch((error) => {
-          console.error("Erro ao salvar produto:", error);
+          console.error("Erro ao guardar produto:", error);
           Swal.showValidationMessage(
-            "Erro ao salvar produto. Tente novamente."
+            "Erro ao guardar produto. Tente novamente."
           );
           return false;
         });

@@ -10,12 +10,12 @@ class DashboardAdmin{
         $row = "";
 
         $sql = "SELECT COUNT(*) AS TotalAtivos FROM Utilizadores WHERE Utilizadores.plano_id IN (2, 3);";
-        
+
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
-                
+
                 $msg  = " <div class='stat-icon'><i class='fas fa-crown'></i></div>";
                 $msg .= "<div class='stat-label'>Planos Ativos</div>";
                 $msg .= "<div class='stat-value'>".$row["TotalAtivos"]."</div>";
@@ -29,7 +29,7 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-value'>Não Encontrado</div>";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -38,12 +38,12 @@ class DashboardAdmin{
         $msg = "";
         $row = "";
         $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg  = "<div class='profile-avatar'>";
                     $msg .= "<img src='" .$row["foto"]. "' alt='User Photo' id='userPhoto'>";
                     $msg .= "<span class='avatar-placeholder'>👤</span>";
@@ -67,7 +67,7 @@ class DashboardAdmin{
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -77,12 +77,12 @@ class DashboardAdmin{
         $row = "";
         $novos = $this->getNovosUtilizadores();
         $sql = "SELECT count(*) As TotalUtilizadores from Utilizadores,Tipo_Utilizadores where Utilizadores.tipo_utilizador_id = Tipo_Utilizadores.id AND utilizadores.tipo_utilizador_id IN (2, 3);";
-        
+
         $result = $conn->query($sql);
-        
+
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
-                
+
                 $msg  = "<div class='stat-icon'><i class='fas fa-users'></i></div>";
                 $msg .= "<div class='stat-label'>Utilizadores Ativos</div>";
                 $msg .= "<div class='stat-value'>".$row["TotalUtilizadores"]."</div>";
@@ -97,7 +97,7 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-change'>+ X Novos utilizadores</div>";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -106,12 +106,12 @@ class DashboardAdmin{
         $msg = "";
         $row = "";
         $sql = "SELECT * from Utilizadores where id = ".$ID_User;
-        
+
         $result = $conn->query($sql);
-        
+
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
-                
+
                 $msg  = "<div class='dropdown-header'>";
                 $msg .= "    <img src='" . $row['foto']."' alt='Usuário' class='dropdown-avatar'>";
                 $msg .= "    <div>";
@@ -148,7 +148,7 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-change'>+ X Novos utilizadores</div>";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -165,7 +165,7 @@ class DashboardAdmin{
         $row = "";
 
         $sql = "SELECT COUNT(*) AS novos FROM Utilizadores WHERE data_criacao >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);";
-        
+
         $result = $conn->query($sql);
 
         if ($result && $result->num_rows > 0) {
@@ -182,7 +182,7 @@ class DashboardAdmin{
             $row = "";
             $novos = $this->getNovosRendimentos();
             $sql = "SELECT Sum(rendimento.valor) AS TotalRendimentos FROM rendimento";
-            
+
             $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
@@ -201,7 +201,7 @@ class DashboardAdmin{
                     $msg .= "<div class='stat-value'>Rendimentos não Encontrado!</div>";
             }
             $conn->close();
-            
+
             return ($msg);
 
         }
@@ -210,7 +210,7 @@ class DashboardAdmin{
         $msg = "";
         $row = "";
         $sql = "SELECT sum(rendimento.valor) NovoRendimento from rendimento where data_registo >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);";
-        
+
         $result = $conn->query($sql);
 
 
@@ -228,7 +228,7 @@ class DashboardAdmin{
         $row = "";
 
         $sql = "SELECT Sum(gastos.valor) As TotalGastos FROM gastos";
-        
+
         $result = $conn->query($sql);
         $novos = $this->getNovosGastos();
         if ($result->num_rows > 0) {
@@ -247,7 +247,7 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-value'>Gastos não Encontrado!</div>";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -257,7 +257,7 @@ class DashboardAdmin{
         $row = "";
 
         $sql = "SELECT sum(gastos.valor) NovoGastos from Gastos where data_registo >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);";
-        
+
         $result = $conn->query($sql);
 
 
@@ -329,7 +329,7 @@ function getVendasGrafico() {
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td>".$row['stock']."</td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Editar</button></td>";  
+                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'></button></td>";
                 $msg .= "</tr>";
             }
         } else {
