@@ -355,7 +355,7 @@ function getProdutosInvativo(){
     
     .done(function( msg ) {
         $('#ProdutosInativosBody').html(msg);
-        $('#ProdutosInativosTable').DataTable();
+        $('.ProdutosInativosTable').DataTable();
         
     })
     

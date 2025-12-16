@@ -32,4 +32,8 @@ if ($_POST['op'] == 7) {
     $resp = $func->getDadosPerfil($_SESSION['utilizador']);
     echo $resp;
 }
+if ($_POST['op'] == 8) {
+    $resp = $func->getProdutosInvativo();
+    echo $resp;
+}
 ?>

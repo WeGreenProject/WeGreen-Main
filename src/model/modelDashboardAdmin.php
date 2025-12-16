@@ -253,7 +253,7 @@ function getVendasGrafico() {
     $conn->close();
     return $resp;
 }
-    function getInativos(){
+    function getProdutosInvativo(){
         global $conn;
         $msg = "";
         $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id AND produtos.ativo = 0;";
@@ -264,22 +264,6 @@ function getVendasGrafico() {
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
-
-                if($row['ativo'] == 1)
-                {
-                    $text = "Ativo";
-                    $text2 = 'status-approved';
-                }
-                else if($row['ativo'] == 2)
-                {
-                    $text = "Rejeitado";
-                    $text2 = 'status-rejected';
-                }
-                else
-                {
-                    $text = "Inativo";
-                    $text2 = 'status-rejected';
-                }
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
                 $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
@@ -287,7 +271,6 @@ function getVendasGrafico() {
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td>".$row['stock']."</td>";
-                $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
                 $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Editar</button></td>";  
                 $msg .= "</tr>";
             }

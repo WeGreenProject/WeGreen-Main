@@ -146,7 +146,7 @@
                         <p>Últimos produtos adicionados</p>
                     </div>
                     <div id="ProdutosInativosTable">
-                        <table class="recent-products-table">
+                        <table class="ProdutosInativosTable">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -155,6 +155,7 @@
                                     <th>Categoria</th>
                                     <th>Preço</th>
                                     <th>Stock</th>
+                                    <th>Ação</th>
                                 </tr>
                             </thead>
                             <tbody id="ProdutosInativosBody">

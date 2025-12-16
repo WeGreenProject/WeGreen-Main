@@ -91,4 +91,8 @@ if ($_POST['op'] == 14) {
     $resp = $func->getDadosPerfil($_SESSION['utilizador']);
     echo $resp;
 }
+if ($_POST['op'] == 15) {
+    $resp = $func->getTopTipoGrafico();
+    echo $resp;
+}
 ?>

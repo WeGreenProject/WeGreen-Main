@@ -29,6 +29,49 @@ function getMinhasVendas(){
 });
 
 }
+function getTopTipoGrafico() {
+    $.ajax({
+        url: "src/controller/controllerDashboardAdmin.php",
+        type: "POST",
+        data: { op: 15 },
+        dataType: "json",
+        success: function(response) {
+            console.log("Resposta AJAX:", response);
+
+                const ctx3 = document.getElementById('topProductsChart').getContext('2d');
+                
+                new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: response.dados1,
+                        datasets: [{
+                            data: response.dados2,
+                            backgroundColor: ['#a4d70a', '#2a3548', '#c8e200', '#1a2a3b', '#d1d3d4', '#f4c542'],
+                            borderColor: '#1a1a1a',
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#888',
+                                    padding: 15
+                                }
+                            }
+                        }
+                    }
+                });
+        },
+        error: function(xhr, status, error) {
+            console.error("Erro AJAX:", error);
+            console.error("Resposta do servidor:", xhr.responseText);
+        }
+    });
+}
 function getInativos(){
 
     
@@ -519,4 +562,5 @@ $(function() {
     getProdutos();
     getMinhasVendas();
     getDadosPerfil();
+    getTopTipoGrafico();
 });
