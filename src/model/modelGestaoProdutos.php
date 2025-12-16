@@ -522,5 +522,42 @@ function uploads($foto, $nome){
 
         return ($msg);
     }
+    function getTopTipoGrafico() {
+    global $conn;
+    $dados1 = [];
+    $dados2 = [];
+    $msg = "";
+    $flag = false;
+
+    $sql = "SELECT 
+    utilizadores.id AS Cliente_ID,
+    utilizadores.nome AS Cliente_Nome,
+    COUNT(produtos.produto_id) AS Produtos_Anunciados
+FROM 
+    utilizadores,produtos where utilizadores.id = produtos.anunciante_id
+GROUP BY 
+    utilizadores.id, utilizadores.nome;";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $dados1[] = $row['Cliente_Nome'];
+            $dados2[] = $row['Produtos_Anunciados'];
+        }
+        $flag = true;
+    } else {
+        $msg = "Nenhum Serviço encontrado.";
+    }
+
+    $resp = json_encode(array(
+        "flag" => $flag,
+        "msg" => $msg,
+        "dados1" => $dados1,
+        "dados2" => $dados2
+    ));
+
+    $conn->close();
+    return $resp;
+}
 }
 ?>

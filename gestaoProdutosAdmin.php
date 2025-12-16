@@ -87,7 +87,22 @@
                 <h2>Gestão de Produtos</h2>
                 <p>Gerir todos os produtos na plataforma</p>
             </div>
-
+ <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-fire"></i>Produto anunciados (por Categoria)</h3>
+                        </div>
+                        <canvas id="topProductsChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-star"></i>Produto Vendidos (por Categoria)</h3>
+                        </div>
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            <br>
+            <br>
             <div class="tabs-container">
                 <button class="tab-btn active" onclick="switchTab('minhas-vendas')">
                     <i class="fas fa-list"></i> Meus Produtos
@@ -232,7 +247,6 @@
                     </table>
                 </div>
             </div>
-            <!-- TAB: Meus Produtos -->
             <div id="minhas-vendas" class="tab-content active">
                 <div class="table-container">
                     <h3><i class="fas fa-box-open" style="color: #A6D90C;"></i> Histórico de Meus Produtos</h3>
@@ -394,7 +408,7 @@
             }
             </script>
             <script src="src/js/gestaoProdutos.js"></script>
-
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 
 </html>

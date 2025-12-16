@@ -504,17 +504,17 @@
     }
 
     /* Tabela de Produtos Recentes */
-    .recent-products-table {
+    .ProdutosInativosTable {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
     }
 
-    .recent-products-table thead {
+    .ProdutosInativosTable thead {
         background: linear-gradient(135deg, #A6D90C 0%, #90c207 100%);
     }
 
-    .recent-products-table th {
+    .ProdutosInativosTable th {
         padding: 12px;
         text-align: left;
         font-weight: 600;
@@ -524,14 +524,14 @@
         letter-spacing: 0.5px;
     }
 
-    .recent-products-table td {
+    .ProdutosInativosTable td {
         padding: 12px;
         border-bottom: 1px solid #e2e8f0;
         color: #1a202c;
         font-size: 14px;
     }
 
-    .recent-products-table tbody tr:hover {
+    .ProdutosInativosTable tbody tr:hover {
         background: #f0f9f0;
     }
 
