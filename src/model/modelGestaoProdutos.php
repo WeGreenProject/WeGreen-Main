@@ -481,7 +481,7 @@ function uploads($foto, $nome){
             ];
 
         if ($result->num_rows > 0) {
-            $msg .= "<h3>📸 Fotos do Produto</h3>";
+            $msg .= "<h3>📸 Fotos do Produto Adicionais</h3>";
             $msg .= "<div class='photos-grid' id='photosGrid'>";
             $i = 0;
             while($row = $result->fetch_assoc()) {
@@ -494,7 +494,7 @@ function uploads($foto, $nome){
             }
             $msg .= "</div>";   
         } else {
-                $msg .= "<h3>📸 Não existem fotos</h3>";
+                $msg .= "<h3>📸 Não existem fotos adicionais</h3>";
         }
         $conn->close();
 
@@ -529,19 +529,50 @@ function uploads($foto, $nome){
     $flag = false;
 
     $sql = "SELECT 
-    utilizadores.id AS Cliente_ID,
-    utilizadores.nome AS Cliente_Nome,
-    COUNT(produtos.produto_id) AS Produtos_Anunciados
-FROM 
-    utilizadores,produtos where utilizadores.id = produtos.anunciante_id
-GROUP BY 
-    utilizadores.id, utilizadores.nome;";
+        utilizadores.id AS Cliente_ID,
+        utilizadores.nome AS Cliente_Nome,
+        COUNT(produtos.produto_id) AS Produtos_Anunciados
+        FROM 
+        utilizadores,produtos where utilizadores.id = produtos.anunciante_id
+        GROUP BY 
+        utilizadores.id, utilizadores.nome;";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $dados1[] = $row['Cliente_Nome'];
             $dados2[] = $row['Produtos_Anunciados'];
+        }
+        $flag = true;
+    } else {
+        $msg = "Nenhum Serviço encontrado.";
+    }
+
+    $resp = json_encode(array(
+        "flag" => $flag,
+        "msg" => $msg,
+        "dados1" => $dados1,
+        "dados2" => $dados2
+    ));
+
+    $conn->close();
+    return $resp;
+}
+    function getProdutoVendidos() {
+    global $conn;
+    $dados1 = [];
+    $dados2 = [];
+    $msg = "";
+    $flag = false;
+
+    $sql = "SELECT Utilizadores.nome AS Anunciante_Nome, SUM(Vendas.quantidade) AS Produtos_Vendidos FROM Vendas,Utilizadores where Utilizadores.id = Vendas.anunciante_id
+    GROUP BY Utilizadores.id, Utilizadores.nome;";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $dados1[] = $row['Anunciante_Nome'];
+            $dados2[] = $row['Produtos_Vendidos'];
         }
         $flag = true;
     } else {

@@ -1,337 +1,469 @@
-CREATE DATABASE WeGreen;
-USE WeGreen;
--- ========================
--- TABELA: Tipo_Utilizadores
--- ========================
-CREATE TABLE Tipo_Utilizadores (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    descricao VARCHAR(250) NOT NULL
-);
+create database wegreen;
 
-INSERT INTO Tipo_Utilizadores (descricao) VALUES
-('Administrador'),
-('Cliente'),
-('Anunciante');
+use wegreen;
 
--- ========================
--- TABELA: Planos
--- ========================
-CREATE TABLE Planos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(200) NOT NULL,
-    preco DECIMAL(10,2),
-    limite_produtos INT,
-    rastreio_tipo VARCHAR(200) NOT NULL,
-    relatorio_pdf BOOLEAN DEFAULT FALSE
-);
+CREATE TABLE `carrinho_itens` (
+  `id` int(11) NOT NULL,
+  `utilizador_id` int(11) NOT NULL,
+  `produto_id` int(11) NOT NULL,
+  `quantidade` int(11) DEFAULT 1 CHECK (`quantidade` > 0),
+  `data_adicao` timestamp NOT NULL DEFAULT current_timestamp(),
+  `data_atualizacao` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO Planos (nome, preco, limite_produtos, rastreio_tipo, relatorio_pdf) VALUES
-('Plano Essencial Verde', 0, 5, 'Basico', FALSE),
-('Plano Crescimento Circular', 25, 10, 'Basico', TRUE),
-('Plano Profissional Eco+', 100, NULL, 'Avancado', TRUE);
+--
+-- Extraindo dados da tabela `carrinho_itens`
+--
 
--- ========================
--- TABELA: Ranking
--- ========================
-CREATE TABLE Ranking (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(250),
-    pontos INT
-);
+INSERT INTO `carrinho_itens` (`id`, `utilizador_id`, `produto_id`, `quantidade`, `data_adicao`, `data_atualizacao`) VALUES
+(1, 1, 1, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(5, 1, 5, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(6, 1, 6, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(7, 1, 7, 2, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(8, 2, 3, 1, '2025-12-16 20:55:36', '2025-12-16 20:55:36');
 
-INSERT INTO Ranking (nome, pontos) VALUES
-('Bronze', 0),
-('Ouro', 50),
-('Diamante', 150);
+-- --------------------------------------------------------
 
--- ========================
--- TABELA: Utilizadores
--- ========================
-CREATE TABLE Utilizadores (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    nif VARCHAR(20),
-    telefone VARCHAR(50),
-    foto varchar(250),
-    password VARCHAR(255) NOT NULL,
-    tipo_utilizador_id INT,
-    morada varchar(255) DEFAULT NULL,
-    plano_id INT,
-    ranking_id INT,
-    pontos_conf INT DEFAULT 0,
-    data_criacao DATE,
-    FOREIGN KEY (ranking_id) REFERENCES Ranking(id),
-    FOREIGN KEY (tipo_utilizador_id) REFERENCES Tipo_Utilizadores(id),
-    FOREIGN KEY (plano_id) REFERENCES Planos(id)
-);
+--
+-- Estrutura da tabela `denuncias`
+--
 
-INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
-VALUES
-('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,"src/img/pexels-beccacorreiaph-31095884.jpg"),
-('João Silva', 'joao@wegreen.pt', 'cliente123', 2, 1, 1, 10, 'src/img/pexels-stefanstefancik-91227.jpg'),
-('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,"src/img/pexels-olly-733872.jpg");
+CREATE TABLE `denuncias` (
+  `id` int(11) NOT NULL,
+  `denunciante_id` int(11) DEFAULT NULL,
+  `denunciado_id` int(11) DEFAULT NULL,
+  `descricao` text DEFAULT NULL,
+  `imagem_anexo` varchar(255) DEFAULT NULL,
+  `estado` varchar(250) DEFAULT 'Pendente',
+  `data_registo` date DEFAULT curdate()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
-VALUES
-('Maria Luiza', 'Luiza@wegreen.pt','anunciante123', 3, 3, 3, 54, "src/img/josefina-pereyra-dupe.jpeg"),
-('Matilde Mayer', 'Matilde@wegreen.pt','anunciante123', 3, 2, 3, 350,"src/img/pexels-beccacorreiaph-31095531.jpg"),
-('Carlos Pereira', 'Carlos@wegreen.pt','anunciante123', 3, 1, 3, 98,"src/img/pexels-rb-audiovisual-1819481.jpg"),
-('Mango', 'mango@wegreen.pt', 'mango123', 2, 1, 1, 10,"src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg"),
-('Solange Jewels', 'Solange@wegreen.pt','anunciante123', 3, 2, 3, 350,"src/img/pexels-victor-dubugras.jpg");
+-- --------------------------------------------------------
 
--- ========================
--- TABELA: Tipo_Produtos
--- ========================
-CREATE TABLE Tipo_Produtos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    descricao VARCHAR(100) NOT NULL
-);
+--
+-- Estrutura da tabela `encomendas`
+--
 
-INSERT INTO Tipo_Produtos (descricao) VALUES
-('Roupa'),
-('Calçado'),
-('Acessórios'),
-('Beleza'),
-('Outros'),
-('Design'),
-('Artesanato');
+CREATE TABLE `encomendas` (
+  `id` int(11) NOT NULL,
+  `codigo_encomenda` varchar(50) DEFAULT NULL,
+  `cliente_id` int(11) DEFAULT NULL,
+  `anunciante_id` int(11) DEFAULT NULL,
+  `transportadora_id` int(11) DEFAULT NULL,
+  `produto_id` int(11) DEFAULT NULL,
+  `TipoProdutoNome` int(11) DEFAULT NULL,
+  `data_envio` date DEFAULT NULL,
+  `morada` varchar(250) DEFAULT NULL,
+  `estado` varchar(250) DEFAULT NULL,
+  `plano_rastreio` varchar(250) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ========================
--- TABELA: Produtos
--- ========================
-CREATE TABLE Produtos (
-    Produto_id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(150) NOT NULL,
-    tipo_produto_id INT,
-    preco DECIMAL(10,2),
-    foto VARCHAR(255),
-	genero VARCHAR(255),
-    anunciante_id INT,
-    designer_id INT DEFAULT NULL,
-    marca VARCHAR(30),
-    tamanho VARCHAR(30),
-    estado VARCHAR(20),
-    descricao VARCHAR(255),
-    data_criacao DATE DEFAULT (CURDATE()),
-    ativo BOOLEAN DEFAULT TRUE,
-    stock INT DEFAULT 1,
-    FOREIGN KEY (tipo_produto_id) REFERENCES Tipo_Produtos(id),
-    FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
-);
-INSERT INTO Produtos
-(nome, tipo_produto_id, preco, foto, genero, designer_id, anunciante_id, marca, tamanho, estado, descricao,ativo)
-VALUES
-('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', NULL, 1, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.',0),
-#('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', NULL, 3, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.',1),
-('Conjunto Blusa Saia', 1, 39.90, 'src/img/8d33d7eabd4faf7d5bf2305c7808e2b5.jpg', 'Mulher', NULL, 4, 'Custo Barcelona', 'S', 'Como Novo', 'Conjunto de Saia e Blusa Custo Barcelona, nunca usada.',1),
-('Calças de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', NULL, 1, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.',1),
-('Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', NULL, 3, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.',1),
-('Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', NULL, 1, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.',1),
-('Sweatshirt Billabong', 1, 23.80, 'src/img/6fa73f19c9a53d2c3d32f4c7e8d84300.jpg', 'Homem', NULL, 2, 'Billabong', 'M', 'Excelente', 'Sweatshirt Azul e Amarela da  Billabong, nunca usado.',1),
-('Leggings Yoga', 1, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', NULL, 3, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.',1),
-('Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', NULL, 2, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.',1),
-('Casaco Desportivo Nike', 1, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', NULL, 2, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.',1),
-('Sweatshirt North Face', 1, 18.00, 'src/img/northfacem.jpeg', 'Criança', NULL, 2, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.',1),
-('Vestido Florido', 1, 20.00, 'src/img/435e5ceb4782b9d64d6fd8f6b98b8c43.jpg', 'Criança', NULL, 4, 'Kiabi', '7 anos', 'Excelente', 'Vestido Florido com ganga da Kiabi nunca usada, com etiqueta.',1),
-('Botas Timbaland', 2, 26.00, 'src/img/TimberlandUnisexBoots.jpeg', 'Criança', NULL, 2, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.',1),
-('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', NULL, 2, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.',1),
-('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/AdidasMenSneakers.jpeg', 'Homem', NULL, 2, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.',1),
-('Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/1298bdfb53f943dc29132b4684dbb507.jpg', 'Mulher', NULL, 3, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.',1),
-('Creme Hidratante Nivea', 4, 29.90, 'src/img/b06b57ded4c5ded4bc7e600eada0649c.jpg', 'Mulher', NULL, 3, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea Edição Limitada de 2006 lacrado.',0),
-('Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src/img/s-l1200.webp', 'Homem', NULL, 2, 'Bose', 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.',1),
-('Calças de ganga Levis', 1, 19.00, 'src/img/LeviJeans.jpeg', 'Homem', NULL, 2, 'Levis', 'XL', 'Novo', 'Calças de gnaga Levis nunca usadas com etiqueta.',1),
-('Casaco Verde Pistachio', 1, 29.90, 'src/img/image.webp', 'Mulher', NULL, 3, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.',1),
-('Ténis Adidas Samba', 2, 69.90, 'src/img/f2e6b550dbf350fed5c1145c79d9224f.jpg', 'Mulher', NULL, 3, 'Adidas', '38', 'Novo', 'Tênis Rosa da Adidas Samba, novos na caixa.',1),
-('Calça de ganga em algodão', 1, 64.00, 'src/img/calcaboy.jpeg', 'Criança', NULL, 3, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.',1),
-('Aneis feito de colher', 3, 8.00, 'src/img/b3fc34c50a03f2eec63563fbd2e6efe9.jpg', 'Mulher', 1, 3, 'AnaCarfts', 'Tamanho Único', 'Novo', 'Aneis feita com colheres.', 1),
-('Colar Animal Edition', 3, 15.00, 'src/img/animalcross.jpeg', 'Mulher', 1, 4, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar com missangas coloridas e daltamata coleção Animal Cross.', 1),
-('Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 1, 5, 'MatildeMayer', 'Tamanho Único', 'Novo', 'Mala branca de missangas feita á mão.', 1),
-('Chocker Rosa', 3, 12.00, 'src/img/chocker.jpeg', 'Mulher', 1, 8, 'SolangeJewels', 'Tamanho Único', 'Novo', 'Chocker Rosa de missangas da coleção Fairytale.', 1),
-('T-shirt Cult Classic', 6, 25.00, 'src/img/ccult.jpeg', 'Homem', 1, 6, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', 1),
-('Copo Palhaço Ceramica', 7, 15.00, 'src/img/download (12).jpeg', 'Mulher', 1, 4, 'HeartKnows', 'Tamanho Único', 'Novo', 'Copo Palhaço de Ceramica.', 1),
-('Mala Chloe Paddigton', 5, 235.00, 'src/img/9e8e572724743ed9e7cea7a66c5aa07b.jpg', 'Mulher', NULL, 3, 'Chloe', 'Tamanho Único', 'Novo', 'Mala de couro castanha da Chloe Paddigton coleção 2005.',1);
+--
+-- Extraindo dados da tabela `encomendas`
+--
 
-CREATE TABLE Produto_Fotos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    produto_id INT NOT NULL,
-    foto VARCHAR(255) NOT NULL,
-    FOREIGN KEY (produto_id) REFERENCES Produtos(Produto_id) ON DELETE CASCADE
-);
-INSERT INTO Produto_Fotos (produto_id, foto) VALUES
-(1, 'src/img/m83296720182_6.avif'),
-(1, 'src/img/m83296720182_5.avif');
+INSERT INTO `encomendas` (`id`, `codigo_encomenda`, `cliente_id`, `anunciante_id`, `transportadora_id`, `produto_id`, `TipoProdutoNome`, `data_envio`, `morada`, `estado`, `plano_rastreio`) VALUES
+(1, 'WG12345', 2, 3, 1, 1, 1, '2025-12-06', 'Rua das Flores 15, Lisboa', 'Pendente', 'Básico'),
+(2, 'WG12346', 2, 3, 1, 2, 1, '2025-12-06', 'Av. do Mar 20, Porto', 'Entregue', 'Básico'),
+(3, 'WG12347', 7, 3, 2, 3, 2, '2025-12-06', 'Rua Central 12, Coimbra', 'Pendente', 'Básico'),
+(4, 'WG12352', 2, 3, 1, 4, 3, '2025-12-06', 'Rua Nova 8, Braga', 'Pendente', 'Básico'),
+(5, 'WG12353', 7, 3, 1, 5, 1, '2025-12-06', 'Av. das Oliveiras 30, Setúbal', 'Entregue', 'Básico'),
+(6, 'WG12348', 2, 1, 1, 6, 5, '2025-12-06', 'Rua Verde 5, Faro', 'Entregue', 'Avançado'),
+(7, 'WG12349', 7, 1, 2, 7, 4, '2025-12-06', 'Rua do Sol 40, Lisboa', 'Pendente', 'Avançado'),
+(8, 'WG12354', 2, 1, 2, 1, 1, '2025-12-06', 'Rua das Amendoeiras 22, Coimbra', 'Entregue', 'Avançado'),
+(9, 'WG12350', 2, 4, 1, 2, 1, '2025-12-06', 'Av. dos Descobrimentos 50, Aveiro', 'Entregue', 'Básico'),
+(10, 'WG12351', 7, 4, 2, 3, 2, '2025-12-06', 'Rua dos Cedros 18, Leiria', 'Cancelada', 'Básico'),
+(11, 'WG12355', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'Pendente', 'Básico');
 
--- ========================
--- TABELA: Carrinho_Itens
--- ========================
-CREATE TABLE Carrinho_Itens(
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    utilizador_id INT NOT NULL,
-    produto_id INT NOT NULL,
-    quantidade INT DEFAULT 1 CHECK (quantidade > 0),
-    data_adicao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (utilizador_id) REFERENCES Utilizadores(id) ON DELETE CASCADE,
-    FOREIGN KEY (produto_id) REFERENCES Produtos(Produto_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_product (utilizador_id, produto_id)
-);
+-- --------------------------------------------------------
 
-INSERT INTO Carrinho_Itens (utilizador_id, produto_id, quantidade) VALUES
-(1, 1, 1),
-(1, 2, 1),
-(1, 3, 1),
-(1, 4, 1),
-(1, 5, 1),
-(1, 6, 1),
-(1, 7, 2);
+--
+-- Estrutura da tabela `fornecedores`
+--
 
--- ========================
--- TABELA: Mensagens
--- ========================
-CREATE TABLE Mensagens (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    remetente_id INT,
-    destinatario_id INT,
-    produto_id INT,
-    mensagem TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (remetente_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (destinatario_id) REFERENCES Utilizadores(id),
-	FOREIGN KEY (produto_id) REFERENCES Produtos(produto_id)
-);
+CREATE TABLE `fornecedores` (
+  `id` int(11) NOT NULL,
+  `nome` varchar(250) DEFAULT NULL,
+  `descricao` varchar(250) DEFAULT NULL,
+  `tipo_produtos_id` int(11) NOT NULL,
+  `email` varchar(250) DEFAULT NULL,
+  `telefone` varchar(250) DEFAULT NULL,
+  `morada` varchar(250) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO Mensagens (remetente_id, destinatario_id, mensagem)
-VALUES
-(3, 2, 'Olá João! O seu pedido já foi enviado.');
+--
+-- Extraindo dados da tabela `fornecedores`
+--
 
-INSERT INTO Mensagens (remetente_id, destinatario_id, produto_id,mensagem)
-VALUES
-(1, 3, 5,'Olá eu sou a Luiza');
+INSERT INTO `fornecedores` (`id`, `nome`, `descricao`, `tipo_produtos_id`, `email`, `telefone`, `morada`) VALUES
+(1, 'ModaCenter', 'Fornecedor de vestuário masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
+(2, 'FootWorld', 'Fornecedor de sapatilhas e calçado desportivo', 2, 'info@footworld.pt', '934567890', 'Av. Central 45, Porto'),
+(3, 'AccessoriArt', 'Fornecedor de bijuteria e acessórios de moda', 3, 'suporte@accessoriart.com', '965432187', 'Rua do Comércio 22, Braga'),
+(4, 'BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
+(5, 'MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
 
--- ========================
--- TABELA: Rendimento
--- ========================
-CREATE TABLE Rendimento (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    valor DECIMAL(10,2),
-    anunciante_id int,
-	descricao TEXT,
-    data_registo TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
-);
-INSERT INTO Rendimento (anunciante_id, valor,descricao)
-VALUES
-(3, 25,"Premium comprado!"),
-(4, 100,"Enterprize comprado!"),
-(5, 25,"Premium comprado!"),
-(null, 5,"Comissão cobrada!");
+-- --------------------------------------------------------
 
--- ========================
--- TABELA: Gastos
--- ========================
-CREATE TABLE Gastos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    anunciante_id INT,
-    valor DECIMAL(10,2),
-    descricao TEXT,
-    data_registo DATE DEFAULT (CURDATE()),
-    FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
-);
+--
+-- Estrutura da tabela `gastos`
+--
 
-INSERT INTO Gastos (anunciante_id, valor, descricao)
-VALUES (3, 50.00, 'Publicidade online');
+CREATE TABLE `gastos` (
+  `id` int(11) NOT NULL,
+  `anunciante_id` int(11) DEFAULT NULL,
+  `valor` decimal(10,2) DEFAULT NULL,
+  `descricao` text DEFAULT NULL,
+  `data_registo` date DEFAULT curdate()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `gastos`
+--
 
--- ========================
--- TABELA: Transportadora
--- ========================
-CREATE TABLE Transportadora (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome ENUM('CTT', 'DPD') NOT NULL
-);
+INSERT INTO `gastos` (`id`, `anunciante_id`, `valor`, `descricao`, `data_registo`) VALUES
+(1, 3, 50.00, 'Publicidade online', '2025-12-06');
 
-INSERT INTO Transportadora (nome) VALUES
-('CTT'),
-('DPD');
+-- --------------------------------------------------------
 
--- ========================
--- TABELA: Encomendas
--- ========================
-CREATE TABLE Encomendas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    codigo_encomenda VARCHAR(50) UNIQUE,
-    cliente_id INT,
-    anunciante_id INT,
-    transportadora_id INT,
-    produto_id int,
-    TipoProdutoNome int,
-    data_envio DATE,
-    morada varchar(250),
-    estado VARCHAR(250),
-    plano_rastreio VARCHAR(250),
-    FOREIGN KEY (cliente_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (produto_id) REFERENCES Produtos(Produto_id),
-    FOREIGN KEY (transportadora_id) REFERENCES Transportadora(id),
-    FOREIGN KEY (TipoProdutoNome) REFERENCES Tipo_Produtos(id)
-);
-INSERT INTO Encomendas
-(codigo_encomenda, cliente_id, anunciante_id, transportadora_id, produto_id, TipoProdutoNome, data_envio, morada, estado, plano_rastreio)
-VALUES
-('WG12345', 2, 3, 1, 1, 1, CURDATE(), 'Rua das Flores 15, Lisboa', 'Pendente', 'Básico'),
-('WG12346', 2, 3, 1, 2, 1, CURDATE(), 'Av. do Mar 20, Porto', 'Entregue', 'Básico'),
-('WG12347', 7, 3, 2, 3, 2, CURDATE(), 'Rua Central 12, Coimbra', 'Pendente', 'Básico'),
-('WG12352', 2, 3, 1, 4, 3, CURDATE(), 'Rua Nova 8, Braga', 'Pendente', 'Básico'),
-('WG12353', 7, 3, 1, 5, 1, CURDATE(), 'Av. das Oliveiras 30, Setúbal', 'Entregue', 'Básico'),
-('WG12348', 2, 1, 1, 6, 5, CURDATE(), 'Rua Verde 5, Faro', 'Entregue', 'Avançado'),
-('WG12349', 7, 1, 2, 7, 4, CURDATE(), 'Rua do Sol 40, Lisboa', 'Pendente', 'Avançado'),
-('WG12354', 2, 1, 2, 1, 1, CURDATE(), 'Rua das Amendoeiras 22, Coimbra', 'Entregue', 'Avançado'),
-('WG12350', 2, 4, 1, 2, 1, CURDATE(), 'Av. dos Descobrimentos 50, Aveiro', 'Entregue', 'Básico'),
-('WG12351', 7, 4, 2, 3, 2, CURDATE(), 'Rua dos Cedros 18, Leiria', 'Cancelada', 'Básico'),
-('WG12355', 7, 4, 1, 4, 3, CURDATE(), 'Rua da Alegria 7, Viseu', 'Pendente', 'Básico');
+--
+-- Estrutura da tabela `historico_produtos`
+--
 
--- ========================
--- TABELA: Denuncias
--- ========================
-CREATE TABLE Denuncias (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    denunciante_id INT,
-    denunciado_id INT,
-    descricao TEXT,
-    imagem_anexo VARCHAR(255),
-    estado VARCHAR(250) DEFAULT 'Pendente',
-    data_registo DATE DEFAULT (CURDATE()),
-    FOREIGN KEY (denunciante_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (denunciado_id) REFERENCES Utilizadores(id)
-);
+CREATE TABLE `historico_produtos` (
+  `id` int(11) NOT NULL,
+  `encomenda_id` int(11) DEFAULT NULL,
+  `estado_encomenda` varchar(250) DEFAULT 'Pendente',
+  `descricao` text DEFAULT NULL,
+  `data_atualizacao` date DEFAULT curdate()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `historico_produtos`
+--
 
+INSERT INTO `historico_produtos` (`id`, `encomenda_id`, `estado_encomenda`, `descricao`, `data_atualizacao`) VALUES
+(1, 2, 'Entregue', 'Produto entregue ao cliente.', '2025-12-06'),
+(2, 3, 'Em trânsito', 'Produto enviado pela transportadora.', '2025-12-06'),
+(3, 4, 'Entregue', 'Entrega concluída.', '2025-12-06'),
+(4, 5, 'Pendente', 'Aguardando envio.', '2025-12-06'),
+(5, 6, 'Entregue', 'Venda finalizada com sucesso.', '2025-12-06'),
+(6, 7, 'Cancelada', 'Encomenda cancelada pelo cliente.', '2025-12-06'),
+(7, 8, 'Em trânsito', 'Produto saiu do armazém.', '2025-12-06'),
+(8, 9, 'Entregue', 'Cliente recebeu o produto.', '2025-12-06'),
+(9, 10, 'Entregue', 'Envio concluído.', '2025-12-06'),
+(10, 11, 'Pendente', 'Aguardando confirmação de pagamento.', '2025-12-06');
 
--- ========================
--- TABELA: Historico_Produtos
--- ========================
-CREATE TABLE Historico_Produtos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    encomenda_id INT,
-    estado_encomenda VARCHAR(250) DEFAULT 'Pendente',
-    descricao TEXT,
-    data_atualizacao DATE DEFAULT (CURDATE()),
-    FOREIGN KEY (encomenda_id) REFERENCES Encomendas(id)
-);
-INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao)
-VALUES
-(2, 'Entregue', 'Produto entregue ao cliente.'),
-(3, 'Em trânsito', 'Produto enviado pela transportadora.'),
-(4, 'Entregue', 'Entrega concluída.'),
-(5, 'Pendente', 'Aguardando envio.'),
-(6, 'Entregue', 'Venda finalizada com sucesso.'),
-(7, 'Cancelada', 'Encomenda cancelada pelo cliente.'),
-(8, 'Em trânsito', 'Produto saiu do armazém.'),
-(9, 'Entregue', 'Cliente recebeu o produto.'),
-(10, 'Entregue', 'Envio concluído.'),
-(11, 'Pendente', 'Aguardando confirmação de pagamento.');
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `mensagens`
+--
+
+CREATE TABLE `mensagens` (
+  `id` int(11) NOT NULL,
+  `remetente_id` int(11) DEFAULT NULL,
+  `destinatario_id` int(11) DEFAULT NULL,
+  `produto_id` int(11) DEFAULT NULL,
+  `mensagem` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `mensagens`
+--
+
+INSERT INTO `mensagens` (`id`, `remetente_id`, `destinatario_id`, `produto_id`, `mensagem`, `created_at`, `updated_at`) VALUES
+(1, 3, 2, NULL, 'Olá João! O seu pedido já foi enviado.', '2025-12-06 19:18:55', '2025-12-06 19:18:55'),
+(2, 1, 3, 5, 'Olá eu sou a Luiza', '2025-12-06 19:18:55', '2025-12-06 19:18:55');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `mensagensadmin`
+--
+
+CREATE TABLE `mensagensadmin` (
+  `id` int(11) NOT NULL,
+  `remetente_id` int(11) DEFAULT NULL,
+  `destinatario_id` int(11) DEFAULT NULL,
+  `mensagem` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `mensagensadmin`
+--
+
+INSERT INTO `mensagensadmin` (`id`, `remetente_id`, `destinatario_id`, `mensagem`, `created_at`, `updated_at`) VALUES
+(1, 2, 1, 'Olá João! O seu pedido já foi enviado.', '2025-12-16 22:56:09', '2025-12-16 22:56:09');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `planos`
+--
+
+CREATE TABLE `planos` (
+  `id` int(11) NOT NULL,
+  `nome` varchar(200) NOT NULL,
+  `preco` decimal(10,2) DEFAULT NULL,
+  `limite_produtos` int(11) DEFAULT NULL,
+  `rastreio_tipo` varchar(200) NOT NULL,
+  `relatorio_pdf` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `planos`
+--
+
+INSERT INTO `planos` (`id`, `nome`, `preco`, `limite_produtos`, `rastreio_tipo`, `relatorio_pdf`) VALUES
+(1, 'Plano Essencial Verde', 0.00, 5, 'Basico', 0),
+(2, 'Plano Crescimento Circular', 25.00, 10, 'Basico', 1),
+(3, 'Plano Profissional Eco+', 100.00, NULL, 'Avancado', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `planos_ativos`
+--
+
+CREATE TABLE `planos_ativos` (
+  `id` int(11) NOT NULL,
+  `anunciante_id` int(11) NOT NULL,
+  `plano_id` int(11) NOT NULL,
+  `data_inicio` date DEFAULT curdate(),
+  `data_fim` date DEFAULT NULL,
+  `ativo` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `planos_ativos`
+--
+
+INSERT INTO `planos_ativos` (`id`, `anunciante_id`, `plano_id`, `data_inicio`, `data_fim`, `ativo`) VALUES
+(1, 3, 2, '2025-12-06', NULL, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `produtos`
+--
+
+CREATE TABLE `produtos` (
+  `Produto_id` int(11) NOT NULL,
+  `nome` varchar(150) NOT NULL,
+  `tipo_produto_id` int(11) DEFAULT NULL,
+  `preco` decimal(10,2) DEFAULT NULL,
+  `foto` varchar(255) DEFAULT NULL,
+  `genero` varchar(255) DEFAULT NULL,
+  `anunciante_id` int(11) DEFAULT NULL,
+  `designer_id` int(11) DEFAULT NULL,
+  `marca` varchar(30) DEFAULT NULL,
+  `tamanho` varchar(30) DEFAULT NULL,
+  `estado` varchar(20) DEFAULT NULL,
+  `descricao` varchar(255) DEFAULT NULL,
+  `data_criacao` date DEFAULT curdate(),
+  `ativo` tinyint(1) DEFAULT 1,
+  `stock` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `produtos`
+--
+
+INSERT INTO `produtos` (`Produto_id`, `nome`, `tipo_produto_id`, `preco`, `foto`, `genero`, `anunciante_id`, `designer_id`, `marca`, `tamanho`, `estado`, `descricao`, `data_criacao`, `ativo`, `stock`) VALUES
+(1, 'Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', 1, NULL, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.', '2025-12-06', 1, 0),
+(2, 'Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, NULL, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.', '2025-12-06', 1, 10),
+(3, 'Calças de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', 1, NULL, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.', '2025-12-06', 1, 10),
+(4, 'Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', 3, NULL, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.', '2025-12-06', 0, 10),
+(5, 'Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', 1, NULL, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.', '2025-12-06', 1, 10),
+(6, 'Sweatshirt Billabong', 1, 23.80, 'src/img/6fa73f19c9a53d2c3d32f4c7e8d84300.jpg', 'Homem', 2, NULL, 'Billabong', 'M', 'Excelente', 'Sweatshirt Azul e Amarela da  Billabong, nunca usado.', '2025-12-06', 1, 10),
+(7, 'Leggings Yoga', 1, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', 3, NULL, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.', '2025-12-06', 0, 10),
+(8, 'Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', 2, NULL, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.', '2025-12-06', 1, 10),
+(9, 'Casaco Desportivo Nike', 1, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', 2, NULL, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.', '2025-12-06', 1, 10),
+(10, 'Sweatshirt North Face', 1, 18.00, 'src/img/northface.webp', 'Criança', 2, NULL, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.', '2025-12-06', 1, 10),
+(11, 'Botas Timbaland', 2, 26.00, 'src/img/image66.webp', 'Criança', 3, NULL, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.', '2025-12-06', 0, 10),
+(12, 'Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', 2, NULL, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.', '2025-12-06', 1, 10),
+(13, 'Tênis Adidas UltraBoost', 2, 249.99, 'src/img/Adidas Ultraboost Light - lateral 2.jpg', 'Homem', 2, NULL, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.', '2025-12-06', 1, 10),
+(14, 'Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/1298bdfb53f943dc29132b4684dbb507.jpg', 'Mulher', 3, NULL, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.', '2025-12-06', 0, 10),
+(15, 'Creme Hidratante Nivea', 4, 29.90, 'src/img/b06b57ded4c5ded4bc7e600eada0649c.jpg', 'Mulher', 3, NULL, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea Edição Limitada de 2006 lacrado.', '2025-12-06', 0, 0),
+(16, 'Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src/img/s-l1200.webp', 'Homem', 2, NULL, 'Bose', 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.', '2025-12-06', 1, 10),
+(17, 'Calças de ganga Levis', 1, 19.00, 'src/img/63ee2e61813747ba02e97868eb523680.jpg', 'Homem', 2, NULL, 'Levis', 'XL', 'Novo', 'Calças de gnaga Levis nunca usadas com etiqueta.', '2025-12-06', 1, 10),
+(18, 'Casaco Verde Pistachio', 1, 29.90, 'src/img/image.webp', 'Mulher', 3, NULL, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.', '2025-12-06', 0, 10),
+(19, 'Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', 3, NULL, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.', '2025-12-06', 0, 10),
+(20, 'Calça de ganga em algodão', 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', 3, NULL, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.', '2025-12-06', 0, 10),
+(22, 'Colar Animal Edition', 3, 15.00, 'src/img/animalcross.jpeg', 'Mulher', 4, 1, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar com missangas coloridas e daltamata coleção Animal Cross.', '2025-12-06', 1, 10),
+(23, 'Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 5, 1, 'MatildeMayer', 'Tamanho Único', 'Novo', 'Mala branca de missangas feita á mão.', '2025-12-06', 1, 10),
+(24, 'Colar Cruz', 3, 12.00, 'src/img/cora-pursley-dupe.jpeg', 'Mulher', 8, 1, 'SolangeJewels', 'Tamanho Único', 'Novo', 'Colar com cruz.', '2025-12-06', 1, 10),
+(25, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10),
+(26, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `produto_fotos`
+--
+
+CREATE TABLE `produto_fotos` (
+  `id` int(11) NOT NULL,
+  `produto_id` int(11) NOT NULL,
+  `foto` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `produto_fotos`
+--
+
+INSERT INTO `produto_fotos` (`id`, `produto_id`, `foto`) VALUES
+(1, 1, 'src/img/m83296720182_6.avif'),
+(2, 1, 'src/img/m83296720182_5.avif');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `ranking`
+--
+
+CREATE TABLE `ranking` (
+  `id` int(11) NOT NULL,
+  `nome` varchar(250) DEFAULT NULL,
+  `pontos` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `ranking`
+--
+
+INSERT INTO `ranking` (`id`, `nome`, `pontos`) VALUES
+(1, 'Bronze', 0),
+(2, 'Ouro', 50),
+(3, 'Diamante', 150);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `rendimento`
+--
+
+CREATE TABLE `rendimento` (
+  `id` int(11) NOT NULL,
+  `valor` decimal(10,2) DEFAULT NULL,
+  `anunciante_id` int(11) DEFAULT NULL,
+  `descricao` text DEFAULT NULL,
+  `data_registo` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `rendimento`
+--
+
+INSERT INTO `rendimento` (`id`, `valor`, `anunciante_id`, `descricao`, `data_registo`) VALUES
+(1, 25.00, 3, 'Premium comprado!', '2025-12-06 19:18:55'),
+(2, 100.00, 4, 'Enterprize comprado!', '2025-12-06 19:18:55'),
+(3, 25.00, 5, 'Premium comprado!', '2025-12-06 19:18:55'),
+(4, 5.00, NULL, 'Comissão cobrada!', '2025-12-06 19:18:55');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `tipo_produtos`
+--
+
+CREATE TABLE `tipo_produtos` (
+  `id` int(11) NOT NULL,
+  `descricao` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `tipo_produtos`
+--
+
+INSERT INTO `tipo_produtos` (`id`, `descricao`) VALUES
+(1, 'Roupa'),
+(2, 'Calçado'),
+(3, 'Acessórios'),
+(4, 'Beleza'),
+(5, 'Outros'),
+(6, 'Artesanato');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `tipo_utilizadores`
+--
+
+CREATE TABLE `tipo_utilizadores` (
+  `id` int(11) NOT NULL,
+  `descricao` varchar(250) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `tipo_utilizadores`
+--
+
+INSERT INTO `tipo_utilizadores` (`id`, `descricao`) VALUES
+(1, 'Administrador'),
+(2, 'Cliente'),
+(3, 'Anunciante');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `transportadora`
+--
+
+CREATE TABLE `transportadora` (
+  `id` int(11) NOT NULL,
+  `nome` enum('CTT','DPD') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `transportadora`
+--
+
+INSERT INTO `transportadora` (`id`, `nome`) VALUES
+(1, 'CTT'),
+(2, 'DPD');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `utilizadores`
+--
+
+CREATE TABLE `utilizadores` (
+  `id` int(11) NOT NULL,
+  `nome` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `nif` varchar(20) DEFAULT NULL,
+  `telefone` varchar(50) DEFAULT NULL,
+  `morada` varchar(255) DEFAULT NULL,
+  `foto` varchar(250) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `tipo_utilizador_id` int(11) DEFAULT NULL,
+  `plano_id` int(11) DEFAULT NULL,
+  `ranking_id` int(11) DEFAULT NULL,
+  `pontos_conf` int(11) DEFAULT 0,
+  `data_criacao` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `utilizadores`
+--
+
+INSERT INTO `utilizadores` (`id`, `nome`, `email`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`) VALUES
+(1, 'Admin WeGreen', 'admin@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 3, 3, 200, NULL),
+(2, 'João Silva', 'joao@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL),
+(3, 'Maria Santos', 'maria@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 2, 2, 75, NULL),
+(4, 'Maria Luiza', 'Luiza@wegreen.pt', NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 3, 3, 54, NULL),
+(5, 'Matilde Mayer', 'Matilde@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 2, 3, 350, NULL),
+(6, 'Carlos Pereira', 'Carlos@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 3, 98, NULL),
+(7, 'Mango', 'mango@wegreen.pt', NULL, NULL, NULL, 'src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg', 'mango123', 2, 1, 1, 10, NULL),
+(8, 'Solange Jewels', 'Solange@wegreen.pt', NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 2, 3, 350, NULL);
+
+-- --------------------------------------------------------
 
 --
 -- Estrutura da tabela `vendas`
@@ -361,55 +493,377 @@ INSERT INTO `vendas` (`id`, `encomenda_id`, `anunciante_id`, `produto_id`, `quan
 (6, NULL, 3, 1, 2, 100.00, 20.00, '2025-12-08'),
 (7, NULL, 3, 2, 1, 50.00, 10.00, '2025-12-07');
 
-CREATE TABLE Planos_Ativos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    anunciante_id INT NOT NULL,
-    plano_id INT NOT NULL,
-    data_inicio DATE DEFAULT (CURDATE()),
-    data_fim DATE,
-    ativo BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (plano_id) REFERENCES Planos(id)
-);
-INSERT INTO Planos_Ativos (anunciante_id, plano_id, data_inicio, ativo)
-VALUES (3, 2, CURDATE(), TRUE);
+--
+-- Índices para tabelas despejadas
+--
 
-CREATE TABLE Fornecedores (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome varchar(250),
-    descricao varchar(250),
-    tipo_produtos_id INT NOT NULL,
-    email varchar(250),
-    telefone varchar(250),
-    morada varchar(250),
-    FOREIGN KEY (tipo_produtos_id) REFERENCES tipo_produtos(id)
-);
-INSERT INTO Fornecedores (nome, descricao, tipo_produtos_id, email, telefone, morada) VALUES
-('ModaCenter', 'Fornecedor de vestuário masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
+--
+-- Índices para tabela `carrinho_itens`
+--
+ALTER TABLE `carrinho_itens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_product` (`utilizador_id`,`produto_id`),
+  ADD KEY `produto_id` (`produto_id`);
 
-('FootWorld', 'Fornecedor de sapatilhas e calçado desportivo', 2, 'info@footworld.pt', '934567890', 'Av. Central 45, Porto'),
+--
+-- Índices para tabela `denuncias`
+--
+ALTER TABLE `denuncias`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `denunciante_id` (`denunciante_id`),
+  ADD KEY `denunciado_id` (`denunciado_id`);
 
-('AccessoriArt', 'Fornecedor de bijuteria e acessórios de moda', 3, 'suporte@accessoriart.com', '965432187', 'Rua do Comércio 22, Braga'),
+--
+-- Índices para tabela `encomendas`
+--
+ALTER TABLE `encomendas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo_encomenda` (`codigo_encomenda`),
+  ADD KEY `cliente_id` (`cliente_id`),
+  ADD KEY `anunciante_id` (`anunciante_id`),
+  ADD KEY `produto_id` (`produto_id`),
+  ADD KEY `transportadora_id` (`transportadora_id`),
+  ADD KEY `TipoProdutoNome` (`TipoProdutoNome`);
 
-('BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
+--
+-- Índices para tabela `fornecedores`
+--
+ALTER TABLE `fornecedores`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `tipo_produtos_id` (`tipo_produtos_id`);
 
-('MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
+--
+-- Índices para tabela `gastos`
+--
+ALTER TABLE `gastos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `anunciante_id` (`anunciante_id`);
 
-CREATE TABLE MensagensAdmin (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    remetente_id INT,
-    destinatario_id INT,
-    mensagem TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (remetente_id) REFERENCES Utilizadores(id),
-    FOREIGN KEY (destinatario_id) REFERENCES Utilizadores(id)
-);
+--
+-- Índices para tabela `historico_produtos`
+--
+ALTER TABLE `historico_produtos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `encomenda_id` (`encomenda_id`);
 
-INSERT INTO MensagensAdmin (remetente_id, destinatario_id, mensagem)
-VALUES
-(2, 1, 'Olá João! O seu pedido já foi enviado.');
+--
+-- Índices para tabela `mensagens`
+--
+ALTER TABLE `mensagens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `remetente_id` (`remetente_id`),
+  ADD KEY `destinatario_id` (`destinatario_id`),
+  ADD KEY `produto_id` (`produto_id`);
 
-INSERT INTO MensagensAdmin (remetente_id, destinatario_id,mensagem)
-VALUES
-(1, 2, 'Olá eu sou a Luiza');
+--
+-- Índices para tabela `mensagensadmin`
+--
+ALTER TABLE `mensagensadmin`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `remetente_id` (`remetente_id`),
+  ADD KEY `destinatario_id` (`destinatario_id`);
+
+--
+-- Índices para tabela `planos`
+--
+ALTER TABLE `planos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `planos_ativos`
+--
+ALTER TABLE `planos_ativos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `anunciante_id` (`anunciante_id`),
+  ADD KEY `plano_id` (`plano_id`);
+
+--
+-- Índices para tabela `produtos`
+--
+ALTER TABLE `produtos`
+  ADD PRIMARY KEY (`Produto_id`),
+  ADD KEY `tipo_produto_id` (`tipo_produto_id`),
+  ADD KEY `anunciante_id` (`anunciante_id`);
+
+--
+-- Índices para tabela `produto_fotos`
+--
+ALTER TABLE `produto_fotos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `produto_id` (`produto_id`);
+
+--
+-- Índices para tabela `ranking`
+--
+ALTER TABLE `ranking`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `rendimento`
+--
+ALTER TABLE `rendimento`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `anunciante_id` (`anunciante_id`);
+
+--
+-- Índices para tabela `tipo_produtos`
+--
+ALTER TABLE `tipo_produtos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `tipo_utilizadores`
+--
+ALTER TABLE `tipo_utilizadores`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `transportadora`
+--
+ALTER TABLE `transportadora`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices para tabela `utilizadores`
+--
+ALTER TABLE `utilizadores`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `ranking_id` (`ranking_id`),
+  ADD KEY `tipo_utilizador_id` (`tipo_utilizador_id`),
+  ADD KEY `plano_id` (`plano_id`);
+
+--
+-- Índices para tabela `vendas`
+--
+ALTER TABLE `vendas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `encomenda_id` (`encomenda_id`),
+  ADD KEY `anunciante_id` (`anunciante_id`),
+  ADD KEY `produto_id` (`produto_id`);
+
+--
+-- AUTO_INCREMENT de tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `carrinho_itens`
+--
+ALTER TABLE `carrinho_itens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT de tabela `denuncias`
+--
+ALTER TABLE `denuncias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `encomendas`
+--
+ALTER TABLE `encomendas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de tabela `fornecedores`
+--
+ALTER TABLE `fornecedores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de tabela `gastos`
+--
+ALTER TABLE `gastos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `historico_produtos`
+--
+ALTER TABLE `historico_produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT de tabela `mensagens`
+--
+ALTER TABLE `mensagens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `mensagensadmin`
+--
+ALTER TABLE `mensagensadmin`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `planos`
+--
+ALTER TABLE `planos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `planos_ativos`
+--
+ALTER TABLE `planos_ativos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `produtos`
+--
+ALTER TABLE `produtos`
+  MODIFY `Produto_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+
+--
+-- AUTO_INCREMENT de tabela `produto_fotos`
+--
+ALTER TABLE `produto_fotos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de tabela `ranking`
+--
+ALTER TABLE `ranking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `rendimento`
+--
+ALTER TABLE `rendimento`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de tabela `tipo_produtos`
+--
+ALTER TABLE `tipo_produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de tabela `tipo_utilizadores`
+--
+ALTER TABLE `tipo_utilizadores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `transportadora`
+--
+ALTER TABLE `transportadora`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `utilizadores`
+--
+ALTER TABLE `utilizadores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT de tabela `vendas`
+--
+ALTER TABLE `vendas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- Restrições para despejos de tabelas
+--
+
+--
+-- Limitadores para a tabela `carrinho_itens`
+--
+ALTER TABLE `carrinho_itens`
+  ADD CONSTRAINT `carrinho_itens_ibfk_1` FOREIGN KEY (`utilizador_id`) REFERENCES `utilizadores` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `carrinho_itens_ibfk_2` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`) ON DELETE CASCADE;
+
+--
+-- Limitadores para a tabela `denuncias`
+--
+ALTER TABLE `denuncias`
+  ADD CONSTRAINT `denuncias_ibfk_1` FOREIGN KEY (`denunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `denuncias_ibfk_2` FOREIGN KEY (`denunciado_id`) REFERENCES `utilizadores` (`id`);
+
+--
+-- Limitadores para a tabela `encomendas`
+--
+ALTER TABLE `encomendas`
+  ADD CONSTRAINT `encomendas_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `encomendas_ibfk_2` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `encomendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`),
+  ADD CONSTRAINT `encomendas_ibfk_4` FOREIGN KEY (`transportadora_id`) REFERENCES `transportadora` (`id`),
+  ADD CONSTRAINT `encomendas_ibfk_5` FOREIGN KEY (`TipoProdutoNome`) REFERENCES `tipo_produtos` (`id`);
+
+--
+-- Limitadores para a tabela `fornecedores`
+--
+ALTER TABLE `fornecedores`
+  ADD CONSTRAINT `fornecedores_ibfk_1` FOREIGN KEY (`tipo_produtos_id`) REFERENCES `tipo_produtos` (`id`);
+
+--
+-- Limitadores para a tabela `gastos`
+--
+ALTER TABLE `gastos`
+  ADD CONSTRAINT `gastos_ibfk_1` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`);
+
+--
+-- Limitadores para a tabela `historico_produtos`
+--
+ALTER TABLE `historico_produtos`
+  ADD CONSTRAINT `historico_produtos_ibfk_1` FOREIGN KEY (`encomenda_id`) REFERENCES `encomendas` (`id`);
+
+--
+-- Limitadores para a tabela `mensagens`
+--
+ALTER TABLE `mensagens`
+  ADD CONSTRAINT `mensagens_ibfk_1` FOREIGN KEY (`remetente_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `mensagens_ibfk_2` FOREIGN KEY (`destinatario_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `mensagens_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`);
+
+--
+-- Limitadores para a tabela `mensagensadmin`
+--
+ALTER TABLE `mensagensadmin`
+  ADD CONSTRAINT `mensagensadmin_ibfk_1` FOREIGN KEY (`remetente_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `mensagensadmin_ibfk_2` FOREIGN KEY (`destinatario_id`) REFERENCES `utilizadores` (`id`);
+
+--
+-- Limitadores para a tabela `planos_ativos`
+--
+ALTER TABLE `planos_ativos`
+  ADD CONSTRAINT `planos_ativos_ibfk_1` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `planos_ativos_ibfk_2` FOREIGN KEY (`plano_id`) REFERENCES `planos` (`id`);
+
+--
+-- Limitadores para a tabela `produtos`
+--
+ALTER TABLE `produtos`
+  ADD CONSTRAINT `produtos_ibfk_1` FOREIGN KEY (`tipo_produto_id`) REFERENCES `tipo_produtos` (`id`),
+  ADD CONSTRAINT `produtos_ibfk_2` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`);
+
+--
+-- Limitadores para a tabela `produto_fotos`
+--
+ALTER TABLE `produto_fotos`
+  ADD CONSTRAINT `produto_fotos_ibfk_1` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`) ON DELETE CASCADE;
+
+--
+-- Limitadores para a tabela `rendimento`
+--
+ALTER TABLE `rendimento`
+  ADD CONSTRAINT `rendimento_ibfk_1` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`);
+
+--
+-- Limitadores para a tabela `utilizadores`
+--
+ALTER TABLE `utilizadores`
+  ADD CONSTRAINT `utilizadores_ibfk_1` FOREIGN KEY (`ranking_id`) REFERENCES `ranking` (`id`),
+  ADD CONSTRAINT `utilizadores_ibfk_2` FOREIGN KEY (`tipo_utilizador_id`) REFERENCES `tipo_utilizadores` (`id`),
+  ADD CONSTRAINT `utilizadores_ibfk_3` FOREIGN KEY (`plano_id`) REFERENCES `planos` (`id`);
+
+--
+-- Limitadores para a tabela `vendas`
+--
+ALTER TABLE `vendas`
+  ADD CONSTRAINT `vendas_ibfk_1` FOREIGN KEY (`encomenda_id`) REFERENCES `encomendas` (`id`),
+  ADD CONSTRAINT `vendas_ibfk_2` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `vendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

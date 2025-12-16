@@ -405,15 +405,91 @@ class DashboardAnunciante {
         return "Produto atualizado";
     }
 
-    function insertProduto($nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id) {
+    function insertProduto($nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $fotos = []) {
         global $conn;
-        $sql = "INSERT INTO Produtos (nome, tipo_produto_id, preco, stock, marca, tamanho, estado, genero, descricao, anunciante_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Inserir o produto principal
+        $foto_principal = !empty($fotos) ? $fotos[0] : '';
+        $ativo = 1;
+
+        $sql = "INSERT INTO Produtos (nome, tipo_produto_id, preco, stock, marca, tamanho, estado, genero, descricao, anunciante_id, foto, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sidisssssi", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id);
+
+        if (!$stmt) {
+            error_log('Erro ao preparar statement INSERT Produtos: ' . $conn->error);
+            return "Erro ao preparar inserção do produto";
+        }
+
+        $stmt->bind_param("sidisssssisi", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $foto_principal, $ativo);
+
+        if (!$stmt->execute()) {
+            error_log('Erro ao executar INSERT Produtos: ' . $stmt->error);
+            $stmt->close();
+            return "Erro ao inserir produto: " . $stmt->error;
+        }
+
+        $produto_id = $conn->insert_id;
+        $stmt->close();
+
+        // Se houver mais fotos, adicionar à tabela Produto_Fotos
+        if (count($fotos) > 1) {
+            $sqlFotos = "INSERT INTO Produto_Fotos (produto_id, foto) VALUES (?, ?)";
+            $stmtFotos = $conn->prepare($sqlFotos);
+            if ($stmtFotos) {
+                for ($i = 1; $i < count($fotos); $i++) {
+                    $stmtFotos->bind_param("is", $produto_id, $fotos[$i]);
+                    $stmtFotos->execute();
+                }
+                $stmtFotos->close();
+            }
+        }
+
+        return "Produto adicionado com sucesso";
+    }
+
+    function atualizarProduto($id, $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $fotos = []) {
+        global $conn;
+
+        // Se houver novas fotos, atualizar a foto principal
+        if (!empty($fotos)) {
+            $foto_principal = $fotos[0];
+            $sql = "UPDATE Produtos SET nome = ?, tipo_produto_id = ?, preco = ?, stock = ?, marca = ?, tamanho = ?, estado = ?, genero = ?, descricao = ?, foto = ? WHERE Produto_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sidissssssi", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $foto_principal, $id);
+        } else {
+            // Sem novas fotos, atualizar apenas outros campos
+            $sql = "UPDATE Produtos SET nome = ?, tipo_produto_id = ?, preco = ?, stock = ?, marca = ?, tamanho = ?, estado = ?, genero = ?, descricao = ? WHERE Produto_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sidisssssi", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $id);
+        }
+
         $stmt->execute();
         $stmt->close();
 
-        return "Produto adicionado";
+        // Se houver múltiplas fotos novas, atualizar tabela de fotos adicionais
+        if (count($fotos) > 1) {
+            // Remover fotos antigas
+            $sqlDelete = "DELETE FROM Produto_Fotos WHERE produto_id = ?";
+            $stmtDelete = $conn->prepare($sqlDelete);
+            if ($stmtDelete) {
+                $stmtDelete->bind_param("i", $id);
+                $stmtDelete->execute();
+                $stmtDelete->close();
+            }
+
+            // Adicionar novas fotos
+            $sqlFotos = "INSERT INTO Produto_Fotos (produto_id, foto) VALUES (?, ?)";
+            $stmtFotos = $conn->prepare($sqlFotos);
+            if ($stmtFotos) {
+                for ($i = 1; $i < count($fotos); $i++) {
+                    $stmtFotos->bind_param("is", $id, $fotos[$i]);
+                    $stmtFotos->execute();
+                }
+                $stmtFotos->close();
+            }
+        }
+
+        return "Produto atualizado com sucesso";
     }
 
     function getReceitaTotal($ID_User, $periodo = 'all') {
