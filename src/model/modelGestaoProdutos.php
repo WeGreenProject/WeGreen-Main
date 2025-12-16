@@ -481,7 +481,7 @@ function uploads($foto, $nome){
             ];
 
         if ($result->num_rows > 0) {
-            $msg .= "<h3>📸 Fotos do Produto</h3>";
+            $msg .= "<h3>📸 Fotos do Produto Adicionais</h3>";
             $msg .= "<div class='photos-grid' id='photosGrid'>";
             $i = 0;
             while($row = $result->fetch_assoc()) {
@@ -494,7 +494,7 @@ function uploads($foto, $nome){
             }
             $msg .= "</div>";   
         } else {
-                $msg .= "<h3>📸 Não existem fotos</h3>";
+                $msg .= "<h3>📸 Não existem fotos adicionais</h3>";
         }
         $conn->close();
 
