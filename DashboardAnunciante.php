@@ -23,6 +23,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="src/js/Anunciante.js"></script>
 </head>
 
 <body>
@@ -52,7 +53,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     <li class="nav-item">
                         <button class="nav-link" onclick="showPage('sales', this)">
                             <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Pedidos</span>
+                            <span class="nav-text">Encomendas</span>
                         </button>
                     </li>
                     <li class="nav-item">
@@ -213,7 +214,6 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
             <div id="profile" class="page">
                 <div class="profile-container" id="profileCard">
-                    <!-- Header com avatar e botão upgrade carregado via JS -->
                 </div>
 
                 <div class="profile-tabs">
@@ -249,12 +249,18 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
             <div id="sales" class="page">
                 <div class="page-header">
-                    <h2>Gestão de Pedidos</h2>
-                    <p>Acompanhe e gerencie todos os seus pedidos</p>
+                    <h2>Gestão de Encomendas</h2>
+                </div>
+
+                <div class="stats-grid stats-grid-compact" id="encomendasSummary">
+                    <div class="stat-card stat-card-compact" id="totalPendentesCard"></div>
+                    <div class="stat-card stat-card-compact" id="totalProcessandoCard"></div>
+                    <div class="stat-card stat-card-compact" id="totalEnviadasCard"></div>
+                    <div class="stat-card stat-card-compact" id="totalEntreguesCard"></div>
                 </div>
 
                 <div class="filters">
-                    <select id="filterOrderStatus">
+                    <select id="filterEncomendaStatus">
                         <option value="">Todos os Status</option>
                         <option value="pendente">Pendente</option>
                         <option value="processando">Processando</option>
@@ -267,13 +273,14 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 </div>
 
                 <div class="table-container">
-                    <table id="ordersTable" class="display">
+                    <table id="encomendasTable" class="display">
                         <thead>
                             <tr>
-                                <th>Nº Pedido</th>
+                                <th>Nº Encomenda</th>
                                 <th>Data</th>
                                 <th>Cliente</th>
                                 <th>Produtos</th>
+                                <th>Transportadora</th>
                                 <th>Total (€)</th>
                                 <th>Status</th>
                                 <th>Ações</th>

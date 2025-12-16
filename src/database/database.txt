@@ -8,7 +8,7 @@ CREATE TABLE Tipo_Utilizadores (
     descricao VARCHAR(250) NOT NULL
 );
 
-INSERT INTO Tipo_Utilizadores (descricao) VALUES 
+INSERT INTO Tipo_Utilizadores (descricao) VALUES
 ('Administrador'),
 ('Cliente'),
 ('Anunciante');
@@ -25,10 +25,10 @@ CREATE TABLE Planos (
     relatorio_pdf BOOLEAN DEFAULT FALSE
 );
 
-INSERT INTO Planos (nome, preco, limite_produtos, rastreio_tipo, relatorio_pdf) VALUES 
-('Free', 0, 3, 'Basico', FALSE),
-('Premium', 25, 10, 'Basico', TRUE),
-('Enterprise', 100, NULL, 'Avancado', TRUE);
+INSERT INTO Planos (nome, preco, limite_produtos, rastreio_tipo, relatorio_pdf) VALUES
+('Plano Essencial Verde', 0, 5, 'Basico', FALSE),
+('Plano Crescimento Circular', 25, 10, 'Basico', TRUE),
+('Plano Profissional Eco+', 100, NULL, 'Avancado', TRUE);
 
 -- ========================
 -- TABELA: Ranking
@@ -39,7 +39,7 @@ CREATE TABLE Ranking (
     pontos INT
 );
 
-INSERT INTO Ranking (nome, pontos) VALUES 
+INSERT INTO Ranking (nome, pontos) VALUES
 ('Bronze', 0),
 ('Ouro', 50),
 ('Diamante', 150);
@@ -65,15 +65,15 @@ CREATE TABLE Utilizadores (
     FOREIGN KEY (tipo_utilizador_id) REFERENCES Tipo_Utilizadores(id),
     FOREIGN KEY (plano_id) REFERENCES Planos(id)
 );
-        
+
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
-VALUES 
+VALUES
 ('Admin WeGreen', 'admin@wegreen.pt', 'admin123', 1, 3, 3, 200,"src/img/pexels-beccacorreiaph-31095884.jpg"),
 ('João Silva', 'joao@wegreen.pt', 'cliente123', 2, 1, 1, 10, 'src/img/pexels-stefanstefancik-91227.jpg'),
 ('Maria Santos', 'maria@wegreen.pt','anunciante123', 3, 2, 2, 75,"src/img/pexels-olly-733872.jpg");
 
 INSERT INTO Utilizadores (nome, email, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf,foto)
-VALUES 
+VALUES
 ('Maria Luiza', 'Luiza@wegreen.pt','anunciante123', 3, 3, 3, 54, "src/img/josefina-pereyra-dupe.jpeg"),
 ('Matilde Mayer', 'Matilde@wegreen.pt','anunciante123', 3, 2, 3, 350,"src/img/pexels-beccacorreiaph-31095531.jpg"),
 ('Carlos Pereira', 'Carlos@wegreen.pt','anunciante123', 3, 1, 3, 98,"src/img/pexels-rb-audiovisual-1819481.jpg"),
@@ -106,7 +106,7 @@ CREATE TABLE Produtos (
     tipo_produto_id INT,
     preco DECIMAL(10,2),
     foto VARCHAR(255),
-	genero VARCHAR(255),  
+	genero VARCHAR(255),
     anunciante_id INT,
     designer_id INT DEFAULT NULL,
     marca VARCHAR(30),
@@ -119,7 +119,7 @@ CREATE TABLE Produtos (
     FOREIGN KEY (tipo_produto_id) REFERENCES Tipo_Produtos(id),
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
-INSERT INTO Produtos 
+INSERT INTO Produtos
 (nome, tipo_produto_id, preco, foto, genero, designer_id, anunciante_id, marca, tamanho, estado, descricao,ativo)
 VALUES
 ('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', NULL, 1, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.',0),
@@ -203,11 +203,11 @@ CREATE TABLE Mensagens (
 );
 
 INSERT INTO Mensagens (remetente_id, destinatario_id, mensagem)
-VALUES 
+VALUES
 (3, 2, 'Olá João! O seu pedido já foi enviado.');
 
 INSERT INTO Mensagens (remetente_id, destinatario_id, produto_id,mensagem)
-VALUES 
+VALUES
 (1, 3, 5,'Olá eu sou a Luiza');
 
 -- ========================
@@ -222,7 +222,7 @@ CREATE TABLE Rendimento (
     FOREIGN KEY (anunciante_id) REFERENCES Utilizadores(id)
 );
 INSERT INTO Rendimento (anunciante_id, valor,descricao)
-VALUES 
+VALUES
 (3, 25,"Premium comprado!"),
 (4, 100,"Enterprize comprado!"),
 (5, 25,"Premium comprado!"),
@@ -252,7 +252,7 @@ CREATE TABLE Transportadora (
     nome ENUM('CTT', 'DPD') NOT NULL
 );
 
-INSERT INTO Transportadora (nome) VALUES 
+INSERT INTO Transportadora (nome) VALUES
 ('CTT'),
 ('DPD');
 
@@ -277,9 +277,9 @@ CREATE TABLE Encomendas (
     FOREIGN KEY (transportadora_id) REFERENCES Transportadora(id),
     FOREIGN KEY (TipoProdutoNome) REFERENCES Tipo_Produtos(id)
 );
-INSERT INTO Encomendas 
+INSERT INTO Encomendas
 (codigo_encomenda, cliente_id, anunciante_id, transportadora_id, produto_id, TipoProdutoNome, data_envio, morada, estado, plano_rastreio)
-VALUES 
+VALUES
 ('WG12345', 2, 3, 1, 1, 1, CURDATE(), 'Rua das Flores 15, Lisboa', 'Pendente', 'Básico'),
 ('WG12346', 2, 3, 1, 2, 1, CURDATE(), 'Av. do Mar 20, Porto', 'Entregue', 'Básico'),
 ('WG12347', 7, 3, 2, 3, 2, CURDATE(), 'Rua Central 12, Coimbra', 'Pendente', 'Básico'),
@@ -321,7 +321,7 @@ CREATE TABLE Historico_Produtos (
     FOREIGN KEY (encomenda_id) REFERENCES Encomendas(id)
 );
 INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao)
-VALUES 
+VALUES
 (2, 'Entregue', 'Produto entregue ao cliente.'),
 (3, 'Em trânsito', 'Produto enviado pela transportadora.'),
 (4, 'Entregue', 'Entrega concluída.'),
@@ -407,9 +407,9 @@ CREATE TABLE MensagensAdmin (
 );
 
 INSERT INTO MensagensAdmin (remetente_id, destinatario_id, mensagem)
-VALUES 
+VALUES
 (2, 1, 'Olá João! O seu pedido já foi enviado.');
 
 INSERT INTO MensagensAdmin (remetente_id, destinatario_id,mensagem)
-VALUES 
+VALUES
 (1, 2, 'Olá eu sou a Luiza');
