@@ -36,4 +36,12 @@ if ($_POST['op'] == 8) {
     $resp = $func->getProdutosInvativo();
     echo $resp;
 }
+if ($_POST['op'] == 9) {
+    $resp = $func->getInfoUserDropdown($_SESSION['utilizador']);
+    echo $resp;
+}
+if ($_POST['op'] == 10) {
+    $resp = $func->logout();
+    echo $resp;
+}
 ?>

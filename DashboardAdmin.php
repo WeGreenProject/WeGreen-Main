@@ -1,3 +1,8 @@
+<?php
+session_start();
+
+if($_SESSION['tipo'] == 1){
+?>
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -93,13 +98,16 @@
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </button>
-                    <div class="navbar-user">
+                    <div class="navbar-user" onclick="toggleUserDropdown()">
                         <div class="user-avatar">A</div>
                         <div class="user-info">
                             <span class="user-name">Administrador</span>
                             <span class="user-role">Admin</span>
                         </div>
                         <i class="fas fa-chevron-down" style="font-size: 12px; color: #4a5568;"></i>
+                        <div class="user-dropdown" id="userDropdown">
+
+                        </div>
                     </div>
                 </div>
             </nav>
@@ -159,7 +167,7 @@
                                 </tr>
                             </thead>
                             <tbody id="ProdutosInativosBody">
-                               
+
                             </tbody>
                         </table>
                     </div>
@@ -206,4 +214,29 @@
 </body>
 <script src="src/js/Adminstrador.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function toggleUserDropdown() {
+    document.getElementById('userDropdown').classList.toggle('active');
+}
+
+function closeUserDropdown() {
+    document.getElementById('userDropdown').classList.remove('active');
+}
+
+// Fecha ao clicar fora
+document.addEventListener('click', function(e) {
+    const user = document.querySelector('.navbar-user');
+    const dropdown = document.getElementById('userDropdown');
+
+    if (!user.contains(e.target)) {
+        dropdown.classList.remove('active');
+    }
+});
+</script>
+
 </html>
+<?php
+}else{
+header("Location: forbiddenerror.html");
+}
+?>
