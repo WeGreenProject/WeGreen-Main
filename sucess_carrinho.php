@@ -19,240 +19,174 @@
     <script src="src/js/lib/sweatalert.js"></script>
 
      <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a0a;
-            color: #fff;
-            overflow-x: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #ffffff;
+    color: #000000;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
 
-        .success-container {
-            max-width: 700px;
-            width: 100%;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-            border: 2px solid #90c207;
-            border-radius: 20px;
-            padding: 50px 40px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.3);
-            animation: slideIn 0.6s ease-out;
-        }
+.success-container {
+    max-width: 700px;
+    width: 100%;
+    background: #ffffff;
+    border: 2px solid #cb371;
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.6s ease-out;
+}
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.success-icon {
+    width: 120px;
+    height: 120px;
+    background: #cb371;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    font-size: 60px;
+    color: #3cb371;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
 
-        .success-icon {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #90c207 0%, #90c207 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
-            font-size: 60px;
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
-            animation: checkmark 0.8s ease-out 0.3s both;
-        }
+.success-title {
+    font-size: 36px;
+    color: #cb371;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
 
-        @keyframes checkmark {
-            0% {
-                transform: scale(0) rotate(-45deg);
-            }
-            50% {
-                transform: scale(1.1) rotate(5deg);
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-            }
-        }
+.success-subtitle {
+    font-size: 18px;
+    color: #333333;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
 
-        .success-title {
-            font-size: 36px;
-            color: #90c207;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
+.order-details {
+    background: #f9f9f9;
+    border: 1px solid #3cb371;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    text-align: left;
+}
 
-        .success-subtitle {
-            font-size: 18px;
-            color: #888;
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #3cb371;
+}
 
-        .order-details {
-            background: #0a0a0a;
-            border: 2px solid #333;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            text-align: left;
-        }
+.detail-label {
+    font-size: 14px;
+    color: #555555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #333;
-        }
+.detail-value {
+    font-size: 16px;
+    color: #000000;
+    font-weight: 600;
+}
 
-        .detail-row:last-child {
-            border-bottom: none;
-        }
+.confirmation-info {
+    background: #3cb371;
+    border: 1px solid #cb371;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
 
-        .detail-label {
-            font-size: 14px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.confirmation-info p {
+    font-size: 14px;
+    color: #ffffffff;
+    line-height: 1.6;
+    margin: 0;
+}
 
-        .detail-value {
-            font-size: 16px;
-            color: #fff;
-            font-weight: 600;
-        }
+.btn {
+    flex: 1;
+    min-width: 200px;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+}
 
-        .plan-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.btn-primary {
+    background: #3cb371;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
 
-        .plan-premium {
-            background: linear-gradient(90deg, #90c207 0%, #90c207 100%);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
 
-        .plan-enterprise {
-            background: linear-gradient(90deg, #9c27b0 0%, #ba68c8 100%);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
-        }
+.btn-secondary {
+    background: #3cb371;
+    color: #ffffff;
+    border: 2px solid;
+}
 
-        .plan-icon {
-            font-size: 18px;
-        }
+.btn-secondary:hover {
+    background: rgba(203, 179, 113, 0.15);
+}
 
-        .confirmation-info {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #90c207;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
 
-        .confirmation-info p {
-            font-size: 14px;
-            color: #90c207;
-            line-height: 1.6;
-            margin: 0;
-        }
+.action-buttons .btn {
+    flex: none;
+    min-width: auto;
+    padding: 12px 22px;
+    border-radius: 8px; /* borda mais pequena */
+    font-size: 14px;
+}
 
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
 
-        .btn {
-            flex: 1;
-            min-width: 200px;
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-        }
+    .action-buttons .btn {
+        width: 100%;
+    }
+}
 
-        .btn-primary {
-            background: linear-gradient(90deg, #90c207 0%, #90c207 100%);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-        }
 
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #90c207;
-            border: 2px solid #90c207;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 215, 0, 0.1);
-        }
-
-        .btn-icon {
-            font-size: 18px;
-        }
-
-        @media (max-width: 768px) {
-            .success-container {
-                padding: 40px 25px;
-            }
-
-            .success-title {
-                font-size: 28px;
-            }
-
-            .success-subtitle {
-                font-size: 16px;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                min-width: auto;
-            }
-
-            .detail-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -265,16 +199,17 @@
         <div class="order-details">
             <div class="detail-row">
                 <span class="detail-label">Cliente</span>
-                <span class="detail-value">Admin Wegreen</span>
+                <span class="detail-value">Mariana Brites</span>
             </div>
             
-            <div class="detail-row" id="planoConfirmado">
-                
+            <div class="detail-row" id="Encomenda">
+            <span class="detail-label">Pedido</span>
+             <span class="detail-label">Botas Ana Salazar</span>    
             </div>
             
             <div class="detail-row">
                 <span class="detail-label">Data da Compra</span>
-                <span class="detail-value" id="purchaseDate">28 de Novembro, 2025</span>
+                <span class="detail-value" id="purchaseDate">17 de Novembro, 2025</span>
             </div>
             
             <div class="detail-row">
@@ -284,7 +219,7 @@
         </div>
 
         <div class="confirmation-info">
-            <p> Enviámos um email de confirmação com todos os detalhes da sua compra e instruções para aceder ao seu plano.</p>
+            <p> Enviámos um email de confirmação com todos os detalhes da sua compra</p>
         </div>
 
         <div class="action-buttons">

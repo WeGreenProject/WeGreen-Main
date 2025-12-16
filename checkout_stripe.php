@@ -57,7 +57,7 @@ if (isset($_SESSION['cupao_desconto']) && $_SESSION['cupao_desconto'] > 0) {
 }
 
 $sessionData = [
-    'payment_method_types' => ['card'],  
+    'payment_method_types' => ['card', 'paypal', 'klarna'],
     'line_items' => $line_items,
     'mode' => 'payment', 
     'success_url' => 'http://localhost/wegreen-main/sucess_carrinho.php?session_id={CHECKOUT_SESSION_ID}', 
@@ -65,8 +65,60 @@ $sessionData = [
     'metadata' => [ 
         'utilizador' => $utilizador_id,
         'tipo' => 'carrinho'
-    ]
+    ],
+
+    'shipping_address_collection' => [
+        'allowed_countries' => ['PT'],
+    ],
+
+    'customer_creation' => 'always',
+
+    'shipping_options' => [
+        [
+            'shipping_rate_data' => [
+                'type' => 'fixed_amount',
+                'fixed_amount' => [
+                    'amount' => 250,
+                    'currency' => 'eur',
+                ],
+                'display_name' => 'DPD',
+                'delivery_estimate' => [
+                    'minimum' => ['unit' => 'business_day', 'value' => 1],
+                    'maximum' => ['unit' => 'business_day', 'value' => 2],
+                ],
+            ],
+        ],
+        [
+            'shipping_rate_data' => [
+                'type' => 'fixed_amount',
+                'fixed_amount' => [
+                    'amount' => 250,
+                    'currency' => 'eur',
+                ],
+                'display_name' => 'CTT',
+                'delivery_estimate' => [
+                    'minimum' => ['unit' => 'business_day', 'value' => 2],
+                    'maximum' => ['unit' => 'business_day', 'value' => 4],
+                ],
+            ],
+        ],
+        [
+            'shipping_rate_data' => [
+                'type' => 'fixed_amount',
+                'fixed_amount' => [
+                    'amount' => 500,
+                    'currency' => 'eur',
+                ],
+                'display_name' => 'Entrega em Casa',
+                'delivery_estimate' => [
+                    'minimum' => ['unit' => 'business_day', 'value' => 1],
+                    'maximum' => ['unit' => 'business_day', 'value' => 3],
+                ],
+            ],
+        ],
+    ],
 ];
+
 
 if (!empty($discounts)) {
     $sessionData['discounts'] = $discounts;
