@@ -95,4 +95,8 @@ if ($_POST['op'] == 15) {
     $resp = $func->getTopTipoGrafico();
     echo $resp;
 }
+if ($_POST['op'] == 16) {
+    $resp = $func->getProdutoVendidos();
+    echo $resp;
+}
 ?>
