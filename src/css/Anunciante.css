@@ -2334,7 +2334,7 @@
             font-size: 13px;
         }
     }
-        
+
 
         .gallery-main {
             height: 300px;
@@ -2343,4 +2343,261 @@
         .modal-view-right {
             grid-template-columns: 1fr;
         }
-    
+
+
+/* ==========================================
+   ESTILOS PARA PÁGINA DE ENCOMENDAS
+   ========================================== */
+
+#sales .filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+#sales .filters select,
+#sales .filters input {
+    padding: 10px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    color: #2d3748;
+    transition: all 0.3s ease;
+}
+
+#sales .filters select:focus,
+#sales .filters input:focus {
+    outline: none;
+    border-color: #A6D90C;
+    box-shadow: 0 0 0 3px rgba(166, 217, 12, 0.1);
+}
+
+#sales .filters select {
+    min-width: 200px;
+}
+
+#sales .table-container {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#encomendasTable {
+    width: 100% !important;
+}
+
+#encomendasTable thead th {
+    background: #f7fafc;
+    color: #2d3748;
+    font-weight: 600;
+    padding: 15px 12px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+#encomendasTable tbody td {
+    padding: 15px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.customer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.customer-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.customer-email {
+    font-size: 12px;
+    color: #718096;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.product-name {
+    font-weight: 500;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.product-qty {
+    font-size: 12px;
+    color: #718096;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-primary {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-secondary {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.btn-view {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.btn-view:hover {
+    background: #c7d2fe;
+    transform: translateY(-2px);
+}
+
+.btn-edit {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.btn-edit:hover {
+    background: #bfdbfe;
+    transform: translateY(-2px);
+}
+
+.btn-history {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.btn-history:hover {
+    background: #fde68a;
+    transform: translateY(-2px);
+}
+
+/* Indicador de Urgência */
+.row-urgent {
+    background: #fff5f5 !important;
+    border-left: 4px solid #e53e3e;
+}
+
+.row-urgent:hover {
+    background: #fed7d7 !important;
+}
+
+/* Badge Novo */
+.badge-new {
+    background: #A6D90C;
+    color: white;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-danger {
+    background: #e53e3e;
+    color: white;
+}
+
+/* Transportadora Info */
+.transportadora-info {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+/* Tooltip para morada */
+.customer-info {
+    cursor: help;
+    position: relative;
+}
+
+.customer-info:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: #2d3748;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para DataTables */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #A6D90C !important;
+    border-color: #A6D90C !important;
+    color: white !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #A6D90C !important;
+    border-color: #A6D90C !important;
+    color: white !important;
+}

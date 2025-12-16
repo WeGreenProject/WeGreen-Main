@@ -6,95 +6,53 @@ class DashboardAnunciante {
 
     function getDadosPlanos($ID_User, $plano) {
         global $conn;
-        $msg = "";
 
-        $sql = "SELECT * FROM Utilizadores WHERE id = $ID_User";
-        $result = $conn->query($sql);
+        $sql = "SELECT p.nome AS plano_nome FROM Utilizadores u LEFT JOIN Planos p ON u.plano_id = p.id WHERE u.id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                if ($plano == 1) {
-                    $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
-                    $msg .= "<div class='stat-content'>";
-                    $msg .= "<div class='stat-label'>Plano Atual</div>";
-                    $msg .= "<div class='stat-value'>Free</div>";
-                    $msg .= "</div>";
-                } else if ($plano == 2) {
-                    $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
-                    $msg .= "<div class='stat-content'>";
-                    $msg .= "<div class='stat-label'>Plano Atual</div>";
-                    $msg .= "<div class='stat-value'>Premium</div>";
-                    $msg .= "</div>";
-                } else if ($plano == 3) {
-                    $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
-                    $msg .= "<div class='stat-content'>";
-                    $msg .= "<div class='stat-label'>Plano Atual</div>";
-                    $msg .= "<div class='stat-value'>Enterprise</div>";
-                    $msg .= "</div>";
-                }
-            }
-        } else {
-            $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
-            $msg .= "<h6 class='mb-0 text-wegreen-accent'>Detectamos um erro na sua conta!</h6>";
-            $msg .= "</div></li>";
-            $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
+            $row = $result->fetch_assoc();
+            $planoNome = $row['plano_nome'] ?? 'N/A';
+
+            $stmt->close();
+            return json_encode(['success' => true, 'plano' => $planoNome]);
         }
 
-        $conn->close();
-        return $msg;
+        $stmt->close();
+        return json_encode(['success' => false, 'message' => 'Erro na conta']);
     }
 
-    function CarregaProdutos($ID_User) {
+    function carregarProdutos($ID_User) {
         global $conn;
-        $msg = "";
 
-        $sql = "SELECT COUNT(*) AS StockProdutos FROM Produtos WHERE anunciante_id = $ID_User";
-        $result = $conn->query($sql);
+        $sql = "SELECT COUNT(*) AS total FROM Produtos WHERE anunciante_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $total = (int)($row['total'] ?? 0);
+        $stmt->close();
 
-        if ($row = $result->fetch_assoc()) {
-            $msg  = "<div class='stat-icon'><i class='fas fa-box'></i></div>";
-            $msg .= "<div class='stat-content'>";
-            $msg .= "<div class='stat-label'>Produtos em Stock</div>";
-            $msg .= "<div class='stat-value'>".$row["StockProdutos"]."</div>";
-            $msg .= "</div>";
-        } else {
-            $msg  = "<div class='stat-icon'><i class='fas fa-box'></i></div>";
-            $msg .= "<div class='stat-content'>";
-            $msg .= "<div class='stat-label'>Produtos em Stock</div>";
-            $msg .= "<div class='stat-value'>0</div>";
-            $msg .= "</div>";
-        }
-
-        $conn->close();
-        return $msg;
+        return json_encode(['total' => $total]);
     }
 
-
-
-
-    function CarregaPontos($ID_User) {
+    function carregarPontos($ID_User) {
         global $conn;
-        $msg = "";
 
-        $sql = "SELECT pontos_conf FROM Utilizadores WHERE id = $ID_User";
-        $result = $conn->query($sql);
+        $sql = "SELECT pontos_conf FROM Utilizadores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $pontos = (int)($row['pontos_conf'] ?? 0);
+        $stmt->close();
 
-        if ($row = $result->fetch_assoc()) {
-            $msg  = "<div class='stat-icon'><i class='fas fa-star'></i></div>";
-            $msg .= "<div class='stat-content'>";
-            $msg .= "<div class='stat-label'>Pontos Confiança</div>";
-            $msg .= "<div class='stat-value'>".$row['pontos_conf']."</div>";
-            $msg .= "</div>";
-        } else {
-            $msg  = "<div class='stat-icon'><i class='fas fa-star'></i></div>";
-            $msg .= "<div class='stat-content'>";
-            $msg .= "<div class='stat-label'>Pontos Confiança</div>";
-            $msg .= "<div class='stat-value'>0</div>";
-            $msg .= "</div>";
-        }
-
-        $conn->close();
-        return $msg;
+        return json_encode(['pontos' => $pontos]);
     }
 
     function getEstatisticasProdutos($ID_User) {
@@ -106,9 +64,12 @@ class DashboardAnunciante {
                     SUM(CASE WHEN ativo = 0 THEN 1 ELSE 0 END) as inativos,
                     SUM(CASE WHEN stock < 5 THEN 1 ELSE 0 END) as stockBaixo
                 FROM Produtos
-                WHERE anunciante_id = $ID_User";
+                WHERE anunciante_id = ?";
 
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $row = $result->fetch_assoc();
 
         $stats = array(
@@ -118,58 +79,63 @@ class DashboardAnunciante {
             'stockBaixo' => (int)$row['stockBaixo']
         );
 
+        $stmt->close();
         return json_encode($stats);
     }
 
-    function getGastos($ID_User){
-    global $conn;
+    function getGastos($ID_User) {
+        global $conn;
 
-    $msg = "";
-
-    $sql = "SELECT SUM(gastos.valor) AS TotalGastos FROM gastos WHERE anunciante_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $ID_User);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result && $result->num_rows > 0) {
+        $sql = "SELECT SUM(gastos.valor) AS total FROM gastos WHERE anunciante_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $row = $result->fetch_assoc();
+        $total = (float)($row['total'] ?? 0);
+        $stmt->close();
 
-        $msg  = "<div class='stat-icon'><i class='fas fa-wallet'></i></div>";
-        $msg .= "<div class='stat-content'>";
-        $msg .= "<div class='stat-label'>Gastos Totais</div>";
-        $msg .= "<div class='stat-value'>€".number_format($row['TotalGastos'], 2, ',', '.')."</div>";
-        $msg .= "</div>";
-
-    } else {
-
-        $msg  = "<div class='stat-icon'><i class='fas fa-wallet'></i></div>";
-        $msg .= "<div class='stat-content'>";
-        $msg .= "<div class='stat-label'>Gastos Totais</div>";
-        $msg .= "<div class='stat-value'>€0,00</div>";
-        $msg .= "</div>";
-
+        return json_encode(['total' => $total]);
     }
 
-    return $msg;
-}
+    function getLucroTotal($ID_User) {
+        global $conn;
 
+        $sql = "SELECT SUM(lucro) AS total FROM Vendas WHERE anunciante_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $total = (float)($row['total'] ?? 0);
+        $stmt->close();
+
+        return json_encode(['total' => $total]);
+    }
 
     function getVendasMensais($ID_User) {
         global $conn;
-        $dados = array_fill(1, 12, 0);
+        $meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+        $dados = array_fill(0, 12, 0);
+
         $sql = "SELECT MONTH(data_venda) AS mes, SUM(valor) AS total
                 FROM Vendas
-                WHERE anunciante_id = $ID_User
+                WHERE anunciante_id = ?
                 GROUP BY MONTH(data_venda)";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $dados[(int)$row['mes']] = (float)$row['total'];
+            $dados[(int)$row['mes'] - 1] = (float)$row['total'];
         }
 
-        $conn->close();
-        return $dados;
+        $stmt->close();
+        return [
+            'dados1' => $meses,
+            'dados2' => $dados
+        ];
     }
 
     function getTopProdutos($ID_User) {
@@ -179,17 +145,20 @@ class DashboardAnunciante {
         $sql = "SELECT p.nome, SUM(v.quantidade) AS vendidos
                 FROM Vendas v
                 JOIN Produtos p ON v.produto_id = p.Produto_id
-                WHERE v.anunciante_id = $ID_User
+                WHERE v.anunciante_id = ?
                 GROUP BY v.produto_id
                 ORDER BY vendidos DESC
                 LIMIT 5";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
             $dados[] = ['nome' => $row['nome'], 'vendidos' => (int)$row['vendidos']];
         }
 
-        $conn->close();
+        $stmt->close();
         return $dados;
     }
 
@@ -200,15 +169,18 @@ class DashboardAnunciante {
         $sql = "SELECT p.nome, SUM(v.lucro) AS lucro_total
                 FROM Vendas v
                 JOIN Produtos p ON v.produto_id = p.Produto_id
-                WHERE v.anunciante_id = $ID_User
+                WHERE v.anunciante_id = ?
                 GROUP BY v.produto_id";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
             $dados[] = ['nome' => $row['nome'], 'lucro' => (float)$row['lucro_total']];
         }
 
-        $conn->close();
+        $stmt->close();
         return $dados;
     }
 
@@ -219,46 +191,73 @@ class DashboardAnunciante {
         $sql = "SELECT p.nome, SUM(v.lucro) AS lucro, SUM(v.valor) AS total_vendas
                 FROM Vendas v
                 JOIN Produtos p ON v.produto_id = p.Produto_id
-                WHERE v.anunciante_id = $ID_User
+                WHERE v.anunciante_id = ?
                 GROUP BY v.produto_id";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
             $margem = $row['total_vendas'] != 0 ? ($row['lucro'] / $row['total_vendas']) * 100 : 0;
             $dados[] = ['nome' => $row['nome'], 'margem' => round($margem, 2)];
         }
 
-        $conn->close();
+        $stmt->close();
+        return $dados;
+    }
+
+    function getEvolucaoVendas($ID_User) {
+        global $conn;
+        $dados = [];
+
+        $sql = "SELECT DATE_FORMAT(data_venda, '%Y-%m') AS periodo,
+                       SUM(valor) AS total,
+                       COUNT(*) AS quantidade
+                FROM Vendas
+                WHERE anunciante_id = ?
+                GROUP BY DATE_FORMAT(data_venda, '%Y-%m')
+                ORDER BY periodo ASC
+                LIMIT 12";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $dados[] = [
+                'periodo' => $row['periodo'],
+                'total' => (float)$row['total'],
+                'quantidade' => (int)$row['quantidade']
+            ];
+        }
+
+        $stmt->close();
         return $dados;
     }
 
     function getProdutosRecentes($ID_User) {
         global $conn;
-        $html = "";
+        $produtos = [];
 
-        $sql = "SELECT * FROM Produtos
-                WHERE anunciante_id = $ID_User
-                ORDER BY data_criacao DESC
+        $sql = "SELECT p.*, t.descricao as tipo_produto,
+                DATE_FORMAT(p.data_criacao, '%d/%m/%Y') as data_formatada
+                FROM Produtos p
+                LEFT JOIN Tipo_Produtos t ON p.tipo_produto_id = t.id
+                WHERE p.anunciante_id = ?
+                ORDER BY p.data_criacao DESC
                 LIMIT 5";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $html .= "<div class='product-info-row'>
-                        <div style='display: flex; align-items: center; gap: 15px;'>
-                            <span style='font-size: 30px;'>👕</span>
-                            <div>
-                                <div style='font-weight: 600; color: #fff;'>".$row['nome']."</div>
-                                <div style='color: #888; font-size: 14px;'>".$row['tamanho']." em stock</div>
-                            </div>
-                        </div>
-                        <div style='text-align: right;'>
-                            <div style='color: #ffd700; font-weight: 600;'>€".$row['preco']."</div>
-                        </div>
-                      </div>";
+            $produtos[] = $row;
         }
 
-        $conn->close();
-        return $html;
+        $stmt->close();
+        return json_encode($produtos);
     }
 
     function getTodosProdutos($ID_User) {
@@ -268,15 +267,18 @@ class DashboardAnunciante {
         $sql = "SELECT p.*, t.descricao as tipo_descricao
                 FROM Produtos p
                 LEFT JOIN Tipo_Produtos t ON p.tipo_produto_id = t.id
-                WHERE p.anunciante_id = $ID_User
+                WHERE p.anunciante_id = ?
                 ORDER BY p.data_criacao DESC";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
             $produtos[] = $row;
         }
 
-        $conn->close();
+        $stmt->close();
         return json_encode($produtos);
     }
 
@@ -291,7 +293,6 @@ class DashboardAnunciante {
             $tipos[] = $row;
         }
 
-        $conn->close();
         return json_encode($tipos);
     }
 
@@ -301,10 +302,14 @@ class DashboardAnunciante {
                 FROM Utilizadores u
                 JOIN Planos p ON u.plano_id = p.id
                 LEFT JOIN Produtos pr ON pr.anunciante_id = u.id
-                WHERE u.id = $ID_User
+                WHERE u.id = ?
                 GROUP BY u.id";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $row = $result->fetch_assoc();
+        $stmt->close();
 
         return json_encode(['max' => (int)($row['limite_produtos'] ?? 0), 'current' => (int)($row['current'] ?? 0)]);
     }
@@ -317,6 +322,7 @@ class DashboardAnunciante {
         $stmt->execute();
         $result = $stmt->get_result();
         $produto = $result->fetch_assoc();
+        $stmt->close();
 
         return json_encode($produto);
     }
@@ -327,6 +333,7 @@ class DashboardAnunciante {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
+        $stmt->close();
 
         return "Produto removido";
     }
@@ -346,6 +353,7 @@ class DashboardAnunciante {
         $stmt->bind_param($tipos, ...$parametros);
 
         $resultado = $stmt->execute();
+        $stmt->close();
         return $resultado;
     }
 
@@ -363,6 +371,7 @@ class DashboardAnunciante {
         $stmt->bind_param($tipos, ...$ids);
 
         $resultado = $stmt->execute();
+        $stmt->close();
         return $resultado;
     }
 
@@ -381,122 +390,153 @@ class DashboardAnunciante {
         $stmt->bind_param($tipos, ...$parametros);
 
         $resultado = $stmt->execute();
+        $stmt->close();
         return $resultado;
     }
 
     function updateProduto($id, $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao) {
         global $conn;
-        $sql = "UPDATE Produtos SET nome='$nome', tipo_produto_id=$tipo_produto_id, preco=$preco, stock=$stock, marca='$marca', tamanho='$tamanho', estado='$estado', genero='$genero', descricao='$descricao' WHERE Produto_id=$id";
-        $conn->query($sql);
+        $sql = "UPDATE Produtos SET nome=?, tipo_produto_id=?, preco=?, stock=?, marca=?, tamanho=?, estado=?, genero=?, descricao=? WHERE Produto_id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sidiissssi", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $id);
+        $stmt->execute();
+        $stmt->close();
 
-        $conn->close();
         return "Produto atualizado";
     }
 
     function insertProduto($nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id) {
         global $conn;
-        $sql = "INSERT INTO Produtos (nome, tipo_produto_id, preco, stock, marca, tamanho, estado, genero, descricao, anunciante_id) VALUES ('$nome', $tipo_produto_id, $preco, $stock, '$marca', '$tamanho', '$estado', '$genero', '$descricao', $anunciante_id)";
-        $conn->query($sql);
+        $sql = "INSERT INTO Produtos (nome, tipo_produto_id, preco, stock, marca, tamanho, estado, genero, descricao, anunciante_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sidisssssi", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id);
+        $stmt->execute();
+        $stmt->close();
 
-        $conn->close();
         return "Produto adicionado";
     }
 
     function getReceitaTotal($ID_User, $periodo = 'all') {
         global $conn;
-        $dateFilter = "";
+        $filtroData = "";
+
         if ($periodo == 'month') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         } elseif ($periodo == 'year') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
         }
-        $sql = "SELECT SUM(valor) AS total FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+
+        $sql = "SELECT SUM(valor) AS total FROM Vendas WHERE anunciante_id = ?" . $filtroData;
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
-        $total = $row['total'] ?? 0;
+        $total = (float)($row['total'] ?? 0);
         $stmt->close();
-        return (float)$total;
+
+        return $total;
     }
 
     function getTotalPedidos($ID_User, $periodo = 'all') {
         global $conn;
-        $dateFilter = "";
+        $filtroData = "";
+
         if ($periodo == 'month') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         } elseif ($periodo == 'year') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
         }
-        $sql = "SELECT COUNT(*) AS total FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+
+        $sql = "SELECT COUNT(*) AS total FROM Vendas WHERE anunciante_id = ?" . $filtroData;
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
-        $total = $row['total'] ?? 0;
+        $total = (int)($row['total'] ?? 0);
         $stmt->close();
-        return (int)$total;
+
+        return $total;
     }
 
     function getTicketMedio($ID_User, $periodo = 'all') {
         global $conn;
-        $dateFilter = "";
+        $filtroData = "";
+
         if ($periodo == 'month') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         } elseif ($periodo == 'year') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
         }
-        $sql = "SELECT SUM(valor) AS total, COUNT(*) AS count FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+
+        $sql = "SELECT SUM(valor) AS total, COUNT(*) AS quantidade FROM Vendas WHERE anunciante_id = ?" . $filtroData;
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
-        $total = $row['total'] ?? 0;
-        $count = $row['count'] ?? 0;
-        $ticket = $count > 0 ? $total / $count : 0;
+        $total = (float)($row['total'] ?? 0);
+        $quantidade = (int)($row['quantidade'] ?? 0);
+        $ticket = $quantidade > 0 ? $total / $quantidade : 0;
         $stmt->close();
-        return round((float)$ticket, 2);
+
+        return round($ticket, 2);
     }
 
     function getMargemLucroGeral($ID_User, $periodo = 'all') {
         global $conn;
-        $dateFilter = "";
+        $filtroData = "";
+
         if ($periodo == 'month') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         } elseif ($periodo == 'year') {
-            $dateFilter = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+            $filtroData = " AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
         }
-        $sql = "SELECT (SUM(lucro) / SUM(valor)) * 100 AS margem FROM Vendas WHERE anunciante_id = ?" . $dateFilter;
+
+        $sql = "SELECT (SUM(lucro) / SUM(valor)) * 100 AS margem FROM Vendas WHERE anunciante_id = ?" . $filtroData;
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
-        $margem = $row['margem'] ?? 0;
+        $margem = (float)($row['margem'] ?? 0);
         $stmt->close();
-        return round((float)$margem, 2);
+
+        return round($margem, 2);
     }
 
     function getVendasPorCategoria($ID_User, $periodo = 'all') {
         global $conn;
         $dados = [];
-        $dateFilter = "";
+        $filtroData = "";
+
         if ($periodo == 'month') {
-            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+            $filtroData = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         } elseif ($periodo == 'year') {
-            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+            $filtroData = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
         }
-        $sql = "SELECT tp.descricao AS categoria, SUM(v.quantidade) AS vendas, SUM(v.valor) AS receita FROM Vendas v JOIN Produtos p ON v.produto_id = p.Produto_id JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id WHERE v.anunciante_id = ?" . $dateFilter . " GROUP BY tp.id ORDER BY receita DESC";
+
+        $sql = "SELECT tp.descricao AS categoria, SUM(v.quantidade) AS vendas, SUM(v.valor) AS receita
+                FROM Vendas v
+                JOIN Produtos p ON v.produto_id = p.Produto_id
+                JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id
+                WHERE v.anunciante_id = ?" . $filtroData . "
+                GROUP BY tp.id
+                ORDER BY receita DESC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
+
         while ($row = $result->fetch_assoc()) {
-            $dados[] = ['categoria' => $row['categoria'], 'vendas' => (int)$row['vendas'], 'receita' => (float)$row['receita']];
+            $dados[] = [
+                'categoria' => $row['categoria'],
+                'vendas' => (int)$row['vendas'],
+                'receita' => (float)$row['receita']
+            ];
         }
+
         $stmt->close();
         return $dados;
     }
@@ -506,23 +546,37 @@ class DashboardAnunciante {
         $dados = [];
 
         if ($periodo == 'month') {
-            // Dados diários dos últimos 30 dias
-            $sql = "SELECT DATE(data_venda) AS data, SUM(valor) AS receita FROM Vendas WHERE anunciante_id = ? AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) GROUP BY DATE(data_venda) ORDER BY data ASC";
+            $sql = "SELECT DATE(data_venda) AS data, SUM(valor) AS receita
+                    FROM Vendas
+                    WHERE anunciante_id = ? AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                    GROUP BY DATE(data_venda)
+                    ORDER BY data ASC";
         } elseif ($periodo == 'year') {
-            // Dados mensais dos últimos 12 meses
-            $sql = "SELECT DATE_FORMAT(data_venda, '%Y-%m') AS data, SUM(valor) AS receita FROM Vendas WHERE anunciante_id = ? AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) GROUP BY DATE_FORMAT(data_venda, '%Y-%m') ORDER BY data ASC";
+            $sql = "SELECT DATE_FORMAT(data_venda, '%Y-%m') AS data, SUM(valor) AS receita
+                    FROM Vendas
+                    WHERE anunciante_id = ? AND data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+                    GROUP BY DATE_FORMAT(data_venda, '%Y-%m')
+                    ORDER BY data ASC";
         } else {
-            // Dados mensais de todo o período
-            $sql = "SELECT DATE_FORMAT(data_venda, '%Y-%m') AS data, SUM(valor) AS receita FROM Vendas WHERE anunciante_id = ? GROUP BY DATE_FORMAT(data_venda, '%Y-%m') ORDER BY data ASC";
+            $sql = "SELECT DATE_FORMAT(data_venda, '%Y-%m') AS data, SUM(valor) AS receita
+                    FROM Vendas
+                    WHERE anunciante_id = ?
+                    GROUP BY DATE_FORMAT(data_venda, '%Y-%m')
+                    ORDER BY data ASC";
         }
 
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
+
         while ($row = $result->fetch_assoc()) {
-            $dados[] = ['data' => $row['data'], 'receita' => (float)$row['receita']];
+            $dados[] = [
+                'data' => $row['data'],
+                'receita' => (float)$row['receita']
+            ];
         }
+
         $stmt->close();
         return $dados;
     }
@@ -530,41 +584,55 @@ class DashboardAnunciante {
     function getRelatoriosProdutos($ID_User, $periodo = 'all') {
         global $conn;
         $dados = [];
-        $dateFilter = "";
+        $filtroData = "";
+
         if ($periodo == 'month') {
-            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+            $filtroData = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
         } elseif ($periodo == 'year') {
-            $dateFilter = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
+            $filtroData = " AND v.data_venda >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)";
         }
-        $sql = "SELECT p.nome AS produto, SUM(v.quantidade) AS vendas, SUM(v.valor) AS receita, SUM(v.lucro) AS lucro FROM Vendas v JOIN Produtos p ON v.produto_id = p.Produto_id WHERE v.anunciante_id = ?" . $dateFilter . " GROUP BY p.Produto_id ORDER BY receita DESC LIMIT 10";
+
+        $sql = "SELECT p.nome AS produto, SUM(v.quantidade) AS vendas, SUM(v.valor) AS receita, SUM(v.lucro) AS lucro
+                FROM Vendas v
+                JOIN Produtos p ON v.produto_id = p.Produto_id
+                WHERE v.anunciante_id = ?" . $filtroData . "
+                GROUP BY p.Produto_id
+                ORDER BY receita DESC
+                LIMIT 10";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
+
         while ($row = $result->fetch_assoc()) {
-            $dados[] = ['produto' => $row['produto'], 'vendas' => (int)$row['vendas'], 'receita' => (float)$row['receita'], 'lucro' => (float)$row['lucro']];
+            $dados[] = [
+                'produto' => $row['produto'],
+                'vendas' => (int)$row['vendas'],
+                'receita' => (float)$row['receita'],
+                'lucro' => (float)$row['lucro']
+            ];
         }
+
         $stmt->close();
         return $dados;
     }
 
-    // ========================
-    // FUNÇÕES DE PERFIL
-    // ========================
+
 
     function getDadosPerfil($ID_User) {
         global $conn;
 
         $sql = "SELECT u.id, u.nome, u.email, u.nif, u.telefone, u.morada, u.foto, u.pontos_conf, u.plano_id,
-                       r.nome AS ranking_nome, r.pontos AS ranking_pontos_necessarios,
+                       r.nome AS ranking_nome, r.pontos AS ranking_pontos_atuais,
                        p.nome AS plano_nome, p.preco AS plano_preco, p.limite_produtos AS plano_limite,
                        COUNT(DISTINCT pr.Produto_id) AS total_produtos
-                FROM utilizadores u
-                LEFT JOIN ranking r ON u.ranking_id = r.id
-                LEFT JOIN planos p ON u.plano_id = p.id
-                LEFT JOIN produtos pr ON pr.anunciante_id = u.id
+                FROM Utilizadores u
+                LEFT JOIN Ranking r ON u.ranking_id = r.id
+                LEFT JOIN Planos p ON u.plano_id = p.id
+                LEFT JOIN Produtos pr ON pr.anunciante_id = u.id AND pr.ativo = 1
                 WHERE u.id = ?
-                GROUP BY u.id";
+                GROUP BY u.id, u.nome, u.email, u.nif, u.telefone, u.morada, u.foto, u.pontos_conf, u.plano_id,
+                         r.nome, r.pontos, p.nome, p.preco, p.limite_produtos";
 
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
@@ -572,13 +640,27 @@ class DashboardAnunciante {
         $result = $stmt->get_result();
 
         if ($row = $result->fetch_assoc()) {
+            // Obter próximo ranking
+            $sqlProximo = "SELECT nome, pontos FROM Ranking WHERE pontos > ? ORDER BY pontos ASC LIMIT 1";
+            $stmtProximo = $conn->prepare($sqlProximo);
+            $stmtProximo->bind_param("i", $row['pontos_conf']);
+            $stmtProximo->execute();
+            $resultProximo = $stmtProximo->get_result();
+
+            if ($rowProximo = $resultProximo->fetch_assoc()) {
+                $row['proximo_ranking_nome'] = $rowProximo['nome'];
+                $row['proximo_ranking_pontos'] = $rowProximo['pontos'];
+            } else {
+                $row['proximo_ranking_nome'] = null;
+                $row['proximo_ranking_pontos'] = null;
+            }
+            $stmtProximo->close();
+
             $stmt->close();
-            $conn->close();
             return json_encode($row);
         }
 
         $stmt->close();
-        $conn->close();
         return json_encode(['error' => 'Utilizador não encontrado']);
     }
 
@@ -611,7 +693,6 @@ class DashboardAnunciante {
 
         if ($resultCheck->num_rows > 0) {
             $stmtCheck->close();
-            $conn->close();
             return json_encode(['success' => false, 'message' => 'Email já está em uso']);
         }
         $stmtCheck->close();
@@ -623,12 +704,10 @@ class DashboardAnunciante {
 
         if ($stmt->execute()) {
             $stmt->close();
-            $conn->close();
             return json_encode(['success' => true, 'message' => 'Perfil atualizado com sucesso']);
         }
 
         $stmt->close();
-        $conn->close();
         return json_encode(['success' => false, 'message' => 'Erro ao atualizar perfil']);
     }
 
@@ -663,13 +742,11 @@ class DashboardAnunciante {
 
             if ($stmt->execute()) {
                 $stmt->close();
-                $conn->close();
                 return json_encode(['success' => true, 'message' => 'Foto atualizada com sucesso', 'foto' => $targetFile]);
             }
             $stmt->close();
         }
 
-        $conn->close();
         return json_encode(['success' => false, 'message' => 'Erro ao fazer upload da foto']);
     }
 
@@ -687,7 +764,6 @@ class DashboardAnunciante {
             // Comparar senha (assumindo que está armazenada em texto plano - NOTA: deveria usar password_hash)
             if ($row['password'] !== $senha_atual) {
                 $stmt->close();
-                $conn->close();
                 return json_encode(['success' => false, 'message' => 'Senha atual incorreta']);
             }
 
@@ -699,15 +775,118 @@ class DashboardAnunciante {
             if ($stmtUpdate->execute()) {
                 $stmtUpdate->close();
                 $stmt->close();
-                $conn->close();
                 return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso']);
             }
             $stmtUpdate->close();
         }
 
         $stmt->close();
-        $conn->close();
         return json_encode(['success' => false, 'message' => 'Erro ao alterar senha']);
+    }
+
+function getEncomendas($ID_User) {
+        global $conn;
+
+        $sql = "SELECT
+                    e.id,
+                    e.codigo_encomenda,
+                    e.data_envio,
+                    e.estado,
+                    e.morada,
+                    u.nome AS cliente_nome,
+                    u.email AS cliente_email,
+                    p.nome AS produto_nome,
+                    p.foto AS produto_foto,
+                    v.quantidade,
+                    v.valor,
+                    t.nome AS transportadora_nome
+                FROM Encomendas e
+                INNER JOIN Utilizadores u ON e.cliente_id = u.id
+                LEFT JOIN Produtos p ON e.produto_id = p.Produto_id
+                LEFT JOIN Vendas v ON e.id = v.encomenda_id
+                LEFT JOIN Transportadora t ON e.transportadora_id = t.id
+                WHERE e.anunciante_id = ?
+                ORDER BY e.data_envio DESC";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $encomendas = [];
+        while ($row = $result->fetch_assoc()) {
+            $encomendas[] = [
+                'id' => (int)$row['id'],
+                'codigo' => $row['codigo_encomenda'],
+                'data' => date('d/m/Y', strtotime($row['data_envio'])),
+                'data_completa' => $row['data_envio'],
+                'estado' => $row['estado'],
+                'morada' => $row['morada'],
+                'cliente_nome' => $row['cliente_nome'],
+                'cliente_email' => $row['cliente_email'],
+                'produto_nome' => $row['produto_nome'],
+                'produto_foto' => $row['produto_foto'],
+                'quantidade' => (int)$row['quantidade'],
+                'valor' => (float)$row['valor'],
+                'transportadora' => $row['transportadora_nome']
+            ];
+        }
+
+        $stmt->close();
+
+        return json_encode($encomendas);
+    }
+
+    function atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao = '') {
+        global $conn;
+
+        // Atualiza o estado na tabela Encomendas
+        $sql = "UPDATE Encomendas SET estado = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $novo_estado, $encomenda_id);
+
+        if (!$stmt->execute()) {
+            $stmt->close();
+            return json_encode(['success' => false, 'message' => 'Erro ao atualizar status']);
+        }
+        $stmt->close();
+
+        // Registra no histórico
+        $descricao = empty($observacao) ? "Status alterado para: $novo_estado" : $observacao;
+        $sqlHist = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao) VALUES (?, ?, ?)";
+        $stmtHist = $conn->prepare($sqlHist);
+        $stmtHist->bind_param("iss", $encomenda_id, $novo_estado, $descricao);
+        $stmtHist->execute();
+        $stmtHist->close();
+
+        return json_encode(['success' => true, 'message' => 'Status atualizado com sucesso']);
+    }
+
+    function getHistoricoEncomenda($encomenda_id) {
+        global $conn;
+
+        $sql = "SELECT estado_encomenda, descricao, data_atualizacao
+                FROM Historico_Produtos
+                WHERE encomenda_id = ?
+                ORDER BY data_atualizacao ASC";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $encomenda_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $historico = [];
+        while ($row = $result->fetch_assoc()) {
+            $historico[] = [
+                'estado' => $row['estado_encomenda'],
+                'descricao' => $row['descricao'],
+                'data' => date('d/m/Y', strtotime($row['data_atualizacao']))
+            ];
+        }
+
+        $stmt->close();
+
+        return json_encode($historico);
     }
 
 }

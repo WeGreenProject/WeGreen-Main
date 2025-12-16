@@ -2,6 +2,17 @@
 include_once '../model/modelDashboardAnunciante.php';
 session_start();
 
+// Validações de segurança
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['error' => 'Não autenticado']);
+    exit;
+}
+
+if (!isset($_POST['op'])) {
+    echo json_encode(['error' => 'Operação inválida']);
+    exit;
+}
+
 $func = new DashboardAnunciante();
 
 if ($_POST['op'] == 1) {
@@ -10,12 +21,12 @@ if ($_POST['op'] == 1) {
 }
 
 if ($_POST['op'] == 2) {
-    $resp = $func->CarregaProdutos($_SESSION['utilizador']);
+    $resp = $func->carregarProdutos($_SESSION['utilizador']);
     echo $resp;
 }
 
 if ($_POST['op'] == 3) {
-    $resp = $func->CarregaPontos($_SESSION['utilizador']);
+    $resp = $func->carregarPontos($_SESSION['utilizador']);
     echo $resp;
 }
 
@@ -155,10 +166,6 @@ if ($_POST['op'] == 25) {
     echo json_encode($resp);
 }
 
-// ========================
-// OPERAÇÕES DE PERFIL
-// ========================
-
 // op 27 - Obter dados do perfil
 if ($_POST['op'] == 27) {
     $resp = $func->getDadosPerfil($_SESSION['utilizador']);
@@ -197,5 +204,33 @@ if ($_POST['op'] == 30) {
 if ($_POST['op'] == 31) {
     $resp = $func->getEstatisticasProdutos($_SESSION['utilizador']);
     echo $resp;
+}
+
+// op 32 - Obter lista de encomendas
+if ($_POST['op'] == 32) {
+    $resp = $func->getEncomendas($_SESSION['utilizador']);
+    echo $resp;
+}
+
+// op 33 - Atualizar status da encomenda
+if ($_POST['op'] == 33) {
+    $encomenda_id = $_POST['encomenda_id'];
+    $novo_estado = $_POST['novo_estado'];
+    $observacao = $_POST['observacao'] ?? '';
+    $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao);
+    echo $resp;
+}
+
+// op 34 - Obter histórico da encomenda
+if ($_POST['op'] == 34) {
+    $encomenda_id = $_POST['encomenda_id'];
+    $resp = $func->getHistoricoEncomenda($encomenda_id);
+    echo $resp;
+}
+
+// Fechar conexão global no final
+global $conn;
+if (isset($conn)) {
+    $conn->close();
 }
 ?>
