@@ -6,8 +6,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-    color: #fff;
+    background: #f8f9fa;
+    color: #000000;
     min-height: 100vh;
 }
 
@@ -17,11 +17,10 @@ body {
     padding: 0 20px;
 }
 
-/* Header */
 .header {
-    background: rgba(26, 26, 26, 0.95);
+    background: #ffffff;
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    border-bottom: 1px solid #e0e0e0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -42,7 +41,7 @@ body {
     align-items: center;
     gap: 12px;
     text-decoration: none;
-    color: #fff;
+    color: #000000;
 }
 
 .logo-icon {
@@ -51,7 +50,7 @@ body {
 
 .logo h1 {
     font-size: 24px;
-    background: linear-gradient(135deg, #6ce170 0%, #ffed4e 100%);
+    background: linear-gradient(135deg, #3cb371 0%, #32a05f 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -62,7 +61,7 @@ body {
 }
 
 .nav a {
-    color: #888;
+    color: #6c757d;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
@@ -71,15 +70,14 @@ body {
 }
 
 .nav a:hover {
-    color: #90c207
+    color: #3cb371;
 }
 
 .nav a.active {
-    color: #1d7c5d;
-    background: rgba(255, 215, 0, 0.1);
+    color: #3cb371;
+    background: rgba(60, 179, 113, 0.1);
 }
 
-/* Main Content */
 .main-content {
     padding: 40px 0;
 }
@@ -92,14 +90,14 @@ body {
 .page-header h2 {
     font-size: 36px;
     margin-bottom: 10px;
+    color: #000000;
 }
 
 .page-header p {
-    color: #888;
+    color: #6c757d;
     font-size: 16px;
 }
 
-/* Cart Layout */
 .cart-layout {
     display: grid;
     grid-template-columns: 1fr 400px;
@@ -107,10 +105,10 @@ body {
     margin-top: 30px;
 }
 
-/* Cart Section */
+
 .cart-section {
-    background: rgba(26, 26, 26, 0.6);
-    border: 1px solid rgba(255, 215, 0, 0.1);
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 16px;
     padding: 30px;
 }
@@ -121,17 +119,18 @@ body {
     align-items: center;
     margin-bottom: 25px;
     padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+    border-bottom: 1px solid #e0e0e0;
 }
 
 .section-header h3 {
     font-size: 22px;
+    color: #000000;
 }
 
 .btn-text {
     background: none;
     border: none;
-    color: #ff4444;
+    color: #dc3545;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -139,10 +138,10 @@ body {
 }
 
 .btn-text:hover {
-    color: #ff6666;
+    color: #c82333;
 }
 
-/* Cart Items */
+
 .cart-items {
     display: flex;
     flex-direction: column;
@@ -154,15 +153,16 @@ body {
     grid-template-columns: 100px 1fr auto;
     gap: 20px;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.3);
+    background: #f8f9fa;
     border-radius: 12px;
-    border: 1px solid rgba(255, 215, 0, 0.05);
+    border: 1px solid #e0e0e0;
     transition: all 0.3s;
 }
 
 .cart-item:hover {
-    border-color: rgba(255, 215, 0, 0.2);
+    border-color: #3cb371;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(60, 179, 113, 0.1);
 }
 
 .item-image {
@@ -188,12 +188,12 @@ body {
 .item-details h4 {
     font-size: 18px;
     font-weight: 600;
-    color: #fff;
+    color: #000000;
     margin: 0;
 }
 
 .item-meta {
-    color: #888;
+    color: #6c757d;
     font-size: 14px;
     margin: 0;
 }
@@ -201,25 +201,25 @@ body {
 .item-price {
     font-size: 20px;
     font-weight: 700;
-    color: #90c207;
+    color: #3cb371;
     margin: 0;
 }
 
 .item-name {
     font-size: 18px;
     font-weight: 600;
-    color: #fff;
+    color: #000000;
 }
 
 .item-info {
     display: flex;
     gap: 15px;
-    color: #888;
+    color: #6c757d;
     font-size: 14px;
 }
 
 .item-brand {
-    color: #90c207;
+    color: #3cb371;
 }
 
 .item-actions {
@@ -230,7 +230,6 @@ body {
     gap: 10px;
 }
 
-/* CORREÇÃO FINAL: Botões de quantidade */
 .quantity-control {
     display: flex;
     align-items: center;
@@ -241,9 +240,9 @@ body {
 }
 
 .quantity-control button {
-    background: linear-gradient(135deg, #90c207 0%, #90c207 100%);
+    background: #3cb371;
     border: none;
-    color: #000;
+    color: #ffffff;
     width: 32px;
     height: 32px;
     border-radius: 6px;
@@ -254,13 +253,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(60, 179, 113, 0.3);
 }
 
 .quantity-control button:hover {
-    background: linear-gradient(135deg, #90c207 0%, #fffb99 100%);
+    background: #32a05f;
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 4px 12px rgba(60, 179, 113, 0.5);
 }
 
 .quantity-control span {
@@ -268,17 +267,16 @@ body {
     text-align: center;
     font-weight: 700;
     font-size: 16px;
-    color: #fff;
-    background: rgba(255, 215, 0, 0.1);
+    color: #000000;
+    background: rgba(60, 179, 113, 0.1);
     padding: 6px 10px;
     border-radius: 6px;
 }
 
-/* CORREÇÃO FINAL: Botão do lixo */
 .btn-remove {
-    background: rgba(255, 68, 68, 0.15);
-    border: 1px solid rgba(255, 68, 68, 0.4);
-    color: #ff4444;
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #dc3545;
     width: 38px;
     height: 38px;
     border-radius: 8px;
@@ -287,22 +285,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.2);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
 }
 
 .btn-remove:hover {
-    background: rgba(255, 68, 68, 0.3);
-    border-color: #ff6666;
+    background: rgba(220, 53, 69, 0.2);
+    border-color: #c82333;
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(255, 68, 68, 0.4);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
 }
 
 .btn-remove i {
-    color: #ff4444;
+    color: #dc3545;
     font-size: 18px;
 }
 
-/* Empty Cart */
+
 .empty-cart {
     text-align: center;
     padding: 60px 20px;
@@ -312,19 +310,21 @@ body {
     font-size: 80px;
     margin-bottom: 20px;
     opacity: 0.5;
+    color: #6c757d;
 }
 
 .empty-cart h3 {
     font-size: 24px;
     margin-bottom: 10px;
+    color: #000000;
 }
 
 .empty-cart p {
-    color: #888;
+    color: #6c757d;
     margin-bottom: 30px;
 }
 
-/* Cart Summary */
+
 .cart-summary {
     display: flex;
     flex-direction: column;
@@ -334,8 +334,8 @@ body {
 .summary-card,
 .coupon-card,
 .AplicarCupao {
-    background: rgba(26, 26, 26, 0.6);
-    border: 1px solid rgba(255, 215, 0, 0.1);
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 16px;
     padding: 25px;
 }
@@ -345,34 +345,35 @@ body {
 .AplicarCupao h4 {
     font-size: 20px;
     margin-bottom: 20px;
+    color: #000000;
 }
 
 .summary-row {
     display: flex;
     justify-content: space-between;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 215, 0, 0.05);
-    color: #888;
+    border-bottom: 1px solid #e0e0e0;
+    color: #6c757d;
 }
 
 .summary-row.highlight {
     border-bottom: none;
-    border-top: 2px solid rgba(255, 215, 0, 0.2);
+    border-top: 2px solid #e0e0e0;
     margin-top: 10px;
     padding-top: 20px;
     font-size: 20px;
     font-weight: 700;
-    color: #fff;
+    color: #000000;
 }
 
 .summary-row.highlight span:last-child {
-    color: #90c207;
+    color: #3cb371;
 }
 
 .btn-checkout {
     width: 100%;
-    background: linear-gradient(135deg, #11e130 0%, #ffed4e 100%);
-    color: #000;
+    background: #3cb371;
+    color: #ffffff;
     border: none;
     padding: 16px;
     border-radius: 12px;
@@ -385,11 +386,13 @@ body {
     justify-content: center;
     align-items: center;
     gap: 10px;
+    box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
 }
 
 .btn-checkout:hover {
+    background: #32a05f;
     transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(60, 179, 113, 0.4);
 }
 
 .btn-checkout span {
@@ -402,11 +405,11 @@ body {
     justify-content: center;
     gap: 8px;
     margin-top: 15px;
-    color: #888;
+    color: #6c757d;
     font-size: 14px;
 }
 
-/* Coupon Card */
+
 .coupon-input {
     display: flex;
     gap: 10px;
@@ -414,23 +417,24 @@ body {
 
 .coupon-input input {
     flex: 1;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 215, 0, 0.2);
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     padding: 12px;
-    color: #fff;
+    color: #000000;
     font-size: 14px;
 }
 
 .coupon-input input:focus {
     outline: none;
-    border-color: #ffd700;
+    border-color: #3cb371;
+    box-shadow: 0 0 0 0.2rem rgba(60, 179, 113, 0.1);
 }
 
 .coupon-input button {
-    background: rgba(255, 215, 0, 0.1);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    color: #90c207;
+    background: rgba(60, 179, 113, 0.1);
+    border: 1px solid rgba(60, 179, 113, 0.3);
+    color: #3cb371;
     padding: 12px 20px;
     border-radius: 8px;
     cursor: pointer;
@@ -439,26 +443,28 @@ body {
 }
 
 .coupon-input button:hover {
-    background: rgba(255, 215, 0, 0.2);
+    background: rgba(60, 179, 113, 0.2);
+    border-color: #3cb371;
 }
 
 .btn-primary {
     display: inline-block;
-    background: linear-gradient(135deg, #90c207 0%, #90c207 100%);
-    color: #000;
+    background: #3cb371;
+    color: #ffffff;
     padding: 12px 30px;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
 }
 
 .btn-primary:hover {
+    background: #32a05f;
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+    box-shadow: 0 8px 20px rgba(60, 179, 113, 0.4);
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
     .cart-layout {
         grid-template-columns: 1fr;

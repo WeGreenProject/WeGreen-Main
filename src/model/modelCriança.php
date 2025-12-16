@@ -30,12 +30,12 @@ function getProdutosCriança($categoria, $tamanho, $estado)
 
         while ($row = $result->fetch_assoc()) {
             $msg .= "<div class='col-md-3 col-sm-6'>";
-            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-80'>";
             $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
             $msg .= "<div class='card-body text-center'>";
             $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
             $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-            $msg .= "<p class='fw-semibold'>".$row["preco"]."€</p>";
+            $msg .= "<p class='fw-bold text-black'>" . $row["preco"] . "€ <span class='fw-normal'>(com IVA)</span></p>";
             $msg .= "<a href='ProdutoCriançaMostrar.html?id=".$row["Produto_id"]."' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
             $msg .= "</div>";
             $msg .= "</div>";
@@ -55,7 +55,7 @@ function getFiltrosCriancaCategoria() {
     $sql = "SELECT id AS ValueProduto, tipo_produtos.descricao AS NomeProduto FROM tipo_produtos,Produtos where Produtos.ativo = 1 AND tipo_produtos.id = Produtos.tipo_produto_id group by tipo_produtos.id;";
     $result = $conn->query($sql);
 
-    $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+    $msg .= "<option value='-1'>Selecionar Categoria</option>";
     
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
@@ -78,14 +78,14 @@ function getFiltrosCriancaCategoria() {
         $result = $conn->query($sql);
 
 
-        $msg .= "<option value='-1'>Selecionar o Tamanho...</option>";
+        $msg .= "<option value='-1'>Selecionar o Tamanho</option>";
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
 
                 $msg .= "<option value=".$row["ValueTamanho"].">".$row["NomeTamanho"]."</option>";
             }
         } else {
-                $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+                $msg .= "<option value='-1'>Selecionar Categoria</option>";
                 $msg .= "<option value='1'>Sem Registos</option>";
         }
         $conn->close();
@@ -105,7 +105,7 @@ function getFiltrosCriancaCategoria() {
         $result = $conn->query($sql);
 
 
-        $msg .= "<option value='-1'>Selecionar Estado...</option>";
+        $msg .= "<option value='-1'>Selecionar Estado</option>";
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
 
