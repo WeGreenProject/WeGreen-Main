@@ -101,6 +101,64 @@ class DashboardAdmin{
         return ($msg);
 
     }
+    function getInfoUserDropdown($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT * from Utilizadores where id = ".$ID_User;
+        
+        $result = $conn->query($sql);
+        
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+                
+                $msg  = "<div class='dropdown-header'>";
+                $msg .= "    <img src='" . $row['foto']."' alt='Usuário' class='dropdown-avatar'>";
+                $msg .= "    <div>";
+                $msg .= "        <div class='dropdown-name'>" . $row['nome']. "</div>";
+                $msg .= "        <div class='dropdown-email'>" . $row['email']. "</div>";
+                $msg .= "    </div>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='dropdown-divider'></div>";
+
+                $msg .= "<button class='dropdown-item' onclick=\"showPage('profile', null); closeUserDropdown();\">";
+                $msg .= "    <i class='fas fa-user'></i>";
+                $msg .= "    <span>Meu Perfil</span>";
+                $msg .= "</button>";
+
+                $msg .= "<button class='dropdown-item' onclick='showPasswordModal()'>";
+                $msg .= "    <i class='fas fa-key'></i>";
+                $msg .= "    <span>Alterar Senha</span>";
+                $msg .= "</button>";
+
+                $msg .= "<div class='dropdown-divider'></div>";
+
+                $msg .= "<button class='dropdown-item dropdown-item-danger' onclick='logout()'>";
+                $msg .= "    <i class='fas fa-sign-out-alt'></i>";
+                $msg .= "    <span>Sair</span>";
+                $msg .= "</button>";
+            }
+        }
+        else
+        {
+                $msg  = "<div class='stat-icon'>👥</div>";
+                $msg .= "<div class='stat-label'>Utilizadores</div>";
+                $msg .= "<div class='stat-value'>Nao Encontrado!</div>";
+                $msg .= "<div class='stat-change'>+ X Novos utilizadores</div>";
+        }
+        $conn->close();
+        
+        return ($msg);
+
+    }
+    function logout(){
+
+        session_start();
+        session_destroy();
+
+        return("Obrigado!");
+    }
     function getNovosUtilizadores(){
         global $conn;
         $msg = "";

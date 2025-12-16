@@ -31,7 +31,7 @@ function getMinhasVendas(){
 }
 function getTopTipoGrafico() {
     $.ajax({
-        url: "src/controller/controllerDashboardAdmin.php",
+        url: "src/controller/controllerGestaoProdutos.php",
         type: "POST",
         data: { op: 15 },
         dataType: "json",
