@@ -87,20 +87,20 @@
                 <h2>Gestão de Produtos</h2>
                 <p>Gerir todos os produtos na plataforma</p>
             </div>
- <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3><i class="fas fa-fire"></i>Produto anunciados (por Categoria)</h3>
-                        </div>
-                        <canvas id="topProductsChart"></canvas>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-fire"></i>Produto anunciados (por Categoria)</h3>
                     </div>
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3><i class="fas fa-star"></i>Produto Vendidos (por Categoria)</h3>
-                        </div>
-                        <canvas id="salesChart"></canvas>
-                    </div>
+                    <canvas id="topProductsChart"></canvas>
                 </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-star"></i>Produto Vendidos (por Categoria)</h3>
+                    </div>
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
             <br>
             <br>
             <div class="tabs-container">
@@ -284,7 +284,7 @@
                             <h2>Editar Produto</h2>
                             <button type="button" class="modal-close" data-bs-dismiss="modal">×</button>
                         </div>
-
+                        <br>
                         <div class=" product-info-grid">
                             <div class="info-item">
                                 <label>ID do Produto</label>
@@ -345,6 +345,7 @@
                             <button class="modal-close" type="button" class="modal-close"
                                 data-bs-dismiss="modal">×</button>
                         </div>
+                        <br>
 
                         <div class="product-info-grid">
                             <div class="info-item">

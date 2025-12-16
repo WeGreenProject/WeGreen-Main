@@ -540,77 +540,86 @@
             box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
         }
 
-        /* MODAL */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1050;
-            overflow-y: auto;
-            align-items: center;
-            justify-content: center;
-        }
+ /* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1050;
+    overflow-y: auto;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+}
 
-        .modal.show {
-            display: flex !important;
-        }
+.modal.show {
+    display: flex !important;
+}
 
-        .modal-dialog {
-            margin: 30px auto;
-            max-width: 900px;
-            width: 90%;
-        }
+.modal-dialog {
+    margin: auto;
+    max-width: 900px;
+    width: 90%;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+}
 
-        .modal-content {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 50px rgba(166, 217, 12, 0.3);
-            border: 2px solid #A6D90C;
-        }
+.modal-content {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 50px rgba(166, 217, 12, 0.3);
+    border: 2px solid #A6D90C;
+    max-height: 85vh;
+    overflow-y: auto;
+    width: 100%;
+    position: relative;
+}
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #A6D90C;
-        }
+/* Scrollbar personalizada para o modal */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
 
-        .modal-header h2 {
-            color: #1a202c;
-            font-size: 24px;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
 
-        .modal-close {
-            background: #dc2626;
-            border: none;
-            color: white;
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
+.modal-content::-webkit-scrollbar-thumb {
+    background: #A6D90C;
+    border-radius: 10px;
+}
 
-        .modal-close:hover {
-            background: #b91c1c;
-            transform: rotate(90deg);
-        }
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #90c207;
+}
+
+.modal-close {
+    background: #dc2626;
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.modal-close:hover {
+    background: #b91c1c;
+    transform: rotate(90deg);
+}
 
         .product-info-grid {
             display: grid;

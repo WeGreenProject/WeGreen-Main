@@ -339,7 +339,6 @@ $sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, genero,anunciante_id
     } else {
         $flag = false;
         $msg = "Error: " . $stmt->error;
-        #$this->wFicheiroError(date("Y-m-d H:i:s")." - ".$stmt->error);
     }
     $stmt->close();
    

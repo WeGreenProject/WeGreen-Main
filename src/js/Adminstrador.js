@@ -46,6 +46,70 @@ function getUtilizadores()
     });
 
 }
+function getInfoUserDropdown()
+{
+    let dados = new FormData();
+    dados.append("op", 9);
+
+    $.ajax({
+    url: "src/controller/controllerDashboardAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#userDropdown').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
+function logout(){
+    let dados = new FormData();
+    dados.append("op", 10);
+
+    $.ajax({
+    url: "src/controller/controllerDashboardAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })  
+    
+    .done(function(msg) {
+
+
+    alerta("Utilizador","Obrigado! Por usar nosso website","success");
+    
+    setTimeout(function(){ 
+        window.location.href = "index.html";
+    }, 2000);
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
+function alerta(titulo,msg,icon){
+    Swal.fire({
+        position: 'center',
+        icon: icon,
+        title: titulo,
+        text: msg,
+        showConfirmButton: true,
+
+      })
+}
 function getRendimentos()
 {
     let dados = new FormData();
@@ -373,4 +437,5 @@ $(function() {
     getGastos();
     getUtilizadores();
     getDadosPlanos();
+    getInfoUserDropdown();
 });

@@ -33,7 +33,7 @@ class Perfil{
                     $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</a></li>";
+                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</li>";
                 }
                 else if($tpUser == 3)
                 {

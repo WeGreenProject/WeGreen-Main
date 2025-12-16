@@ -28,13 +28,13 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 <body>
     <div class="container">
         <aside class="sidebar">
-                <div class="logo">
-                    <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                    <div class="logo-text">
-                        <h1>WeGreen</h1>
-                        <p>Moda Sustentável</p>
-                    </div>
+            <div class="logo">
+                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+                <div class="logo-text">
+                    <h1>WeGreen</h1>
+                    <p>Moda Sustentável</p>
                 </div>
+            </div>
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
@@ -79,7 +79,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </div>
                 </div>
                 <div class="navbar-right">
-                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="mostrarPlanosUpgrade()" style="display: none;">
+                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="mostrarPlanosUpgrade()"
+                        style="display: none;">
                         <i class="fas fa-crown"></i> Upgrade
                     </button>
                     <button class="navbar-icon-btn" id="notificationBtn">
@@ -87,7 +88,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         <span class="notification-badge">3</span>
                     </button>
                     <div class="navbar-user" id="userMenuBtn">
-                        <img src="src/img/default-avatar.png" alt="Usuário" class="user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff'">
+                        <img src="src/img/default-avatar.png" alt="Usuário" class="user-avatar"
+                            onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff'">
                         <div class="user-info">
                             <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></span>
                             <span class="user-role">Anunciante</span>
@@ -96,7 +98,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </div>
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-header">
-                            <img src="src/img/default-avatar.png" alt="Usuário" class="dropdown-avatar" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff'">
+                            <img src="src/img/default-avatar.png" alt="Usuário" class="dropdown-avatar"
+                                onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff'">
                             <div>
                                 <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></div>
                                 <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'user@email.com'; ?></div>
@@ -279,7 +282,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         <tbody>
                             <tr>
                                 <td colspan="7" style="text-align: center; padding: 40px; color: #718096;">
-                                    <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+                                    <i class="fas fa-shopping-bag"
+                                        style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
                                     <p>Nenhum pedido encontrado</p>
                                     <small>Os pedidos dos seus produtos aparecerão aqui</small>
                                 </td>
@@ -290,140 +294,147 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             </div>
 
             <div id="products" class="page">
-    <div class="page-actions">
-        <div class="actions-left">
-            <button id="addProductBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar Produto</button>
-        </div>
-        <div class="actions-right">
-            <button id="exportProductsBtn" class="btn btn-secondary"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
-        </div>
-    </div>
+                <div class="page-actions">
+                    <div class="actions-left">
+                        <button id="addProductBtn" class="btn btn-primary"><i class="fas fa-plus"></i> Adicionar
+                            Produto</button>
+                    </div>
+                    <div class="actions-right">
+                        <button id="exportProductsBtn" class="btn btn-secondary"><i class="fas fa-file-pdf"></i>
+                            Exportar PDF</button>
+                    </div>
+                </div>
 
-    <div class="stats-grid stats-grid-compact" id="productStats">
-        <div class="stat-card stat-card-compact" id="totalProdutosCard"></div>
-        <div class="stat-card stat-card-compact" id="produtosAtivosCard"></div>
-        <div class="stat-card stat-card-compact" id="produtosInativosCard"></div>
-        <div class="stat-card stat-card-compact" id="stockCriticoCard"></div>
-    </div>
+                <div class="stats-grid stats-grid-compact" id="productStats">
+                    <div class="stat-card stat-card-compact" id="totalProdutosCard"></div>
+                    <div class="stat-card stat-card-compact" id="produtosAtivosCard"></div>
+                    <div class="stat-card stat-card-compact" id="produtosInativosCard"></div>
+                    <div class="stat-card stat-card-compact" id="stockCriticoCard"></div>
+                </div>
 
-    <div id="bulkActions" class="bulk-actions" style="display: none;">
-        <span id="selectedCount">0 selecionados</span>
-        <button onclick="ativarEmMassa()" class="btn-bulk"><i class="fas fa-check"></i> Ativar</button>
-        <button onclick="desativarEmMassa()" class="btn-bulk"><i class="fas fa-times"></i> Desativar</button>
-        <button onclick="alterarEstadoEmMassa()" class="btn-bulk"><i class="fas fa-tag"></i> Alterar Estado</button>
-        <button onclick="editarSelecionado()" class="btn-bulk"><i class="fas fa-edit"></i> Editar</button>
-        <button onclick="removerEmMassa()" class="btn-bulk"><i class="fas fa-trash"></i> Remover</button>
-    </div>
+                <div id="bulkActions" class="bulk-actions" style="display: none;">
+                    <span id="selectedCount">0 selecionados</span>
+                    <button onclick="ativarEmMassa()" class="btn-bulk"><i class="fas fa-check"></i> Ativar</button>
+                    <button onclick="desativarEmMassa()" class="btn-bulk"><i class="fas fa-times"></i>
+                        Desativar</button>
+                    <button onclick="alterarEstadoEmMassa()" class="btn-bulk"><i class="fas fa-tag"></i> Alterar
+                        Estado</button>
+                    <button onclick="editarSelecionado()" class="btn-bulk"><i class="fas fa-edit"></i> Editar</button>
+                    <button onclick="removerEmMassa()" class="btn-bulk"><i class="fas fa-trash"></i> Remover</button>
+                </div>
 
-    <div class="filters">
-        <select id="filterTipo">
-            <option value="">Todos os Tipos</option>
-        </select>
-        <select id="filterEstado">
-            <option value="">Todos os Estados</option>
-            <option value="Novo">Novo</option>
-            <option value="Como Novo">Como Novo</option>
-            <option value="Excelente">Excelente</option>
-        </select>
-        <select id="filterGenero">
-            <option value="">Todos os Géneros</option>
-            <option value="Mulher">Mulher</option>
-            <option value="Homem">Homem</option>
-            <option value="Criança">Criança</option>
-        </select>
-        <select id="filterAtivo">
-            <option value="">Todos (Ativo/Inativo)</option>
-            <option value="1">Apenas Ativos</option>
-            <option value="0">Apenas Inativos</option>
-        </select>
-    </div>
+                <div class="filters">
+                    <select id="filterTipo">
+                        <option value="">Todos os Tipos</option>
+                    </select>
+                    <select id="filterEstado">
+                        <option value="">Todos os Estados</option>
+                        <option value="Novo">Novo</option>
+                        <option value="Como Novo">Como Novo</option>
+                        <option value="Excelente">Excelente</option>
+                    </select>
+                    <select id="filterGenero">
+                        <option value="">Todos os Géneros</option>
+                        <option value="Mulher">Mulher</option>
+                        <option value="Homem">Homem</option>
+                        <option value="Criança">Criança</option>
+                    </select>
+                    <select id="filterAtivo">
+                        <option value="">Todos (Ativo/Inativo)</option>
+                        <option value="1">Apenas Ativos</option>
+                        <option value="0">Apenas Inativos</option>
+                    </select>
+                </div>
 
-    <div class="table-container">
-        <table id="productsTable" class="display">
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="selectAll"></th>
-                    <th><i class="fas fa-image"></i> Foto</th>
-                    <th><i class="fas fa-tag"></i> Nome</th>
-                    <th><i class="fas fa-box"></i> Tipo</th>
-                    <th><i class="fas fa-euro-sign"></i> Preço (€)</th>
-                    <th><i class="fas fa-warehouse"></i> Stock</th>
-                    <th><i class="fas fa-info-circle"></i> Estado</th>
-                    <th><i class="fas fa-toggle-on"></i> Ativo</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal Alterar Senha -->
-<div id="passwordModal" class="modal">
-    <div class="modal-content" style="max-width: 500px;">
-        <div class="modal-header">
-            <h3>Alterar Senha</h3>
-            <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
-        </div>
-        <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
-            <div class="form-group">
-                <label>Senha Atual</label>
-                <input type="password" id="currentPassword" required>
+                <div class="table-container">
+                    <table id="productsTable" class="display">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAll"></th>
+                                <th><i class="fas fa-image"></i> Foto</th>
+                                <th><i class="fas fa-tag"></i> Nome</th>
+                                <th><i class="fas fa-box"></i> Tipo</th>
+                                <th><i class="fas fa-euro-sign"></i> Preço (€)</th>
+                                <th><i class="fas fa-warehouse"></i> Stock</th>
+                                <th><i class="fas fa-info-circle"></i> Estado</th>
+                                <th><i class="fas fa-toggle-on"></i> Ativo</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Nova Senha</label>
-                <input type="password" id="newPassword" required>
+
+            <!-- Modal Alterar Senha -->
+            <div id="passwordModal" class="modal">
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>Alterar Senha</h3>
+                        <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
+                    </div>
+                    <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label>Senha Atual</label>
+                            <input type="password" id="currentPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nova Senha</label>
+                            <input type="password" id="newPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar Nova Senha</label>
+                            <input type="password" id="confirmPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                            <i class="fas fa-key"></i> Alterar Senha
+                        </button>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Confirmar Nova Senha</label>
-                <input type="password" id="confirmPassword" required>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-                <i class="fas fa-key"></i> Alterar Senha
-            </button>
-        </form>
-    </div>
-</div>
 
         </main>
     </div>
 
     <script>
-        // Carregar estatísticas de relatórios
-        function loadReportStats() {
-            const periodo = $('#reportPeriod').val();
-            $.post('src/controller/controllerDashboardAnunciante.php', {
-                op: 19,
-                periodo: periodo
-            }, function(res) {
-                $('#totalRevenue').text('€' + parseFloat(res).toFixed(2));
-            });
+    // Carregar estatísticas de relatórios
+    function loadReportStats() {
+        const periodo = $('#reportPeriod').val();
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 19,
+            periodo: periodo
+        }, function(res) {
+            $('#totalRevenue').text('€' + parseFloat(res).toFixed(2));
+        });
 
-            $.post('src/controller/controllerDashboardAnunciante.php', {
-                op: 20,
-                periodo: periodo
-            }, function(res) {
-                $('#totalOrders').text(res);
-            });
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 20,
+            periodo: periodo
+        }, function(res) {
+            $('#totalOrders').text(res);
+        });
 
-            $.post('src/controller/controllerDashboardAnunciante.php', {
-                op: 21,
-                periodo: periodo
-            }, function(res) {
-                $('#avgTicket').text('€' + parseFloat(res).toFixed(2));
-            });
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 21,
+            periodo: periodo
+        }, function(res) {
+            $('#avgTicket').text('€' + parseFloat(res).toFixed(2));
+        });
 
-            $.post('src/controller/controllerDashboardAnunciante.php', {
-                op: 22,
-                periodo: periodo
-            }, function(res) {
-                $('#profitMargin').text(parseFloat(res).toFixed(2) + '%');
-            });
-        }    // Vendas por Categoria (placeholder)
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 22,
+            periodo: periodo
+        }, function(res) {
+            $('#profitMargin').text(parseFloat(res).toFixed(2) + '%');
+        });
+    } // Vendas por Categoria (placeholder)
     function loadCategorySalesChart() {
         const ctx = document.getElementById('categorySalesChart');
         if (window.categoryChart && typeof window.categoryChart.destroy === 'function') window.categoryChart.destroy();
         const periodo = $('#reportPeriod').val();
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 23, periodo: periodo }, function(data) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 23,
+            periodo: periodo
+        }, function(data) {
             window.categoryChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -451,7 +462,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     // Receita Diária (placeholder)
     function loadDailyRevenueChart() {
         const ctx = document.getElementById('dailyRevenueChart');
-        if (window.dailyRevenueChart && typeof window.dailyRevenueChart.destroy === 'function') window.dailyRevenueChart.destroy();
+        if (window.dailyRevenueChart && typeof window.dailyRevenueChart.destroy === 'function') window.dailyRevenueChart
+            .destroy();
         const periodo = $('#reportPeriod').val();
 
         // Atualizar título e subtítulo baseado no período
@@ -465,7 +477,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             $('#revenueChartSubtitle').text('Evolução da receita em todo o período');
         }
 
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 24, periodo: periodo }, function(data) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 24,
+            periodo: periodo
+        }, function(data) {
             // Para dados mensais (year/all), usar gráfico de barras; para diários (month), usar linha
             const chartType = periodo === 'month' ? 'line' : 'bar';
             const chartLabel = periodo === 'month' ? 'Receita Diária (€)' : 'Receita Mensal (€)';
@@ -479,7 +494,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         label: chartLabel,
                         data: data.map(d => d.receita),
                         borderColor: '#A6D90C',
-                        backgroundColor: chartType === 'bar' ? '#A6D90C' : 'rgba(166, 217, 12, 0.15)',
+                        backgroundColor: chartType === 'bar' ? '#A6D90C' :
+                            'rgba(166, 217, 12, 0.15)',
                         borderWidth: 2,
                         hoverBackgroundColor: '#90c207'
                     }]
@@ -532,14 +548,26 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     // Tabela de Relatórios (placeholder)
     function loadReportsTable() {
         const periodo = $('#reportPeriod').val();
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 25, periodo: periodo }, function(data) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 25,
+            periodo: periodo
+        }, function(data) {
             $('#reportsTable').DataTable({
                 data: data,
-                columns: [
-                    { data: 'produto' },
-                    { data: 'vendas' },
-                    { data: 'receita', render: v => '€' + parseFloat(v).toFixed(2) },
-                    { data: 'lucro', render: v => '€' + parseFloat(v).toFixed(2) }
+                columns: [{
+                        data: 'produto'
+                    },
+                    {
+                        data: 'vendas'
+                    },
+                    {
+                        data: 'receita',
+                        render: v => '€' + parseFloat(v).toFixed(2)
+                    },
+                    {
+                        data: 'lucro',
+                        render: v => '€' + parseFloat(v).toFixed(2)
+                    }
                 ],
                 destroy: true,
                 pageLength: 10,
@@ -547,7 +575,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese.json'
                 },
                 drawCallback: function() {
-                    $('#reportsTable tbody tr').removeClass('even odd').css('background', '#ffffff');
+                    $('#reportsTable tbody tr').removeClass('even odd').css('background',
+                    '#ffffff');
                 }
             });
         }, 'json');
@@ -564,14 +593,30 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
         // Atualizar breadcrumb e ícone da navbar
         const paginas = {
-            'dashboard': { titulo: 'Dashboard', icone: 'fa-chart-line' },
-            'products': { titulo: 'Gestão de Produtos', icone: 'fa-tshirt' },
-            'sales': { titulo: 'Pedidos', icone: 'fa-shopping-bag' },
-            'analytics': { titulo: 'Relatórios', icone: 'fa-chart-bar' },
-            'profile': { titulo: 'Meu Perfil', icone: 'fa-user' }
+            'dashboard': {
+                titulo: 'Dashboard',
+                icone: 'fa-chart-line'
+            },
+            'products': {
+                titulo: 'Gestão de Produtos',
+                icone: 'fa-tshirt'
+            },
+            'sales': {
+                titulo: 'Pedidos',
+                icone: 'fa-shopping-bag'
+            },
+            'analytics': {
+                titulo: 'Relatórios',
+                icone: 'fa-chart-bar'
+            },
+            'profile': {
+                titulo: 'Meu Perfil',
+                icone: 'fa-user'
+            }
         };
         const pagina = paginas[pageId] || paginas['dashboard'];
-        document.getElementById('pageBreadcrumb').innerHTML = `<i class="navbar-icon fas ${pagina.icone}" id="pageIcon"></i> ${pagina.titulo}`;
+        document.getElementById('pageBreadcrumb').innerHTML =
+            `<i class="navbar-icon fas ${pagina.icone}" id="pageIcon"></i> ${pagina.titulo}`;
         document.getElementById('pageIcon').className = 'navbar-icon fas ' + pagina.icone;
 
         // Carregar dados específicos da página
@@ -593,7 +638,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
     // Funções globais para onclick
     function visualizarProduto(id) {
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 15, id: id }, function(dados) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 15,
+            id: id
+        }, function(dados) {
             if (dados && dados.Produto_id) {
                 const foto = dados.foto ? dados.foto : 'src/img/no-image.png';
                 const ativo = dados.ativo ? 'Sim' : 'Não';
@@ -674,7 +722,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
     function editarProduto(id) {
         console.log('Editando produto ID:', id);
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 15, id: id }, function(dados) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 15,
+            id: id
+        }, function(dados) {
             console.log('Dados recebidos:', dados);
             if (dados && dados.Produto_id) {
                 abrirModalProduto('Editar Produto', dados);
@@ -698,7 +749,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             cancelButtonText: 'Cancelar'
         }).then((resultado) => {
             if (resultado.isConfirmed) {
-                $.post('src/controller/controllerDashboardAnunciante.php', { op: 16, id: id }, function() {
+                $.post('src/controller/controllerDashboardAnunciante.php', {
+                    op: 16,
+                    id: id
+                }, function() {
                     Swal.fire('Removido!', 'Produto removido com sucesso.', 'success');
                     carregarProdutos();
                 });
@@ -747,7 +801,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             cancelButtonText: 'Cancelar'
         }).then((resultado) => {
             if (resultado.isConfirmed) {
-                $.post('src/controller/controllerDashboardAnunciante.php', { op: 17, ids: ids, ativo: 1 }, function() {
+                $.post('src/controller/controllerDashboardAnunciante.php', {
+                    op: 17,
+                    ids: ids,
+                    ativo: 1
+                }, function() {
                     Swal.fire('Sucesso!', 'Produtos ativados.', 'success');
                     carregarProdutos();
                     carregarEstatisticasProdutos();
@@ -767,7 +825,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             cancelButtonText: 'Cancelar'
         }).then((resultado) => {
             if (resultado.isConfirmed) {
-                $.post('src/controller/controllerDashboardAnunciante.php', { op: 17, ids: ids, ativo: 0 }, function() {
+                $.post('src/controller/controllerDashboardAnunciante.php', {
+                    op: 17,
+                    ids: ids,
+                    ativo: 0
+                }, function() {
                     Swal.fire('Sucesso!', 'Produtos desativados.', 'success');
                     carregarProdutos();
                     carregarEstatisticasProdutos();
@@ -790,7 +852,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             cancelButtonText: 'Cancelar'
         }).then((resultado) => {
             if (resultado.isConfirmed) {
-                $.post('src/controller/controllerDashboardAnunciante.php', { op: 18, ids: ids }, function() {
+                $.post('src/controller/controllerDashboardAnunciante.php', {
+                    op: 18,
+                    ids: ids
+                }, function() {
                     Swal.fire('Removido!', 'Produtos removidos com sucesso.', 'success');
                     carregarProdutos();
                     carregarEstatisticasProdutos();
@@ -839,7 +904,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         $.ajax({
             url: 'src/controller/controllerDashboardAnunciante.php',
             method: 'POST',
-            data: { op: 8 },
+            data: {
+                op: 8
+            },
             dataType: 'json'
         }).done(function(dados) {
             // Destruir DataTable existente se houver
@@ -849,24 +916,48 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
             window.tabelaProdutos = $('#productsTable').DataTable({
                 data: dados,
-                columns: [
-                    { data: null, orderable: false, render: (dados) => `<input type="checkbox" class="product-checkbox" data-id="${dados.Produto_id}">` },
-                    { data: 'foto', orderable: false, render: (foto) => {
-                        const imgSrc = foto ? foto : 'src/img/no-image.png';
-                        return `<img src="${imgSrc}" alt="Produto" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid #e2e8f0;">`;
-                    }},
-                    { data: 'nome' },
-                    { data: 'tipo_descricao' },
-                    { data: 'preco', render: v => '€' + parseFloat(v).toFixed(2) },
-                    { data: 'stock', render: (v) => {
-                        const stock = parseInt(v);
-                        if (stock < 5) {
-                            return `<span class="stock-low"><i class="fas fa-exclamation-triangle"></i> ${stock}</span>`;
+                columns: [{
+                        data: null,
+                        orderable: false,
+                        render: (dados) =>
+                            `<input type="checkbox" class="product-checkbox" data-id="${dados.Produto_id}">`
+                    },
+                    {
+                        data: 'foto',
+                        orderable: false,
+                        render: (foto) => {
+                            const imgSrc = foto ? foto : 'src/img/no-image.png';
+                            return `<img src="${imgSrc}" alt="Produto" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid #e2e8f0;">`;
                         }
-                        return stock;
-                    }},
-                    { data: 'estado' },
-                    { data: 'ativo', render: v => v ? '<span class="status-active">Sim</span>' : '<span class="status-inactive"><i class="fas fa-exclamation-circle"></i> Não</span>' }
+                    },
+                    {
+                        data: 'nome'
+                    },
+                    {
+                        data: 'tipo_descricao'
+                    },
+                    {
+                        data: 'preco',
+                        render: v => '€' + parseFloat(v).toFixed(2)
+                    },
+                    {
+                        data: 'stock',
+                        render: (v) => {
+                            const stock = parseInt(v);
+                            if (stock < 5) {
+                                return `<span class="stock-low"><i class="fas fa-exclamation-triangle"></i> ${stock}</span>`;
+                            }
+                            return stock;
+                        }
+                    },
+                    {
+                        data: 'estado'
+                    },
+                    {
+                        data: 'ativo',
+                        render: v => v ? '<span class="status-active">Sim</span>' :
+                            '<span class="status-inactive"><i class="fas fa-exclamation-circle"></i> Não</span>'
+                    }
                 ],
                 destroy: true,
                 pageLength: 10,
@@ -874,7 +965,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese.json'
                 },
                 drawCallback: function() {
-                    $('#productsTable tbody tr').removeClass('even odd').css('background', '#ffffff');
+                    $('#productsTable tbody tr').removeClass('even odd').css('background',
+                        '#ffffff');
                 }
             });
 
@@ -894,16 +986,24 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     $(document).ready(function() {
 
         // Carregar estatísticas principais do dashboard
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 3 }, function(res) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 3
+        }, function(res) {
             $('#PontosConfianca').html(res);
         });
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 1 }, function(res) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 1
+        }, function(res) {
             $('#PlanosAtual').html(res);
         });
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 2 }, function(res) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 2
+        }, function(res) {
             $('#ProdutoStock').html(res);
         });
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 4 }, function(res) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 4
+        }, function(res) {
             $('#GastosCard').html(res);
         });
 
@@ -925,13 +1025,19 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             // Limpar o canvas completamente
             ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
 
-            const colors = ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748'];
-            const hoverColors = ['#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c'];
+            const colors = ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C',
+                '#2d3748', '#A6D90C', '#2d3748', '#A6D90C', '#2d3748'
+            ];
+            const hoverColors = ['#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c',
+                '#90c207', '#1a202c', '#90c207', '#1a202c', '#90c207', '#1a202c'
+            ];
 
             window.salesChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set',
+                        'Out', 'Nov', 'Dez'
+                    ],
                     datasets: [{
                         label: 'Vendas (€)',
                         data: res,
@@ -1012,7 +1118,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     labels: res.map(p => p.nome),
                     datasets: [{
                         data: res.map(p => p.vendidos),
-                        backgroundColor: ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C'],
+                        backgroundColor: ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748',
+                            '#A6D90C'
+                        ],
                         borderColor: '#ffffff',
                         borderWidth: 2,
                         hoverBorderWidth: 3
@@ -1043,9 +1151,12 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             padding: 12,
                             callbacks: {
                                 label: function(context) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                    return context.label + ': ' + context.parsed + ' un (' + percentage + '%)';
+                                    const total = context.dataset.data.reduce((a, b) => a +
+                                        b, 0);
+                                    const percentage = ((context.parsed / total) * 100)
+                                        .toFixed(1);
+                                    return context.label + ': ' + context.parsed + ' un (' +
+                                        percentage + '%)';
                                 }
                             }
                         }
@@ -1082,7 +1193,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     labels: res.map(p => p.nome),
                     datasets: [{
                         data: res.map(p => p.lucro),
-                        backgroundColor: ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748', '#A6D90C'],
+                        backgroundColor: ['#A6D90C', '#2d3748', '#A6D90C', '#2d3748',
+                            '#A6D90C'
+                        ],
                         borderWidth: 2,
                         borderColor: '#ffffff',
                         hoverBorderWidth: 3
@@ -1105,7 +1218,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.label + ': €' + context.parsed.toFixed(2);
+                                    return context.label + ': €' + context.parsed.toFixed(
+                                    2);
                                 }
                             }
                         }
@@ -1164,10 +1278,13 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         });
 
         // Carregar Tipos de Produto
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 13 }, function(data) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 13
+        }, function(data) {
             console.log('Tipos recebidos:', data);
             if (Array.isArray(data)) {
-                data.forEach(t => $('#filterTipo, #tipo_produto_id').append(`<option value="${t.id}">${t.descricao}</option>`));
+                data.forEach(t => $('#filterTipo, #tipo_produto_id').append(
+                    `<option value="${t.id}">${t.descricao}</option>`));
             } else {
                 console.error('Tipos não é array:', data);
             }
@@ -1191,7 +1308,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             if (window.tabelaProdutos) {
                 window.tabelaProdutos.rows().every(function() {
                     const dadosLinha = this.data();
-                    const corresponde = !valor || (dadosLinha.genero && dadosLinha.genero === valor);
+                    const corresponde = !valor || (dadosLinha.genero && dadosLinha.genero ===
+                        valor);
                     $(this.node()).toggle(corresponde);
                 });
             }
@@ -1223,11 +1341,15 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
         // Exportar produtos para PDF
         $('#exportProductsBtn').on('click', function() {
-            const { jsPDF } = window.jspdf;
+            const {
+                jsPDF
+            } = window.jspdf;
             const doc = new jsPDF();
 
             const tabela = $('#productsTable').DataTable();
-            const dados = tabela.rows({ search: 'applied' }).data();
+            const dados = tabela.rows({
+                search: 'applied'
+            }).data();
 
             // Cabeçalho do PDF
             doc.setFontSize(18);
@@ -1254,7 +1376,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             // Criar tabela no PDF
             doc.autoTable({
                 startY: 35,
-                head: [['Nome', 'Tipo', 'Preço', 'Stock', 'Estado', 'Ativo']],
+                head: [
+                    ['Nome', 'Tipo', 'Preço', 'Stock', 'Estado', 'Ativo']
+                ],
                 body: linhasTabela,
                 theme: 'striped',
                 headStyles: {
@@ -1267,12 +1391,24 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     cellPadding: 3
                 },
                 columnStyles: {
-                    0: { cellWidth: 50 },
-                    1: { cellWidth: 35 },
-                    2: { cellWidth: 25 },
-                    3: { cellWidth: 20 },
-                    4: { cellWidth: 30 },
-                    5: { cellWidth: 20 }
+                    0: {
+                        cellWidth: 50
+                    },
+                    1: {
+                        cellWidth: 35
+                    },
+                    2: {
+                        cellWidth: 25
+                    },
+                    3: {
+                        cellWidth: 20
+                    },
+                    4: {
+                        cellWidth: 30
+                    },
+                    5: {
+                        cellWidth: 20
+                    }
                 }
             });
 
@@ -1432,7 +1568,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     // ========================
 
     function verificarPlanoUpgrade() {
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 27 }, function(resp) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 27
+        }, function(resp) {
             const dados = JSON.parse(resp);
             if (dados && dados.plano_nome !== 'Enterprise') {
                 $('#upgradeBtn').show();
@@ -1443,7 +1581,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     }
 
     function carregarPerfil() {
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 27 }, function(resp) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 27
+        }, function(resp) {
             const dados = JSON.parse(resp);
             if (dados.error) return Swal.fire('Erro', dados.error, 'error');
 
@@ -1489,7 +1629,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         </div>
                     </div>
                 </div>
-            `);// Tab 1: Informações Pessoais
+            `); // Tab 1: Informações Pessoais
             $('#profileInfo').html(`
                 <div class='section-header'>
                     <h3><i class='fas fa-user'></i> Informações Pessoais</h3>
@@ -1756,7 +1896,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 
     function carregarEstatisticasProdutos() {
         // Carregar estatísticas
-        $.post('src/controller/controllerDashboardAnunciante.php', { op: 31 }, function(stats) {
+        $.post('src/controller/controllerDashboardAnunciante.php', {
+            op: 31
+        }, function(stats) {
             console.log('Stats recebidas:', stats);
 
             // Card Produtos Ativos
@@ -1799,7 +1941,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             console.log('Elemento #totalProgress criado:', $('#totalProgress').length > 0);
 
             // Carregar limite de produtos (depois de criar o elemento #totalProgress)
-            $.post('src/controller/controllerDashboardAnunciante.php', { op: 14 }, function(limite) {
+            $.post('src/controller/controllerDashboardAnunciante.php', {
+                op: 14
+            }, function(limite) {
                 console.log('Limite recebido:', limite);
 
                 const percentagem = (limite.current / limite.max) * 100;
@@ -1821,7 +1965,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 console.log('Barra inserida, conteúdo de #totalProgress:', $('#totalProgress').html());
 
                 if (limite.current >= limite.max) {
-                    $('#addProductBtn').prop('disabled', true).css({'background-color': '#ccc', 'cursor': 'not-allowed', 'opacity': '0.6'});
+                    $('#addProductBtn').prop('disabled', true).css({
+                        'background-color': '#ccc',
+                        'cursor': 'not-allowed',
+                        'opacity': '0.6'
+                    });
                 }
             }, 'json').fail(function(xhr, status, error) {
                 console.error('Erro ao carregar limite:', error, xhr.responseText);
@@ -1830,12 +1978,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             console.error('Erro ao carregar estatísticas:', error, xhr.responseText);
         });
     }
-
     </script>
 </body>
 <?php
 }else{
-    echo "sem permissão!";
+header("Location: forbiddenerror.html");
 }
 ?>
 
