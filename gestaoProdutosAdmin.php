@@ -104,9 +104,9 @@
             <br>
             <br>
             <div class="tabs-container">
-                <button class="tab-btn active" onclick="switchTab('minhas-vendas')">
+                <!-- <button class="tab-btn active" onclick="switchTab('minhas-vendas')">
                     <i class="fas fa-list"></i> Meus Produtos
-                </button>
+                </button> -->
                 <!-- <button class="tab-btn" onclick="switchTab('adicionar-venda')">
                     <i class="fas fa-plus-circle"></i> Adicionar Produto
                 </button> -->
