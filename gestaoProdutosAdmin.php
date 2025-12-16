@@ -61,7 +61,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="chats.php">
+                        <a class="nav-link" href="Chatadmin.php">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
@@ -69,7 +69,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="fornecedores.php">
                             <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                            <span class="nav-text">Fornecedores</span>
+                            <span class="nav-text">Gestão de Fornecedores</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -90,13 +90,13 @@
             <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fas fa-fire"></i>Produto anunciados (por Categoria)</h3>
+                        <h3><i class="fas fa-fire"></i>Produto anunciados</h3>
                     </div>
                     <canvas id="topProductsChart"></canvas>
                 </div>
                 <div class="chart-card">
                     <div class="chart-header">
-                        <h3><i class="fas fa-star"></i>Produto Vendidos (por Categoria)</h3>
+                        <h3><i class="fas fa-star"></i>Produto Vendidos</h3>
                     </div>
                     <canvas id="salesChart"></canvas>
                 </div>
@@ -292,7 +292,7 @@
                             </div>
                             <div class="info-item">
                                 <label>Nome do Produto</label>
-                                <input type="text" class="form-control" id="nomeprodutoEdit2">
+                                <input type="text" class="form-control" id="nomeprodutoEdit2" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Categoria</label>
@@ -310,11 +310,11 @@
                             </div>
                             <div class="info-item">
                                 <label>Preço</label>
-                                <input type="text" class="form-control" id="precoprodutoEdit2">
+                                <input type="text" class="form-control" id="precoprodutoEdit2" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Gênero</label>
-                                <input type="text" class="form-control" id="generoprodutoEdit2">
+                                <input type="text" class="form-control" id="generoprodutoEdit2" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Vendedor</label>
@@ -354,34 +354,34 @@
                             </div>
                             <div class="info-item">
                                 <label>Nome do Produto</label>
-                                <input type="text" class="form-control" id="nomeprodutoEdit">
+                                <input type="text" class="form-control" id="nomeprodutoEdit" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Categoria</label>
-                                <select name="" id="categoriaprodutoEdit">
+                                <select name="" id="categoriaprodutoEdit" disabled>
 
                                 </select>
                             </div>
                             <div class="info-item">
                                 <label>Marca</label>
-                                <input type="text" class="form-control" id="marcaprodutoEdit">
+                                <input type="text" class="form-control" id="marcaprodutoEdit" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Tamanho</label>
-                                <input type="text" class="form-control" id="tamanhoprodutoEdit">
+                                <input type="text" class="form-control" id="tamanhoprodutoEdit" disabled>
                             </div>
 
                             <div class="info-item">
                                 <label>Preço</label>
-                                <input type="text" class="form-control" id="precoprodutoEdit">
+                                <input type="text" class="form-control" id="precoprodutoEdit" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Gênero</label>
-                                <input type="text" class="form-control" id="generoprodutoEdit">
+                                <input type="text" class="form-control" id="generoprodutoEdit" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Vendedor</label>
-                                <select name="" id="vendedorprodutoEdit">
+                                <select name="" id="vendedorprodutoEdit" disabled>
 
                                 </select>
                             </div>

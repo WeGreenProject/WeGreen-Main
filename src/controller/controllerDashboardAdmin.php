@@ -44,4 +44,5 @@ if ($_POST['op'] == 10) {
     $resp = $func->logout();
     echo $resp;
 }
+
 ?>
