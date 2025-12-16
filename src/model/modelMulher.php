@@ -10,7 +10,7 @@ function getFiltrosMulherCategoria() {
     $sql = "SELECT id AS ValueProduto, tipo_produtos.descricao AS NomeProduto FROM tipo_produtos,Produtos where Produtos.ativo = 1 AND tipo_produtos.id = Produtos.tipo_produto_id group by tipo_produtos.id;";
     $result = $conn->query($sql);
 
-    $msg .= "<option value='-1'>Selecionar Categoria...</option>";
+    $msg .= "<option value='-1'>Selecionar Categoria</option>";
     
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
@@ -33,7 +33,7 @@ function getFiltrosMulherCategoria() {
         $result = $conn->query($sql);
 
 
-        $msg .= "<option value='-1'>Selecionar o Tamanho...</option>";
+        $msg .= "<option value='-1'>Selecionar Tamanho</option>";
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
 
@@ -60,7 +60,7 @@ function getFiltrosMulherCategoria() {
         $result = $conn->query($sql);
 
 
-        $msg .= "<option value='-1'>Selecionar Estado...</option>";
+        $msg .= "<option value='-1'>Selecionar Estado.</option>";
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
 
@@ -100,12 +100,12 @@ function getProdutosMulher($categoria,$tamanho,$estado){
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $msg .= "<div class='col-md-3 col-sm-6'>";
-            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-80'>";
             $msg .= "<img src='".$row["foto"]."' height='340px' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
             $msg .= "<div class='card-body text-center'>";
             $msg .= "<h6 class='mb-1'>" . $row["nome"] . "</h6>";
             $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-            $msg .= "<p class='fw-bold text-success'>" . $row["preco"] . "€ <span class='fw-normal'>(com IVA)</span></p>";
+            $msg .= "<p class='fw-bold text-black'>" . $row["preco"] . "€ <span class='fw-normal'>(com IVA)</span></p>";
             $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-outline-success rounded-pill w-95 fw-semibold'>Ver Produto</a>";
             $msg .= "</div></div></div>";
         }
