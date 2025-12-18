@@ -63,9 +63,12 @@ $sessionData = [
     'success_url' => 'http://localhost/wegreen-main/sucess_carrinho.php?session_id={CHECKOUT_SESSION_ID}', 
     'cancel_url' => 'http://localhost/wegreen-main/carrinho.html', 
     'metadata' => [ 
-        'utilizador' => $utilizador_id,
-        'tipo' => 'carrinho'
-    ],
+    'utilizador' => $utilizador_id,
+    'tipo' => 'carrinho',
+    'dpd_pickup' => 'DPD Pickup – Rua Exemplo 123, 1000-001 Lisboa',
+    'ctt_pickup' => 'CTT Pickup – Loja Central, 4000-123 Porto'
+],
+
 
     'shipping_address_collection' => [
         'allowed_countries' => ['PT'],

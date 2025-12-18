@@ -410,7 +410,7 @@ class DashboardAnunciante {
 
         // Inserir o produto principal
         $foto_principal = !empty($fotos) ? $fotos[0] : '';
-        $ativo = 1;
+        $ativo = 0;
 
         $sql = "INSERT INTO Produtos (nome, tipo_produto_id, preco, stock, marca, tamanho, estado, genero, descricao, anunciante_id, foto, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
