@@ -128,15 +128,6 @@ class Carrinho {
         $msg .= "<span>Total:</span>";
         $msg .= "<span id='total'>€".number_format($total, 2)."</span>";
         $msg .= "</div>";
-
-        $msg .= "<button class='btn-checkout mt-3' onclick='irParaCheckout()'>";
-        $msg .= "<span>Finalizar Checkout</span>";
-        $msg .= "<span>→</span>";
-        $msg .= "</button>";
-
-        $msg .= "<div class='secure-checkout'>";
-        $msg .= "<span>🔒</span>";
-        $msg .= "<span>Pagamento 100% Seguro</span>";
         $msg .= "</div>";
         $msg .= "</div>";
 

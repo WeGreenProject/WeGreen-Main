@@ -1,8 +1,3 @@
-<?php
-    session_start();
-
-    if($_SESSION['tipo'] == 1 ||$_SESSION['tipo'] == 2){ 
-?>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -204,7 +199,7 @@ body {
             
             <div class="detail-row" id="Encomenda">
             <span class="detail-label">Pedido</span>
-             <span class="detail-label">Botas Ana Salazar</span>    
+             <span class="detail-label">Blusa Colorida Custo Barcelona</span>    
             </div>
             
             <div class="detail-row">
@@ -275,9 +270,3 @@ body {
 </body>
 </html>
 <script src="src/js/checkout.js"></script>
-<?php
-}else{
-    echo "sem permissão!";
-}
-
-?>

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeGreen | Sobre Nós</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+    <link rel="stylesheet" href="src/css/lib/datatables.css">
+    <link rel="stylesheet" href="src/css/lib/select2.css">
+    <link rel="stylesheet" href="src/css/style.css">
+
+    <script src="src/js/lib/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="src/js/lib/datatables.js"></script>
+    <script src="src/js/lib/select2.js"></script>
+    <script src="src/js/lib/sweatalert.js"></script>
+
+    <style>
+        :root {
+            --primary-green: #3cb371;
+            --dark-green: #2e9b5a;
+            --light-green: #e8f5e9;
+            --text-dark: #1a1a1a;
+            --text-gray: #666;
+            --bg-light: #fafafa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #ffffff;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Hero Section */
+        .hero-about {
+            height: 70vh;
+            background: url('src/img/pexels-ron-lach-8396317.jpg') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            margin-top: 80px;
+            margin-left: 20px;
+            margin-right: 20px;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .hero-about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: pulseGlow 8s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            padding: 40px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-content h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .hero-content .subtitle {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            letter-spacing: 0.5px;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-indicator i {
+            font-size: 32px;
+            color: white;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* About Title Section */
+        .about-title-section {
+            padding: 100px 0 60px;
+            background: white;
+            text-align: center;
+        }
+
+        .about-main-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .about-subtitle {
+            font-size: 18px;
+            color: var(--text-gray);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Mission Section */
+        .mission-section {
+            padding: 60px 0 120px;
+            background: white;
+            position: relative;
+        }
+
+        .mission-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to bottom, var(--light-green), transparent);
+            opacity: 0.3;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 56px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: var(--primary-green);
+        }
+
+        .mission-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+            margin-top: 60px;
+        }
+
+        .mission-text {
+            position: relative;
+        }
+
+        .mission-text p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: var(--text-gray);
+            margin-bottom: 25px;
+        }
+
+        .mission-text .highlight {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary-green);
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .mission-image {
+            position: relative;
+            height: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .mission-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .mission-image:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Values Section */
+        .values-section {
+            padding: 120px 0;
+            background: var(--bg-light);
+            position: relative;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .value-card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .value-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-green);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(60, 179, 113, 0.2);
+        }
+
+        .value-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .value-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: var(--light-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: var(--primary-green);
+            transition: all 0.4s ease;
+        }
+
+        .value-card:hover .value-icon {
+            background: var(--primary-green);
+            color: white;
+            transform: rotate(360deg);
+        }
+
+        .value-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .value-card p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-gray);
+        }
+
+        /* Story Section */
+        .story-section {
+            padding: 120px 0;
+            background: white;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 80px auto 0;
+            padding: 0 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-green);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            width: calc(50% - 40px);
+            background: var(--bg-light);
+            padding: 40px;
+            border-radius: 15px;
+            position: relative;
+            opacity: 0;
+            animation: fadeInTimeline 0.8s ease-out forwards;
+        }
+
+        .timeline-item:nth-child(1) .timeline-content { animation-delay: 0.2s; }
+        .timeline-item:nth-child(2) .timeline-content { animation-delay: 0.4s; }
+        .timeline-item:nth-child(3) .timeline-content { animation-delay: 0.6s; }
+        .timeline-item:nth-child(4) .timeline-content { animation-delay: 0.8s; }
+
+        @keyframes fadeInTimeline {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .timeline-year {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            box-shadow: 0 0 0 10px white;
+        }
+
+        .timeline-content h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+
+        .timeline-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-gray);
+        }
+
+        /* Team Section */
+        .team-section {
+            padding: 120px 0;
+            background: var(--light-green);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .team-member {
+            text-align: center;
+            position: relative;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .team-member:nth-child(1) { animation-delay: 0.1s; }
+        .team-member:nth-child(2) { animation-delay: 0.2s; }
+        .team-member:nth-child(3) { animation-delay: 0.3s; }
+        .team-member:nth-child(4) { animation-delay: 0.4s; }
+
+        .team-photo {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            filter: grayscale(20%);
+        }
+
+        .team-photo:hover img {
+            transform: scale(1.1);
+            filter: grayscale(0%);
+        }
+
+        .team-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(60, 179, 113, 0.9), transparent);
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .team-photo:hover .team-overlay {
+            transform: translateY(0);
+        }
+
+        .team-social {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .team-social a {
+            color: white;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .team-social a:hover {
+            transform: scale(1.2);
+        }
+
+        .team-member h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+        }
+
+        .team-member .role {
+            font-size: 15px;
+            color: var(--primary-green);
+            font-weight: 600;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: var(--text-dark);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(60, 179, 113, 0.1) 0%, transparent 50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-content h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .cta-content p {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 18px 50px;
+            background: var(--primary-green);
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(60, 179, 113, 0.3);
+        }
+
+        .cta-btn:hover {
+            background: var(--dark-green);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(60, 179, 113, 0.4);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content h1 {
+                font-size: 52px;
+            }
+
+            .mission-content {
+                grid-template-columns: 1fr;
+                gap: 50px;
+            }
+
+            .values-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .team-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item {
+                flex-direction: row !important;
+                padding-left: 80px;
+            }
+
+            .timeline-content {
+                width: 100%;
+            }
+
+            .timeline-year {
+                left: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-about {
+                height: 60vh;
+            }
+
+            .hero-content h1 {
+                font-size: 38px;
+            }
+
+            .hero-content .subtitle {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .values-grid,
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mission-section,
+            .values-section,
+            .story-section,
+            .team-section {
+                padding: 80px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-main text-white w-100 z-3" style="position: fixed; top: 0; left: 0; right: 0; background-color: #000000; z-index: 1030;">
+        <div class="container-fluid px-5">
+            <nav class="navbar navbar-expand-lg py-3">
+                
+                <a class="navbar-brand me-4" href="index.html">
+                    <img src="src\img\2-removebg-preview.png" alt="Wegreen Logo" class="logo-img" style="width: auto; height: 30px;">
+                </a>
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-start" id="navbarNav">
+                    <ul class="navbar-nav mb-2 mb-lg-0">
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mulher</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="produtosmulher.html">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
+                                <li><a class="dropdown-item" href="#">Tops e T-shirts</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Acessórios</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Homem</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="produtoshomem.html">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Blusas</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Calçado</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Crianças</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                            <li><a class="dropdown-item" href="produtoscriança.html">Ver Tudo</a></li>
+                                <li><a class="dropdown-item" href="#">Blusas</a></li>
+                                <li><a class="dropdown-item" href="#">Casacos</a></li>
+                                <li><a class="dropdown-item" href="#">T-shirts</a></li>
+                                <li><a class="dropdown-item" href="#">Calças</a></li>
+                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
+                                <li><a class="dropdown-item" href="#">Calçado</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="produtosDesigner.html">Designers</a></li>
+                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="produtoartesao.html">Artesãos</a></li>
+                        
+                        <li class="nav-item dropdown mx-2">
+                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Marcas</a>
+                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
+                                <li><a class="dropdown-item" href="#">Naz</a></li>
+                                <li><a class="dropdown-item" href="#">Nea Vegan Shoes</a></li>
+                                <li><a class="dropdown-item" href="#">PlayUp®</a></li>
+                                <li><a class="dropdown-item" href="#">Vintage for a Cause</a></li>
+                                <li><a class="dropdown-item" href="#">Isto®</a></li>
+                            </ul>
+                        </li>
+                         <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="suporte.html">Suporte</a></li>
+                    </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="d-flex align-items-center ms-auto">
+                    
+                    <form class="d-flex search-bar me-3" role="search">
+                        <input class="form-control rounded-pill me-2 border-0 bg-secondary bg-opacity-25 text-white" type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
+                        <button class="btn btn-outline-light rounded-pill" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+
+                    <a class="nav-link text-white mx-2 fs-5" href="checkout.html"><i class="bi bi-bag"></i></a> 
+
+                    <div class="nav-item dropdown" id="Perfil_do_Utilizador">
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-about">
+        <div class="scroll-indicator">
+            <i class="bi bi-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- About Title Section -->
+    <section class="about-title-section">
+        <div class="container">
+            <h2 class="about-main-title">Sobre Nós</h2>
+            <p class="about-subtitle">Descobre a missão, visão e valores que orientam o nosso propósito sustentável.</p>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="container">
+            <h2 class="section-title">A Nossa Missão</h2>
+            <div class="mission-content">
+                <div class="mission-text">
+                    <p class="highlight">"Criar uma indústria da moda mais consciente, transparente e sustentável para as gerações futuras."</p>
+                    <p>Na WeGreen, acreditamos que a moda pode ser uma força positiva para a mudança. Desde a nossa fundação, dedicamo-nos a conectar consumidores conscientes com designers e artesãos que partilham os nossos valores de sustentabilidade e ética.</p>
+                    <p>Cada produto na nossa plataforma é cuidadosamente selecionado para garantir que cumpre os mais altos padrões de qualidade, responsabilidade ambiental e práticas laborais justas. Porque a moda sustentável não deve ser um luxo, mas uma escolha acessível para todos.</p>
+                    <p>Trabalhamos diretamente com criadores locais e internacionais que utilizam materiais orgânicos, reciclados e biodegradáveis, promovendo uma economia circular que respeita tanto as pessoas quanto o planeta.</p>
+                </div>
+                <div class="mission-image">
+                    <img src="src/img/download (4).jpeg" alt="Moda Sustentável">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="container">
+            <h2 class="section-title text-center">Os Nossos Valores</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="bi bi-leaf"></i>
+                    </div>
+                    <h3>Sustentabilidade</h3>
+                    <p>Priorizamos materiais ecológicos e processos de produção que minimizam o impacto ambiental, protegendo o nosso planeta para as futuras gerações.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="bi bi-heart"></i>
+                    </div>
+                    <h3>Transparência</h3>
+                    <p>Acreditamos na honestidade total sobre as nossas práticas, desde a origem dos materiais até às condições de trabalho dos artesãos.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3>Comunidade</h3>
+                    <p>Construímos uma rede de designers, artesãos e consumidores que partilham a mesma visão de um futuro mais sustentável e justo.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <h3>Qualidade</h3>
+                    <p>Cada peça é selecionada pela sua durabilidade e design atemporal, promovendo um consumo consciente e de longa duração.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="bi bi-star"></i>
+                    </div>
+                    <h3>Inovação</h3>
+                    <p>Exploramos constantemente novas tecnologias e métodos sustentáveis para criar uma indústria da moda mais responsável.</p>
+                </div>
+
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="bi bi-globe"></i>
+                    </div>
+                    <h3>Impacto Global</h3>
+                    <p>Trabalhamos para criar mudanças positivas que vão além das nossas fronteiras, inspirando uma transformação global na indústria.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="team-section">
+        <div class="container">
+            <h2 class="section-title text-center">A Nossa Equipa</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-photo">
+                        <img src="src/img/jessica.png" alt="Maria Silva">
+                        <div class="team-overlay">
+                            <div class="team-social">
+                                <a href="#"><i class="bi bi-linkedin"></i></a>
+                                <a href="#"><i class="bi bi-instagram"></i></a>
+                                <a href="#"><i class="bi bi-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Jéssica Fernandes</h3>
+                    <p class="role">Desenvolvedora de Front-End</p>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-photo">
+                        <img src="src/img/joao.png" alt="João Santos">
+                        <div class="team-overlay">
+                            <div class="team-social">
+                                <a href="#"><i class="bi bi-linkedin"></i></a>
+                                <a href="#"><i class="bi bi-instagram"></i></a>
+                                <a href="#"><i class="bi bi-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>João Santos</h3>
+                    <p class="role">Desenvolvedora de Fullstack</p>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-photo">
+                        <img src="src/img/4.png" alt="Ana Costa">
+                        <div class="team-overlay">
+                            <div class="team-social">
+                                <a href="#"><i class="bi bi-linkedin"></i></a>
+                                <a href="#"><i class="bi bi-instagram"></i></a>
+                                <a href="#"><i class="bi bi-envelope"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>Manuel Silvestre</h3>
+                    <p class="role">Desenvolvedor de Back-End</p>
+                </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Junte-se à Revolução Verde</h2>
+                <p>Faça parte da mudança. Descubra moda sustentável que reflete os seus valores.</p>
+                <a href="index.html" class="cta-btn">Explorar Produtos</a>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
