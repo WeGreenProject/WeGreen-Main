@@ -38,7 +38,7 @@ function PerfilDoUtilizador()
     })
     
     .done(function( msg ) {
-         $('#Perfil_do_Utilizador').html(msg);
+         $('#FotoPerfil').attr('src', msg);
     })
     
     .fail(function( jqXHR, textStatus ) {
@@ -100,6 +100,7 @@ function getDadosPlanos(){
     });
 
 }
+
 $(function() {
     PerfilDoUtilizador();
     getDadosTipoPerfil();

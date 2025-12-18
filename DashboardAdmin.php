@@ -50,13 +50,13 @@ if($_SESSION['tipo'] == 1){
                     <li class="nav-item">
                         <a class="nav-link" href="vendas.php">
                             <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Vendas</span>
+                            <span class="nav-text">Gestao de Utilizadores</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="ProdutosAdmin.php">
                             <span class="nav-icon"><i class="fas fa-check-circle"></i></span>
-                            <span class="nav-text">Aprovar Produtos</span>
+                            <span class="nav-text">Gestao de Clientes</span>
                         </a>
                     </li>
                     <li class="nav-item">
