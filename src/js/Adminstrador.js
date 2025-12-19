@@ -219,7 +219,7 @@ function getVendasGrafico() {
                     }]
                 },
                 options: {
-                    responsive: true,
+                    resFponsive: true,
                     maintainAspectRatio: true,
                     interaction: {
                         intersect: false,

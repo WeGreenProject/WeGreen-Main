@@ -48,7 +48,7 @@ if($_SESSION['tipo'] == 1){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="vendas.php">
+                        <a class="nav-link" href="gestaoCliente.php">
                             <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
                             <span class="nav-text">Gestao de Utilizadores</span>
                         </a>

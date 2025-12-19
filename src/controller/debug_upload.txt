@@ -1,0 +1,2 @@
+Entrou na condição de upload
+is_uploaded_file OK
