@@ -1,0 +1,55 @@
+[17-Dec-2025 00:12:16 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 112
+[17-Dec-2025 00:12:16 Europe/Berlin] PHP Warning:  Undefined array key "nome" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 113
+[17-Dec-2025 00:12:16 Europe/Berlin] PHP Warning:  Undefined array key "tipo_produto_id" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 114
+[17-Dec-2025 00:12:16 Europe/Berlin] PHP Warning:  Undefined array key "preco" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 115
+[17-Dec-2025 00:12:16 Europe/Berlin] PHP Warning:  Undefined array key "estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 119
+[17-Dec-2025 00:12:16 Europe/Berlin] PHP Warning:  Undefined array key "genero" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 120
+[17-Dec-2025 00:12:33 Europe/Berlin] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php:415
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(415): mysqli_stmt->bind_param('sidisssssiss', 'Vestido Versace...', '1', '23', '2', 'Versace', 's', 'Excelente', 'Mulher', 'sad', 3, 'src/img/6941e76...')
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(192): DashboardAnunciante->insertProduto('Vestido Versace...', '1', '23', '2', 'Versace', 's', 'Excelente', 'Mulher', 'sad', 3, Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php on line 415
+[17-Dec-2025 00:13:43 Europe/Berlin] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php:423
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(423): mysqli_stmt->bind_param('sidisssssissi', 'Vestido Versace...', '1', '23', '2', 'Versace', 'S', 'Excelente', 'Mulher', 'asda', 3, 'src/img/6941e7a...', 1)
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(192): DashboardAnunciante->insertProduto('Vestido Versace...', '1', '23', '2', 'Versace', 'S', 'Excelente', 'Mulher', 'asda', 3, Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php on line 423
+[17-Dec-2025 00:14:37 Europe/Berlin] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php:423
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(423): mysqli_stmt->bind_param('sidisssssissi', 'Vestido Versace...', '1', '23', '2', 'Versace', 'S', 'Excelente', 'Mulher', 'asd', 3, 'src/img/6941e7d...', 1)
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(192): DashboardAnunciante->insertProduto('Vestido Versace...', '1', '23', '2', 'Versace', 'S', 'Excelente', 'Mulher', 'asd', 3, Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php on line 423
+[17-Dec-2025 00:16:22 Europe/Berlin] Erro ao adicionar produto: Column 'produto_id' cannot be null
+[17-Dec-2025 00:22:17 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[17-Dec-2025 00:22:17 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[17-Dec-2025 00:22:21 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[17-Dec-2025 00:22:21 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[17-Dec-2025 00:22:51 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[17-Dec-2025 00:22:51 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[17-Dec-2025 09:17:09 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[17-Dec-2025 09:17:09 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[17-Dec-2025 09:43:03 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[17-Dec-2025 09:43:03 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[17-Dec-2025 09:51:48 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`wegreen`.`encomendas`, CONSTRAINT `encomendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`)) in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php:373
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(373): mysqli_stmt->execute()
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(315): DashboardAnunciante->removerProdutosEmMassa(Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php on line 373
+[17-Dec-2025 09:51:53 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot delete or update a parent row: a foreign key constraint fails (`wegreen`.`encomendas`, CONSTRAINT `encomendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`)) in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php:373
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(373): mysqli_stmt->execute()
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(315): DashboardAnunciante->removerProdutosEmMassa(Array)
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php on line 373
+[17-Dec-2025 10:02:00 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[17-Dec-2025 10:02:00 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[17-Dec-2025 11:26:47 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[17-Dec-2025 11:26:47 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[20-Dec-2025 10:43:10 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[20-Dec-2025 10:43:10 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[20-Dec-2025 10:43:33 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[20-Dec-2025 10:43:33 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
