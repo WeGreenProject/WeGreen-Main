@@ -31,5 +31,4 @@ if ($_POST['op'] == 6) {
     $resp = $func->adicionarFotoPerfil($_SESSION["utilizador"], $_FILES['foto']);
     echo $resp;
 }
- 
 ?>

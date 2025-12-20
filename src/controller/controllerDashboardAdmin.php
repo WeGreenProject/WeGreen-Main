@@ -44,5 +44,8 @@ if ($_POST['op'] == 10) {
     $resp = $func->logout();
     echo $resp;
 }
-
+ if ($_POST['op'] == 21) {
+    $resp = $func->getAdminPerfil($_SESSION["utilizador"]);
+    echo $resp;
+}
 ?>

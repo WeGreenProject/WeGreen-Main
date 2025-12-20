@@ -62,7 +62,10 @@ function getInfoUserDropdown()
     })
     
     .done(function( msg ) {
-         $('#userDropdown').html(msg);
+        console.log(msg);
+        $('#userDropdown').html(msg);
+        // Reinicializa o evento de clique após o conteúdo ser carregado
+        initializeDropdownEvents();
     })
     
     .fail(function( jqXHR, textStatus ) {
@@ -70,6 +73,29 @@ function getInfoUserDropdown()
     });
 
 }
+
+function initializeDropdownEvents() {
+    // Remove eventos anteriores para evitar duplicação
+    $('.navbar-user').off('click');
+    
+    // Adiciona evento de clique no elemento user
+    $('.navbar-user').on('click', function(e) {
+        e.stopPropagation();
+        $('#userDropdown').toggleClass('active');
+    });
+    
+    // Fecha ao clicar fora
+    $(document).off('click.dropdown').on('click.dropdown', function(e) {
+        if (!$(e.target).closest('.navbar-user').length) {
+            $('#userDropdown').removeClass('active');
+        }
+    });
+}
+
+function closeUserDropdown() {
+    $('#userDropdown').removeClass('active');
+}
+
 function logout(){
     let dados = new FormData();
     dados.append("op", 10);
@@ -85,21 +111,18 @@ function logout(){
     })  
     
     .done(function(msg) {
-
-
-    alerta("Utilizador","Obrigado! Por usar nosso website","success");
-    
-    setTimeout(function(){ 
-        window.location.href = "index.html";
-    }, 2000);
+        alerta("Utilizador","Obrigado! Por usar nosso website","success");
         
+        setTimeout(function(){ 
+            window.location.href = "index.html";
+        }, 2000);
     })
     
     .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
+        alert( "Request failed: " + textStatus );
     });
-
 }
+
 function alerta(titulo,msg,icon){
     Swal.fire({
         position: 'center',
@@ -107,9 +130,9 @@ function alerta(titulo,msg,icon){
         title: titulo,
         text: msg,
         showConfirmButton: true,
-
-      })
+    })
 }
+
 function getRendimentos()
 {
     let dados = new FormData();
@@ -158,7 +181,31 @@ function getGastos()
     });
 
 }
+function getAdminPerfil()
+{
+    let dados = new FormData();
+    dados.append("op", 21);
 
+    $.ajax({
+    url: "src/controller/controllerDashboardAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+        console.log(msg);
+         $('#AdminPerfilInfo').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
 function getVendasGrafico() {
     $.ajax({
         url: "src/controller/controllerDashboardAdmin.php",
@@ -428,7 +475,9 @@ function getProdutosInvativo(){
 });
 
 }
+
 $(function() {
+    getAdminPerfil();
     getProdutosInvativo();
     getTopTipoGrafico();
     getDadosPerfil();
