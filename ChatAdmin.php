@@ -45,15 +45,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="vendas.php">
+                        <a class="nav-link active" href="gestaoCliente.php">
                             <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Vendas</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="ProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-check-circle"></i></span>
-                            <span class="nav-text">Aprovar Produtos</span>
+                            <span class="nav-text">Gestao de Utilizadores</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -63,7 +57,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="Chatadmin.php">
+                        <a class="nav-link" href="Chatadmin.php">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>

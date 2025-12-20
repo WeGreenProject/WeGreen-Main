@@ -20,4 +20,20 @@ if ($_POST['op'] == 4) {
     $resp = $func->removerClientes($_POST["ID_Cliente"]);
     echo $resp;
 }
+if ($_POST['op'] == 5) {
+    $resp = $func->getDadosCliente($_POST["id"]);
+    echo $resp;
+}
+if ($_POST['op'] == 6) {
+    $resp = $func->guardaEditCliente(        
+        $_POST["viewNome"],
+        $_POST["viewEmail"],
+        $_POST["viewTelefone"],
+        $_POST["viewTipo"],
+        $_POST["viewNif"],
+        $_POST["viewPlano"],
+        $_POST["viewRanking"],
+        $_POST["ID_Utilizador"]);
+    echo $resp;
+}
 ?>

@@ -205,6 +205,35 @@ class DashboardAdmin{
             return ($msg);
 
         }
+        function getAdminPerfil($ID_User){
+    global $conn;
+    $msg = "";
+    $row = "";
+    $sql = "SELECT * from utilizadores where id = ".$ID_User;
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $msg  = "<div class='user-avatar'><img src='".$row["foto"]."' alt='Avatar'></div>";
+            $msg .= "<div class='user-info'>";
+            $msg .= "<span class='user-name'>".$row["nome"]."</span>";
+            $msg .= "<span class='user-role'>Administrador</span>";
+            $msg .= "</div>";
+        }
+    }
+    else
+    {
+        $msg  = "<div class='user-avatar'>A</div>";
+        $msg .= "<div class='user-info'>";
+        $msg .= "<span class='user-name'>Administrador</span>";
+        $msg .= "<span class='user-role'>Admin</span>";
+        $msg .= "</div>";
+    }
+    $conn->close();
+
+    return ($msg);
+}
         function getNovosRendimentos(){
         global $conn;
         $msg = "";

@@ -149,6 +149,72 @@
             height: 32px;
         }
 
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .modal-footer .btn {
+            min-width: 150px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-footer .btn-secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+            border: 2px solid transparent;
+        }
+
+        .modal-footer .btn-secondary:hover {
+            background: #cbd5e0;
+            color: #1a202c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-footer .btn-primary {
+            background: linear-gradient(90deg, #A6D90C 0%, #90c207 100%);
+            color: #1a202c;
+            box-shadow: 0 4px 15px rgba(166, 217, 12, 0.25);
+            border: 2px solid transparent;
+        }
+
+        .modal-footer .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(166, 217, 12, 0.4);
+        }
+
+        .modal-footer .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(166, 217, 12, 0.3);
+        }
+
+        .modal-footer .btn i {
+            font-size: 16px;
+        }
+
+        /* Estilo para input desabilitado */
+        #viewIDedit:disabled {
+            background: #e2e8f0;
+            color: #718096;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
         .nav-icon {
             font-size: 18px;
             width: 20px;
@@ -793,6 +859,18 @@
             /* Animação suave */
             animation: modalFadeIn 0.3s ease-out;
         }
+
+        .swal2-popup.custom-toast {
+            background-color: #4CAF50 !important;
+            color: white !important;
+            width: 400px !important;
+        }
+
+        .swal2-popup.toast-error {
+            background-color: #f44336 !important;
+            color: white !important;
+            width: 400px !important;
+        }
         </style>
     </head>
 
@@ -822,14 +900,8 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="gestaoCliente.php">
-                                <span class="nav-icon"><i class="fas fa-users"></i></span>
-                                <span class="nav-text">Gestão de Clientes</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="ProdutosAdmin.php">
                                 <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                                <span class="nav-text">Encomendas</span>
+                                <span class="nav-text">Gestao de Utilizadores</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -847,7 +919,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="fornecedores.php">
                                 <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                                <span class="nav-text">Fornecedores</span>
+                                <span class="nav-text">Gestão de Fornecedores</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -1002,53 +1074,49 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>Detalhes do Cliente</h3>
-                    <button class="close-btn" onclick="closeViewModal()">&times;</button>
+                    <button class="close-btn" onclick="closeModal2()">&times;</button>
                 </div>
                 <div class="client-view-grid">
                     <div class="info-group">
+                        <label>ID Utilizador</label>
+                        <input id="viewIDedit"></input disable>
+                    </div>
+                    <div class="info-group">
                         <label>Nome Completo</label>
-                        <span id="viewNome">-</span>
+                        <input id="viewNome"></input>
                     </div>
                     <div class="info-group">
                         <label>Email</label>
-                        <span id="viewEmail">-</span>
+                        <input id="viewEmail"></input>
                     </div>
                     <div class="info-group">
                         <label>Telefone</label>
-                        <span id="viewTelefone">-</span>
+                        <input id="viewTelefone"></input>
                     </div>
                     <div class="info-group">
                         <label>Tipo</label>
-                        <span id="viewTipo">-</span>
+                        <input id="viewTipo"></input>
                     </div>
                     <div class="info-group">
                         <label>NIF</label>
-                        <span id="viewNif">-</span>
+                        <input id="viewNif"></input>
                     </div>
                     <div class="info-group">
-                        <label>Data Nascimento</label>
-                        <span id="viewDataNascimento">-</span>
+                        <label>Plano</label>
+                        <input id="viewPlano"></input>
                     </div>
                     <div class="info-group" style="grid-column: 1 / -1;">
-                        <label>Morada</label>
-                        <span id="viewMorada">-</span>
+                        <label>Ranking</label>
+                        <input id="viewRanking"></input>
                     </div>
-                    <div class="info-group">
-                        <label>Código Postal</label>
-                        <span id="viewCodigoPostal">-</span>
-                    </div>
-                    <div class="info-group">
-                        <label>Localidade</label>
-                        <span id="viewLocalidade">-</span>
-                    </div>
-                    <div class="info-group">
-                        <label>Data Registo</label>
-                        <span id="viewDataRegisto">-</span>
-                    </div>
-                    <div class="info-group">
-                        <label>Status</label>
-                        <span id="viewStatus">-</span>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Fechar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnGuardar">
+                        <i class="bi bi-check-circle"></i> Guardar Alterações
+                    </button>
                 </div>
             </div>
         </div>

@@ -54,12 +54,6 @@ if($_SESSION['tipo'] == 1){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="ProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-check-circle"></i></span>
-                            <span class="nav-text">Gestao de Clientes</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="analytics.php">
                             <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
                             <span class="nav-text">Análises</span>
@@ -98,16 +92,11 @@ if($_SESSION['tipo'] == 1){
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </button>
-                    <div class="navbar-user" onclick="toggleUserDropdown()">
-                        <div class="user-avatar">A</div>
-                        <div class="user-info">
-                            <span class="user-name">Administrador</span>
-                            <span class="user-role">Admin</span>
-                        </div>
-                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #4a5568;"></i>
-                        <div class="user-dropdown" id="userDropdown">
+                    <div class="navbar-user">
+                        <div id="AdminPerfilInfo" style="display:flex;"></div>
+                        <i class=" fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>
 
-                        </div>
+                        <div class="user-dropdown" id="userDropdown"></div>
                     </div>
                 </div>
             </nav>

@@ -29,10 +29,7 @@ class ClienteAdmin{
                     $msg .= "<td>".$row["data_criacao"]."</td>";
                     $msg .= "<td>";
                     $msg .= "<div class='action-buttons'>";
-                    $msg .= "<button class='btn-action btn-view' onclick='viewClient(".$row["id"].")' title='Ver Detalhes'>";
-                    $msg .= "<i class='fas fa-eye'></i>";
-                    $msg .= "</button>";
-                    $msg .= "<button class='btn-action btn-edit' onclick='editClient(".$row["id"].")' title='Editar'>";
+                    $msg .= "<button class='btn-action btn-edit' onclick='getDadosCliente(".$row["id"].")' title='Editar'>";
                     $msg .= "<i class='fas fa-edit'></i>";
                     $msg .= "</button>";
                     $msg .= "<button class='btn-action btn-delete' onclick='removerClientes(".$row["id"].")' title='Eliminar'>";
@@ -57,7 +54,51 @@ class ClienteAdmin{
 
         return ($msg);
     }
-function registaClientes($nome, $email, $telefone, $tipo, $nif, $password, $foto){
+    function getDadosCliente($ID_Utilizador){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * FROM utilizadores WHERE id =".$ID_Utilizador;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+        }
+
+        $conn->close();
+
+        return (json_encode($row));
+
+    }
+    function guardaEditCliente($nome, $email, $telefone, $tipo,$nif,$plano,$rank,$ID_Utilizador){
+        
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+
+        $sql = "UPDATE utilizadores SET nome = '".$nome."', email = '".$email."',telefone = '".$telefone."',tipo_utilizador_id = '".$tipo."',plano_id = '".$plano."',nif = '".$nif."',ranking_id = '".$rank."' WHERE id =".$ID_Utilizador;
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Editado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close(); 
+
+        return($resp);
+
+    }
+    function registaClientes($nome, $email, $telefone, $tipo, $nif, $password, $foto){
     global $conn;
     $msg = "";
     $flag = true;

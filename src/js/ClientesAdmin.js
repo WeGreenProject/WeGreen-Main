@@ -30,10 +30,13 @@ function getClientes(){
 
 }
 function showModal() {
-    $('#clientModal').modal('show');
+    $('#clientModal').addClass('active');
 }
 function closeModal() {
-    $('#clientModal').modal('hide');
+    $('#clientModal').removeClass('active');
+}
+function closeModal2() {
+    $('#viewModal').removeClass('active');
 }
 function getCardUtilizadores()
 {
@@ -141,6 +144,86 @@ function alerta(titulo,msg,icon){
         text: msg,
         showConfirmButton: true,
       })
+}
+function getDadosCliente(id){
+
+
+    let dados = new FormData();
+    dados.append("op", 5);
+    dados.append("id", id);
+
+    $.ajax({
+    url: "src/controller/controllerClientesAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+        
+        let obj = JSON.parse(msg);
+        $('#viewIDedit').val(obj.id);
+        $('#viewNome').val(obj.nome);
+        $('#viewEmail').val(obj.email);
+        $('#viewTelefone').val(obj.telefone);
+        $('#viewTipo').val(obj.tipo_utilizador_id);
+        $('#viewNif').val(obj.nif);
+        $('#viewPlano').val(obj.plano_id);
+        $('#viewRanking').val(obj.ranking_id);
+       $('#btnGuardar').attr("onclick","guardaEditCliente("+obj.id+")") 
+        
+       $('#viewModal').addClass('active');
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+    
+}
+
+function guardaEditCliente(ID_Utilizador) {
+    let dados = new FormData();
+    dados.append("op", 6);
+    dados.append("viewIDedit", $('#viewIDedit').val());
+    dados.append("viewNome", $('#viewNome').val());
+    dados.append("viewEmail", $('#viewEmail').val());
+    dados.append("viewTelefone", $('#viewTelefone').val());
+    dados.append("viewTipo", $('#viewTipo').val());
+    dados.append("viewNif", $('#viewNif').val());
+    dados.append("viewPlano", $('#viewPlano').val());
+    dados.append("viewRanking", $('#viewRanking').val());
+    dados.append("ID_Utilizador", ID_Utilizador);
+
+    $.ajax({
+        url: "src/controller/controllerClientesAdmin.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(msg) {
+    closeModal2();
+        
+        let obj = JSON.parse(msg);
+        if(obj.flag) {
+            alerta("Fornecedor", obj.msg, "success");
+            alerta2(obj.msg,"success");
+            getClientes();
+        } else {
+            alerta2(obj.msg,"error");
+            alerta("Fornecedor", obj.msg, "error");
+        }
+        console.log(msg);
+    })
+    .fail(function(jqXHR, textStatus) {
+        alert("Request failed: " + textStatus);
+    });
 }
 function alerta2(msg,icon)
 {
