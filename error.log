@@ -49,3 +49,7 @@ Stack trace:
 [17-Dec-2025 10:02:00 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
 [17-Dec-2025 11:26:47 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
 [17-Dec-2025 11:26:47 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[20-Dec-2025 10:43:10 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[20-Dec-2025 10:43:10 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[20-Dec-2025 10:43:33 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[20-Dec-2025 10:43:33 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
