@@ -54,9 +54,9 @@ if($_SESSION['tipo'] == 1){
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="analytics.php">
-                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
-                            <span class="nav-text">Análises</span>
+                        <a class="nav-link" href="gestaoLucros.php">
+                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
+                            <span class="nav-text">Gestão de Lucros</span>
                         </a>
                     </li>
                     <li class="nav-item">
