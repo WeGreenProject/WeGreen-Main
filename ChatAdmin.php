@@ -45,19 +45,19 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="gestaoCliente.php">
+                        <a class="nav-link" href="gestaoCliente.php">
                             <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
                             <span class="nav-text">Gestao de Utilizadores</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="analytics.php">
-                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
-                            <span class="nav-text">Análises</span>
+                        <a class="nav-link" href="gestaoLucros.php">
+                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
+                            <span class="nav-text">Gestão de Lucros</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php">
+                        <a class="nav-link active" href="Chatadmin.php">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
@@ -66,12 +66,6 @@
                         <a class="nav-link" href="fornecedores.php">
                             <span class="nav-icon"><i class="fas fa-truck"></i></span>
                             <span class="nav-text">Gestão de Fornecedores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="perfilAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
-                            <span class="nav-text">Configurações</span>
                         </a>
                     </li>
                 </ul>
