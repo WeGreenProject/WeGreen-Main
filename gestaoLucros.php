@@ -96,116 +96,167 @@ if($_SESSION['tipo'] == 1){
         margin-bottom: 40px;
     }
 
+    /* Substituir o CSS dos summary-card existente por este */
+
+    .lucros-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
     .summary-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
-        border: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        border: 1px solid #4a5568;
         border-radius: 20px;
-        padding: 30px;
+        padding: 35px;
         position: relative;
         overflow: hidden;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .summary-card:hover {
-        border-color: #A6D90C;
         transform: translateY(-5px);
-        box-shadow: 0 12px 35px rgba(166, 217, 12, 0.15);
+        box-shadow: 0 12px 35px rgba(166, 217, 12, 0.2);
     }
 
     .summary-card::before {
         content: '';
         position: absolute;
-        top: -50px;
-        right: -50px;
+        top: 0;
+        right: 0;
         width: 150px;
         height: 150px;
-        border-radius: 50%;
-        opacity: 0.1;
+        background: radial-gradient(circle, rgba(166, 217, 12, 0.12) 0%, transparent 70%);
     }
 
-    .summary-card.receitas::before {
-        background: #48bb78;
+    /* Bordas específicas por tipo */
+    .summary-card.receitas {
+        border-left: 4px solid #48bb78;
     }
 
-    .summary-card.despesas::before {
-        background: #f56565;
+    .summary-card.receitas:hover {
+        border-left-color: #38a169;
     }
 
-    .summary-card.lucro::before {
-        background: #A6D90C;
+    .summary-card.despesas {
+        border-left: 4px solid #f56565;
     }
 
-    .summary-card.margem::before {
-        background: #4299e1;
+    .summary-card.despesas:hover {
+        border-left-color: #e53e3e;
+    }
+
+    .summary-card.lucro {
+        border-left: 4px solid #A6D90C;
+    }
+
+    .summary-card.lucro:hover {
+        border-left-color: #8fb80a;
+    }
+
+    .summary-card.margem {
+        border-left: 4px solid #4299e1;
+    }
+
+    .summary-card.margem:hover {
+        border-left-color: #3182ce;
     }
 
     .summary-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        font-size: 48px;
+        margin-bottom: 18px;
+        width: auto;
+        height: auto;
+        border-radius: 0;
+        display: block;
+        box-shadow: none;
+        background: none;
     }
 
+    /* Ícones coloridos por tipo */
     .summary-card.receitas .summary-icon {
-        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        color: #ffffff;
+        filter: drop-shadow(0 4px 8px rgba(72, 187, 120, 0.4));
+        color: #48bb78;
     }
 
     .summary-card.despesas .summary-icon {
-        background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-        color: #ffffff;
+        filter: drop-shadow(0 4px 8px rgba(245, 101, 101, 0.4));
+        color: #f56565;
     }
 
     .summary-card.lucro .summary-icon {
-        background: linear-gradient(135deg, #A6D90C 0%, #90c207 100%);
-        color: #1a202c;
+        filter: drop-shadow(0 4px 8px rgba(166, 217, 12, 0.4));
+        color: #A6D90C;
     }
 
     .summary-card.margem .summary-icon {
-        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-        color: #ffffff;
+        filter: drop-shadow(0 4px 8px rgba(66, 153, 225, 0.4));
+        color: #4299e1;
     }
 
     .summary-label {
-        font-size: 13px;
-        color: #718096;
-        font-weight: 600;
+        color: #cbd5e0;
+        font-size: 12px;
+        margin-bottom: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 10px;
+        letter-spacing: 0.8px;
+        font-weight: 600;
     }
 
     .summary-value {
-        font-size: 36px;
+        font-size: 48px;
         font-weight: 800;
-        color: #1a202c;
         line-height: 1;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+    }
+
+    /* Valores coloridos por tipo */
+    .summary-card.receitas .summary-value {
+        color: #48bb78;
+        text-shadow: 0 2px 6px rgba(72, 187, 120, 0.25);
+    }
+
+    .summary-card.despesas .summary-value {
+        color: #f56565;
+        text-shadow: 0 2px 6px rgba(245, 101, 101, 0.25);
+    }
+
+    .summary-card.lucro .summary-value {
+        color: #A6D90C;
+        text-shadow: 0 2px 6px rgba(166, 217, 12, 0.25);
+    }
+
+    .summary-card.margem .summary-value {
+        color: #4299e1;
+        text-shadow: 0 2px 6px rgba(66, 153, 225, 0.25);
     }
 
     .summary-change {
-        font-size: 13px;
+        font-size: 14px;
+        margin-top: 0;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        padding: 5px 10px;
-        border-radius: 8px;
+        padding: 0;
+        border-radius: 0;
+        background: none;
     }
 
     .summary-change.positive {
-        background: #c6f6d5;
-        color: #22543d;
+        color: #4ade80;
+        background: none;
     }
 
     .summary-change.negative {
-        background: #fed7d7;
-        color: #742a2a;
+        color: #f87171;
+        background: none;
     }
 
     .lucros-tables {
@@ -246,6 +297,303 @@ if($_SESSION['tipo'] == 1){
 
     .table-header h3 i {
         color: #A6D90C;
+    }
+
+    /* Adicionar este CSS ao arquivo - Seção de Formulários */
+
+    .forms-lucros {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 1024px) {
+        .forms-lucros {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-section {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    /* Card de Formulário */
+    .form-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        padding: 25px;
+        transition: all 0.3s ease;
+        min-height: 280px;
+    }
+
+    .form-card:hover {
+        border-color: #A6D90C;
+        box-shadow: 0 4px 12px rgba(166, 217, 12, 0.1);
+    }
+
+    .form-header {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .form-header h3 {
+        font-size: 18px;
+        color: #1a202c;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 5px;
+    }
+
+    .form-header h3 i {
+        color: #A6D90C;
+        font-size: 20px;
+    }
+
+    .form-header p {
+        color: #718096;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #1a202c;
+        transition: all 0.3s;
+        background: #ffffff;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #A6D90C;
+        box-shadow: 0 0 0 3px rgba(166, 217, 12, 0.1);
+    }
+
+    .form-input::placeholder {
+        color: #a0aec0;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 14px 25px;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-success {
+        background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+        color: #ffffff;
+    }
+
+    .btn-success:hover {
+        box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+    }
+
+    .btn-danger {
+        background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
+        color: #ffffff;
+    }
+
+    .btn-danger:hover {
+        box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
+    }
+
+    /* Card de Tabela */
+    .table-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 15px;
+        padding: 25px;
+        transition: all 0.3s ease;
+        min-height: 450px;
+    }
+
+    .table-card:hover {
+        border-color: #A6D90C;
+    }
+
+    .table-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .table-card-header h3 {
+        font-size: 18px;
+        color: #1a202c;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .table-card-header h3 i {
+        color: #A6D90C;
+    }
+
+    .btn-export-sm {
+        padding: 8px 16px;
+        background: #2d3748;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-export-sm:hover {
+        background: #1a202c;
+        transform: translateY(-2px);
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    }
+
+    .data-table th {
+        padding: 12px 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e2e8f0;
+        white-space: nowrap;
+    }
+
+    .data-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #1a202c;
+        font-size: 14px;
+    }
+
+    .data-table tbody tr {
+        transition: all 0.2s;
+    }
+
+    .data-table tbody tr:hover {
+        background: #f7fafc;
+    }
+
+    /* Botões de ação na tabela */
+    .btn-action {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-edit {
+        background: #bee3f8;
+        color: #1e4e8c;
+    }
+
+    .btn-edit:hover {
+        background: #90cdf4;
+    }
+
+    .btn-remove {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    .btn-remove:hover {
+        background: #fc8181;
+        color: #ffffff;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .table-card {
+            min-height: auto;
+        }
+
+        .data-table {
+            font-size: 12px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 8px 10px;
+        }
     }
 
     .btn-export {
@@ -389,19 +737,13 @@ if($_SESSION['tipo'] == 1){
                     <li class="nav-item">
                         <a class="nav-link" href="gestaoCliente.php">
                             <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Gestão de Utilizadores</span>
+                            <span class="nav-text">Gestao de Utilizadores</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="gestaoLucros.php">
                             <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
                             <span class="nav-text">Gestão de Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="analytics.php">
-                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
-                            <span class="nav-text">Análises</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -416,12 +758,7 @@ if($_SESSION['tipo'] == 1){
                             <span class="nav-text">Gestão de Fornecedores</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="perfilAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
-                            <span class="nav-text">Configurações</span>
-                        </a>
-                    </li>
+
                 </ul>
             </nav>
         </aside>
@@ -451,62 +788,135 @@ if($_SESSION['tipo'] == 1){
                     <p>Análise detalhada de receitas, despesas e margem de lucro</p>
                 </div>
 
-                <!-- Filtros -->
-                <div class="lucros-filters">
-                    <div class="filter-group">
-                        <label>Período</label>
-                        <select id="periodoFilter">
-                            <option value="hoje">Hoje</option>
-                            <option value="semana">Esta Semana</option>
-                            <option value="mes" selected>Este Mês</option>
-                            <option value="trimestre">Este Trimestre</option>
-                            <option value="ano">Este Ano</option>
-                            <option value="personalizado">Personalizado</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>Categoria</label>
-                        <select id="categoriaFilter">
-                            <option value="todas">Todas as Categorias</option>
-                            <option value="vendas">Vendas de Produtos</option>
-                            <option value="assinaturas">Assinaturas</option>
-                            <option value="outros">Outros</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>&nbsp;</label>
-                        <button class="btn-filter">
-                            <i class="fas fa-filter"></i>
-                            Aplicar Filtros
-                        </button>
-                    </div>
-                </div>
-
                 <!-- Resumo Financeiro -->
                 <div class="lucros-summary">
 
                 </div>
 
 
-                <div class="charts-lucros">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3><i class="fas fa-chart-line"></i> Evolução Da Receita</h3>
-                            <p>Comparação de receitas, despesas e lucros</p>
+                <!-- Substituir a div .charts-lucros por este código -->
+                <div class="forms-lucros">
+                    <!-- Coluna Gastos -->
+                    <div class="form-section">
+                        <!-- Card Adicionar Gastos -->
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3><i class="fas fa-wallet"></i> Adicionar Gastos</h3>
+                                <p>Registar novos gastos e despesas</p>
+                            </div>
+                            <form class="form-grid">
+                                <div class="form-group">
+                                    <label>Descrição</label>
+                                    <input type="text" class="form-input" placeholder="Ex: Fornecedor, Material..."
+                                        id="descricaoGasto">
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor (€)</label>
+                                    <input type="text" class="form-input" placeholder="0.00" id="valorGasto">
+                                </div>
+                                <div class="form-group">
+                                    <label>Data</label>
+                                    <input type="date" class="form-input" id="dataGasto">
+                                </div>
+                                <div class="form-group full-width">
+                                    <button type="button" class="btn-submit btn-danger" onclick="registaGastos()">
+                                        <i class="fas fa-plus-circle"></i>
+                                        Registar Gasto
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <canvas id="evolucaoChart"></canvas>
+
+                        <!-- Tabela Gastos -->
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <h3><i class="fas fa-list"></i> Lista de Gastos</h3>
+                                <button class="btn-export-sm">
+                                    <i class="fas fa-download"></i>
+                                    Exportar
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="tblGastos">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Descrição</th>
+                                            <th>Valor</th>
+                                            <th>Data</th>
+                                            <th>Editar</th>
+                                            <th>Remover</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="listagemGastos">
+                                        <!-- Dados dinâmicos via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3><i class="fas fa-chart-pie"></i> Distribuição de Receitas</h3>
-                            <p>Por categoria de produto</p>
+                    <!-- Coluna Rendimentos -->
+                    <div class="form-section">
+                        <!-- Card Adicionar Rendimentos -->
+                        <div class="form-card">
+                            <div class="form-header">
+                                <h3><i class="fas fa-hand-holding-usd"></i> Adicionar Rendimentos</h3>
+                                <p>Registar novas receitas e rendimentos</p>
+                            </div>
+                            <form class="form-grid">
+                                <div class="form-group">
+                                    <label>Descrição</label>
+                                    <input type="text" class="form-input" placeholder="Ex: Venda, Serviço..."
+                                        id="descricaoRendimento">
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor (€)</label>
+                                    <input type="text" class="form-input" placeholder="0.00" id="valorRendimento">
+                                </div>
+                                <div class="form-group">
+                                    <label>Data</label>
+                                    <input type="date" class="form-input" id="dataRendimento">
+                                </div>
+                                <div class="form-group full-width">
+                                    <button type="button" class="btn-submit btn-success" onclick="registaRendimentos()">
+                                        <i class="fas fa-plus-circle"></i>
+                                        Registar Rendimento
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <canvas id="distribuicaoChart"></canvas>
+
+                        <!-- Tabela Rendimentos -->
+                        <div class="table-card">
+                            <div class="table-card-header">
+                                <h3><i class="fas fa-list"></i> Lista de Rendimentos</h3>
+                                <button class="btn-export-sm">
+                                    <i class="fas fa-download"></i>
+                                    Exportar
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="tblRendimentos">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Descrição</th>
+                                            <th>Valor</th>
+                                            <th>Data</th>
+                                            <th>Editar</th>
+                                            <th>Remover</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="listagemRendimentos">
+                                        <!-- Dados dinâmicos via JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Tabela de Transações -->
                 <div class="lucros-tables">
                     <div class="lucros-table-card">
                         <div class="table-header">
@@ -522,168 +932,19 @@ if($_SESSION['tipo'] == 1){
                                     <th>ID</th>
                                     <th>Data</th>
                                     <th>Tipo</th>
+                                    <th>Anunciante</th>
                                     <th>Descrição</th>
-                                    <th>Categoria</th>
-                                    <th>Receita</th>
-                                    <th>Despesa</th>
-                                    <th>Lucro</th>
-                                    <th>Status</th>
+                                    <th>Valor</th>
                                 </tr>
                             </thead>
                             <tbody id="transacoesBody">
-                                <tr>
-                                    <td>#1234</td>
-                                    <td>23/12/2025</td>
-                                    <td><span class="badge badge-success">Venda</span></td>
-                                    <td>Camisa Sustentável - Pedido #5678</td>
-                                    <td>Vestuário</td>
-                                    <td class="valor-positivo">€89.90</td>
-                                    <td class="valor-negativo">€45.50</td>
-                                    <td class="valor-neutro">€44.40</td>
-                                    <td><span class="badge badge-success">Concluído</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#1233</td>
-                                    <td>23/12/2025</td>
-                                    <td><span class="badge badge-info">Assinatura</span></td>
-                                    <td>Plano Premium - João Silva</td>
-                                    <td>Assinaturas</td>
-                                    <td class="valor-positivo">€29.90</td>
-                                    <td class="valor-negativo">€5.00</td>
-                                    <td class="valor-neutro">€24.90</td>
-                                    <td><span class="badge badge-success">Ativo</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#1232</td>
-                                    <td>22/12/2025</td>
-                                    <td><span class="badge badge-warning">Despesa</span></td>
-                                    <td>Fornecedor - Matéria Prima</td>
-                                    <td>Operacional</td>
-                                    <td>-</td>
-                                    <td class="valor-negativo">€1,250.00</td>
-                                    <td class="valor-negativo">-€1,250.00</td>
-                                    <td><span class="badge badge-success">Pago</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#1231</td>
-                                    <td>22/12/2025</td>
-                                    <td><span class="badge badge-success">Venda</span></td>
-                                    <td>Calças Eco-Friendly - Pedido #5677</td>
-                                    <td>Vestuário</td>
-                                    <td class="valor-positivo">€129.90</td>
-                                    <td class="valor-negativo">€68.00</td>
-                                    <td class="valor-neutro">€61.90</td>
-                                    <td><span class="badge badge-success">Concluído</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#1230</td>
-                                    <td>21/12/2025</td>
-                                    <td><span class="badge badge-success">Venda</span></td>
-                                    <td>Conjunto Sustentável - Pedido #5676</td>
-                                    <td>Vestuário</td>
-                                    <td class="valor-positivo">€199.90</td>
-                                    <td class="valor-negativo">€95.00</td>
-                                    <td class="valor-neutro">€104.90</td>
-                                    <td><span class="badge badge-warning">Processando</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Tabela de Produtos Mais Lucrativos -->
-                    <div class="lucros-table-card">
-                        <div class="table-header">
-                            <h3><i class="fas fa-trophy"></i> Produtos Mais Lucrativos</h3>
-                            <button class="btn-export">
-                                <i class="fas fa-download"></i>
-                                Exportar Excel
-                            </button>
-                        </div>
-                        <table class="lucros-table">
-                            <thead>
-                                <tr>
-                                    <th>Posição</th>
-                                    <th>Produto</th>
-                                    <th>Categoria</th>
-                                    <th>Vendas</th>
-                                    <th>Receita Total</th>
-                                    <th>Custo Total</th>
-                                    <th>Lucro Total</th>
-                                    <th>Margem</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><span class="badge badge-warning">🥇 1º</span></td>
-                                    <td>Camisa Sustentável</td>
-                                    <td>Vestuário</td>
-                                    <td>156 unidades</td>
-                                    <td class="valor-positivo">€14,024.40</td>
-                                    <td class="valor-negativo">€7,098.00</td>
-                                    <td class="valor-neutro">€6,926.40</td>
-                                    <td><span class="badge badge-success">49.4%</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="badge badge-info">🥈 2º</span></td>
-                                    <td>Calças Eco-Friendly</td>
-                                    <td>Vestuário</td>
-                                    <td>98 unidades</td>
-                                    <td class="valor-positivo">€12,730.20</td>
-                                    <td class="valor-negativo">€6,664.00</td>
-                                    <td class="valor-neutro">€6,066.20</td>
-                                    <td><span class="badge badge-success">47.6%</span></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="badge badge-danger">🥉 3º</span></td>
-                                    <td>Conjunto Sustentável</td>
-                                    <td>Vestuário</td>
-                                    <td>72 unidades</td>
-                                    <td class="valor-positivo">€14,392.80</td>
-                                    <td class="valor-negativo">€6,840.00</td>
-                                    <td class="valor-neutro">€7,552.80</td>
-                                    <td><span class="badge badge-success">52.5%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>4º</td>
-                                    <td>Mochila Reciclada</td>
-                                    <td>Acessórios</td>
-                                    <td>134 unidades</td>
-                                    <td class="valor-positivo">€8,040.00</td>
-                                    <td class="valor-negativo">€4,824.00</td>
-                                    <td class="valor-neutro">€3,216.00</td>
-                                    <td><span class="badge badge-success">40.0%</span></td>
-                                </tr>
-                                <tr>
-                                    <td>5º</td>
-                                    <td>Ténis Vegano</td>
-                                    <td>Calçado</td>
-                                    <td>89 unidades</td>
-                                    <td class="valor-positivo">€8,010.00</td>
-                                    <td class="valor-negativo">€4,450.00</td>
-                                    <td class="valor-neutro">€3,560.00</td>
-                                    <td><span class="badge badge-success">44.4%</span></td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
         </main>
     </div>
     <script src="src/js/GestaoLucros.js"></script>
-    <script>
-    $(document).ready(function() {
-        $('#transacoesTable').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/pt-PT.json'
-            },
-            order: [
-                [0, 'desc']
-            ],
-            pageLength: 10
-        });
-    });
-    </script>
     <?php
 }else{
 header("Location: forbiddenerror.html");

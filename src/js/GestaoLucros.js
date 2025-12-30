@@ -64,8 +64,42 @@ function GraficoReceita() {
                 console.error("Erro AJAX:", error);
             }
         });
+}
+
+function getTransicoes(){
+
+    
+    if ( $.fn.DataTable.isDataTable('#transacoesTable') ) {
+        $('#transacoesTable').DataTable().destroy();
     }
+
+    let dados = new FormData();
+    dados.append("op", 4);
+
+    $.ajax({
+    url: "src/controller/controllerGestaoLucros.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+        console.log(msg);
+        $('#transacoesBody').html(msg);
+        $('#transacoesTable').DataTable();
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+});
+
+}
 $(function() {
+    getTransicoes();
     getCards();
     GraficoReceita();
 });

@@ -71,12 +71,6 @@ if($_SESSION['tipo'] == 1){
                             <span class="nav-text">Gestão de Fornecedores</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="perfilAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-cog"></i></span>
-                            <span class="nav-text">Configurações</span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </aside>
