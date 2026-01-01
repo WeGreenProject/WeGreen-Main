@@ -10,12 +10,12 @@ class ChatAnunciante{
         $row = "";
 
         $sql = "SELECT * from Produtos where Produto_id =".$ID_Produto;
-        
+
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
-                
+
             $msg .= "<div class='product-sidebar'>";
 
             $msg .= "<img src='".$row["foto"]."' alt='Produto' class='product-image'>";
@@ -36,7 +36,7 @@ class ChatAnunciante{
             }
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -46,7 +46,7 @@ class ChatAnunciante{
         $row = "";
 
         $sql = "SELECT * from utilizadores where id =".$ID_Anunciante;
-        
+
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -64,7 +64,7 @@ class ChatAnunciante{
             }
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -73,7 +73,7 @@ class ChatAnunciante{
         $msg = "";
         $row = "";
 
-        $sql = "SELECT * FROM Utilizadores WHERE id = " . $ID_User;
+        $sql = "SELECT * FROM Utilizadores WHERE id = '" . $ID_User . "'";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -85,7 +85,7 @@ class ChatAnunciante{
                 $msg .= "</ul>";
 
             }
-            
+
         }
         else
         {
@@ -96,7 +96,7 @@ class ChatAnunciante{
                 $msg .= "</ul>";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -128,7 +128,7 @@ function ChatMensagens($ID_Anunciante,$ID_Consumidor,$ID_Produto){
         global $conn;
         $msg = "";
         $row = "";
-    $sqlFoto2 = "SELECT foto As PerfilAnunciante FROM Utilizadores WHERE id = $ID_Anunciante";
+    $sqlFoto2 = "SELECT foto As PerfilAnunciante FROM Utilizadores WHERE id = '" . $ID_Anunciante . "'";
     $resultFoto2 = $conn->query($sqlFoto2);
     $fotoPerfil2 = "";
 
@@ -138,7 +138,7 @@ function ChatMensagens($ID_Anunciante,$ID_Consumidor,$ID_Produto){
     }
 
 
-    $sqlFoto = "SELECT foto FROM Utilizadores WHERE id = $ID_Consumidor";
+    $sqlFoto = "SELECT foto FROM Utilizadores WHERE id = '" . $ID_Consumidor . "'";
     $resultFoto = $conn->query($sqlFoto);
     $fotoPerfil = "";
 
@@ -146,13 +146,13 @@ function ChatMensagens($ID_Anunciante,$ID_Consumidor,$ID_Produto){
         $rowFoto = $resultFoto->fetch_assoc();
         $fotoPerfil = $rowFoto["foto"];
     }
-        
-        $sql = "SELECT * FROM Mensagens 
-WHERE 
+
+        $sql = "SELECT * FROM Mensagens
+WHERE
     (
-        (remetente_id = $ID_Anunciante AND destinatario_id = $ID_Consumidor)
+        (remetente_id = '" . $ID_Anunciante . "' AND destinatario_id = '" . $ID_Consumidor . "')
         OR
-        (remetente_id = $ID_Consumidor AND destinatario_id = $ID_Anunciante)
+        (remetente_id = '" . $ID_Consumidor . "' AND destinatario_id = '" . $ID_Anunciante . "')
     )
     AND Produto_id = $ID_Produto
 ORDER BY id ASC;";
@@ -185,14 +185,14 @@ ORDER BY id ASC;";
                     $msg .= "</div>";
                 }
             }
-            
+
         }
         else
         {
                 $msg  = "";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }

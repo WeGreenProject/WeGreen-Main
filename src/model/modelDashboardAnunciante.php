@@ -327,17 +327,6 @@ class DashboardAnunciante {
         return json_encode($produto);
     }
 
-    function deleteProduto($id) {
-        global $conn;
-        $sql = "DELETE FROM Produtos WHERE Produto_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
-
-        return "Produto removido";
-    }
-
     function atualizarAtivoEmMassa($ids, $ativo) {
         global $conn;
         if (empty($ids) || !is_array($ids)) {
@@ -356,24 +345,98 @@ class DashboardAnunciante {
         $stmt->close();
         return $resultado;
     }
+function removerProdutosEmMassa($ids) {
+    global $conn;
 
-    function removerProdutosEmMassa($ids) {
-        global $conn;
-        if (empty($ids) || !is_array($ids)) {
-            return false;
+    // Normalizar entrada: aceitar tanto um ID único quanto array
+    if (!is_array($ids)) {
+        $ids = [$ids];
+    }
+
+    if (empty($ids)) {
+        return json_encode(['success' => false, 'message' => 'Nenhum produto selecionado']);
+    }
+
+    error_log('removerProdutosEmMassa - IDs: ' . print_r($ids, true));
+
+    try {
+        $removidos = 0;
+        $desativados = 0;
+
+        foreach ($ids as $id) {
+            // Verificar se tem encomendas ou vendas
+            $sqlCheck = "SELECT
+                (SELECT COUNT(*) FROM Encomendas WHERE produto_id = ?) as encomendas,
+                (SELECT COUNT(*) FROM Vendas WHERE produto_id = ?) as vendas";
+            $stmtCheck = $conn->prepare($sqlCheck);
+            $stmtCheck->bind_param("ii", $id, $id);
+            $stmtCheck->execute();
+            $resultCheck = $stmtCheck->get_result();
+            $rowCheck = $resultCheck->fetch_assoc();
+            $stmtCheck->close();
+
+            $temEncomendas = $rowCheck['encomendas'] > 0;
+            $temVendas = $rowCheck['vendas'] > 0;
+
+            if ($temEncomendas || $temVendas) {
+                // Desativar produto em vez de remover
+                $sqlUpdate = "UPDATE Produtos SET ativo = 0 WHERE Produto_id = ?";
+                $stmtUpdate = $conn->prepare($sqlUpdate);
+                $stmtUpdate->bind_param("i", $id);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+                error_log("Produto $id desativado (tem encomendas ou vendas)");
+                $desativados++;
+            } else {
+                // Pode remover - primeiro remove do carrinho
+                $sqlCarrinho = "DELETE FROM Carrinho WHERE produto_id = ?";
+                $stmtCarrinho = $conn->prepare($sqlCarrinho);
+                if ($stmtCarrinho) {
+                    $stmtCarrinho->bind_param("i", $id);
+                    $stmtCarrinho->execute();
+                    $stmtCarrinho->close();
+                }
+
+                // Remove fotos adicionais
+                $sqlFotos = "DELETE FROM Produto_Fotos WHERE produto_id = ?";
+                $stmtFotos = $conn->prepare($sqlFotos);
+                if ($stmtFotos) {
+                    $stmtFotos->bind_param("i", $id);
+                    $stmtFotos->execute();
+                    $stmtFotos->close();
+                }
+
+                // Remove o produto
+                $sqlDelete = "DELETE FROM Produtos WHERE Produto_id = ?";
+                $stmtDelete = $conn->prepare($sqlDelete);
+                $stmtDelete->bind_param("i", $id);
+                $stmtDelete->execute();
+                $stmtDelete->close();
+                error_log("Produto $id removido");
+                $removidos++;
+            }
         }
 
-        $marcadores = implode(',', array_fill(0, count($ids), '?'));
-        $sql = "DELETE FROM Produtos WHERE Produto_id IN ($marcadores)";
-        $stmt = $conn->prepare($sql);
+        // Montar mensagem de resposta
+        $mensagens = [];
+        if ($removidos > 0) {
+            $mensagens[] = "$removidos produto(s) removido(s)";
+        }
+        if ($desativados > 0) {
+            $mensagens[] = "$desativados produto(s) desativado(s) (possui histórico de vendas/encomendas)";
+        }
 
-        $tipos = str_repeat('i', count($ids));
-        $stmt->bind_param($tipos, ...$ids);
+        $msg = implode(' e ', $mensagens);
+        error_log("Resultado final: $msg");
 
-        $resultado = $stmt->execute();
-        $stmt->close();
-        return $resultado;
+        return json_encode(['success' => true, 'message' => $msg]);
+
+    } catch (Exception $e) {
+        error_log('Exceção ao remover produtos: ' . $e->getMessage());
+        error_log('Stack trace: ' . $e->getTraceAsString());
+        return json_encode(['success' => false, 'message' => 'Erro ao remover produtos: ' . $e->getMessage()]);
     }
+}
 
     function alterarEstadoEmMassa($ids, $estado) {
         global $conn;

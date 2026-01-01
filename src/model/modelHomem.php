@@ -7,9 +7,9 @@ function getProdutosHomem($categoria, $tamanho, $estado) {
     global $conn;
     $msg = "";
 
-    $sql = "SELECT produtos.* 
-            FROM produtos 
-            WHERE produtos.genero = 'Homem' 
+    $sql = "SELECT produtos.*
+            FROM produtos
+            WHERE produtos.genero = 'Homem'
             AND produtos.ativo = 1";
 
     if (!empty($tamanho) && $tamanho != "-1") {
@@ -52,12 +52,12 @@ function getProdutosHomem($categoria, $tamanho, $estado) {
 function getFiltrosHomemCategoria() {
     global $conn;
     $msg = "";
-    
+
     $sql = "SELECT id AS ValueProduto, tipo_produtos.descricao AS NomeProduto FROM tipo_produtos,Produtos where Produtos.ativo = 1 AND tipo_produtos.id = Produtos.tipo_produto_id group by tipo_produtos.id;";
     $result = $conn->query($sql);
 
     $msg .= "<option value='-1'>Selecionar Categoria</option>";
-    
+
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
             $msg .= "<option value='".$row["ValueProduto"]."'>".$row["NomeProduto"]."</option>";
@@ -65,12 +65,12 @@ function getFiltrosHomemCategoria() {
     } else {
         $msg .= "<option value='1'>Sem Registos</option>";
     }
-    
+
     $conn->close();
     return $msg;
 }
     function getFiltrosHomemTamanho(){
-        
+
         global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT tamanho AS NomeTamanho,
@@ -92,13 +92,13 @@ function getFiltrosHomemCategoria() {
         $conn->close();
 
         return ($msg);
-    
-    
+
+
     $conn->close();
     return ($msg);
 }
     function getFiltrosHomemEstado(){
-        
+
         global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT estado AS NomeEstado,
@@ -119,8 +119,8 @@ function getFiltrosHomemCategoria() {
         $conn->close();
 
         return ($msg);
-    
-    
+
+
     $conn->close();
     return ($msg);
 }
@@ -129,32 +129,32 @@ function getProdutoHomemMostrar($ID_Produto){
     $msg = "";
 
     $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,ranking.nome As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos,utilizadores,ranking WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id AND utilizadores.ranking_id = ranking.id";
-    
+
     $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = $ID_Produto";
-    
-    $sql3 = "SELECT Produto_id, nome, foto, marca, tamanho, estado, preco 
-             FROM Produtos 
-             WHERE genero = (SELECT genero FROM Produtos WHERE Produto_id = $ID_Produto) 
-             AND Produto_id != $ID_Produto 
-             AND ativo = 1 
+
+    $sql3 = "SELECT Produto_id, nome, foto, marca, tamanho, estado, preco
+             FROM Produtos
+             WHERE genero = (SELECT genero FROM Produtos WHERE Produto_id = $ID_Produto)
+             AND Produto_id != $ID_Produto
+             AND ativo = 1
              LIMIT 4";
-    
+
     $result = $conn->query($sql);
     $result2 = $conn->query($sql2);
-    $result3 = $conn->query($sql3); 
-    
+    $result3 = $conn->query($sql3);
+
     if ($result->num_rows > 0) {
         while ($rowProduto = $result->fetch_assoc()) {
             $msg .= "<div class='col-md-6'>";
             $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
-            
+
             $msg .= "<div id='productGallery' class='carousel slide' data-bs-ride='carousel'>";
-            
+
             $msg .= "<div class='carousel-inner rounded-4 shadow-sm'>";
             $msg .= "<div class='carousel-item active'>";
             $msg .= "<img src='".$rowProduto["FotoProduto"]."' height='700px' class='d-block w-100 rounded-4' alt='Produto'>";
             $msg .= "</div>";
-            
+
             if ($result2 && $result2->num_rows > 0) {
                 while ($rowFoto = $result2->fetch_assoc()) {
                     $msg .= "<div class='carousel-item'>";
@@ -163,7 +163,7 @@ function getProdutoHomemMostrar($ID_Produto){
                 }
             }
             $msg .= "</div>";
-            
+
             $msg .= "<button class='carousel-control-prev' type='button' data-bs-target='#productGallery' data-bs-slide='prev'>";
             $msg .= "<span class='carousel-control-prev-icon'></span>";
             $msg .= "</button>";
@@ -173,7 +173,7 @@ function getProdutoHomemMostrar($ID_Produto){
             $msg .= "</div>";
             $msg .= "</div>";
             $msg .= "</div>";
-            
+
             $msg .= "<div class='col-md-6'>";
             $msg .= "<h3 class='fw-bold mb-3'>".$rowProduto["nome"]."</h3>";
             $msg .= "<p class='text-muted mb-2'>Marca: <span class='fw-semibold'>".$rowProduto["marca"]."</span></p>";
@@ -181,23 +181,23 @@ function getProdutoHomemMostrar($ID_Produto){
             $msg .= "<p class='text-muted mb-2'>Estado: <span class='fw-semibold'>".$rowProduto["estado"]."</span></p>";
             $msg .= "<h4 class='fw-bold text-success mb-3'>".$rowProduto["preco"]."€</h4>";
             $msg .= "<p class='mb-4'>".$rowProduto["descricao"]."</p>";
-            
+
             $msg .= "<div class='d-flex gap-3 mb-4'>";
             $msg .= "<button class='btn btn-wegreen-accent rounded-pill px-4 py-2 fw-semibold shadow-sm btnComprarAgora' ";
             $msg .= "data-id='".$rowProduto['Produto_id']."'>";
-            $msg .= "Comprar Agora";
+            $msg .= "Comprar Agora</button>";
+
             if(isset($_SESSION['utilizador'])) {
                 if($_SESSION['utilizador'] == $rowProduto['IdUtilizador']) {
                     $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold' onclick='ErrorSession2()'>Chat com o vendedor</button>";
                 } else {
-                    $msg .= "</button>"; 
                     $msg .= "<a href='ChatAnunciante.php?id=".$rowProduto['Produto_id']."&nome=".$rowProduto['IdUtilizador']."'><button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button></a>";
                 }
             } else {
                 $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold' onclick='ErrorSession()'>Chat com o vendedor</button>";
             }
             $msg .= "</div>";
-            
+
             $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
             $msg .= "<div class='d-flex align-items-center'>";
             $msg .= "<div class='position-relative me-3'>";
@@ -218,11 +218,11 @@ function getProdutoHomemMostrar($ID_Produto){
             $msg .= "</div>";
             $msg .= "</div>";
             $msg .= "</div>";
-            
+
             $msg .= "<div class='mt-5'>";
             $msg .= "<h5 class='fw-bold mb-4'>Produtos Relacionados</h5>";
             $msg .= "<div class='row g-4'>";
-            
+
             if ($result3 && $result3->num_rows > 0) {
                 while ($rowRelated = $result3->fetch_assoc()) {
                     $msg .= "<div class='col-md-3 col-sm-6'>";
@@ -242,14 +242,14 @@ function getProdutoHomemMostrar($ID_Produto){
                 $msg .= "<p class='text-muted text-center'>Nenhum produto relacionado encontrado.</p>";
                 $msg .= "</div>";
             }
-            
-            $msg .= "</div>"; 
-            $msg .= "</div>"; 
+
+            $msg .= "</div>";
+            $msg .= "</div>";
         }
     } else {
         $msg = "<p class='text-center text-muted'>Produto não encontrado.</p>";
     }
-    
+
     $conn->close();
     return $msg;
 }

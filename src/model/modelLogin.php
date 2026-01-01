@@ -19,6 +19,10 @@ class Login{
     if($result->num_rows > 0){
     $row = $result->fetch_assoc();
         $msg = "Bem vindo ".$row['nome'];
+
+        // Guardar ID temporário antes de sobrescrever
+        $temp_user_id = isset($_SESSION['temp_user_id']) ? $_SESSION['temp_user_id'] : null;
+
         $_SESSION['utilizador'] = $row['id'];
         $_SESSION['nome'] = $row['nome'];
         $_SESSION['tipo'] = $row['tipo_utilizador_id'];
@@ -29,7 +33,15 @@ class Login{
         $_SESSION['data'] = $row['data_criacao'];
         $_SESSION['email'] = $row['email'];
 
-        
+        // Transferir carrinho temporário se existir
+        if ($temp_user_id !== null) {
+            require_once 'modelCarrinho.php';
+            $carrinho = new Carrinho();
+            $carrinho->transferirCarrinhoTemporario($temp_user_id, $row['id']);
+            unset($_SESSION['temp_user_id']);
+        }
+
+
     }else{
         $flag = false;
         $msg = "Erro! Dados Inválidos";

@@ -1933,56 +1933,100 @@ function carregarEncomendas() {
 }
 
 function renderEncomendas(encomendas) {
-  if (encomendasTable) {
-    encomendasTable.destroy();
-  }
-
   const tbody = $("#encomendasTable tbody");
-  tbody.empty();
 
   // Calcular estatísticas
   atualizarEstatisticasEncomendas(encomendas);
 
+  // Se DataTable existe, apenas limpar os dados
+  if ($.fn.DataTable.isDataTable("#encomendasTable")) {
+    try {
+      const table = $("#encomendasTable").DataTable();
+      table.clear();
+
+      if (!encomendas || encomendas.length === 0) {
+        tbody.html(`
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
+              <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+              <p>Nenhuma encomenda encontrada</p>
+              <small>As encomendas dos seus produtos aparecerão aqui</small>
+            </td>
+          </tr>
+        `);
+        return;
+      }
+
+      encomendas.forEach((encomenda) => {
+        const row = criarLinhaEncomenda(encomenda);
+        table.row.add($(row)[0]);
+      });
+
+      table.draw();
+      aplicarFiltrosEncomendas();
+      return;
+    } catch (e) {
+      console.warn("Erro ao atualizar tabela, recriando:", e);
+      // Se falhar, destruir e recriar abaixo
+      try {
+        $("#encomendasTable").DataTable().destroy();
+      } catch (e2) {
+        // Ignorar erro de destruição
+      }
+    }
+  }
+
+  // Criar tabela do zero
+  tbody.empty();
+
   if (!encomendas || encomendas.length === 0) {
     tbody.html(`
-            <tr>
-                <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
-                    <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
-                    <p>Nenhuma encomenda encontrada</p>
-                    <small>As encomendas dos seus produtos aparecerão aqui</small>
-                </td>
-            </tr>
-        `);
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
+          <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+          <p>Nenhuma encomenda encontrada</p>
+          <small>As encomendas dos seus produtos aparecerão aqui</small>
+        </td>
+      </tr>
+    `);
     return;
   }
 
   encomendas.forEach((encomenda) => {
-    const statusClass = getStatusClass(encomenda.estado);
-    const statusBadge = `<span class="badge badge-${statusClass}">${encomenda.estado}</span>`;
+    tbody.append(criarLinhaEncomenda(encomenda));
+  });
 
-    // Calcular dias desde a encomenda
-    const dataEncomenda = new Date(encomenda.data_completa);
-    const hoje = new Date();
-    const diasDesdeEncomenda = Math.floor(
-      (hoje - dataEncomenda) / (1000 * 60 * 60 * 24)
-    );
+  initEncomendasTable();
+  aplicarFiltrosEncomendas();
+}
 
-    // Badge "Novo" para últimas 24h
-    const badgeNovo =
-      diasDesdeEncomenda === 0
-        ? '<span class="badge badge-new">Novo</span> '
-        : "";
+function criarLinhaEncomenda(encomenda) {
+  const statusClass = getStatusClass(encomenda.estado);
+  const statusBadge = `<span class="badge badge-${statusClass}">${encomenda.estado}</span>`;
 
-    // Classe de urgência (mais de 3 dias pendente)
-    const classeUrgente =
-      diasDesdeEncomenda > 3 && encomenda.estado === "Pendente"
-        ? "row-urgent"
-        : "";
+  // Calcular dias desde a encomenda
+  const dataEncomenda = new Date(encomenda.data_completa);
+  const hoje = new Date();
+  const diasDesdeEncomenda = Math.floor(
+    (hoje - dataEncomenda) / (1000 * 60 * 60 * 24)
+  );
 
-    // Tooltip morada
-    const moradaTooltip = encomenda.morada || "Morada não disponível";
+  // Badge "Novo" para últimas 24h
+  const badgeNovo =
+    diasDesdeEncomenda === 0
+      ? '<span class="badge badge-new">Novo</span> '
+      : "";
 
-    const row = `
+  // Classe de urgência (mais de 3 dias pendente)
+  const classeUrgente =
+    diasDesdeEncomenda > 3 && encomenda.estado === "Pendente"
+      ? "row-urgent"
+      : "";
+
+  // Tooltip morada
+  const moradaTooltip = encomenda.morada || "Morada não disponível";
+
+  const row = `
             <tr data-encomenda-id="${encomenda.id}" class="${classeUrgente}">
                 <td>
                     ${badgeNovo}<strong>${encomenda.codigo}</strong>
@@ -2008,8 +2052,8 @@ function renderEncomendas(encomendas) {
                         <img src="${
                           encomenda.produto_foto || "src/img/no-image.png"
                         }" alt="${
-      encomenda.produto_nome
-    }" class="product-thumb">
+    encomenda.produto_nome
+  }" class="product-thumb">
                         <div>
                             <div class="product-name">${
                               encomenda.produto_nome
@@ -2049,11 +2093,8 @@ function renderEncomendas(encomendas) {
                 </td>
             </tr>
         `;
-    tbody.append(row);
-  });
 
-  initEncomendasTable();
-  aplicarFiltrosEncomendas();
+  return row;
 }
 
 function atualizarEstatisticasEncomendas(encomendas) {
@@ -2086,14 +2127,23 @@ function atualizarEstatisticasEncomendas(encomendas) {
 }
 
 function initEncomendasTable() {
-  encomendasTable = $("#encomendasTable").DataTable({
-    language: {
-      url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-PT.json",
-    },
-    order: [[1, "desc"]],
-    pageLength: 10,
-    responsive: true,
-  });
+  if (
+    $("#encomendasTable").length &&
+    !$.fn.DataTable.isDataTable("#encomendasTable")
+  ) {
+    try {
+      encomendasTable = $("#encomendasTable").DataTable({
+        language: {
+          url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-PT.json",
+        },
+        order: [[1, "desc"]],
+        pageLength: 10,
+        responsive: true,
+      });
+    } catch (e) {
+      console.error("Erro ao inicializar tabela de encomendas:", e);
+    }
+  }
 }
 
 function getStatusClass(estado) {
@@ -2420,4 +2470,83 @@ function verHistoricoEncomenda(encomendaId) {
   ).fail(function () {
     Swal.fire("Erro", "Falha ao carregar histórico", "error");
   });
+}
+
+// ========== FUNÇÕES DE INICIALIZAÇÃO POR PÁGINA ==========
+
+// Inicializar página Dashboard
+function initDashboardPage() {
+  if (typeof updateDashboard === "function") {
+    updateDashboard();
+  } else {
+    if (typeof getDadosPlanos === "function") getDadosPlanos();
+    if (typeof CarregaProdutos === "function") CarregaProdutos();
+    if (typeof CarregaPontos === "function") CarregaPontos();
+    if (typeof getGastos === "function") getGastos();
+    if (typeof getVendasMensais === "function") getVendasMensais();
+    if (typeof renderTopProductsChart === "function") renderTopProductsChart();
+    if (typeof renderRecentProducts === "function") renderRecentProducts();
+  }
+}
+
+// Inicializar página Produtos
+function initProductsPage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof carregarProdutos === "function") carregarProdutos();
+}
+
+// Inicializar página Encomendas
+function initSalesPage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof initEncomendasTable === "function") initEncomendasTable();
+  if (typeof carregarEncomendas === "function") carregarEncomendas();
+  if (typeof aplicarFiltrosEncomendas === "function")
+    aplicarFiltrosEncomendas();
+}
+
+// Inicializar página Relatórios/Analytics
+function initAnalyticsPage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof loadReportStats === "function") loadReportStats();
+  if (typeof loadCategorySalesChart === "function") loadCategorySalesChart();
+  if (typeof loadDailyRevenueChart === "function") loadDailyRevenueChart();
+  if (typeof loadReportsTable === "function") loadReportsTable();
+}
+
+// Inicializar página Perfil
+function initProfilePage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof carregarPerfil === "function") carregarPerfil();
+}
+
+// Função de Logout
+function logout() {
+  let dados = new FormData();
+  dados.append("op", 2);
+
+  $.ajax({
+    url: "src/controller/controllerPerfil.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+    .done(function (msg) {
+      Swal.fire({
+        icon: "success",
+        title: "Sessão Terminada",
+        text: msg,
+        confirmButtonColor: "#A6D90C",
+        timer: 2000,
+        timerProgressBar: true,
+      }).then(() => {
+        window.location.href = "index.html";
+      });
+    })
+    .fail(function (jqXHR, textStatus) {
+      console.error("Erro ao fazer logout:", textStatus);
+      window.location.href = "index.html";
+    });
 }
