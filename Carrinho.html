@@ -1,160 +1,498 @@
 <!DOCTYPE html>
 <html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout - WeGreen</title>
-    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="src/css/carrinho.css">
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css"
+    />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="src/css/carrinho.css" />
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
+    <!-- Header com User Dropdown -->
     <header class="checkout-header">
-        <div class="container">
-            <div class="header-content">
-                <a href="index.html" class="logo">
-                    <img src="src/img/2-removebg-preview.png" alt="Wegreen" style="width: auto; height: 35px;">
-                </a>
-                <a href="carrinho.html" class="cart-link">
-                    <i class="bi bi-cart3"></i>
-                    <span class="cart-badge">1</span>
-                    View cart
-                </a>
-            </div>
-        </div>
-    </header>
+      <div class="container">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img
+              src="src/img/2-removebg-preview.png"
+              alt="Wegreen"
+              style="width: auto; height: 35px"
+            />
+          </a>
+          <!-- User Dropdown Bootstrap -->
+          <div class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle d-flex align-items-center"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+            >
+              <img
+                id="FotoPerfil"
+                src="assets/media/avatars/blank.png"
+                class="rounded-circle profile-img-small me-1"
+                alt="Perfil do Utilizador"
+                onerror="this.src='assets/media/avatars/blank.png'"
+              />
+            </a>
 
+            <ul
+              class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3"
+              id="PerfilTipo"
+            ></ul>
+          </div>
+        </div>
+      </div>
+    </header>
     <!-- Main Content -->
     <div class="checkout-container">
-        <div class="container">
-            <div class="row">
-                <!-- Left Column - Checkout Steps -->
-                <div class="col-lg-7">
-                    <h1 class="checkout-title">Checkout</h1>
-                    
-                    <!-- Step 1: Cart Items -->
-                    <div class="checkout-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h2 class="step-title">Carrinho</h2>
-                            <div id="Carrinho"></div>
-                        </div>
-                    </div>
+      <div class="container">
+        <div class="row">
+          <!-- Full Width Column -->
+          <div class="col-12">
+            <h1 class="checkout-title text-center">Checkout</h1>
 
-                    <!-- Step 2: Shipping Address -->
-                    <div class="checkout-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h2 class="step-title">Endereço de envio</h2>
-                            <form id="shippingForm">
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Nome *</label>
-                                        <input type="text" class="form-control" id="firstName" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Apelido *</label>
-                                        <input type="text" class="form-control" id="lastName" required>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Endereço *</label>
-                                        <input type="text" class="form-control" id="address1" required>
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Apartamento, suite, andar (opcional)</label>
-                                        <input type="text" class="form-control" id="address2" placeholder="Deixe em branco se não aplicável">
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Código Postal *</label>
-                                        <input type="text" class="form-control" id="zipCode" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Cidade</label>
-                                        <input type="text" class="form-control" id="city" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">Localidade</label>
-                                        <select class="form-select" id="state" required>
-                                            <option value="">Selecione...</option>
-                                            <option value="Lisboa">Lisboa</option>
-                                            <option value="Porto">Porto</option>
-                                            <option value="Faro">Faro</option>
-                                            <option value="Braga">Braga</option>
-                                            <option value="Coimbra">Coimbra</option>
-                                            <option value="Aveiro">Aveiro</option>
-                                            <option value="Setúbal">Setúbal</option>
-                                            <option value="Setúbal">Évora</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn-continue" onclick="continueToPayment()">
-                                    Continuar para o pagamento
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="checkout-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h2 class="step-title">Pagamento</h2>
-                            <p class="text-muted">Vai ser redirecionado para o pagamento seguro</p>
-                        </div>
-                    </div>
-
-                    <!-- Step 4: Review -->
-                    <div class="checkout-step">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h2 class="step-title">Rever & finalizar pedido</h2>
-                        </div>
-                    </div>
+            <!-- Progress Steps Horizontal -->
+            <div class="steps-progress-container">
+              <div class="step-progress-item" data-step="1">
+                <div class="step-progress-number">
+                  <i class="bi bi-cart3"></i>
                 </div>
-
-    
-                <div class="col-lg-5">
-                    <div class="summary-sidebar">
-                        <div id="ResumoPedido"></div>
-                    </div>
+                <div class="step-progress-label">Carrinho</div>
+              </div>
+              <div class="step-progress-item" data-step="2">
+                <div class="step-progress-number">
+                  <i class="bi bi-house-door"></i>
                 </div>
+                <div class="step-progress-label">Entrega</div>
+              </div>
+              <div class="step-progress-item" data-step="3">
+                <div class="step-progress-number">
+                  <i class="bi bi-truck"></i>
+                </div>
+                <div class="step-progress-label">Transportadora</div>
+              </div>
+              <div class="step-progress-item" data-step="4">
+                <div class="step-progress-number">
+                  <i class="bi bi-credit-card"></i>
+                </div>
+                <div class="step-progress-label">Pagamento</div>
+              </div>
             </div>
+
+            <!-- Content Area: Steps + Summary -->
+            <div class="row mt-4">
+              <!-- Left: Step Content -->
+              <div class="col-12 col-lg-8">
+                <!-- STEP 1: CARRINHO -->
+                <div class="checkout-step" id="step-1">
+                  <div class="step-content">
+                    <h2 class="step-title">Carrinho</h2>
+                    <div id="cartItemsStep1"></div>
+                    <button
+                      type="button"
+                      class="btn-continue mt-3 w-100"
+                      onclick="nextStep()"
+                    >
+                      Continuar para Entrega
+                      <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- STEP 2: ENTREGA -->
+                <div class="checkout-step" id="step-2">
+                  <div class="step-content">
+                    <h2 class="step-title">Endereço de Entrega</h2>
+                    <form id="shippingForm">
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label class="form-label">Nome *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="firstName"
+                            required
+                          />
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Apelido *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="lastName"
+                            required
+                          />
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label">Endereço *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="address1"
+                            required
+                          />
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label"
+                            >Apartamento, suíte, andar (opcional)</label
+                          >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="address2"
+                            placeholder="Ex: Apt 5B, 3º andar esquerdo"
+                          />
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">Código Postal *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="zipCode"
+                            pattern="[0-9]{4}-[0-9]{3}"
+                            placeholder="1000-001"
+                            title="Formato: XXXX-XXX (ex: 1000-001)"
+                            required
+                          />
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">Cidade *</label>
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="city"
+                            required
+                          />
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">Localidade *</label>
+                          <select class="form-select" id="state" required>
+                            <option value="">Selecione...</option>
+                            <option value="Lisboa">Lisboa</option>
+                            <option value="Porto">Porto</option>
+                            <option value="Faro">Faro</option>
+                            <option value="Braga">Braga</option>
+                            <option value="Coimbra">Coimbra</option>
+                            <option value="Aveiro">Aveiro</option>
+                            <option value="Setúbal">Setúbal</option>
+                            <option value="Évora">Évora</option>
+                          </select>
+                        </div>
+                      </div>
+                    </form>
+                    <div class="mt-3 d-flex gap-2">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        onclick="previousStep()"
+                      >
+                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-continue flex-grow-1"
+                        onclick="nextStep()"
+                      >
+                        Continuar para Transportadora
+                        <i class="bi bi-arrow-right ms-2"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- STEP 3: TRANSPORTADORA -->
+                <div class="checkout-step" id="step-3">
+                  <div class="step-content">
+                    <h2 class="step-title">Escolha a Transportadora</h2>
+                    <div class="transportadora-options">
+                      <!-- CTT -->
+                      <div
+                        class="transportadora-card"
+                        id="transportadora1"
+                        onclick="selectTransportadora(1, 2.50)"
+                        role="radio"
+                        aria-checked="false"
+                        tabindex="0"
+                      >
+                        <div class="transportadora-icon">
+                          <i class="bi bi-mailbox"></i>
+                        </div>
+                        <div class="transportadora-info">
+                          <h3>CTT</h3>
+                          <p class="transportadora-time">2-4 dias úteis</p>
+                          <div class="transportadora-features">
+                            <span
+                              ><i class="bi bi-check"></i> Rastreamento</span
+                            >
+                            <span
+                              ><i class="bi bi-check"></i> Seguro incluído</span
+                            >
+                          </div>
+                        </div>
+                        <div class="transportadora-price">
+                          <span class="price">2,50 €</span>
+                          <div class="radio-check">
+                            <i class="bi bi-circle"></i>
+                            <i class="bi bi-check-circle-fill"></i>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- CTT Pickup -->
+                      <div
+                        class="transportadora-card"
+                        id="transportadora2"
+                        onclick="selectTransportadora(2, 2.50)"
+                        role="radio"
+                        aria-checked="false"
+                        tabindex="0"
+                      >
+                        <div class="transportadora-icon">
+                          <i class="bi bi-shop"></i>
+                        </div>
+                        <div class="transportadora-info">
+                          <h3>CTT Pickup Point</h3>
+                          <p class="transportadora-time">
+                            2-4 dias úteis + Recolha em loja
+                          </p>
+                          <div class="transportadora-features">
+                            <span
+                              ><i class="bi bi-geo-alt"></i> Ponto de
+                              recolha</span
+                            >
+                            <span
+                              ><i class="bi bi-clock"></i> Disponível 24/7</span
+                            >
+                          </div>
+                        </div>
+                        <div class="transportadora-price">
+                          <span class="price">2,50 €</span>
+                          <div class="radio-check">
+                            <i class="bi bi-circle"></i>
+                            <i class="bi bi-check-circle-fill"></i>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- DPD -->
+                      <div
+                        class="transportadora-card"
+                        id="transportadora3"
+                        onclick="selectTransportadora(3, 2.50)"
+                        role="radio"
+                        aria-checked="false"
+                        tabindex="0"
+                      >
+                        <div class="transportadora-icon">
+                          <i class="bi bi-box-seam"></i>
+                        </div>
+                        <div class="transportadora-info">
+                          <h3>DPD</h3>
+                          <p class="transportadora-time">1-2 dias úteis</p>
+                          <div class="transportadora-features">
+                            <span
+                              ><i class="bi bi-lightning"></i> Entrega
+                              rápida</span
+                            >
+                            <span
+                              ><i class="bi bi-check"></i> Rastreamento</span
+                            >
+                          </div>
+                        </div>
+                        <div class="transportadora-price">
+                          <span class="price">2,50 €</span>
+                          <div class="radio-check">
+                            <i class="bi bi-circle"></i>
+                            <i class="bi bi-check-circle-fill"></i>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- DPD Pickup -->
+                      <div
+                        class="transportadora-card"
+                        id="transportadora4"
+                        onclick="selectTransportadora(4, 2.50)"
+                        role="radio"
+                        aria-checked="false"
+                        tabindex="0"
+                      >
+                        <div class="transportadora-icon">
+                          <i class="bi bi-shop-window"></i>
+                        </div>
+                        <div class="transportadora-info">
+                          <h3>DPD Pickup Point</h3>
+                          <p class="transportadora-time">
+                            1-2 dias úteis + Recolha em loja
+                          </p>
+                          <div class="transportadora-features">
+                            <span
+                              ><i class="bi bi-geo-alt"></i> Ponto de
+                              recolha</span
+                            >
+                            <span><i class="bi bi-lightning"></i> Rápido</span>
+                          </div>
+                        </div>
+                        <div class="transportadora-price">
+                          <span class="price">2,50 €</span>
+                          <div class="radio-check">
+                            <i class="bi bi-circle"></i>
+                            <i class="bi bi-check-circle-fill"></i>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Entrega em Casa -->
+                      <div
+                        class="transportadora-card featured"
+                        id="transportadora5"
+                        onclick="selectTransportadora(5, 5.00)"
+                        role="radio"
+                        aria-checked="false"
+                        tabindex="0"
+                      >
+                        <span class="featured-badge">Mais Rápido</span>
+                        <div class="transportadora-icon">
+                          <i class="bi bi-house-door"></i>
+                        </div>
+                        <div class="transportadora-info">
+                          <h3>Entrega em Casa</h3>
+                          <p class="transportadora-time">1-3 dias úteis</p>
+                          <div class="transportadora-features">
+                            <span
+                              ><i class="bi bi-lightning-fill"></i>
+                              Express</span
+                            >
+                            <span
+                              ><i class="bi bi-person"></i> Entrega em mão</span
+                            >
+                          </div>
+                        </div>
+                        <div class="transportadora-price">
+                          <span class="price">5,00 €</span>
+                          <div class="radio-check">
+                            <i class="bi bi-circle"></i>
+                            <i class="bi bi-check-circle-fill"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-3 d-flex gap-2">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        onclick="previousStep()"
+                      >
+                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-continue flex-grow-1"
+                        onclick="nextStep()"
+                      >
+                        Continuar para Pagamento
+                        <i class="bi bi-arrow-right ms-2"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- STEP 4: CONFIRMAÇÃO E PAGAMENTO -->
+                <div class="checkout-step" id="step-4">
+                  <div class="step-content">
+                    <h2 class="step-title">Confirmar e Pagar</h2>
+
+                    <div class="alert alert-info mb-4">
+                      <i class="bi bi-info-circle me-2"></i>
+                      <strong
+                        >Revise os detalhes no resumo ao lado antes de
+                        finalizar.</strong
+                      >
+                      Toda a informação do seu pedido está visível no painel
+                      direito.
+                    </div>
+
+                    <div class="mt-4 p-4 bg-light rounded">
+                      <h5 class="mb-3">
+                        <i class="bi bi-shield-check text-success me-2"></i
+                        >Proteção de Dados
+                      </h5>
+                      <div class="form-check">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="gdprConsent"
+                          required
+                        />
+                        <label class="form-check-label" for="gdprConsent">
+                          Aceito os
+                          <a href="#" target="_blank">Termos e Condições</a> e a
+                          <a href="#" target="_blank">Política de Privacidade</a
+                          >. Compreendo os meus direitos ao abrigo do RGPD.
+                        </label>
+                      </div>
+                    </div>
+
+                    <div class="mt-3 d-flex gap-2">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        onclick="previousStep()"
+                      >
+                        <i class="bi bi-arrow-left me-2"></i>Voltar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-continue btn-finalizar flex-grow-1"
+                        onclick="finalizarPedido()"
+                      >
+                        <i class="bi bi-lock-fill me-2"></i>Pagar com Stripe
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Summary Sidebar -->
+              <div class="col-12 col-lg-4">
+                <div class="summary-sidebar">
+                  <div id="ResumoPedido"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
     <script src="src/js/homepage.js"></script>
     <script src="src/js/carrinho.js"></script>
-    
-    <script>
-        function continueToPayment() {
-            // Validate shipping form
-            const form = document.getElementById('shippingForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            // Save shipping info to session (you can add AJAX call here if needed)
-            const shippingData = {
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                address1: document.getElementById('address1').value,
-                address2: document.getElementById('address2').value,
-                zipCode: document.getElementById('zipCode').value,
-                city: document.getElementById('city').value,
-                state: document.getElementById('state').value
-            };
-
-            // Store in sessionStorage
-            sessionStorage.setItem('shippingInfo', JSON.stringify(shippingData));
-
-            // Redirect to Stripe checkout
-            irParaCheckout();
-        }
-    </script>
-</body>
+  </body>
 </html>

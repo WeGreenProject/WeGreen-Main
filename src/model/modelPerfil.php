@@ -55,7 +55,7 @@ class Perfil{
                 }
 
             }
-            
+
         }
         else
         {
@@ -65,7 +65,7 @@ class Perfil{
             $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -82,18 +82,19 @@ class Perfil{
                     return $row['foto'];
 
             }
-            
+
         }
- 
-        
+
+
         $conn->close();
-        
+
          return "src/img/pexels-beccacorreiaph-31095884.jpg";
 
     }
     function logout(){
-
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         session_destroy();
 
         return("Obrigado!");
@@ -493,7 +494,7 @@ class Perfil{
             }
 
         }
-        
+
     }
     else
     {
@@ -503,7 +504,7 @@ class Perfil{
         $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
     }
     $conn->close();
-    
+
     return ($msg);
 
 }
