@@ -298,7 +298,8 @@ if ($_POST['op'] == 33) {
     $encomenda_id = $_POST['encomenda_id'];
     $novo_estado = $_POST['novo_estado'];
     $observacao = $_POST['observacao'] ?? '';
-    $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao);
+    $codigo_rastreio = $_POST['codigo_rastreio'] ?? null;
+    $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao, $codigo_rastreio);
     echo $resp;
 }
 

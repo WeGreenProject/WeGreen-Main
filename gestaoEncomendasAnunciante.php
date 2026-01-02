@@ -21,7 +21,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="src/js/Anunciante.js"></script>
+    <script src="src/js/GuiaEnvio.js"></script>
 </head>
 
 <body>
@@ -153,7 +156,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                                 <th>Cliente</th>
                                 <th>Produtos</th>
                                 <th>Transportadora</th>
-                                <th>Total (€)</th>
+                                <th>Lucro Líquido</th>
                                 <th>Status</th>
                                 <th>Ações</th>
                             </tr>
