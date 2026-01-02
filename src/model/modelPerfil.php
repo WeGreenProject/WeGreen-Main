@@ -30,6 +30,8 @@ class Perfil{
                     $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
                     $msg .= "</div></li>";
+                    $msg .= "<li><a class='dropdown-item' href='DashboardCliente.php'>Dashboard</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='minhasEncomendas.php'>As Minhas Encomendas</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";

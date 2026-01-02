@@ -2026,6 +2026,24 @@ function criarLinhaEncomenda(encomenda) {
   // Tooltip morada
   const moradaTooltip = encomenda.morada || "Morada não disponível";
 
+  // Ícone do método de pagamento
+  let paymentIcon = '<i class="fas fa-credit-card"></i>';
+  if (encomenda.payment_method === "paypal") {
+    paymentIcon = '<i class="fab fa-paypal" style="color: #0070ba;"></i>';
+  } else if (encomenda.payment_method === "klarna") {
+    paymentIcon =
+      '<i class="fas fa-money-check-alt" style="color: #ffb3c7;"></i>';
+  }
+
+  // Comissão e lucro líquido
+  const comissao = encomenda.comissao || 0;
+  const lucroLiquido = encomenda.lucro_liquido || 0;
+  const lucroTooltip = `Valor Bruto: €${encomenda.valor.toFixed(
+    2
+  )}\nComissão (6%): €${comissao.toFixed(
+    2
+  )}\nLucro Líquido: €${lucroLiquido.toFixed(2)}`;
+
   const row = `
             <tr data-encomenda-id="${encomenda.id}" class="${classeUrgente}">
                 <td>
@@ -2070,7 +2088,14 @@ function criarLinhaEncomenda(encomenda) {
                         <span>${encomenda.transportadora || "N/A"}</span>
                     </div>
                 </td>
-                <td><strong>€${encomenda.valor.toFixed(2)}</strong></td>
+                <td>
+                    <div title="${lucroTooltip}">
+                        <strong>€${lucroLiquido.toFixed(2)}</strong>
+                        <div style="font-size: 10px; color: #999;">
+                            ${paymentIcon} ${encomenda.payment_method.toUpperCase()}
+                        </div>
+                    </div>
+                </td>
                 <td>${statusBadge}</td>
                 <td>
                     <div class="action-buttons">
@@ -2088,6 +2113,11 @@ function criarLinhaEncomenda(encomenda) {
                           encomenda.id
                         }, '${encomenda.estado}')" title="Alterar Status">
                             <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-action btn-print" onclick="imprimirGuiaEnvio(${
+                          encomenda.id
+                        })" title="Guia de Envio">
+                            <i class="fas fa-print"></i>
                         </button>
                     </div>
                 </td>
@@ -2299,8 +2329,31 @@ function verDetalhesEncomenda(encomendaId) {
                             <p style="margin: 5px 0;"><strong>Transportadora:</strong> ${
                               encomenda.transportadora || "Não definida"
                             }</p>
+                            <p style="margin: 5px 0;"><strong>Código de Rastreio:</strong> ${
+                              encomenda.codigo_rastreio || "Não disponível"
+                            }</p>
                             <p style="margin: 5px 0;"><strong>Prazo Estimado:</strong> ${prazoEntrega}</p>
                             <p style="margin: 5px 0;"><strong>Tempo Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
+                        </div>
+
+                        <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2d3748; display: flex; align-items: center;">
+                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #A6D90C;"></i>
+                                Detalhes Financeiros
+                            </h4>
+                            <p style="margin: 5px 0;"><strong>Pagamento:</strong> ${encomenda.payment_method.toUpperCase()} - ${encomenda.payment_status.toUpperCase()}</p>
+                            <p style="margin: 5px 0;"><strong>ID Transação:</strong> ${
+                              encomenda.payment_id || "N/A"
+                            }</p>
+                            <p style="margin: 5px 0;"><strong>Valor Bruto:</strong> €${encomenda.valor.toFixed(
+                              2
+                            )}</p>
+                            <p style="margin: 5px 0;"><strong>Comissão (6%):</strong> <span style="color: #dc3545;">-€${encomenda.comissao.toFixed(
+                              2
+                            )}</span></p>
+                            <p style="margin: 5px 0;"><strong>Lucro Líquido:</strong> <span style="color: #28a745; font-weight: bold; font-size: 18px;">€${encomenda.lucro_liquido.toFixed(
+                              2
+                            )}</span></p>
                         </div>
 
                         ${
@@ -2327,7 +2380,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
   Swal.fire({
     title: "Alterar Status da Encomenda",
     html: `
-            <select id="novoStatus" class="swal2-input" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px;">
+            <select id="novoStatus" class="swal2-input" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px;" onchange="toggleCodigoRastreio()">
                 <option value="Pendente" ${
                   statusAtual === "Pendente" ? "selected" : ""
                 }>Pendente</option>
@@ -2344,7 +2397,20 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
                   statusAtual === "Cancelado" ? "selected" : ""
                 }>Cancelado</option>
             </select>
+            <div id="codigoRastreioContainer" style="display: ${
+              statusAtual === "Enviado" ? "block" : "none"
+            }; margin-bottom: 15px;">
+                <input type="text" id="codigoRastreio" class="swal2-input" placeholder="Código de Rastreio *" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 0;">
+                <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">* Obrigatório ao marcar como "Enviado"</small>
+            </div>
             <textarea id="observacao" class="swal2-textarea" placeholder="Observações (opcional)" style="width: 100%; min-height: 100px; padding: 10px; font-size: 14px;"></textarea>
+            <script>
+                function toggleCodigoRastreio() {
+                    const status = document.getElementById('novoStatus').value;
+                    const container = document.getElementById('codigoRastreioContainer');
+                    container.style.display = status === 'Enviado' ? 'block' : 'none';
+                }
+            </script>
         `,
     showCancelButton: true,
     confirmButtonText: "Atualizar",
@@ -2352,9 +2418,20 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
     confirmButtonColor: "#A6D90C",
     width: 600,
     preConfirm: () => {
+      const status = document.getElementById("novoStatus").value;
+      const codigoRastreio = document.getElementById("codigoRastreio").value;
+
+      if (status === "Enviado" && !codigoRastreio.trim()) {
+        Swal.showValidationMessage(
+          'Código de rastreio é obrigatório ao marcar como "Enviado"'
+        );
+        return false;
+      }
+
       return {
-        status: document.getElementById("novoStatus").value,
+        status: status,
         observacao: document.getElementById("observacao").value,
+        codigo_rastreio: codigoRastreio,
       };
     },
   }).then((result) => {
@@ -2367,6 +2444,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
           encomenda_id: encomendaId,
           novo_estado: result.value.status,
           observacao: result.value.observacao,
+          codigo_rastreio: result.value.codigo_rastreio,
         },
         function (resp) {
           const dados = JSON.parse(resp);
