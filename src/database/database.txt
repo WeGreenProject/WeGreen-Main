@@ -110,18 +110,16 @@ INSERT INTO `fornecedores` (`nome`, `descricao`, `tipo_produtos_id`, `email`, `t
 
 CREATE TABLE `gastos` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `anunciante_id` int(11) DEFAULT NULL,
-  `valor` decimal(10,2) DEFAULT NULL,
-  `descricao` text DEFAULT NULL,
-  `data_registo` date DEFAULT curdate()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `origem` ENUM('Plano','Comissao','Servico','Outro','Plataforma') NOT NULL,
+  `valor` DECIMAL(10,2) NOT NULL,
+  `descricao` TEXT,
+  `data_registo` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP()
+);
 
---
--- Extraindo dados da tabela `gastos`
---
-
-INSERT INTO `gastos` (`anunciante_id`, `valor`, `descricao`, `data_registo`) VALUES
-(3, 50.00, 'Publicidade online', '2025-12-06');
+INSERT INTO `gastos` (`origem`, `valor`, `descricao`, `data_registo`) VALUES
+('Servico', 50.00, 'Publicidade online', '2025-12-06 00:00:00');
+INSERT INTO `gastos` (`origem`, `valor`, `descricao`) VALUES
+('Outro', 50.00, 'Fornecedor');
 
 -- --------------------------------------------------------
 
@@ -349,21 +347,17 @@ INSERT INTO `ranking` (`nome`, `pontos`) VALUES
 
 CREATE TABLE `rendimento` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `valor` decimal(10,2) DEFAULT NULL,
-  `anunciante_id` int(11) DEFAULT NULL,
-  `descricao` text DEFAULT NULL,
-  `data_registo` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Extraindo dados da tabela `rendimento`
---
-
-INSERT INTO `rendimento` (`valor`, `anunciante_id`, `descricao`, `data_registo`) VALUES
-(25.00, 3, 'Premium comprado!', '2025-12-06 19:18:55'),
-(100.00, 4, 'Enterprize comprado!', '2025-12-06 19:18:55'),
-(25.00, 5, 'Premium comprado!', '2025-12-06 19:18:55'),
-(5.00, NULL, 'Comissão cobrada!', '2025-12-06 19:18:55');
+  `valor` DECIMAL(10,2) DEFAULT NULL,
+  `origem` ENUM('Plano','Comissao','Servico','Outro'),
+  `descricao` TEXT DEFAULT NULL,
+  `data_registo` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP()
+);
+INSERT INTO `rendimento` (`valor`, `origem`, `descricao`, `data_registo`) VALUES
+(25.00, 'plano', 'Premium comprado!', '2025-12-06 19:18:55'),
+(100.00, 'plano', 'Enterprise comprado!', '2025-12-06 19:18:55'),
+(25.00, 'plano', 'Premium comprado!', '2025-12-06 19:18:55'),
+(5.00, 'comissao', 'Comissão cobrada!', '2025-12-06 19:18:55'),
+(60.00, 'Plano', 'Plano cobrado!',NULL);
 
 -- --------------------------------------------------------
 

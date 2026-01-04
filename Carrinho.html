@@ -7,9 +7,422 @@
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="src/css/carrinho.css">
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .checkout-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #3cb371;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .cart-link:hover {
+            background: rgba(60, 179, 113, 0.1);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            background: #3cb371;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Progress Bar Container */
+        .progress-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .progress-line-bg {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0;
+            z-index: 1;
+        }
+
+        .progress-line-fill {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 4px;
+            background: #3cb371;
+            z-index: 2;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+            flex: 1;
+        }
+
+        .progress-step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #999;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .progress-step.completed .progress-step-circle {
+            background: #3cb371;
+            border-color: #3cb371;
+            color: white;
+        }
+
+        .progress-step.active .progress-step-circle {
+            border-color: #3cb371;
+            color: #3cb371;
+            border-width: 3px;
+            transform: scale(1.1);
+        }
+
+        .progress-step-label {
+            font-size: 13px;
+            color: #999;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .progress-step.active .progress-step-label {
+            color: #3cb371;
+            font-weight: 600;
+        }
+
+        .progress-step.completed .progress-step-label {
+            color: #2c3e50;
+        }
+
+        /* Main Content */
+        .checkout-container {
+            padding: 40px 0 80px;
+        }
+
+        .checkout-title {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #000000;
+        }
+
+        /* Step Content */
+        .step-content-wrapper {
+            display: none;
+        }
+
+        .step-content-wrapper.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .step-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        /* Form Styles */
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            display: block;
+        }
+
+        .form-control,
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #ffffff;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #3cb371;
+            box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-continue {
+            flex: 1;
+            background: #3cb371;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+        }
+
+        .btn-continue:hover {
+            background: #32a05f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
+        }
+
+        .btn-continue:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Summary Sidebar */
+        .summary-sidebar {
+            position: sticky;
+            top: 120px;
+        }
+
+        .summary-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .summary-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .summary-row.highlight {
+            border-top: 2px solid #e0e0e0;
+            margin-top: 10px;
+            padding-top: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #000000;
+        }
+
+        .summary-row.highlight span:last-child {
+            color: #3cb371;
+        }
+
+        /* Cart Item Styles */
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-details h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            color: #3cb371;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Review Section */
+        .review-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .review-section h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #000;
+        }
+
+        .review-section p {
+            margin: 5px 0;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 991px) {
+            .summary-sidebar {
+                position: static;
+                margin-top: 30px;
+            }
+
+            .progress-step-label {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .checkout-title {
+                font-size: 28px;
+            }
+
+            .progress-step-label {
+                display: none;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-back {
+                order: 2;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -28,27 +441,66 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <div class="checkout-container">
         <div class="container">
-            <div class="row">
-                <!-- Left Column - Checkout Steps -->
-                <div class="col-lg-7">
-                    <h1 class="checkout-title">Checkout</h1>
+            <h1 class="checkout-title">Checkout</h1>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-steps">
+                    <div class="progress-line-bg"></div>
+                    <div class="progress-line-fill" id="progressFill"></div>
                     
-                    <!-- Step 1: Cart Items -->
-                    <div class="checkout-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
+                    <div class="progress-step active" data-step="1">
+                        <div class="progress-step-circle">1</div>
+                        <div class="progress-step-label">Carrinho</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="progress-step-circle">2</div>
+                        <div class="progress-step-label">Endereço</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="progress-step-circle">3</div>
+                        <div class="progress-step-label">Pagamento</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="progress-step-circle">4</div>
+                        <div class="progress-step-label">Confirmação</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Left Column - Steps -->
+                <div class="col-lg-7">
+                    
+                    <!-- Step 1: Carrinho -->
+                    <div class="step-content-wrapper active" id="step1">
+                        <div class="step-card">
                             <h2 class="step-title">Carrinho</h2>
-                            <div id="Carrinho"></div>
+                            <div id="Carrinho">
+                                <!-- Cart items will be loaded here -->
+                                <div class="cart-item">
+                                    <div class="item-image">
+                                        <img src="https://via.placeholder.com/80" alt="Produto">
+                                    </div>
+                                    <div class="item-details">
+                                        <h4>Produto Exemplo</h4>
+                                        <p class="item-price">€29.99</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button class="btn-continue" onclick="goToStep(2)">
+                                    Continuar para endereço
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Step 2: Shipping Address -->
-                    <div class="checkout-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
+                    <!-- Step 2: Endereço -->
+                    <div class="step-content-wrapper" id="step2">
+                        <div class="step-card">
                             <h2 class="step-title">Endereço de envio</h2>
                             <form id="shippingForm">
                                 <div class="row g-3">
@@ -66,18 +518,18 @@
                                     </div>
                                     <div class="col-12">
                                         <label class="form-label">Apartamento, suite, andar (opcional)</label>
-                                        <input type="text" class="form-control" id="address2" placeholder="Deixe em branco se não aplicável">
+                                        <input type="text" class="form-control" id="address2">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Código Postal *</label>
                                         <input type="text" class="form-control" id="zipCode" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">Cidade</label>
+                                        <label class="form-label">Cidade *</label>
                                         <input type="text" class="form-control" id="city" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label">Localidade</label>
+                                        <label class="form-label">Localidade *</label>
                                         <select class="form-select" id="state" required>
                                             <option value="">Selecione...</option>
                                             <option value="Lisboa">Lisboa</option>
@@ -87,38 +539,92 @@
                                             <option value="Coimbra">Coimbra</option>
                                             <option value="Aveiro">Aveiro</option>
                                             <option value="Setúbal">Setúbal</option>
-                                            <option value="Setúbal">Évora</option>
+                                            <option value="Évora">Évora</option>
                                         </select>
                                     </div>
                                 </div>
-                                <button type="button" class="btn-continue" onclick="continueToPayment()">
-                                    Continuar para o pagamento
-                                </button>
                             </form>
+                            <div class="button-group">
+                                <button class="btn-back" onclick="goToStep(1)">
+                                    <i class="bi bi-arrow-left"></i> Voltar
+                                </button>
+                                <button class="btn-continue" onclick="validateAndContinue()">
+                                    Continuar para pagamento
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="checkout-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
+                    <!-- Step 3: Pagamento -->
+                    <div class="step-content-wrapper" id="step3">
+                        <div class="step-card">
                             <h2 class="step-title">Pagamento</h2>
-                            <p class="text-muted">Vai ser redirecionado para o pagamento seguro</p>
+                            <p class="text-muted mb-4">Vai ser redirecionado para o pagamento seguro</p>
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-shield-check"></i>
+                                Pagamento seguro processado pelo Stripe
+                            </div>
+
+                            <div class="button-group">
+                                <button class="btn-back" onclick="goToStep(2)">
+                                    <i class="bi bi-arrow-left"></i> Voltar
+                                </button>
+                                <button class="btn-continue" onclick="goToStep(4)">
+                                    Continuar para revisão
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Step 4: Review -->
-                    <div class="checkout-step">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
+                    <!-- Step 4: Confirmação -->
+                    <div class="step-content-wrapper" id="step4">
+                        <div class="step-card">
                             <h2 class="step-title">Rever & finalizar pedido</h2>
+                            
+                            <div class="review-section">
+                                <h4><i class="bi bi-geo-alt"></i> Endereço de Envio</h4>
+                                <div id="reviewAddress"></div>
+                            </div>
+
+                            <div class="review-section">
+                                <h4><i class="bi bi-cart"></i> Itens do Pedido</h4>
+                                <div id="reviewItems"></div>
+                            </div>
+
+                            <div class="button-group">
+                                <button class="btn-back" onclick="goToStep(3)">
+                                    <i class="bi bi-arrow-left"></i> Voltar
+                                </button>
+                                <button class="btn-continue" onclick="finalizeOrder()">
+                                    <i class="bi bi-check-circle"></i> Finalizar Pedido
+                                </button>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
-    
+                <!-- Right Column - Summary -->
                 <div class="col-lg-5">
                     <div class="summary-sidebar">
-                        <div id="ResumoPedido"></div>
+                        <div class="summary-card">
+                            <h3>Resumo do Pedido</h3>
+                            <div id="ResumoPedido">
+                                <div class="summary-row">
+                                    <span>Subtotal</span>
+                                    <span>€29.99</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Envio</span>
+                                    <span>€5.00</span>
+                                </div>
+                                <div class="summary-row highlight">
+                                    <span>Total</span>
+                                    <span>€34.99</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -130,31 +636,44 @@
     <script src="src/js/carrinho.js"></script>
     
     <script>
-        function continueToPayment() {
-            // Validate shipping form
-            const form = document.getElementById('shippingForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+        let currentStep = 1;
+        const totalSteps = 4;
 
-            // Save shipping info to session (you can add AJAX call here if needed)
-            const shippingData = {
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                address1: document.getElementById('address1').value,
-                address2: document.getElementById('address2').value,
-                zipCode: document.getElementById('zipCode').value,
-                city: document.getElementById('city').value,
-                state: document.getElementById('state').value
-            };
+        function updateProgressBar() {
+            // Update progress fill width
+            const progressPercentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressFill').style.width = progressPercentage + '%';
 
-            // Store in sessionStorage
-            sessionStorage.setItem('shippingInfo', JSON.stringify(shippingData));
-
-            // Redirect to Stripe checkout
-            irParaCheckout();
+            // Update step circles
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                const stepNumber = index + 1;
+                step.classList.remove('active', 'completed');
+                
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                    step.querySelector('.progress-step-circle').innerHTML = '<i class="bi bi-check"></i>';
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                    step.querySelector('.progress-step-circle').textContent = stepNumber;
+                } else {
+                    step.querySelector('.progress-step-circle').textContent = stepNumber;
+                }
+            });
         }
+
+        function finalizeOrder() {
+            // Call your checkout function
+            if (typeof irParaCheckout === 'function') {
+                irParaCheckout();
+            } else {
+                alert('A processar o seu pedido...');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+        });
     </script>
 </body>
 </html>

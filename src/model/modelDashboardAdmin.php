@@ -312,12 +312,12 @@ function getVendasGrafico() {
     ];
 
 
-    $sql = "SELECT rendimento.valor As ValorRendimentos,rendimento.data_registo As RegistoRendimento,gastos.data_registo As RegistoGastos,gastos.valor As ValorGastos from rendimento,gastos;";
+    $sql = "SELECT DATE_FORMAT(rendimento.data_registo, '%Y-%m') AS Mes,SUM(rendimento.valor) AS ValorRendimentos,SUM(gastos.valor) AS ValorGastos FROM rendimento, gastos GROUP BY DATE_FORMAT(rendimento.data_registo, '%Y-%m') ORDER BY Mes asc;";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $dataGastos = strtotime($row['RegistoGastos']);
+            $dataGastos = strtotime($row['Mes']);
              $mesGastos = date('n', $dataGastos);
               $mesGastos = $meses[$mesGastos - 1];
             $dados1[] = $mesGastos;

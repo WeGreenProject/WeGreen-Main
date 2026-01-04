@@ -148,28 +148,26 @@ function getTransicoes(){
         $sql = "SELECT 
     'Rendimento' AS tipo_transacao,
     r.id,
-    u.nome AS anunciante,
+    r.origem AS anunciante,
     r.valor,
     r.descricao,
     r.data_registo AS data
-FROM Rendimento r
-JOIN Utilizadores u ON r.anunciante_id = u.id
+FROM rendimento r
 
 UNION ALL
 
 SELECT 
     'Gasto' AS tipo_transacao,
     g.id,
-    u.nome AS anunciante,
+    g.origem AS anunciante,
     g.valor,
     g.descricao,
     g.data_registo AS data
-FROM Gastos g
-JOIN Utilizadores u ON g.anunciante_id = u.id
+FROM gastos g
 
 UNION ALL
 
-SELECT
+SELECT 
     'Venda' AS tipo_transacao,
     v.id,
     u.nome AS anunciante,
@@ -177,7 +175,7 @@ SELECT
     CONCAT('Produto ID: ', v.produto_id) AS descricao,
     v.data_venda AS data
 FROM vendas v
-JOIN Utilizadores u ON v.anunciante_id = u.id
+JOIN utilizadores u ON v.anunciante_id = u.id
 
 ORDER BY data DESC;";
 
@@ -225,6 +223,356 @@ ORDER BY data DESC;";
 
         return ($msg);
     }
+function registaRendimentos($descricao, $valor, $select) {
 
+    global $conn;
+    $msg = "";
+    $flag = false;
+
+    $stmt = $conn->prepare(
+        "INSERT INTO rendimento (valor, origem, descricao) 
+         VALUES (?, ?, ?)"
+    );
+
+    if ($stmt) {
+        $stmt->bind_param("dss", $valor, $select, $descricao);
+
+        if ($stmt->execute()) {
+            $msg = "Registado com sucesso!";
+            $flag = true;
+        } else {
+            $msg = "Erro ao registar rendimento.";
+        }
+
+        $stmt->close();
+    } else {
+        $msg = "Erro na preparação da query.";
+    }
+
+    $conn->close();
+
+    $resp = json_encode(array(
+        "flag" => $flag,
+        "msg" => $msg
+    ));
+
+    return $resp;
+}
+        function registaGastos($descricao, $valor, $select){
+        global $conn;
+        $msg = "";
+        $flag = false;
+
+        $stmt = $conn->prepare("INSERT INTO gastos (valor, origem, descricao) VALUES (?, ?, ?);");
+        if($stmt){
+            $stmt->bind_param("dss", $valor, $select, $descricao);
+            if($stmt->execute()){
+                $msg = "Registado com sucesso!";
+                $flag = true;
+            } else {
+                $msg = "Erro ao executar: " . $stmt->error;
+            }
+            $stmt->close();
+        } else {
+            $msg = "Erro na preparação: " . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+
+        return $resp;
+    }
+function getRendimentos(){
+        global $conn;
+        $msg = "";
+        $sql = "SELECT * from rendimento order by rendimento.id asc;";
+
+
+        $result = $conn->query($sql);
+        $text = "";
+        $text2 = "";
+
+
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $msg .= "<tr>";
+                $msg .= "<th scope='row'>#".$row['id']."</th>";
+                $msg .= "<td>".$row['origem']."</td>";
+                $msg .= "<td>".$row['descricao']."</td>";
+                $msg .= "<td class='valor-neutro'>".$row['valor']."€</td>";
+                $msg .= "<td><button class='btn-info' onclick='getDadosrendimento(".$row['id'].")'>ℹ️ Editar</button></td>";  
+                $msg .= "<td><button class='btn-info' id='btnDesativar'onclick='removerRendimentos(".$row['id'].")'>❌ Remover</button></td>";  
+                $msg .= "</tr>";
+            }
+        } else {
+            $msg .= "<tr>";
+            $msg .= "<td>Sem Registos</td>";
+            $msg .= "<th scope='row'></th>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "</tr>";
+        }
+        $conn->close();
+
+        return ($msg);
+    }
+    function getInfoUserDropdown($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT * from Utilizadores where id = ".$ID_User;
+
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+
+                $msg  = "<div class='dropdown-header'>";
+                $msg .= "    <img src='" . $row['foto']."' alt='Usuário' class='dropdown-avatar'>";
+                $msg .= "    <div>";
+                $msg .= "        <div class='dropdown-name'>" . $row['nome']. "</div>";
+                $msg .= "        <div class='dropdown-email'>" . $row['email']. "</div>";
+                $msg .= "    </div>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='dropdown-divider'></div>";
+
+                $msg .= "<button class='dropdown-item' onclick=\"showPage('profile', null); closeUserDropdown();\">";
+                $msg .= "    <i class='fas fa-user'></i>";
+                $msg .= "    <span>Meu Perfil</span>";
+                $msg .= "</button>";
+
+                $msg .= "<button class='dropdown-item' onclick='showPasswordModal()'>";
+                $msg .= "    <i class='fas fa-key'></i>";
+                $msg .= "    <span>Alterar Senha</span>";
+                $msg .= "</button>";
+
+                $msg .= "<div class='dropdown-divider'></div>";
+
+                $msg .= "<button class='dropdown-item dropdown-item-danger' onclick='logout()'>";
+                $msg .= "    <i class='fas fa-sign-out-alt'></i>";
+                $msg .= "    <span>Sair</span>";
+                $msg .= "</button>";
+            }
+        }
+        else
+        {
+                $msg  = "<div class='stat-icon'>👥</div>";
+                $msg .= "<div class='stat-label'>Utilizadores</div>";
+                $msg .= "<div class='stat-value'>Nao Encontrado!</div>";
+                $msg .= "<div class='stat-change'>+ X Novos utilizadores</div>";
+        }
+        $conn->close();
+
+        return ($msg);
+
+    }
+    function getDadosGastos($ID_Gastos){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * FROM gastos WHERE id =".$ID_Gastos;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+        }
+
+        $conn->close();
+
+        return (json_encode($row));
+
+    }
+    function guardaEditGastos($descricao, $valor, $select, $ID_Gastos){
+        
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+
+        $sql = "UPDATE gastos SET descricao = '".$descricao."', valor = '".$valor."',origem = '".$select."' WHERE id =".$ID_Gastos;
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Editado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close(); 
+
+        return($resp);
+
+    }
+    function getDadosrendimento($ID_Rendimentos){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * FROM rendimento WHERE id =".$ID_Rendimentos;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+        }
+
+        $conn->close();
+
+        return (json_encode($row));
+
+    }
+    function guardaEditRendimento($descricao, $valor, $select, $ID_Rendimentos){
+        
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+
+        $sql = "UPDATE rendimento SET descricao = '".$descricao."', valor = '".$valor."',origem = '".$select."' WHERE id =".$ID_Rendimentos;
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Editado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close(); 
+
+        return($resp);
+
+    }
+    function getGastos(){
+        global $conn;
+        $msg = "";
+        $sql = "SELECT * from gastos order by gastos.id asc;";
+
+
+        $result = $conn->query($sql);
+        $text = "";
+        $text2 = "";
+
+
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $msg .= "<tr>";
+                $msg .= "<th scope='row'>#".$row['id']."</th>";
+                $msg .= "<td>".$row['origem']."</td>";
+                $msg .= "<td>".$row['descricao']."</td>";
+                $msg .= "<td class='valor-neutro'>".$row['valor']."€</td>";
+                $msg .= "<td><button class='btn-info' onclick='getDadosGastos(".$row['id'].")'>ℹ️ Editar</button></td>";  
+                $msg .= "<td><button class='btn-info' id='btnDesativar'onclick='removerGastos(".$row['id'].")'>❌ Remover</button></td>";  
+                $msg .= "</tr>";
+            }
+        } else {
+            $msg .= "<tr>";
+            $msg .= "<td>Sem Registos</td>";
+            $msg .= "<th scope='row'></th>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "</tr>";
+        }
+        $conn->close();
+
+        return ($msg);
+    }
+        function getAdminPerfil($ID_User){
+    global $conn;
+    $msg = "";
+    $row = "";
+    $sql = "SELECT * from utilizadores where id = ".$ID_User;
+
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $msg  = "<div class='user-avatar'><img src='".$row["foto"]."' alt='Avatar'></div>";
+            $msg .= "<div class='user-info'>";
+            $msg .= "<span class='user-name'>".$row["nome"]."</span>";
+            $msg .= "<span class='user-role'>Administrador</span>";
+            $msg .= "</div>";
+        }
+    }
+    else
+    {
+        $msg  = "<div class='user-avatar'>A</div>";
+        $msg .= "<div class='user-info'>";
+        $msg .= "<span class='user-name'>Administrador</span>";
+        $msg .= "<span class='user-role'>Admin</span>";
+        $msg .= "</div>";
+    }
+    $conn->close();
+
+    return ($msg);
+}
+    function removerGastos($ID_Gastos){
+        global $conn;
+        $msg = "";
+        $flag = true;
+
+        $sql = "DELETE FROM gastos WHERE id = ".$ID_Gastos;
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Removido com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+    }
+        function removerRendimentos($ID_Rendimentos){
+        global $conn;
+        $msg = "";
+        $flag = true;
+
+        $sql = "DELETE FROM rendimento WHERE id = ".$ID_Rendimentos;
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Removido com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+    }
 }
 ?>
