@@ -1,17 +1,43 @@
+<?php
+session_start();
+
+// Verificar se está autenticado
+if(!isset($_SESSION['utilizador'])){
+    header('Location: login.html');
+    exit;
+}
+
+// Redirecionar para o processamento se vier do Stripe
+if(isset($_GET['session_id'])){
+    header('Location: src/controller/controllerSucessoCarrinho.php?session_id=' . $_GET['session_id']);
+    exit;
+}
+
+// Recuperar dados processados
+$resultado = $_SESSION['resultado_pagamento'] ?? null;
+
+if(!$resultado || !$resultado['sucesso']){
+    header('Location: Carrinho.html');
+    exit;
+}
+
+$codigoEncomenda = $resultado['codigo_encomenda'];
+$totalCompra = $resultado['total'];
+$produtosNomes = $resultado['produtos'];
+
+// Limpar sessão
+unset($_SESSION['resultado_pagamento']);
+?>
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagamento Confirmado</title>
-        <link rel="stylesheet" href="src/css/lib/datatables.css">
-    <link rel="stylesheet" href="src/css/lib/select2.css">
-
-    <script src="src/js/lib/bootstrap.js"></script>
-    <script src="src/js/lib/jquery.js"></script>
-    <script src="src/js/lib/datatables.js"></script>
-    <script src="src/js/lib/select2.js"></script>
-    <script src="src/js/lib/sweatalert.js"></script>
+    <title>Pagamento Confirmado - WeGreen</title>
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+    <link rel="stylesheet" href="src/css/sucess.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
      <style>
     * {
@@ -187,49 +213,51 @@ body {
 <body>
     <div class="success-container">
         <div class="success-icon">✓</div>
-        
+
         <h1 class="success-title">Pagamento Confirmado!</h1>
         <p class="success-subtitle">Obrigado pela sua compra. O seu pagamento foi processado com sucesso.</p>
 
         <div class="order-details">
             <div class="detail-row">
                 <span class="detail-label">Cliente</span>
-                <span class="detail-value">Mariana Brites</span>
+                <span class="detail-value"><?php echo $_SESSION['nome'] ?? 'Cliente WeGreen'; ?></span>
             </div>
-            
-            <div class="detail-row" id="Encomenda">
-            <span class="detail-label">Pedido</span>
-             <span class="detail-label">Blusa Colorida Custo Barcelona</span>    
+
+            <div class="detail-row">
+                <span class="detail-label">Produtos</span>
+                <span class="detail-value"><?php echo $produtosNomes; ?></span>
             </div>
-            
+
             <div class="detail-row">
                 <span class="detail-label">Data da Compra</span>
-                <span class="detail-value" id="purchaseDate">17 de Novembro, 2025</span>
+                <span class="detail-value"><?php echo date('d \d\e F, Y'); ?></span>
             </div>
-            
+
             <div class="detail-row">
-                <span class="detail-label">Número do Pedido</span>
-                <span class="detail-value" id="orderNumber">#ORD-2025-0001</span>
+                <span class="detail-label">Número da Encomenda</span>
+                <span class="detail-value"><?php echo $codigoEncomenda; ?></span>
+            </div>
+
+            <div class="detail-row">
+                <span class="detail-label">Total Pago</span>
+                <span class="detail-value" style="color: #3cb371; font-size: 24px; font-weight: 700;">€<?php echo number_format($totalCompra, 2, ',', '.'); ?></span>
             </div>
         </div>
 
         <div class="confirmation-info">
-            <p> Enviámos um email de confirmação com todos os detalhes da sua compra</p>
+            <p><i class="fas fa-envelope"></i> Enviámos um email de confirmação com todos os detalhes da sua compra</p>
+            <p><i class="fas fa-truck"></i> O seu pedido será processado em breve e receberá atualizações sobre o envio</p>
         </div>
 
         <div class="action-buttons">
-            <a href="index.html" class="btn btn-primary">
-                <span class="btn-icon"></span>
-                <span>Voltar ao homapage</span>
+            <a href="minhasEncomendas.php" class="btn btn-primary">
+                <span class="btn-icon"><i class="fas fa-shopping-bag"></i></span>
+                <span>Ver Minhas Encomendas</span>
             </a>
 
-            <a href="DashboardAdmin.php" class="btn btn-primary">
-                <span class="btn-icon"></span>
-                <span>Aceder ao Dashboard</span>
-            </a>
-            <a href="#" class="btn btn-secondary">
-                <span class="btn-icon"></span>
-                <span>Ver Fatura</span>
+            <a href="index.html" class="btn btn-secondary">
+                <span class="btn-icon"><i class="fas fa-home"></i></span>
+                <span>Voltar à Loja</span>
             </a>
         </div>
     </div>
@@ -238,35 +266,8 @@ body {
         function getUrlParameter(name) {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
             const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            const results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const customerName = getUrlParameter('name') || 'João Silva';
-            const plan = getUrlParameter('plan') || 'premium';
-            const orderNumber = getUrlParameter('order') || '#ORD-2025-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-            
-            document.getElementById('customerName').textContent = customerName;
-            
-            const planBadge = document.getElementById('planBadge');
-            const planName = document.getElementById('planName');
-            
-            if (plan.toLowerCase() === 'enterprise') {
-                planBadge.className = 'plan-badge plan-enterprise';
-                planBadge.innerHTML = '<span class="plan-icon">💼</span><span>Enterprise</span>';
-            } else {
-                planBadge.className = 'plan-badge plan-premium';
-                planBadge.innerHTML = '<span class="plan-icon">👑</span><span>Premium</span>';
-            }
-            
-            const today = new Date();
-            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('purchaseDate').textContent = today.toLocaleDateString('pt-PT', dateOptions);
-            
-            document.getElementById('orderNumber').textContent = orderNumber;
-        });
-    </script>
-</body>
-</html>
+        // Auto redirect após 5 segundos
+        setTimeout(function() {
+            window.location.href = 'minhasEncomendas.php';
+        }, 5000
 <script src="src/js/checkout.js"></script>

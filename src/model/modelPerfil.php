@@ -30,6 +30,8 @@ class Perfil{
                     $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
                     $msg .= "</div></li>";
+                    $msg .= "<li><a class='dropdown-item' href='DashboardCliente.php'>Dashboard</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='minhasEncomendas.php'>As Minhas Encomendas</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
@@ -55,7 +57,7 @@ class Perfil{
                 }
 
             }
-            
+
         }
         else
         {
@@ -65,7 +67,7 @@ class Perfil{
             $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -82,18 +84,19 @@ class Perfil{
                     return $row['foto'];
 
             }
-            
+
         }
- 
-        
+
+
         $conn->close();
-        
+
          return "src/img/pexels-beccacorreiaph-31095884.jpg";
 
     }
     function logout(){
-
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         session_destroy();
 
         return("Obrigado!");
@@ -493,7 +496,7 @@ class Perfil{
             }
 
         }
-        
+
     }
     else
     {
@@ -503,7 +506,7 @@ class Perfil{
         $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
     }
     $conn->close();
-    
+
     return ($msg);
 
 }

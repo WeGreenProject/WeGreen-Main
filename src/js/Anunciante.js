@@ -1933,56 +1933,118 @@ function carregarEncomendas() {
 }
 
 function renderEncomendas(encomendas) {
-  if (encomendasTable) {
-    encomendasTable.destroy();
-  }
-
   const tbody = $("#encomendasTable tbody");
-  tbody.empty();
 
   // Calcular estatísticas
   atualizarEstatisticasEncomendas(encomendas);
 
+  // Se DataTable existe, apenas limpar os dados
+  if ($.fn.DataTable.isDataTable("#encomendasTable")) {
+    try {
+      const table = $("#encomendasTable").DataTable();
+      table.clear();
+
+      if (!encomendas || encomendas.length === 0) {
+        tbody.html(`
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
+              <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+              <p>Nenhuma encomenda encontrada</p>
+              <small>As encomendas dos seus produtos aparecerão aqui</small>
+            </td>
+          </tr>
+        `);
+        return;
+      }
+
+      encomendas.forEach((encomenda) => {
+        const row = criarLinhaEncomenda(encomenda);
+        table.row.add($(row)[0]);
+      });
+
+      table.draw();
+      aplicarFiltrosEncomendas();
+      return;
+    } catch (e) {
+      console.warn("Erro ao atualizar tabela, recriando:", e);
+      // Se falhar, destruir e recriar abaixo
+      try {
+        $("#encomendasTable").DataTable().destroy();
+      } catch (e2) {
+        // Ignorar erro de destruição
+      }
+    }
+  }
+
+  // Criar tabela do zero
+  tbody.empty();
+
   if (!encomendas || encomendas.length === 0) {
     tbody.html(`
-            <tr>
-                <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
-                    <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
-                    <p>Nenhuma encomenda encontrada</p>
-                    <small>As encomendas dos seus produtos aparecerão aqui</small>
-                </td>
-            </tr>
-        `);
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
+          <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+          <p>Nenhuma encomenda encontrada</p>
+          <small>As encomendas dos seus produtos aparecerão aqui</small>
+        </td>
+      </tr>
+    `);
     return;
   }
 
   encomendas.forEach((encomenda) => {
-    const statusClass = getStatusClass(encomenda.estado);
-    const statusBadge = `<span class="badge badge-${statusClass}">${encomenda.estado}</span>`;
+    tbody.append(criarLinhaEncomenda(encomenda));
+  });
 
-    // Calcular dias desde a encomenda
-    const dataEncomenda = new Date(encomenda.data_completa);
-    const hoje = new Date();
-    const diasDesdeEncomenda = Math.floor(
-      (hoje - dataEncomenda) / (1000 * 60 * 60 * 24)
-    );
+  initEncomendasTable();
+  aplicarFiltrosEncomendas();
+}
 
-    // Badge "Novo" para últimas 24h
-    const badgeNovo =
-      diasDesdeEncomenda === 0
-        ? '<span class="badge badge-new">Novo</span> '
-        : "";
+function criarLinhaEncomenda(encomenda) {
+  const statusClass = getStatusClass(encomenda.estado);
+  const statusBadge = `<span class="badge badge-${statusClass}">${encomenda.estado}</span>`;
 
-    // Classe de urgência (mais de 3 dias pendente)
-    const classeUrgente =
-      diasDesdeEncomenda > 3 && encomenda.estado === "Pendente"
-        ? "row-urgent"
-        : "";
+  // Calcular dias desde a encomenda
+  const dataEncomenda = new Date(encomenda.data_completa);
+  const hoje = new Date();
+  const diasDesdeEncomenda = Math.floor(
+    (hoje - dataEncomenda) / (1000 * 60 * 60 * 24)
+  );
 
-    // Tooltip morada
-    const moradaTooltip = encomenda.morada || "Morada não disponível";
+  // Badge "Novo" para últimas 24h
+  const badgeNovo =
+    diasDesdeEncomenda === 0
+      ? '<span class="badge badge-new">Novo</span> '
+      : "";
 
-    const row = `
+  // Classe de urgência (mais de 3 dias pendente)
+  const classeUrgente =
+    diasDesdeEncomenda > 3 && encomenda.estado === "Pendente"
+      ? "row-urgent"
+      : "";
+
+  // Tooltip morada
+  const moradaTooltip = encomenda.morada || "Morada não disponível";
+
+  // Ícone do método de pagamento
+  let paymentIcon = '<i class="fas fa-credit-card"></i>';
+  if (encomenda.payment_method === "paypal") {
+    paymentIcon = '<i class="fab fa-paypal" style="color: #0070ba;"></i>';
+  } else if (encomenda.payment_method === "klarna") {
+    paymentIcon =
+      '<i class="fas fa-money-check-alt" style="color: #ffb3c7;"></i>';
+  }
+
+  // Comissão e lucro líquido
+  const comissao = encomenda.comissao || 0;
+  const lucroLiquido = encomenda.lucro_liquido || 0;
+  const lucroTooltip = `Valor Bruto: €${encomenda.valor.toFixed(
+    2
+  )}\nComissão (6%): €${comissao.toFixed(
+    2
+  )}\nLucro Líquido: €${lucroLiquido.toFixed(2)}`;
+
+  const row = `
             <tr data-encomenda-id="${encomenda.id}" class="${classeUrgente}">
                 <td>
                     ${badgeNovo}<strong>${encomenda.codigo}</strong>
@@ -2008,8 +2070,8 @@ function renderEncomendas(encomendas) {
                         <img src="${
                           encomenda.produto_foto || "src/img/no-image.png"
                         }" alt="${
-      encomenda.produto_nome
-    }" class="product-thumb">
+    encomenda.produto_nome
+  }" class="product-thumb">
                         <div>
                             <div class="product-name">${
                               encomenda.produto_nome
@@ -2026,7 +2088,14 @@ function renderEncomendas(encomendas) {
                         <span>${encomenda.transportadora || "N/A"}</span>
                     </div>
                 </td>
-                <td><strong>€${encomenda.valor.toFixed(2)}</strong></td>
+                <td>
+                    <div title="${lucroTooltip}">
+                        <strong>€${lucroLiquido.toFixed(2)}</strong>
+                        <div style="font-size: 10px; color: #999;">
+                            ${paymentIcon} ${encomenda.payment_method.toUpperCase()}
+                        </div>
+                    </div>
+                </td>
                 <td>${statusBadge}</td>
                 <td>
                     <div class="action-buttons">
@@ -2045,15 +2114,17 @@ function renderEncomendas(encomendas) {
                         }, '${encomenda.estado}')" title="Alterar Status">
                             <i class="fas fa-edit"></i>
                         </button>
+                        <button class="btn-action btn-print" onclick="imprimirGuiaEnvio(${
+                          encomenda.id
+                        })" title="Guia de Envio">
+                            <i class="fas fa-print"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
         `;
-    tbody.append(row);
-  });
 
-  initEncomendasTable();
-  aplicarFiltrosEncomendas();
+  return row;
 }
 
 function atualizarEstatisticasEncomendas(encomendas) {
@@ -2086,14 +2157,23 @@ function atualizarEstatisticasEncomendas(encomendas) {
 }
 
 function initEncomendasTable() {
-  encomendasTable = $("#encomendasTable").DataTable({
-    language: {
-      url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-PT.json",
-    },
-    order: [[1, "desc"]],
-    pageLength: 10,
-    responsive: true,
-  });
+  if (
+    $("#encomendasTable").length &&
+    !$.fn.DataTable.isDataTable("#encomendasTable")
+  ) {
+    try {
+      encomendasTable = $("#encomendasTable").DataTable({
+        language: {
+          url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-PT.json",
+        },
+        order: [[1, "desc"]],
+        pageLength: 10,
+        responsive: true,
+      });
+    } catch (e) {
+      console.error("Erro ao inicializar tabela de encomendas:", e);
+    }
+  }
 }
 
 function getStatusClass(estado) {
@@ -2249,8 +2329,31 @@ function verDetalhesEncomenda(encomendaId) {
                             <p style="margin: 5px 0;"><strong>Transportadora:</strong> ${
                               encomenda.transportadora || "Não definida"
                             }</p>
+                            <p style="margin: 5px 0;"><strong>Código de Rastreio:</strong> ${
+                              encomenda.codigo_rastreio || "Não disponível"
+                            }</p>
                             <p style="margin: 5px 0;"><strong>Prazo Estimado:</strong> ${prazoEntrega}</p>
                             <p style="margin: 5px 0;"><strong>Tempo Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
+                        </div>
+
+                        <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2d3748; display: flex; align-items: center;">
+                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #A6D90C;"></i>
+                                Detalhes Financeiros
+                            </h4>
+                            <p style="margin: 5px 0;"><strong>Pagamento:</strong> ${encomenda.payment_method.toUpperCase()} - ${encomenda.payment_status.toUpperCase()}</p>
+                            <p style="margin: 5px 0;"><strong>ID Transação:</strong> ${
+                              encomenda.payment_id || "N/A"
+                            }</p>
+                            <p style="margin: 5px 0;"><strong>Valor Bruto:</strong> €${encomenda.valor.toFixed(
+                              2
+                            )}</p>
+                            <p style="margin: 5px 0;"><strong>Comissão (6%):</strong> <span style="color: #dc3545;">-€${encomenda.comissao.toFixed(
+                              2
+                            )}</span></p>
+                            <p style="margin: 5px 0;"><strong>Lucro Líquido:</strong> <span style="color: #28a745; font-weight: bold; font-size: 18px;">€${encomenda.lucro_liquido.toFixed(
+                              2
+                            )}</span></p>
                         </div>
 
                         ${
@@ -2277,7 +2380,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
   Swal.fire({
     title: "Alterar Status da Encomenda",
     html: `
-            <select id="novoStatus" class="swal2-input" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px;">
+            <select id="novoStatus" class="swal2-input" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px;" onchange="toggleCodigoRastreio()">
                 <option value="Pendente" ${
                   statusAtual === "Pendente" ? "selected" : ""
                 }>Pendente</option>
@@ -2294,7 +2397,20 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
                   statusAtual === "Cancelado" ? "selected" : ""
                 }>Cancelado</option>
             </select>
+            <div id="codigoRastreioContainer" style="display: ${
+              statusAtual === "Enviado" ? "block" : "none"
+            }; margin-bottom: 15px;">
+                <input type="text" id="codigoRastreio" class="swal2-input" placeholder="Código de Rastreio *" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 0;">
+                <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">* Obrigatório ao marcar como "Enviado"</small>
+            </div>
             <textarea id="observacao" class="swal2-textarea" placeholder="Observações (opcional)" style="width: 100%; min-height: 100px; padding: 10px; font-size: 14px;"></textarea>
+            <script>
+                function toggleCodigoRastreio() {
+                    const status = document.getElementById('novoStatus').value;
+                    const container = document.getElementById('codigoRastreioContainer');
+                    container.style.display = status === 'Enviado' ? 'block' : 'none';
+                }
+            </script>
         `,
     showCancelButton: true,
     confirmButtonText: "Atualizar",
@@ -2302,9 +2418,20 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
     confirmButtonColor: "#A6D90C",
     width: 600,
     preConfirm: () => {
+      const status = document.getElementById("novoStatus").value;
+      const codigoRastreio = document.getElementById("codigoRastreio").value;
+
+      if (status === "Enviado" && !codigoRastreio.trim()) {
+        Swal.showValidationMessage(
+          'Código de rastreio é obrigatório ao marcar como "Enviado"'
+        );
+        return false;
+      }
+
       return {
-        status: document.getElementById("novoStatus").value,
+        status: status,
         observacao: document.getElementById("observacao").value,
+        codigo_rastreio: codigoRastreio,
       };
     },
   }).then((result) => {
@@ -2317,6 +2444,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
           encomenda_id: encomendaId,
           novo_estado: result.value.status,
           observacao: result.value.observacao,
+          codigo_rastreio: result.value.codigo_rastreio,
         },
         function (resp) {
           const dados = JSON.parse(resp);
@@ -2420,4 +2548,83 @@ function verHistoricoEncomenda(encomendaId) {
   ).fail(function () {
     Swal.fire("Erro", "Falha ao carregar histórico", "error");
   });
+}
+
+// ========== FUNÇÕES DE INICIALIZAÇÃO POR PÁGINA ==========
+
+// Inicializar página Dashboard
+function initDashboardPage() {
+  if (typeof updateDashboard === "function") {
+    updateDashboard();
+  } else {
+    if (typeof getDadosPlanos === "function") getDadosPlanos();
+    if (typeof CarregaProdutos === "function") CarregaProdutos();
+    if (typeof CarregaPontos === "function") CarregaPontos();
+    if (typeof getGastos === "function") getGastos();
+    if (typeof getVendasMensais === "function") getVendasMensais();
+    if (typeof renderTopProductsChart === "function") renderTopProductsChart();
+    if (typeof renderRecentProducts === "function") renderRecentProducts();
+  }
+}
+
+// Inicializar página Produtos
+function initProductsPage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof carregarProdutos === "function") carregarProdutos();
+}
+
+// Inicializar página Encomendas
+function initSalesPage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof initEncomendasTable === "function") initEncomendasTable();
+  if (typeof carregarEncomendas === "function") carregarEncomendas();
+  if (typeof aplicarFiltrosEncomendas === "function")
+    aplicarFiltrosEncomendas();
+}
+
+// Inicializar página Relatórios/Analytics
+function initAnalyticsPage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof loadReportStats === "function") loadReportStats();
+  if (typeof loadCategorySalesChart === "function") loadCategorySalesChart();
+  if (typeof loadDailyRevenueChart === "function") loadDailyRevenueChart();
+  if (typeof loadReportsTable === "function") loadReportsTable();
+}
+
+// Inicializar página Perfil
+function initProfilePage() {
+  if (typeof getDadosPlanos === "function") getDadosPlanos();
+  if (typeof carregarPerfil === "function") carregarPerfil();
+}
+
+// Função de Logout
+function logout() {
+  let dados = new FormData();
+  dados.append("op", 2);
+
+  $.ajax({
+    url: "src/controller/controllerPerfil.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+    .done(function (msg) {
+      Swal.fire({
+        icon: "success",
+        title: "Sessão Terminada",
+        text: msg,
+        confirmButtonColor: "#A6D90C",
+        timer: 2000,
+        timerProgressBar: true,
+      }).then(() => {
+        window.location.href = "index.html";
+      });
+    })
+    .fail(function (jqXHR, textStatus) {
+      console.error("Erro ao fazer logout:", textStatus);
+      window.location.href = "index.html";
+    });
 }

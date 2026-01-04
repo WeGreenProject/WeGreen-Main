@@ -327,17 +327,6 @@ class DashboardAnunciante {
         return json_encode($produto);
     }
 
-    function deleteProduto($id) {
-        global $conn;
-        $sql = "DELETE FROM Produtos WHERE Produto_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
-
-        return "Produto removido";
-    }
-
     function atualizarAtivoEmMassa($ids, $ativo) {
         global $conn;
         if (empty($ids) || !is_array($ids)) {
@@ -356,24 +345,98 @@ class DashboardAnunciante {
         $stmt->close();
         return $resultado;
     }
+function removerProdutosEmMassa($ids) {
+    global $conn;
 
-    function removerProdutosEmMassa($ids) {
-        global $conn;
-        if (empty($ids) || !is_array($ids)) {
-            return false;
+    // Normalizar entrada: aceitar tanto um ID único quanto array
+    if (!is_array($ids)) {
+        $ids = [$ids];
+    }
+
+    if (empty($ids)) {
+        return json_encode(['success' => false, 'message' => 'Nenhum produto selecionado']);
+    }
+
+    error_log('removerProdutosEmMassa - IDs: ' . print_r($ids, true));
+
+    try {
+        $removidos = 0;
+        $desativados = 0;
+
+        foreach ($ids as $id) {
+            // Verificar se tem encomendas ou vendas
+            $sqlCheck = "SELECT
+                (SELECT COUNT(*) FROM Encomendas WHERE produto_id = ?) as encomendas,
+                (SELECT COUNT(*) FROM Vendas WHERE produto_id = ?) as vendas";
+            $stmtCheck = $conn->prepare($sqlCheck);
+            $stmtCheck->bind_param("ii", $id, $id);
+            $stmtCheck->execute();
+            $resultCheck = $stmtCheck->get_result();
+            $rowCheck = $resultCheck->fetch_assoc();
+            $stmtCheck->close();
+
+            $temEncomendas = $rowCheck['encomendas'] > 0;
+            $temVendas = $rowCheck['vendas'] > 0;
+
+            if ($temEncomendas || $temVendas) {
+                // Desativar produto em vez de remover
+                $sqlUpdate = "UPDATE Produtos SET ativo = 0 WHERE Produto_id = ?";
+                $stmtUpdate = $conn->prepare($sqlUpdate);
+                $stmtUpdate->bind_param("i", $id);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+                error_log("Produto $id desativado (tem encomendas ou vendas)");
+                $desativados++;
+            } else {
+                // Pode remover - primeiro remove do carrinho
+                $sqlCarrinho = "DELETE FROM Carrinho WHERE produto_id = ?";
+                $stmtCarrinho = $conn->prepare($sqlCarrinho);
+                if ($stmtCarrinho) {
+                    $stmtCarrinho->bind_param("i", $id);
+                    $stmtCarrinho->execute();
+                    $stmtCarrinho->close();
+                }
+
+                // Remove fotos adicionais
+                $sqlFotos = "DELETE FROM Produto_Fotos WHERE produto_id = ?";
+                $stmtFotos = $conn->prepare($sqlFotos);
+                if ($stmtFotos) {
+                    $stmtFotos->bind_param("i", $id);
+                    $stmtFotos->execute();
+                    $stmtFotos->close();
+                }
+
+                // Remove o produto
+                $sqlDelete = "DELETE FROM Produtos WHERE Produto_id = ?";
+                $stmtDelete = $conn->prepare($sqlDelete);
+                $stmtDelete->bind_param("i", $id);
+                $stmtDelete->execute();
+                $stmtDelete->close();
+                error_log("Produto $id removido");
+                $removidos++;
+            }
         }
 
-        $marcadores = implode(',', array_fill(0, count($ids), '?'));
-        $sql = "DELETE FROM Produtos WHERE Produto_id IN ($marcadores)";
-        $stmt = $conn->prepare($sql);
+        // Montar mensagem de resposta
+        $mensagens = [];
+        if ($removidos > 0) {
+            $mensagens[] = "$removidos produto(s) removido(s)";
+        }
+        if ($desativados > 0) {
+            $mensagens[] = "$desativados produto(s) desativado(s) (possui histórico de vendas/encomendas)";
+        }
 
-        $tipos = str_repeat('i', count($ids));
-        $stmt->bind_param($tipos, ...$ids);
+        $msg = implode(' e ', $mensagens);
+        error_log("Resultado final: $msg");
 
-        $resultado = $stmt->execute();
-        $stmt->close();
-        return $resultado;
+        return json_encode(['success' => true, 'message' => $msg]);
+
+    } catch (Exception $e) {
+        error_log('Exceção ao remover produtos: ' . $e->getMessage());
+        error_log('Stack trace: ' . $e->getTraceAsString());
+        return json_encode(['success' => false, 'message' => 'Erro ao remover produtos: ' . $e->getMessage()]);
     }
+}
 
     function alterarEstadoEmMassa($ids, $estado) {
         global $conn;
@@ -866,74 +929,86 @@ function getEncomendas($ID_User) {
         $sql = "SELECT
                     e.id,
                     e.codigo_encomenda,
+                    e.payment_id,
+                    e.payment_method,
+                    e.payment_status,
                     e.data_envio,
                     e.estado,
                     e.morada,
+                    e.codigo_rastreio,
                     u.nome AS cliente_nome,
                     u.email AS cliente_email,
-                    p.nome AS produto_nome,
-                    p.foto AS produto_foto,
-                    v.quantidade,
-                    v.valor,
+                    GROUP_CONCAT(DISTINCT p.nome SEPARATOR ', ') AS produto_nome,
+                    MIN(p.foto) AS produto_foto,
+                    SUM(v.quantidade) AS quantidade_total,
+                    SUM(v.valor) AS valor_total,
+                    SUM(v.lucro) AS lucro_total,
                     t.nome AS transportadora_nome
                 FROM Encomendas e
                 INNER JOIN Utilizadores u ON e.cliente_id = u.id
                 LEFT JOIN Produtos p ON e.produto_id = p.Produto_id
                 LEFT JOIN Vendas v ON e.id = v.encomenda_id
                 LEFT JOIN Transportadora t ON e.transportadora_id = t.id
-                WHERE e.anunciante_id = ?
+                WHERE e.anunciante_id = $ID_User
+                GROUP BY e.codigo_encomenda
                 ORDER BY e.data_envio DESC";
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $ID_User);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $conn->query($sql);
 
         $encomendas = [];
         while ($row = $result->fetch_assoc()) {
+            $valor_bruto = (float)$row['valor_total'];
+            $comissao = $valor_bruto * 0.06;
+            $lucro_liquido = $valor_bruto - $comissao;
+
             $encomendas[] = [
                 'id' => (int)$row['id'],
                 'codigo' => $row['codigo_encomenda'],
+                'payment_id' => $row['payment_id'],
+                'payment_method' => $row['payment_method'] ?: 'N/A',
+                'payment_status' => $row['payment_status'] ?: 'N/A',
                 'data' => date('d/m/Y', strtotime($row['data_envio'])),
                 'data_completa' => $row['data_envio'],
                 'estado' => $row['estado'],
                 'morada' => $row['morada'],
+                'codigo_rastreio' => $row['codigo_rastreio'],
                 'cliente_nome' => $row['cliente_nome'],
                 'cliente_email' => $row['cliente_email'],
                 'produto_nome' => $row['produto_nome'],
                 'produto_foto' => $row['produto_foto'],
-                'quantidade' => (int)$row['quantidade'],
-                'valor' => (float)$row['valor'],
+                'quantidade' => (int)$row['quantidade_total'],
+                'valor' => $valor_bruto,
+                'comissao' => $comissao,
+                'lucro_liquido' => $lucro_liquido,
                 'transportadora' => $row['transportadora_nome']
             ];
         }
 
-        $stmt->close();
-
         return json_encode($encomendas);
     }
 
-    function atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao = '') {
+    function atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao = '', $codigo_rastreio = null) {
         global $conn;
 
         // Atualiza o estado na tabela Encomendas
-        $sql = "UPDATE Encomendas SET estado = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("si", $novo_estado, $encomenda_id);
+        $sql = "UPDATE Encomendas SET estado = '$novo_estado'";
+        if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
+            $sql .= ", codigo_rastreio = '$codigo_rastreio'";
+        }
+        $sql .= " WHERE id = $encomenda_id";
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$conn->query($sql)) {
             return json_encode(['success' => false, 'message' => 'Erro ao atualizar status']);
         }
-        $stmt->close();
 
         // Registra no histórico
         $descricao = empty($observacao) ? "Status alterado para: $novo_estado" : $observacao;
-        $sqlHist = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao) VALUES (?, ?, ?)";
-        $stmtHist = $conn->prepare($sqlHist);
-        $stmtHist->bind_param("iss", $encomenda_id, $novo_estado, $descricao);
-        $stmtHist->execute();
-        $stmtHist->close();
+        if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
+            $descricao .= " - Código de rastreio: $codigo_rastreio";
+        }
+
+        $sqlHist = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao) VALUES ($encomenda_id, '$novo_estado', '$descricao')";
+        $conn->query($sqlHist);
 
         return json_encode(['success' => true, 'message' => 'Status atualizado com sucesso']);
     }

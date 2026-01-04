@@ -32,14 +32,14 @@ class Checkout {
             }
         }
         $conn->close();
-        
+
         return ($msg);
     }
 
     function getProdutosCarrinho($utilizador_id) {
         global $conn;
-        
-        $sql = "SELECT 
+
+        $sql = "SELECT
                     Produtos.Produto_id,
                     Produtos.nome,
                     Produtos.preco,
@@ -47,20 +47,20 @@ class Checkout {
                     Carrinho_Itens.quantidade
                 FROM Carrinho_Itens
                 INNER JOIN Produtos ON Carrinho_Itens.produto_id = Produtos.Produto_id
-                WHERE Carrinho_Itens.utilizador_id = $utilizador_id 
+                WHERE Carrinho_Itens.utilizador_id = '$utilizador_id'
                 AND Produtos.ativo = 1";
-        
+
         $result = $conn->query($sql);
         $produtos = [];
-        
+
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $produtos[] = $row;
             }
         }
-        
+
         return $produtos;
     }
-        
+
 }
 ?>

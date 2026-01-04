@@ -10,37 +10,32 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Anunciante - WeGreen</title>
+    <title>Perfil - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/Anunciante.css">
-    <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
-    <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="src/js/Anunciante.js"></script>
 </head>
 
 <body>
     <div class="container">
         <aside class="sidebar">
-                <div class="logo">
-                    <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                    <div class="logo-text">
-                        <h1>WeGreen</h1>
-                        <p>Moda Sustentável</p>
-                    </div>
+            <div class="logo">
+                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+                <div class="logo-text">
+                    <h1>WeGreen</h1>
+                    <p>Moda Sustentável</p>
                 </div>
+            </div>
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a class="nav-link active" href="DashboardAnunciante.php">
+                        <a class="nav-link" href="DashboardAnunciante.php">
                             <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                             <span class="nav-text">Dashboard</span>
                         </a>
@@ -76,7 +71,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         </span>
                         <i class="fas fa-chevron-right breadcrumb-separator"></i>
                         <span class="breadcrumb-item active">
-                            <i class="fas fa-chart-line"></i> Dashboard
+                            <i class="fas fa-user"></i> Perfil
                         </span>
                     </div>
                 </div>
@@ -105,7 +100,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="perfilAnunciante.php">
+                        <a class="dropdown-item active" href="perfilAnunciante.php">
                             <i class="fas fa-user"></i>
                             <span>Meu Perfil</span>
                         </a>
@@ -122,70 +117,77 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 </div>
             </nav>
 
-            <div id="dashboard" class="page active">
-                <div class="stats-grid stats-grid-compact">
-                    <div id="PontosConfianca" class="stat-card stat-card-compact"></div>
-                    <div id="GastosCard" class="stat-card stat-card-compact"></div>
-                    <div id="ProdutoStock" class="stat-card stat-card-compact"></div>
-                    <div id="PlanosAtual" class="stat-card stat-card-compact"></div>
+            <div id="profile" class="page active">
+                <div class="profile-container" id="profileCard">
                 </div>
 
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Vendas Mensais</h3>
-                            <p>Evolução das vendas nos últimos meses</p>
+                <div class="profile-tabs">
+                    <button class="profile-tab active" onclick="switchProfileTab('personal', this)">
+                        <i class="fas fa-user"></i> Informações Pessoais
+                    </button>
+                    <button class="profile-tab" onclick="switchProfileTab('plan', this)">
+                        <i class="fas fa-crown"></i> Plano & Ranking
+                    </button>
+                    <button class="profile-tab" onclick="switchProfileTab('security', this)">
+                        <i class="fas fa-shield-alt"></i> Segurança
+                    </button>
+                </div>
+
+                <div class="profile-tab-content">
+                    <div id="tab-personal" class="tab-pane active">
+                        <div class="profile-section" id="profileInfo">
+                            <!-- Carregado via JS -->
                         </div>
-                        <canvas id="salesChart"></canvas>
                     </div>
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Top Produtos</h3>
-                            <p>Produtos mais vendidos</p>
+                    <div id="tab-plan" class="tab-pane">
+                        <div class="profile-section" id="profilePlan">
+                            <!-- Carregado via JS -->
                         </div>
-                        <canvas id="topProductsChart"></canvas>
                     </div>
-                </div>
-
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Produtos Recentes</h3>
-                        <p>Últimos produtos adicionados</p>
+                    <div id="tab-security" class="tab-pane">
+                        <div class="profile-section" id="profileSecurity">
+                            <!-- Carregado via JS -->
+                        </div>
                     </div>
-                    <div id="recentProducts"></div>
                 </div>
             </div>
 
-<!-- Modal Alterar Senha -->
-<div id="passwordModal" class="modal">
-    <div class="modal-content" style="max-width: 500px;">
-        <div class="modal-header">
-            <h3>Alterar Senha</h3>
-            <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
-        </div>
-        <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
-            <input type="text" name="username" autocomplete="username" value="<?php echo $_SESSION['email'] ?? ''; ?>" style="display: none;" readonly>
-            <div class="form-group">
-                <label>Senha Atual</label>
-                <input type="password" id="currentPassword" autocomplete="current-password" required>
+            <!-- Modal Alterar Senha -->
+            <div id="passwordModal" class="modal">
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h3>Alterar Senha</h3>
+                        <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
+                    </div>
+                    <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
+                        <input type="text" name="username" autocomplete="username" value="<?php echo $_SESSION['email'] ?? ''; ?>" style="display: none;" readonly>
+                        <div class="form-group">
+                            <label>Senha Atual</label>
+                            <input type="password" id="currentPassword" autocomplete="current-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nova Senha</label>
+                            <input type="password" id="newPassword" autocomplete="new-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirmar Nova Senha</label>
+                            <input type="password" id="confirmPassword" autocomplete="new-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                            <i class="fas fa-key"></i> Alterar Senha
+                        </button>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Nova Senha</label>
-                <input type="password" id="newPassword" autocomplete="new-password" required>
-            </div>
-            <div class="form-group">
-                <label>Confirmar Nova Senha</label>
-                <input type="password" id="confirmPassword" autocomplete="new-password" required>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-                <i class="fas fa-key"></i> Alterar Senha
-            </button>
-        </form>
-    </div>
-</div>
 
         </main>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            initProfilePage();
+        });
+    </script>
 </body>
 <?php
 }else{
@@ -194,9 +196,3 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 ?>
 
 </html>
-
-    <script>
-        $(document).ready(function() {
-            initDashboardPage();
-        });
-    </script>

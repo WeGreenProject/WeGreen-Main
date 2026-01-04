@@ -5,11 +5,11 @@ session_start();
 $func = new Perfil();
 
 if ($_POST['op'] == 1) {
-    if (isset($_SESSION['utilizador']) && isset($_SESSION['tipo'])) 
-    {    
+    if (isset($_SESSION['utilizador']) && isset($_SESSION['tipo']))
+    {
         $resp = $func->getDadosTipoPerfil($_SESSION['utilizador'],$_SESSION['tipo']);
         echo $resp;
-    } else 
+    } else
     {
         echo "<li><a class='dropdown-item' href='login.html'>Entrar na sua conta</a></li>";
     }
@@ -41,5 +41,21 @@ if ($_POST['op'] == 10) {
         echo "src/img/pexels-beccacorreiaph-31095884.jpg";
     }
 
+}
+if ($_POST['op'] == 11) {
+    // Return user data for checkout
+    if(isset($_SESSION['utilizador']) && isset($_SESSION['nome']) && isset($_SESSION['email']))
+    {
+        $foto = isset($_SESSION['foto']) ? $_SESSION['foto'] : '';
+        echo json_encode([
+            'nome' => $_SESSION['nome'],
+            'email' => $_SESSION['email'],
+            'foto' => $foto
+        ]);
+    }
+    else
+    {
+        echo json_encode(['error' => 'Sessão não iniciada']);
+    }
 }
 ?>
