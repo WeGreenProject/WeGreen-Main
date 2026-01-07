@@ -114,9 +114,7 @@ function getProdutoVendidos() {
             console.error("Resposta do servidor:", xhr.responseText);
         }
     });
-    
 }
-
 function getInativos(){
 
     
@@ -447,6 +445,7 @@ function guardaEditProduto(Produto_id) {
 function rejeitaEditProduto(Produto_id) {
     let dados = new FormData();
     dados.append("op", 9);
+
     dados.append("Produto_id", Produto_id);
 
     $.ajax({

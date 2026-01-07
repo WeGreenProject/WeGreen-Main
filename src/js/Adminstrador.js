@@ -64,6 +64,7 @@ function getInfoUserDropdown()
     .done(function( msg ) {
         console.log(msg);
         $('#userDropdown').html(msg);
+        // Reinicializa o evento de clique após o conteúdo ser carregado
         initializeDropdownEvents();
     })
     
