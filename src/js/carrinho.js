@@ -1,7 +1,3 @@
-// ============ FUNÇÕES DE CARRINHO (CHECKOUT) ============
-
-// Funções legacy removidas - não são usadas nesta versão do checkout
-
 // Remover produto do carrinho
 function removerDoCarrinho(produto_id) {
   Swal.fire({
@@ -1171,9 +1167,78 @@ let pickupMap = null;
 let pickupMarkers = [];
 let userLocation = null;
 
-// Dados dos pontos de recolha CTT e DPD em Portugal
+// Função para extrair cidade do ponto de recolha
+function getCityFromPickupPoint(point) {
+  if (point.city) return point.city;
+
+  // Mapa de cidades baseado em nomes e endereços
+  const cityMap = {
+    Lisboa: [
+      "Lisboa Centro",
+      "Benfica",
+      "Saldanha",
+      "Alameda",
+      "Amoreiras",
+      "Colombo",
+    ],
+    Cascais: ["Cascais"],
+    Amadora: ["Amadora"],
+    Sintra: ["Sintra"],
+    Oeiras: ["Oeiras"],
+    Almada: ["Almada"],
+    "Torres Vedras": ["Torres Vedras"],
+    Porto: ["Porto", "Norte Shopping"],
+    "Vila Nova de Gaia": ["Gaia"],
+    Matosinhos: ["Matosinhos"],
+    Maia: ["Maia"],
+    "Póvoa de Varzim": ["Póvoa"],
+    Espinho: ["Espinho"],
+    Barcelos: ["Barcelos"],
+    Braga: ["Braga"],
+    Guimarães: ["Guimarães"],
+    "Viana do Castelo": ["Viana"],
+    "Vila Real": ["Vila Real"],
+    Bragança: ["Bragança"],
+    Coimbra: ["Coimbra"],
+    "Figueira da Foz": ["Figueira"],
+    Aveiro: ["Aveiro"],
+    Viseu: ["Viseu"],
+    Guarda: ["Guarda"],
+    "Castelo Branco": ["Castelo Branco"],
+    Leiria: ["Leiria"],
+    "Caldas da Rainha": ["Caldas"],
+    Santarém: ["Santarém"],
+    Setúbal: ["Setúbal"],
+    Portalegre: ["Portalegre"],
+    Évora: ["Évora"],
+    Beja: ["Beja"],
+    Faro: ["Faro", "Forum Algarve"],
+    Albufeira: ["Albufeira"],
+    Portimão: ["Portimão"],
+    Lagos: ["Lagos"],
+    Loulé: ["Loulé"],
+    Olhão: ["Olhão"],
+    Tavira: ["Tavira"],
+    "Vila Real de Santo António": ["Vila Real de Santo António"],
+    Funchal: ["Funchal", "Madeira"],
+    "Ponta Delgada": ["Ponta Delgada", "Açores"],
+  };
+
+  const searchText = `${point.name} ${point.address}`;
+
+  for (const [city, keywords] of Object.entries(cityMap)) {
+    if (keywords.some((keyword) => searchText.includes(keyword))) {
+      return city;
+    }
+  }
+
+  return null;
+}
+
+// Dados dos pontos de recolha CTT e DPD em Portugal (principais cidades)
 const pickupPoints = {
   ctt_pickup: [
+    // LISBOA E ARREDORES
     {
       id: 1,
       name: "CTT Lisboa Centro",
@@ -1194,15 +1259,6 @@ const pickupPoints = {
     },
     {
       id: 3,
-      name: "CTT Saldanha",
-      address: "Av. Fontes Pereira de Melo, 6, 1050-121 Lisboa",
-      lat: 38.7332,
-      lng: -9.1448,
-      hours: "Seg-Sex: 09:00-20:00, Sáb: 09:00-14:00",
-      phone: "+351 21 345 6789",
-    },
-    {
-      id: 4,
       name: "CTT Cascais",
       address: "Rua Frederico Arouca, 77, 2750-357 Cascais",
       lat: 38.6979,
@@ -1210,11 +1266,358 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
       phone: "+351 21 456 7890",
     },
-  ],
-  dpd_pickup: [
+    {
+      id: 4,
+      name: "CTT Amadora",
+      address: "Rua Elias Garcia, 1, 2700-312 Amadora",
+      lat: 38.7538,
+      lng: -9.2343,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 21 498 0100",
+    },
+    // PORTO E ARREDORES
     {
       id: 5,
-      name: "DPD Lisboa Parque",
+      name: "CTT Porto Centro",
+      address: "Praça General Humberto Delgado, 4000-281 Porto",
+      lat: 41.1496,
+      lng: -8.6109,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
+      phone: "+351 22 340 0200",
+    },
+    {
+      id: 6,
+      name: "CTT Gaia",
+      address: "Av. da República, 1371, 4430-201 Vila Nova de Gaia",
+      lat: 41.1239,
+      lng: -8.6113,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 22 375 0300",
+    },
+    {
+      id: 7,
+      name: "CTT Matosinhos",
+      address: "Rua Brito Capelo, 241, 4450-079 Matosinhos",
+      lat: 41.182,
+      lng: -8.689,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 22 937 0400",
+    },
+    // BRAGA
+    {
+      id: 8,
+      name: "CTT Braga",
+      address: "Av. da Liberdade, 658, 4710-251 Braga",
+      lat: 41.5454,
+      lng: -8.4265,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
+      phone: "+351 253 203 500",
+    },
+    // COIMBRA
+    {
+      id: 9,
+      name: "CTT Coimbra",
+      address: "Av. Fernão de Magalhães, 223, 3000-175 Coimbra",
+      lat: 40.2111,
+      lng: -8.4291,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
+      phone: "+351 239 851 700",
+    },
+    // AVEIRO
+    {
+      id: 10,
+      name: "CTT Aveiro",
+      address: "Praça Marquês de Pombal, 11, 3800-176 Aveiro",
+      lat: 40.6412,
+      lng: -8.6537,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 234 377 800",
+    },
+    // VISEU
+    {
+      id: 11,
+      name: "CTT Viseu",
+      address: "Rua Formosa, 83, 3500-139 Viseu",
+      lat: 40.6573,
+      lng: -7.9138,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 232 480 900",
+    },
+    // SETÚBAL
+    {
+      id: 12,
+      name: "CTT Setúbal",
+      address: "Av. Luísa Todi, 390, 2900-456 Setúbal",
+      lat: 38.5244,
+      lng: -8.8926,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
+      phone: "+351 265 541 100",
+    },
+    // ÉVORA
+    {
+      id: 13,
+      name: "CTT Évora",
+      address: "Rua de Olivença, 82, 7000-849 Évora",
+      lat: 38.5713,
+      lng: -7.9067,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 266 748 200",
+    },
+    // FARO E ALGARVE
+    {
+      id: 14,
+      name: "CTT Faro",
+      address: "Largo do Carmo, 1, 8000-148 Faro",
+      lat: 37.0194,
+      lng: -7.9304,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
+      phone: "+351 289 860 300",
+    },
+    {
+      id: 15,
+      name: "CTT Portimão",
+      address: "Largo do Dique, 8500-533 Portimão",
+      lat: 37.1364,
+      lng: -8.5372,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 282 405 400",
+    },
+    {
+      id: 16,
+      name: "CTT Albufeira",
+      address: "Rua 5 de Outubro, 8200-080 Albufeira",
+      lat: 37.0886,
+      lng: -8.2503,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 289 585 500",
+    },
+    // LEIRIA
+    {
+      id: 17,
+      name: "CTT Leiria",
+      address: "Av. Heróis de Angola, 2400-185 Leiria",
+      lat: 39.7437,
+      lng: -8.8071,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 244 839 600",
+    },
+    // SANTARÉM
+    {
+      id: 18,
+      name: "CTT Santarém",
+      address: "Rua Pedro de Santarém, 71, 2005-247 Santarém",
+      lat: 39.2369,
+      lng: -8.6867,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 243 309 700",
+    },
+    // GUIMARÃES
+    {
+      id: 19,
+      name: "CTT Guimarães",
+      address: "Alameda de São Dâmaso, 4810-286 Guimarães",
+      lat: 41.4416,
+      lng: -8.2918,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 253 540 100",
+    },
+    // VIANA DO CASTELO
+    {
+      id: 20,
+      name: "CTT Viana do Castelo",
+      address:
+        "Av. dos Combatentes da Grande Guerra, 4900-343 Viana do Castelo",
+      lat: 41.6938,
+      lng: -8.8344,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 258 809 200",
+    },
+    // VILA REAL
+    {
+      id: 21,
+      name: "CTT Vila Real",
+      address: "Av. Carvalho Araújo, 5000-657 Vila Real",
+      lat: 41.3007,
+      lng: -7.7437,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 259 309 300",
+    },
+    // BRAGANÇA
+    {
+      id: 22,
+      name: "CTT Bragança",
+      address: "Av. Sá Carneiro, 5300-252 Bragança",
+      lat: 41.806,
+      lng: -6.757,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 273 309 400",
+    },
+    // GUARDA
+    {
+      id: 23,
+      name: "CTT Guarda",
+      address: "Rua Batalha Reis, 6300-738 Guarda",
+      lat: 40.5375,
+      lng: -7.2681,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 271 205 500",
+    },
+    // CASTELO BRANCO
+    {
+      id: 24,
+      name: "CTT Castelo Branco",
+      address: "Rua da Piscina, 6000-459 Castelo Branco",
+      lat: 39.8208,
+      lng: -7.4916,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 272 348 600",
+    },
+    // PORTALEGRE
+    {
+      id: 25,
+      name: "CTT Portalegre",
+      address: "Rua 19 de Junho, 7300-211 Portalegre",
+      lat: 39.2967,
+      lng: -7.4281,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 245 307 700",
+    },
+    // BEJA
+    {
+      id: 26,
+      name: "CTT Beja",
+      address: "Rua de Évora, 7800-451 Beja",
+      lat: 38.015,
+      lng: -7.8632,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 284 311 800",
+    },
+    // FUNCHAL (MADEIRA)
+    {
+      id: 27,
+      name: "CTT Funchal",
+      address: "Av. Zarco, 9000-069 Funchal",
+      lat: 32.6492,
+      lng: -16.9093,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
+      phone: "+351 291 214 900",
+    },
+    // PONTA DELGADA (AÇORES)
+    {
+      id: 28,
+      name: "CTT Ponta Delgada",
+      address: "Rua Ernesto do Canto, 9500-318 Ponta Delgada",
+      lat: 37.7412,
+      lng: -25.6756,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 296 209 100",
+    },
+    // FIGUEIRA DA FOZ
+    {
+      id: 29,
+      name: "CTT Figueira da Foz",
+      address: "Rua 5 de Outubro, 3080-169 Figueira da Foz",
+      lat: 40.1508,
+      lng: -8.8618,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 233 407 200",
+    },
+    // CALDAS DA RAINHA
+    {
+      id: 30,
+      name: "CTT Caldas da Rainha",
+      address: "Praça 25 de Abril, 2500-116 Caldas da Rainha",
+      lat: 39.4034,
+      lng: -9.1372,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 262 839 300",
+    },
+    // TORRES VEDRAS
+    {
+      id: 31,
+      name: "CTT Torres Vedras",
+      address: "Praça 25 de Abril, 2560-280 Torres Vedras",
+      lat: 39.0908,
+      lng: -9.2589,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 261 310 400",
+    },
+    // SINTRA
+    {
+      id: 32,
+      name: "CTT Sintra",
+      address: "Praça da República, 2710-616 Sintra",
+      lat: 38.7989,
+      lng: -9.3878,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 219 247 500",
+    },
+    // OEIRAS
+    {
+      id: 33,
+      name: "CTT Oeiras",
+      address: "Rua Cândido dos Reis, 2780-229 Oeiras",
+      lat: 38.6913,
+      lng: -9.3106,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 214 408 600",
+    },
+    // PÓVOA DE VARZIM
+    {
+      id: 34,
+      name: "CTT Póvoa de Varzim",
+      address: "Praça do Almada, 4490-438 Póvoa de Varzim",
+      lat: 41.3833,
+      lng: -8.7606,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 252 615 700",
+    },
+    // BARCELOS
+    {
+      id: 35,
+      name: "CTT Barcelos",
+      address: "Av. Dr. Sidónio Pais, 4750-333 Barcelos",
+      lat: 41.5311,
+      lng: -8.6157,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 253 809 800",
+    },
+    // ESPINHO
+    {
+      id: 36,
+      name: "CTT Espinho",
+      address: "Rua 19, 4500-258 Espinho",
+      lat: 41.0078,
+      lng: -8.6411,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 227 331 900",
+    },
+    // OLHÃO
+    {
+      id: 37,
+      name: "CTT Olhão",
+      address: "Av. da República, 8700-307 Olhão",
+      lat: 37.0263,
+      lng: -7.8408,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 289 702 100",
+    },
+    // TAVIRA
+    {
+      id: 38,
+      name: "CTT Tavira",
+      address: "Rua da Liberdade, 8800-371 Tavira",
+      lat: 37.127,
+      lng: -7.6484,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
+      phone: "+351 281 320 200",
+    },
+  ],
+  dpd_pickup: [
+    // LISBOA E ARREDORES
+    {
+      id: 39,
+      name: "DPD Lisboa Amoreiras",
       address: "Av. Eng. Duarte Pacheco, Amoreiras, 1070-103 Lisboa",
       lat: 38.7253,
       lng: -9.1534,
@@ -1222,7 +1625,7 @@ const pickupPoints = {
       phone: "+351 21 567 8901",
     },
     {
-      id: 6,
+      id: 20,
       name: "DPD Centro Colombo",
       address: "Av. Lusíada, Centro Colombo, 1500-392 Lisboa",
       lat: 38.7568,
@@ -1231,22 +1634,378 @@ const pickupPoints = {
       phone: "+351 21 678 9012",
     },
     {
-      id: 7,
-      name: "DPD Alameda",
-      address: "Av. Almirante Reis, 59, 1150-011 Lisboa",
-      lat: 38.7358,
-      lng: -9.1378,
+      id: 41,
+      name: "DPD Cascais",
+      address: "Av. 25 de Abril, 2750-512 Cascais",
+      lat: 38.6968,
+      lng: -9.4215,
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
-      phone: "+351 21 789 0123",
+      phone: "+351 21 460 2000",
     },
     {
-      id: 8,
+      id: 42,
+      name: "DPD Almada Forum",
+      address: "Rua Sérgio Malpique, 2800-278 Almada",
+      lat: 38.6785,
+      lng: -9.157,
+      hours: "Seg-Dom: 10:00-22:00",
+      phone: "+351 21 272 3000",
+    },
+    // PORTO E ARREDORES
+    {
+      id: 43,
+      name: "DPD Porto Norte Shopping",
+      address: "Rua Sara Afonso, 105, 4460-841 Senhora da Hora",
+      lat: 41.1893,
+      lng: -8.6537,
+      hours: "Seg-Dom: 10:00-22:00",
+      phone: "+351 22 950 4000",
+    },
+    {
+      id: 44,
+      name: "DPD Gaia Shopping",
+      address: "Av. dos Descobrimentos, 4400-103 Vila Nova de Gaia",
+      lat: 41.1311,
+      lng: -8.6314,
+      hours: "Seg-Dom: 10:00-23:00",
+      phone: "+351 22 371 5000",
+    },
+    {
+      id: 45,
+      name: "DPD Maia",
+      address: "Rua do Lidador, 4470-343 Maia",
+      lat: 41.2358,
+      lng: -8.6209,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
+      phone: "+351 22 948 6000",
+    },
+    // BRAGA
+    {
+      id: 46,
+      name: "DPD Braga Parque",
+      address: "Quinta dos Congregados, 4710-427 Braga",
+      lat: 41.562,
+      lng: -8.3963,
+      hours: "Seg-Dom: 10:00-23:00",
+      phone: "+351 253 680 700",
+    },
+    // COIMBRA
+    {
+      id: 47,
+      name: "DPD Coimbra Shopping",
+      address: "Av. Dr. Mendes Silva, 3030-290 Coimbra",
+      lat: 40.2034,
+      lng: -8.4122,
+      hours: "Seg-Dom: 09:00-23:00",
+      phone: "+351 239 497 800",
+    },
+    // AVEIRO
+    {
+      id: 48,
+      name: "DPD Aveiro Centro",
+      address: "Rua Batalhão de Caçadores, 3810-064 Aveiro",
+      lat: 40.6443,
+      lng: -8.6455,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
+      phone: "+351 234 098 900",
+    },
+    // VISEU
+    {
+      id: 49,
+      name: "DPD Viseu",
+      address: "Estrada Nacional 2, 3510-021 Viseu",
+      lat: 40.6651,
+      lng: -7.9201,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 232 419 100",
+    },
+    // SETÚBAL
+    {
+      id: 50,
+      name: "DPD Setúbal",
+      address: "Av. Bento Gonçalves, 2910-414 Setúbal",
+      lat: 38.5317,
+      lng: -8.8843,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
+      phone: "+351 265 709 200",
+    },
+    // ÉVORA
+    {
+      id: 51,
+      name: "DPD Évora",
+      address: "Rua Vasco da Gama, 7005-841 Évora",
+      lat: 38.5658,
+      lng: -7.9091,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 266 760 300",
+    },
+    // FARO E ALGARVE
+    {
+      id: 52,
+      name: "DPD Faro Forum Algarve",
+      address: "EN 125, Sitio das Figuras, 8005-518 Faro",
+      lat: 37.0332,
+      lng: -7.9528,
+      hours: "Seg-Dom: 10:00-23:00",
+      phone: "+351 289 889 400",
+    },
+    {
+      id: 53,
+      name: "DPD Portimão",
+      address: "Rua de São Pedro, 8500-801 Portimão",
+      lat: 37.1391,
+      lng: -8.5378,
+      hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
+      phone: "+351 282 498 500",
+    },
+    {
+      id: 54,
+      name: "DPD Lagos",
+      address: "Av. dos Descobrimentos, 8600-645 Lagos",
+      lat: 37.1028,
+      lng: -8.6735,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 282 769 600",
+    },
+    // LEIRIA
+    {
+      id: 55,
+      name: "DPD Leiria Shopping",
+      address: "Rua de Tomar, 2400-441 Leiria",
+      lat: 39.7392,
+      lng: -8.8159,
+      hours: "Seg-Dom: 09:00-23:00",
+      phone: "+351 244 870 700",
+    },
+    // SANTARÉM
+    {
+      id: 56,
+      name: "DPD Santarém",
+      address: "Av. Bernardo Santareno, 2005-177 Santarém",
+      lat: 39.2414,
+      lng: -8.679,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 243 330 800",
+    },
+    // GUIMARÃES
+    {
+      id: 57,
+      name: "DPD Guimarães Shopping",
+      address: "Rua 25 de Abril, 4835-400 Creixomil",
+      lat: 41.4498,
+      lng: -8.2868,
+      hours: "Seg-Dom: 10:00-23:00",
+      phone: "+351 253 510 200",
+    },
+    // VIANA DO CASTELO
+    {
+      id: 58,
+      name: "DPD Viana Shopping",
+      address: "Meadela, 4900-727 Viana do Castelo",
+      lat: 41.708,
+      lng: -8.8165,
+      hours: "Seg-Dom: 10:00-23:00",
+      phone: "+351 258 820 300",
+    },
+    // VILA REAL
+    {
+      id: 59,
+      name: "DPD Vila Real",
+      address: "Av. 1º de Maio, 5000-651 Vila Real",
+      lat: 41.2976,
+      lng: -7.7456,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 259 320 400",
+    },
+    // BRAGANÇA
+    {
+      id: 60,
+      name: "DPD Bragança",
+      address: "Av. Cidade de León, 5300-123 Bragança",
+      lat: 41.8089,
+      lng: -6.7503,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 273 320 500",
+    },
+    // GUARDA
+    {
+      id: 61,
+      name: "DPD Guarda",
+      address: "Rua Coronel Orlindo de Carvalho, 6300-532 Guarda",
+      lat: 40.5401,
+      lng: -7.2712,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 271 220 600",
+    },
+    // CASTELO BRANCO
+    {
+      id: 62,
+      name: "DPD Castelo Branco",
+      address: "Av. Nuno Álvares, 6000-083 Castelo Branco",
+      lat: 39.8183,
+      lng: -7.4936,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 272 320 700",
+    },
+    // PORTALEGRE
+    {
+      id: 63,
+      name: "DPD Portalegre",
+      address: "Rossio, 7300-110 Portalegre",
+      lat: 39.2942,
+      lng: -7.4298,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 245 330 800",
+    },
+    // BEJA
+    {
+      id: 64,
+      name: "DPD Beja",
+      address: "Rua Luís de Camões, 7800-440 Beja",
+      lat: 38.0172,
+      lng: -7.8651,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 284 320 900",
+    },
+    // FUNCHAL (MADEIRA)
+    {
+      id: 65,
+      name: "DPD Funchal Madeira Shopping",
+      address: "Caminho de Santa Quitéria, 9020-069 Funchal",
+      lat: 32.6595,
+      lng: -16.9242,
+      hours: "Seg-Dom: 10:00-23:00",
+      phone: "+351 291 230 100",
+    },
+    // PONTA DELGADA (AÇORES)
+    {
+      id: 66,
+      name: "DPD Ponta Delgada",
+      address: "Av. Infante D. Henrique, 9500-764 Ponta Delgada",
+      lat: 37.7394,
+      lng: -25.665,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 296 280 200",
+    },
+    // FIGUEIRA DA FOZ
+    {
+      id: 67,
+      name: "DPD Figueira da Foz",
+      address: "Rua Dr. Calado, 3080-161 Figueira da Foz",
+      lat: 40.1476,
+      lng: -8.8639,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 233 430 300",
+    },
+    // CALDAS DA RAINHA
+    {
+      id: 68,
+      name: "DPD Caldas da Rainha",
+      address: "Rua Almirante Cândido dos Reis, 2500-152 Caldas da Rainha",
+      lat: 39.4018,
+      lng: -9.1352,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 262 840 400",
+    },
+    // TORRES VEDRAS
+    {
+      id: 69,
+      name: "DPD Torres Vedras",
+      address: "Rua Paiva de Andrade, 2560-337 Torres Vedras",
+      lat: 39.0915,
+      lng: -9.2577,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 261 320 500",
+    },
+    // SINTRA
+    {
+      id: 70,
       name: "DPD Sintra",
       address: "Rua Dr. Alfredo Costa, 15, 2710-524 Sintra",
       lat: 38.7989,
       lng: -9.3878,
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 21 890 1234",
+    },
+    // OEIRAS
+    {
+      id: 71,
+      name: "DPD Oeiras Parque",
+      address: "Av. António Bernardo Cabral de Macedo, 2770-219 Paço de Arcos",
+      lat: 38.6921,
+      lng: -9.2944,
+      hours: "Seg-Dom: 10:00-23:00",
+      phone: "+351 214 405 600",
+    },
+    // PÓVOA DE VARZIM
+    {
+      id: 72,
+      name: "DPD Póvoa de Varzim",
+      address: "Rua Gomes de Amorim, 4490-665 Póvoa de Varzim",
+      lat: 41.3872,
+      lng: -8.7638,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 252 690 700",
+    },
+    // BARCELOS
+    {
+      id: 73,
+      name: "DPD Barcelos",
+      address: "Av. da Liberdade, 4750-287 Barcelos",
+      lat: 41.5336,
+      lng: -8.6183,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 253 820 800",
+    },
+    // ESPINHO
+    {
+      id: 74,
+      name: "DPD Espinho",
+      address: "Rua 37, 4500-904 Espinho",
+      lat: 41.0089,
+      lng: -8.6392,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 227 340 900",
+    },
+    // OLHÃO
+    {
+      id: 75,
+      name: "DPD Olhão",
+      address: "Av. 5 de Outubro, 8700-304 Olhão",
+      lat: 37.0281,
+      lng: -7.8392,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 289 710 100",
+    },
+    // TAVIRA
+    {
+      id: 76,
+      name: "DPD Tavira",
+      address: "Rua Almirante Cândido dos Reis, 8800-355 Tavira",
+      lat: 37.1289,
+      lng: -7.6512,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 281 325 200",
+    },
+    // VILA REAL DE SANTO ANTÓNIO
+    {
+      id: 77,
+      name: "DPD Vila Real de Santo António",
+      address: "Av. da República, 8900-209 Vila Real de Santo António",
+      lat: 37.1934,
+      lng: -7.4155,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 281 510 300",
+    },
+    // LOULÉ
+    {
+      id: 78,
+      name: "DPD Loulé",
+      address: "Av. José da Costa Mealha, 8100-500 Loulé",
+      lat: 37.1399,
+      lng: -8.0229,
+      hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
+      phone: "+351 289 410 400",
     },
   ],
 };
@@ -1255,11 +2014,18 @@ function showPickupMap(transportadoraId) {
   // Criar container do mapa se não existir
   let mapContainer = $("#pickupMapContainer");
   if (mapContainer.length === 0) {
+    const shippingInfo = JSON.parse(
+      localStorage.getItem("shippingInfo") || "{}"
+    );
+    const cityFilter = shippingInfo.state
+      ? `<small class="text-muted">Mostrando pontos em <strong>${shippingInfo.state}</strong></small>`
+      : "";
+
     const mapHTML = `
       <div id="pickupMapContainer" class="pickup-map-container">
         <div class="pickup-header">
           <h4><i class="bi bi-geo-alt-fill"></i> Escolha o Ponto de Recolha</h4>
-          <p class="pickup-subtitle">Selecione o ponto mais próximo de si</p>
+          <p class="pickup-subtitle">Selecione o ponto mais próximo de si ${cityFilter}</p>
         </div>
         <div id="pickupMap" class="pickup-map"></div>
         <div id="pickupPointsList" class="pickup-points-list"></div>
@@ -1267,6 +2033,16 @@ function showPickupMap(transportadoraId) {
     `;
     $(".transportadora-options").after(mapHTML);
   } else {
+    // Atualizar subtítulo com cidade filtrada
+    const shippingInfo = JSON.parse(
+      localStorage.getItem("shippingInfo") || "{}"
+    );
+    const cityFilter = shippingInfo.state
+      ? `<small class="text-muted">Mostrando pontos em <strong>${shippingInfo.state}</strong></small>`
+      : "";
+    $(".pickup-subtitle").html(
+      `Selecione o ponto mais próximo de si ${cityFilter}`
+    );
     mapContainer.show();
   }
 
@@ -1284,11 +2060,42 @@ function hidePickupMap() {
 }
 
 function initPickupMap(transportadoraId) {
-  const points = pickupPoints[transportadoraId] || [];
+  let points = pickupPoints[transportadoraId] || [];
 
   if (points.length === 0) {
     console.error("Nenhum ponto de recolha encontrado para:", transportadoraId);
     return;
+  }
+
+  // Filtrar por cidade selecionada
+  const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
+  const selectedCity = shippingInfo.state; // state contém a cidade selecionada
+
+  if (selectedCity) {
+    // Filtrar pontos pela cidade usando a função getCityFromPickupPoint
+    const filteredPoints = points.filter((p) => {
+      const pointCity = getCityFromPickupPoint(p);
+      return pointCity === selectedCity;
+    });
+
+    if (filteredPoints.length > 0) {
+      points = filteredPoints;
+      console.log(
+        `Filtrados ${filteredPoints.length} pontos para ${selectedCity}`
+      );
+    } else {
+      // Se não encontrar pontos para a cidade, mostrar aviso
+      Swal.fire({
+        icon: "info",
+        title: "Pontos de Recolha",
+        html: `Não há pontos de recolha em <strong>${selectedCity}</strong>.<br><small>A mostrar pontos de todas as localidades disponíveis.</small>`,
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      console.log(
+        `Nenhum ponto encontrado para ${selectedCity}. Mostrando todos.`
+      );
+    }
   }
 
   // Verificar se Leaflet está disponível
