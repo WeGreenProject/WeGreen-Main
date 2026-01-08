@@ -151,7 +151,81 @@ function alerta(titulo,msg,icon){
 
       })
 }
+function ProfileDropCard()
+{
+    let dados = new FormData();
+    dados.append("op", 7);
+
+    $.ajax({
+    url: "src/controller/controllerAdminPerfil.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#profileInfo').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
+function ProfileDropCard2()
+{
+    let dados = new FormData();
+    dados.append("op", 8);
+
+    $.ajax({
+    url: "src/controller/controllerAdminPerfil.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#profileCard').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
+function userDropdown()
+{
+    let dados = new FormData();
+    dados.append("op", 9);
+
+    $.ajax({
+    url: "src/controller/controllerAdminPerfil.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+         $('#profileCard').html(msg);
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
 $(function() {
+    ProfileDropCard();
+    ProfileDropCard2();
     getDadosTipoPerfil();
     getDadosTipoPerfilAdminInical();
     getDadosTipoPerfilAdminInfo();
