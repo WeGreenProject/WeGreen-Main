@@ -59,6 +59,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         </a>
                     </li>
                 </ul>
+
             </nav>
         </aside>
 
@@ -76,7 +77,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </div>
                 </div>
                 <div class="navbar-right">
-                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;">
+                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'"
+                        style="display: none;">
                         <i class="fas fa-crown"></i> Upgrade
                     </button>
                     <button class="navbar-icon-btn" id="notificationBtn">
@@ -84,7 +86,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         <span class="notification-badge">3</span>
                     </button>
                     <div class="navbar-user" id="userMenuBtn">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff" alt="Usuário" class="user-avatar">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff"
+                            alt="Usuário" class="user-avatar">
                         <div class="user-info">
                             <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></span>
                             <span class="user-role">Anunciante</span>
@@ -93,7 +96,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </div>
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-header">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff" alt="Usuário" class="dropdown-avatar">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff"
+                                alt="Usuário" class="dropdown-avatar">
                             <div>
                                 <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></div>
                                 <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'user@email.com'; ?></div>
@@ -160,7 +164,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
                     </div>
                     <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
-                        <input type="text" name="username" autocomplete="username" value="<?php echo $_SESSION['email'] ?? ''; ?>" style="display: none;" readonly>
+                        <input type="text" name="username" autocomplete="username"
+                            value="<?php echo $_SESSION['email'] ?? ''; ?>" style="display: none;" readonly>
                         <div class="form-group">
                             <label>Senha Atual</label>
                             <input type="password" id="currentPassword" autocomplete="current-password" required>
@@ -184,9 +189,9 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     </div>
 
     <script>
-        $(document).ready(function() {
-            initProfilePage();
-        });
+    $(document).ready(function() {
+        initProfilePage();
+    });
     </script>
 </body>
 <?php

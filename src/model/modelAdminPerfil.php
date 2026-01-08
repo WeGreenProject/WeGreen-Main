@@ -172,6 +172,100 @@ function adicionarFotoPerfil($ID_User, $foto){
         return ($msg);
 
     }
+    function ProfileDropCard($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT * from utilizadores where id =".$ID_User;
+        
+        $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    
+                $msg  = "<div class='section-header'>";
+                $msg .= "<h3><i class='fas fa-user'></i> Informações Pessoais</h3>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='info-item'>";
+                $msg .= "<label>Nome Completo</label>";
+                $msg .= "<input type='text' id='nomeAnunciante' value='".$row["nome"]."'>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='info-item'>";
+                $msg .= "<label>Email</label>";
+                $msg .= "<input type='email' id='emailAnunciante' value='".$row["email"]."'>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='info-item'>";
+                $msg .= "<label>NIF</label>";
+                $msg .= "<input type='text' id='nifAnunciante' value='".$row["nif"]."' placeholder='000000000' maxlength='9'>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='info-item'>";
+                $msg .= "<label>Telefone</label>";
+                $msg .= "<input type='text' id='telefoneAnunciante' value='".$row["telefone"]."' placeholder='900000000' maxlength='9'>";
+                $msg .= "</div>";
+
+                $msg .= "<div class='info-item'>";
+                $msg .= "<label>Morada</label>";
+                $msg .= "<input type='text' id='moradaAnunciante' value='".$row["morada"]."' placeholder='Rua, Número, Código Postal, Cidade'>";
+                $msg .= "</div>";
+
+                $msg .= "<button class='btn btn-primary' onclick='guardarDadosPerfil()' style='margin-top: 20px; width: 100%;'>";
+                $msg .= "<i class='fas fa-save'></i> Guardar Alterações";
+                $msg .= "</button>";
+                }
+            }
+
+        $conn->close();
+        
+        return ($msg);
+
+    }
+    function ProfileDropCard2($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT * from utilizadores where id =".$ID_User;
+        
+        $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    
+                    $msg  .= "<div class='profile-header-card'>";
+
+                    $msg .= "<div class='profile-avatar-large'>";
+                    $msg .= "<img src='".$row["foto"]."' alt='Foto de Perfil' id='userPhoto'>";
+                    $msg .= "<button class='avatar-edit-btn' type='button'>";
+                    $msg .= "<i class='fas fa-camera'></i>";
+                    $msg .= "<input type='file' id='avatarUpload' class='avatar-file-input' ";
+                    $msg .= "accept='image/jpeg,image/jpg,image/png,image/gif,image/webp' ";
+                    $msg .= "onchange='adicionarFotoPerfil()' />";
+                    $msg .= "</button>";
+                    $msg .= "</div>";
+
+                    $msg .= "<div class='profile-header-info'>";
+
+                    $msg .= "<div class='profile-header-left'>";
+                    $msg .= "<h1>".$row["nome"]."</h1>";
+                    $msg .= "<span class='role-badge'>Administrador</span>";
+                    $msg .= "</div>";
+
+                    $msg .= "<div class='profile-stats'>";
+
+                    $msg .= "</div>";
+                    $msg .= "</div>"; 
+                    $msg .= "</div>"; 
+                }
+            }
+
+        $conn->close();
+        
+        return ($msg);
+
+    }
         function getDadosTipoPerfilAdminInfo($ID_User){
         global $conn;
 

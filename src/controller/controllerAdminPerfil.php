@@ -31,4 +31,12 @@ if ($_POST['op'] == 6) {
     $resp = $func->adicionarFotoPerfil($_SESSION["utilizador"], $_FILES['foto']);
     echo $resp;
 }
+if ($_POST['op'] == 7) {
+    $resp = $func->ProfileDropCard($_SESSION["utilizador"]);
+    echo $resp;
+}
+if ($_POST['op'] == 8) {
+    $resp = $func->ProfileDropCard2($_SESSION["utilizador"]);
+    echo $resp;
+}
 ?>
