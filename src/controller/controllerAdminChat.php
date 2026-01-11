@@ -49,7 +49,7 @@ if ($_POST['op'] == 6) {
     echo $resp;
 }
 if ($_POST['op'] == 7) {
-    $resp = $func->pesquisarChat($_POST["pesquisa"]);
+    $resp = $func->pesquisarChat($_POST["pesquisa"],$_SESSION['utilizador']);
     echo $resp;
 }
 if ($_POST['op'] == 8) {
