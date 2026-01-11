@@ -132,7 +132,7 @@ function pesquisarChat() {
         processData: false
     })
     .done(function(msg) {
-        $('.conversations-panel').html(msg);
+        $('#ListaCliente').html(msg);
         console.log(msg);
     })
     .fail(function(jqXHR, textStatus) {
