@@ -210,46 +210,44 @@ function getConversas($ID_Anunciante,$ID_Consumidor){
 
     return $resp;
     }
-    function pesquisarChat($pesquisa){
-        global $conn;
-        $msg = "";
-        $row = "";
-        $sql = "SELECT DISTINCT
+function pesquisarChat($pesquisa){
+    global $conn;
+
+    $msg = "";
+
+    $sql = "SELECT DISTINCT
             Utilizadores.id,
             Utilizadores.nome,
             Utilizadores.foto,
             MensagensAdmin.mensagem
-        FROM Utilizadores,MensagensAdmin where  Utilizadores.id = MensagensAdmin.remetente_id AND Utilizadores.nome like '%$pesquisa%' ORDER BY MensagensAdmin.created_at DESC;";
-            $result1 = $conn->query($sql);
-            if ($result1->num_rows > 0) {
-                 while ($row = $result1->fetch_assoc()) {    
-                    $msg .= "<h3>Conversas</h3>";
-                    $msg .= "<div class='search-box'>";
-                    $msg .= "<i class='fas fa-search'></i>";
-                    $msg .= "<input type='text' placeholder='Pesquisar conversas...' id='searchInput'>";
-                    $msg .= "</div>";
-                    $msg .= "<div class='chat-messages' id='chatMessages'></div>";
-                    $msg .= "<div class='chat-input-container' id='BotaoEscrever'></div>";
-                    $msg .= "</div>";
-                }
+        FROM Utilizadores, MensagensAdmin
+        WHERE Utilizadores.id = MensagensAdmin.remetente_id
+        AND Utilizadores.nome LIKE '%$pesquisa%'
+        ORDER BY MensagensAdmin.created_at DESC";
 
-            }
-            else
-            {
-                $msg .= "<h3>Conversas</h3>";
-                $msg .= "<div class='search-box'>";
-                $msg .= "<i class='fas fa-search'></i>";
-                $msg .= "<input type='text' placeholder='Pesquisar conversas...' id='searchInput'>";
-                $msg .= "</div>";
-                $msg .= "<div class='chat-messages' id='chatMessages'></div>";
-                $msg .= "<div class='chat-input-container' id='BotaoEscrever'></div>";
-                $msg .= "</div>";
-            }
-        $conn->close();
-        
-        return ($msg);
+    $result1 = $conn->query($sql);
 
+    if ($result1->num_rows > 0) {
+        while ($row = $result1->fetch_assoc()) {    
+            $msg .= "<div class='conversation-item' data-user='".$row['nome']."'>";
+            $msg .= "<img src='".$row['foto']."' class='conversation-avatar' alt='".$row['nome']."'>";
+            $msg .= "<div class='conversation-info'>";
+            $msg .= "<div class='conversation-header'>";
+            $msg .= "<span class='conversation-name'>".$row['nome']."</span>";
+            $msg .= "</div>";
+            $msg .= "<div class='conversation-preview'>".$row['mensagem']."</div>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+        }
+    } else {
+        $msg .= "<div style='padding: 20px; text-align: center; color: #718096;'>";
+        $msg .= "<p>Sem resultados</p>";
+        $msg .= "</div>";
     }
+
+    $conn->close();
+    return $msg;
+}
     function getBotao($ID_User){
         global $conn;
         $msg = "";
