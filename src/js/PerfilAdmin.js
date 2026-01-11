@@ -199,6 +199,40 @@ function ProfileDropCard2()
     });
 
 }
+function guardarDadosPerfil(Produto_id) {
+    let dados = new FormData();
+    dados.append("op", 11);
+    dados.append("nomeAdminEdit", $('#nomeAdminEdit').val());
+    dados.append("emailAdminEdit", $('#emailAdminEdit').val());
+    dados.append("nifAdminEdit", $('#nifAdminEdit').val());
+    dados.append("telefoneAdminEdit", $('#telefoneAdminEdit').val());
+    dados.append("moradaAdminEdit", $('#moradaAdminEdit').val());
+    dados.append("Produto_id", Produto_id);
+
+    $.ajax({
+        url: "src/controller/controllerAdminPerfil.php",
+        method: "POST",
+        data: dados,
+        dataType: "html",
+        cache: false,
+        contentType: false,
+        processData: false
+    })
+    .done(function(msg) {
+        
+        let obj = JSON.parse(msg);
+        if(obj.flag) {
+            alerta("Perfil", obj.msg, "success");
+            ProfileDropCard();
+        } else {
+            alerta("Perfil", obj.msg, "error");
+        }
+        console.log(msg);
+    })
+    .fail(function(jqXHR, textStatus) {
+        alert("Request failed: " + textStatus);
+    });
+}
 function userDropdown()
 {
     let dados = new FormData();
