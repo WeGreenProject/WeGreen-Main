@@ -63,12 +63,6 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             <span class="nav-text">Relatórios</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="preferenciasNotificacoes.php">
-                            <span class="nav-icon"><i class="fas fa-bell"></i></span>
-                            <span class="nav-text">Notificações</span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </aside>
@@ -76,6 +70,15 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         <main class="main-content">
             <nav class="top-navbar">
                 <div class="navbar-left">
+                    <div class="breadcrumb">
+                        <span class="breadcrumb-item">
+                            <i class="fas fa-home"></i> WeGreen
+                        </span>
+                        <i class="fas fa-chevron-right breadcrumb-separator"></i>
+                        <span class="breadcrumb-item active">
+                            <i class="fas fa-chart-line"></i> Dashboard
+                        </span>
+                    </div>
                 </div>
                 <div class="navbar-right">
                     <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;">
