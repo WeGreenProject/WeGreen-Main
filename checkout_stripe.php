@@ -20,6 +20,13 @@ $shippingData = [
     'state' => isset($_POST['state']) ? $_POST['state'] : ''
 ];
 
+// Get pickup point data from POST (se transportadora for CTT/DPD com pickup)
+$pickupPointData = [
+    'pickup_point_id' => isset($_POST['pickup_point_id']) ? $_POST['pickup_point_id'] : '',
+    'pickup_point_name' => isset($_POST['pickup_point_name']) ? $_POST['pickup_point_name'] : '',
+    'pickup_point_address' => isset($_POST['pickup_point_address']) ? $_POST['pickup_point_address'] : ''
+];
+
 $produtos = $func->getProdutosCarrinho($utilizador_id);
 
 if (empty($produtos)) {
@@ -84,7 +91,11 @@ $sessionData = [
         'shipping_address2' => $shippingData['address2'],
         'shipping_zipCode' => $shippingData['zipCode'],
         'shipping_city' => $shippingData['city'],
-        'shipping_state' => $shippingData['state']
+        'shipping_state' => $shippingData['state'],
+        // Dados do ponto de recolha (se aplicável)
+        'pickup_point_id' => $pickupPointData['pickup_point_id'],
+        'pickup_point_name' => $pickupPointData['pickup_point_name'],
+        'pickup_point_address' => $pickupPointData['pickup_point_address']
     ],
 
 
