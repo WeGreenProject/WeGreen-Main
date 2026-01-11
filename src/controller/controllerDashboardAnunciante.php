@@ -314,7 +314,7 @@ if ($_POST['op'] == 34) {
 if ($_POST['op'] == 36) {
     $ids = $_POST['ids'];
     $resp = $func->removerProdutosEmMassa($ids);
-    echo json_encode(['success' => $resp]);
+    echo $resp; // Já vem como JSON do model
 }
 
 // Fechar conexão global no final

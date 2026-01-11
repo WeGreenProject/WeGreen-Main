@@ -1,11 +1,5 @@
-<?php
-session_start();
-
-if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
-    header("Location: login.html");
-    exit();
-}
-?>
+<br />
+<b>Notice</b>:  session_start(): Ignoring session_start() because a session is already active in <b>C:\xampp\htdocs\WeGreen-Main\minhasEncomendas.php</b> on line <b>2</b><br />
 
 <!DOCTYPE html>
 <html lang="pt">
@@ -27,7 +21,11 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-
+    <!-- TESTE CRÍTICO: Este script DEVE executar PRIMEIRO -->
+    <script>
+        console.log('🔴🔴🔴 TESTE INICIAL - Se vê isto, JavaScript funciona! 🔴🔴🔴');
+        alert('TESTE: JavaScript está carregado! Se vê este alerta, o problema é depois.');
+    </script>
 </head>
 <body>
     <div class="dashboard-container">
@@ -70,11 +68,11 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             <div class="sidebar-footer">
                 <div class="user-profile">
                     <div class="user-avatar">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=3cb371&color=fff" alt="Avatar">
+                        <img src="https://ui-avatars.com/api/?name=Maria+Santos&background=3cb371&color=fff" alt="Avatar">
                     </div>
                     <div class="user-info">
-                        <h4><?php echo $_SESSION['nome'] ?? 'Utilizador'; ?></h4>
-                        <p><?php echo $_SESSION['email'] ?? 'user@wegreen.pt'; ?></p>
+                        <h4>Maria Santos</h4>
+                        <p>maria@wegreen.pt</p>
                     </div>
                 </div>
                 <button class="btn-logout" onclick="logout()">
@@ -179,10 +177,15 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     </div>
 
     <script>
+        // VERSÃO 2.0 - Forçar recarregamento
+        console.log('✅✅✅ Script JavaScript carregado - VERSÃO 2.0 ✅✅✅');
+        console.log('📅 Timestamp:', new Date().toISOString());
+
         let todasEncomendas = [];
         let encomendasFiltradas = [];
 
         $(document).ready(function() {
+            console.log('✅ Document ready executado - VERSÃO 2.0');
             carregarEncomendas();
             inicializarFiltros();
         });
@@ -452,25 +455,35 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
         }
 
         function verDetalhes(codigo) {
+            console.log('🚀 DEBUG: verDetalhes() chamado com código:', codigo);
+
             $.ajax({
                 url: 'src/controller/controllerEncomendas.php',
                 method: 'POST',
                 data: { op: 'detalhesEncomenda', codigo: codigo },
                 dataType: 'json',
                 success: function(response) {
+                    console.log('✅ DEBUG: AJAX resposta recebida:', response);
+
                     if(response.success) {
+                        console.log('✅ DEBUG: Resposta success=true, chamando mostrarDetalhes()');
                         mostrarDetalhes(response.data);
                     } else {
+                        console.error('❌ DEBUG: Resposta success=false:', response.message);
                         Swal.fire('Erro', response.message, 'error');
                     }
                 },
                 error: function(xhr, status, error) {
+                    console.error('❌ DEBUG: Erro no AJAX:', {xhr, status, error});
+                    console.error('❌ DEBUG: Resposta texto:', xhr.responseText);
                     Swal.fire('Erro', 'Erro ao carregar detalhes da encomenda', 'error');
                 }
             });
         }
 
         function mostrarDetalhes(encomenda) {
+            console.log('🔍 DEBUG: Dados da encomenda recebidos:', encomenda);
+
             // Determinar tipo de entrega
             const tipoEntrega = encomenda.tipo_entrega || 'domicilio';
             const tituloMorada = tipoEntrega === 'ponto_recolha' ? '📍 Ponto de Recolha' : '🏠 Morada de Entrega';
@@ -478,9 +491,14 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                 ? (encomenda.morada_ponto_recolha || encomenda.morada)
                 : (encomenda.morada_completa || encomenda.morada);
 
+            console.log('📍 DEBUG: Tipo de entrega:', tipoEntrega);
+            console.log('🏠 DEBUG: Morada completa:', moradaCompleta);
+
             // Gerar URL do mapa
             const enderecoEncoded = encodeURIComponent(moradaCompleta);
             const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}`;
+
+            console.log('🗺️ DEBUG: URL Google Maps:', googleMapsUrl);
 
             // HTML do mapa (iframe do Google Maps)
             const mapaHtml = `
@@ -502,6 +520,8 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                     </div>
                 </div>
             `;
+
+            console.log('✅ DEBUG: HTML do mapa gerado');
 
             const html = `
                 <div style="padding: 20px;">
@@ -534,8 +554,12 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                 </div>
             `;
 
+            console.log('📝 DEBUG: HTML completo gerado');
+
             $('#detalhesContent').html(html);
             $('#detalhesModal').fadeIn();
+
+            console.log('✅ DEBUG: Modal aberto');
         }
 
         function fecharModal() {
@@ -595,7 +619,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
             doc.setFontSize(10);
             doc.setFont(undefined, 'normal');
-            doc.text(encomenda.cliente_nome || '<?php echo $_SESSION['nome']; ?>', 14, 57);
+            doc.text(encomenda.cliente_nome || 'Maria Santos', 14, 57);
             doc.text(encomenda.morada || 'N/A', 14, 63);
 
             // Linha separadora
