@@ -39,15 +39,4 @@ if ($_POST['op'] == 8) {
     $resp = $func->ProfileDropCard2($_SESSION["utilizador"]);
     echo $resp;
 }
-if ($_POST['op'] == 11) {
-    $resp = $func->guardarDadosPerfil( 
-        $_POST['nomeAdminEdit'],
-        $_POST['emailAdminEdit'],
-        $_POST['nifAdminEdit'],
-        $_POST['telefoneAdminEdit'],
-        $_POST['moradaAdminEdit'],
-        $_SESSION["utilizador"]
-    );
-    echo $resp;
-}
 ?>
