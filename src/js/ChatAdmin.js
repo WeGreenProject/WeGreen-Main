@@ -122,7 +122,7 @@ function pesquisarChat() {
     dados.append("op", 7);
     dados.append("pesquisa", termo);
 
-    $.ajax({
+        $.ajax({
         url: "src/controller/controllerAdminChat.php",
         method: "POST",
         data: dados,
@@ -132,7 +132,11 @@ function pesquisarChat() {
         processData: false
     })
     .done(function(msg) {
+<<<<<<< HEAD
         $('#ListaCliente').html(msg);
+=======
+        $('#PesquisarInput').html(msg);
+>>>>>>> parent of d55834b (atualizaçºoes do chat)
         console.log(msg);
     })
     .fail(function(jqXHR, textStatus) {

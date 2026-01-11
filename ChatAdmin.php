@@ -99,13 +99,7 @@
 
             <div class="chat-container">
                 <div class="conversations-panel">
-                    <div class="conversations-header">
-                        <h3>Conversas</h3>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Pesquisar conversas..." id="searchInput"
-                                onkeyup="pesquisarChat()">
-                        </div>
+                    <div class="conversations-header" id="PesquisarInput">
                     </div>
                     <div class="conversations-list" id="ListaCliente">
 

@@ -189,33 +189,32 @@ function adicionarFotoPerfil($ID_User, $foto){
 
                 $msg .= "<div class='info-item'>";
                 $msg .= "<label>Nome Completo</label>";
-                $msg .= "<input type='text' id='nomeAdminEdit' value='".$row["nome"]."'>";
+                $msg .= "<input type='text' id='nomeAnunciante' value='".$row["nome"]."'>";
                 $msg .= "</div>";
 
                 $msg .= "<div class='info-item'>";
                 $msg .= "<label>Email</label>";
-                $msg .= "<input type='email' id='emailAdminEdit' value='".$row["email"]."'>";
+                $msg .= "<input type='email' id='emailAnunciante' value='".$row["email"]."'>";
                 $msg .= "</div>";
 
                 $msg .= "<div class='info-item'>";
                 $msg .= "<label>NIF</label>";
-                $msg .= "<input type='text' id='nifAdminEdit' value='".$row["nif"]."' placeholder='000000000' maxlength='9'>";
+                $msg .= "<input type='text' id='nifAnunciante' value='".$row["nif"]."' placeholder='000000000' maxlength='9'>";
                 $msg .= "</div>";
 
                 $msg .= "<div class='info-item'>";
                 $msg .= "<label>Telefone</label>";
-                $msg .= "<input type='text' id='telefoneAdminEdit' value='".$row["telefone"]."' placeholder='900000000' maxlength='9'>";
+                $msg .= "<input type='text' id='telefoneAnunciante' value='".$row["telefone"]."' placeholder='900000000' maxlength='9'>";
                 $msg .= "</div>";
 
                 $msg .= "<div class='info-item'>";
                 $msg .= "<label>Morada</label>";
-                $msg .= "<input type='text' id='moradaAdminEdit' value='".$row["morada"]."' placeholder='Rua, Número, Código Postal, Cidade'>";
+                $msg .= "<input type='text' id='moradaAnunciante' value='".$row["morada"]."' placeholder='Rua, Número, Código Postal, Cidade'>";
                 $msg .= "</div>";
 
                 $msg .= "<button class='btn btn-primary' onclick='guardarDadosPerfil()' style='margin-top: 20px; width: 100%;'>";
                 $msg .= "<i class='fas fa-save'></i> Guardar Alterações";
                 $msg .= "</button>";
-                
                 }
             }
 
@@ -267,52 +266,6 @@ function adicionarFotoPerfil($ID_User, $foto){
         return ($msg);
 
     }
-    function guardarDadosPerfil($nome, $email, $nif, $telefone, $morada, $ID_Utilizador){
-
-    global $conn;
-    $flag = true;
-    $msg = "";
-
-    $sql = "UPDATE utilizadores 
-            SET nome = ?, 
-                email = ?, 
-                nif = ?, 
-                telefone = ?, 
-                morada = ?
-            WHERE id = ?";
-
-    $stmt = $conn->prepare($sql);
-
-    if(!$stmt){
-        return json_encode([
-            "flag" => false,
-            "msg" => "Erro na preparação: " . $conn->error
-        ]);
-    }
-
-    $stmt->bind_param("sssssi", 
-        $nome, 
-        $email,
-        $nif, 
-        $telefone, 
-        $morada, 
-        $ID_Utilizador
-    );
-
-    if($stmt->execute()){
-        $msg = "Editado com Sucesso";
-    } else {
-        $flag = false;
-        $msg = "Erro na execução: " . $stmt->error;
-    }
-
-    $stmt->close();
-
-    return json_encode([
-        "flag" => $flag,
-        "msg"  => $msg
-    ]);
-}
         function getDadosTipoPerfilAdminInfo($ID_User){
         global $conn;
 

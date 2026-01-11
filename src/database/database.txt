@@ -1,35 +1,34 @@
-create database wegreen;
+CREATE database wegreen;
 
 use wegreen;
 
 CREATE TABLE `carrinho_itens` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
-  `utilizador_id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
+  `utilizador_id` varchar(50) NOT NULL,
   `produto_id` int(11) NOT NULL,
   `quantidade` int(11) DEFAULT 1 CHECK (`quantidade` > 0),
   `data_adicao` timestamp NOT NULL DEFAULT current_timestamp(),
   `data_atualizacao` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `carrinho_itens`
---
 
-INSERT INTO `carrinho_itens` (`utilizador_id`, `produto_id`, `quantidade`, `data_adicao`, `data_atualizacao`) VALUES
-(1, 1, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
-(1, 5, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
-(1, 6, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
-(1, 7, 2, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
-(2, 3, 1, '2025-12-16 20:55:36', '2025-12-16 20:55:36');
+INSERT INTO `carrinho_itens` (`id`, `utilizador_id`, `produto_id`, `quantidade`, `data_adicao`, `data_atualizacao`) VALUES
+(1, '1', 1, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(5, '1', 5, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(6, '1', 6, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(7, '1', 7, 2, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
+(8, '2', 3, 1, '2025-12-16 20:55:36', '2025-12-16 20:55:36'),
+(9, '3', 1, 2, '2025-12-29 23:13:04', '2026-01-01 23:45:06'),
+(18, '3', 9, 1, '2025-12-30 17:58:24', '2025-12-30 23:52:44'),
+(19, '3', 3, 1, '2025-12-30 23:41:40', '2025-12-30 23:52:44'),
+(20, 'temp_69546823d71d2', 1, 1, '2025-12-31 00:02:53', '2025-12-31 00:02:53'),
+(21, '2', 1, 6, '2026-01-01 00:10:47', '2026-01-11 20:39:49'),
+(27, '2', 6, 5, '2026-01-07 20:40:33', '2026-01-07 20:44:44'),
+(28, '2', 10, 6, '2026-01-07 20:40:38', '2026-01-07 20:44:44');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `denuncias`
---
 
 CREATE TABLE `denuncias` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `denunciante_id` int(11) DEFAULT NULL,
   `denunciado_id` int(11) DEFAULT NULL,
   `descricao` text DEFAULT NULL,
@@ -38,18 +37,13 @@ CREATE TABLE `denuncias` (
   `data_registo` date DEFAULT curdate()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `encomendas`
---
 
 CREATE TABLE `encomendas` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `codigo_encomenda` varchar(50) DEFAULT NULL,
-  `payment_id` varchar(100) DEFAULT NULL COMMENT 'ID do pagamento Stripe (pi_xxx)',
-  `payment_method` varchar(50) DEFAULT NULL COMMENT 'Método de pagamento (card, paypal, klarna)',
-  `payment_status` varchar(50) DEFAULT 'paid' COMMENT 'Status do pagamento Stripe',
+  `payment_id` varchar(100) DEFAULT NULL COMMENT 'ID do pagamento Stripe',
+  `payment_method` varchar(50) DEFAULT NULL COMMENT 'MÚtodo de pagamento',
+  `payment_status` varchar(50) DEFAULT 'paid' COMMENT 'Status do pagamento',
   `cliente_id` int(11) DEFAULT NULL,
   `anunciante_id` int(11) DEFAULT NULL,
   `transportadora_id` int(11) DEFAULT NULL,
@@ -57,36 +51,34 @@ CREATE TABLE `encomendas` (
   `TipoProdutoNome` int(11) DEFAULT NULL,
   `data_envio` date DEFAULT NULL,
   `morada` varchar(250) DEFAULT NULL,
+  `tipo_entrega` enum('domicilio','ponto_recolha') DEFAULT 'domicilio',
+  `ponto_recolha_id` int(11) DEFAULT NULL,
+  `morada_completa` text DEFAULT NULL,
+  `nome_destinatario` varchar(255) DEFAULT NULL,
   `estado` varchar(250) DEFAULT NULL,
   `plano_rastreio` varchar(250) DEFAULT NULL,
-  `codigo_rastreio` varchar(100) DEFAULT NULL COMMENT 'Código de rastreamento da transportadora'
+  `codigo_rastreio` varchar(100) DEFAULT NULL COMMENT 'C¾digo de rastreamento da transportadora',
+  `nome_ponto_recolha` varchar(255) DEFAULT NULL COMMENT 'Nome do ponto de recolha',
+  `morada_ponto_recolha` text DEFAULT NULL COMMENT 'Morada completa do ponto de recolha'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `encomendas`
---
 
-INSERT INTO `encomendas` (`codigo_encomenda`, `cliente_id`, `anunciante_id`, `transportadora_id`, `produto_id`, `TipoProdutoNome`, `data_envio`, `morada`, `estado`, `plano_rastreio`) VALUES
-('WG12345', 2, 3, 1, 1, 1, '2025-12-06', 'Rua das Flores 15, Lisboa', 'Pendente', 'Básico'),
-('WG12346', 2, 3, 1, 2, 1, '2025-12-06', 'Av. do Mar 20, Porto', 'Entregue', 'Básico'),
-('WG12347', 7, 3, 2, 3, 2, '2025-12-06', 'Rua Central 12, Coimbra', 'Pendente', 'Básico'),
-('WG12352', 2, 3, 1, 4, 3, '2025-12-06', 'Rua Nova 8, Braga', 'Pendente', 'Básico'),
-('WG12353', 7, 3, 1, 5, 1, '2025-12-06', 'Av. das Oliveiras 30, Setúbal', 'Entregue', 'Básico'),
-('WG12348', 2, 1, 1, 6, 5, '2025-12-06', 'Rua Verde 5, Faro', 'Entregue', 'Avançado'),
-('WG12349', 7, 1, 2, 7, 4, '2025-12-06', 'Rua do Sol 40, Lisboa', 'Pendente', 'Avançado'),
-('WG12354', 2, 1, 2, 1, 1, '2025-12-06', 'Rua das Amendoeiras 22, Coimbra', 'Entregue', 'Avançado'),
-('WG12350', 2, 4, 1, 2, 1, '2025-12-06', 'Av. dos Descobrimentos 50, Aveiro', 'Entregue', 'Básico'),
-('WG12351', 7, 4, 2, 3, 2, '2025-12-06', 'Rua dos Cedros 18, Leiria', 'Cancelada', 'Básico'),
-('WG12355', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'Pendente', 'Básico');
+INSERT INTO `encomendas` (`id`, `codigo_encomenda`, `payment_id`, `payment_method`, `payment_status`, `cliente_id`, `anunciante_id`, `transportadora_id`, `produto_id`, `TipoProdutoNome`, `data_envio`, `morada`, `tipo_entrega`, `ponto_recolha_id`, `morada_completa`, `nome_destinatario`, `estado`, `plano_rastreio`, `codigo_rastreio`, `nome_ponto_recolha`, `morada_ponto_recolha`) VALUES
+(1, 'WG12345', NULL, NULL, 'paid', 2, 3, 1, 1, 1, '2025-12-06', 'Rua das Flores 15, Lisboa', 'domicilio', NULL, 'Rua das Flores 15, 1200-001 Lisboa', NULL, 'Pendente', 'Básico', NULL, NULL, NULL),
+(2, 'WG12346', NULL, NULL, 'paid', 2, 3, 1, 2, 1, '2025-12-06', 'Av. do Mar 20, Porto', 'domicilio', NULL, NULL, NULL, 'Cancelado', 'Básico', NULL, NULL, NULL),
+(3, 'WG12347', NULL, NULL, 'paid', 7, 3, 2, 3, 2, '2025-12-06', 'Rua Central 12, Coimbra', 'domicilio', NULL, NULL, NULL, 'Pendente', 'Básico', NULL, NULL, NULL),
+(4, 'WG12352', NULL, NULL, 'paid', 2, 3, 1, 4, 3, '2025-12-06', 'Rua Nova 8, Braga', 'domicilio', NULL, NULL, NULL, 'Pendente', 'Básico', NULL, NULL, NULL),
+(5, 'WG12353', NULL, NULL, 'paid', 7, 3, 1, 5, 1, '2025-12-06', 'Av. das Oliveiras 30, Setúbal', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Básico', NULL, NULL, NULL),
+(6, 'WG12348', NULL, NULL, 'paid', 2, 1, 1, 6, 5, '2025-12-06', 'Rua Verde 5, Faro', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Avançado', NULL, NULL, NULL),
+(7, 'WG12349', NULL, NULL, 'paid', 7, 1, 2, 7, 4, '2025-12-06', 'Rua do Sol 40, Lisboa', 'domicilio', NULL, NULL, NULL, 'Pendente', 'Avançado', NULL, NULL, NULL),
+(8, 'WG12354', NULL, NULL, 'paid', 2, 1, 2, 1, 1, '2025-12-06', 'Rua das Amendoeiras 22, Coimbra', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Avançado', NULL, NULL, NULL),
+(9, 'WG12350', NULL, NULL, 'paid', 2, 4, 1, 2, 1, '2025-12-06', 'Av. dos Descobrimentos 50, Aveiro', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Básico', NULL, NULL, NULL),
+(10, 'WG12351', NULL, NULL, 'paid', 7, 4, 2, 3, 2, '2025-12-06', 'Rua dos Cedros 18, Leiria', 'domicilio', NULL, NULL, NULL, 'Cancelada', 'Básico', NULL, NULL, NULL),
+(11, 'WG12355', NULL, NULL, 'paid', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'domicilio', NULL, NULL, NULL, 'Pendente', 'Básico', NULL, NULL, NULL);
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `fornecedores`
---
 
 CREATE TABLE `fornecedores` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `nome` varchar(250) DEFAULT NULL,
   `descricao` varchar(250) DEFAULT NULL,
   `tipo_produtos_id` int(11) NOT NULL,
@@ -95,76 +87,54 @@ CREATE TABLE `fornecedores` (
   `morada` varchar(250) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `fornecedores`
---
 
-INSERT INTO `fornecedores` (`nome`, `descricao`, `tipo_produtos_id`, `email`, `telefone`, `morada`) VALUES
-('ModaCenter', 'Fornecedor de vestuário masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
-('FootWorld', 'Fornecedor de sapatilhas e calçado desportivo', 2, 'info@footworld.pt', '934567890', 'Av. Central 45, Porto'),
-('AccessoriArt', 'Fornecedor de bijuteria e acessórios de moda', 3, 'suporte@accessoriart.com', '965432187', 'Rua do Comércio 22, Braga'),
-('BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
-('MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
+INSERT INTO `fornecedores` (`id`, `nome`, `descricao`, `tipo_produtos_id`, `email`, `telefone`, `morada`) VALUES
+(1, 'ModaCenter', 'Fornecedor de vestuário masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
+(2, 'FootWorld', 'Fornecedor de sapatilhas e calçado desportivo', 2, 'info@footworld.pt', '934567890', 'Av. Central 45, Porto'),
+(3, 'AccessoriArt', 'Fornecedor de bijuteria e acessórios de moda', 3, 'suporte@accessoriart.com', '965432187', 'Rua do Comércio 22, Braga'),
+(4, 'BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
+(5, 'MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `gastos`
---
 
 CREATE TABLE `gastos` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `anunciante_id` int(11) DEFAULT NULL,
   `valor` decimal(10,2) DEFAULT NULL,
   `descricao` text DEFAULT NULL,
   `data_registo` date DEFAULT curdate()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `gastos`
---
 
-INSERT INTO `gastos` (`anunciante_id`, `valor`, `descricao`, `data_registo`) VALUES
-(3, 50.00, 'Publicidade online', '2025-12-06');
+INSERT INTO `gastos` (`id`, `anunciante_id`, `valor`, `descricao`, `data_registo`) VALUES
+(1, 3, 50.00, 'Publicidade online', '2025-12-06');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `historico_produtos`
---
 
 CREATE TABLE `historico_produtos` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `encomenda_id` int(11) DEFAULT NULL,
   `estado_encomenda` varchar(250) DEFAULT 'Pendente',
   `descricao` text DEFAULT NULL,
   `data_atualizacao` date DEFAULT curdate()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `historico_produtos`
---
 
-INSERT INTO `historico_produtos` (`encomenda_id`, `estado_encomenda`, `descricao`, `data_atualizacao`) VALUES
-( 2, 'Entregue', 'Produto entregue ao cliente.', '2025-12-06'),
-(3, 'Em trânsito', 'Produto enviado pela transportadora.', '2025-12-06'),
-(4, 'Entregue', 'Entrega concluída.', '2025-12-06'),
-(5, 'Pendente', 'Aguardando envio.', '2025-12-06'),
-(6, 'Entregue', 'Venda finalizada com sucesso.', '2025-12-06'),
-(7, 'Cancelada', 'Encomenda cancelada pelo cliente.', '2025-12-06'),
-(8, 'Em trânsito', 'Produto saiu do armazém.', '2025-12-06'),
-(9, 'Entregue', 'Cliente recebeu o produto.', '2025-12-06'),
-(10, 'Entregue', 'Envio concluído.', '2025-12-06'),
-(11, 'Pendente', 'Aguardando confirmação de pagamento.', '2025-12-06');
-
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `mensagens`
---
+INSERT INTO `historico_produtos` (`id`, `encomenda_id`, `estado_encomenda`, `descricao`, `data_atualizacao`) VALUES
+(1, 2, 'Entregue', 'Produto entregue ao cliente.', '2025-12-06'),
+(2, 3, 'Em trânsito', 'Produto enviado pela transportadora.', '2025-12-06'),
+(3, 4, 'Entregue', 'Entrega concluída.', '2025-12-06'),
+(4, 5, 'Pendente', 'Aguardando envio.', '2025-12-06'),
+(5, 6, 'Entregue', 'Venda finalizada com sucesso.', '2025-12-06'),
+(6, 7, 'Cancelada', 'Encomenda cancelada pelo cliente.', '2025-12-06'),
+(7, 8, 'Em trânsito', 'Produto saiu do armazém.', '2025-12-06'),
+(8, 9, 'Entregue', 'Cliente recebeu o produto.', '2025-12-06'),
+(9, 10, 'Entregue', 'Envio concluído.', '2025-12-06'),
+(10, 11, 'Pendente', 'Aguardando confirmação de pagamento.', '2025-12-06'),
+(11, 1, 'Processando', 'Status alterado para: Processando', '2026-01-11'),
+(12, 2, 'Cancelado', 'Status alterado para: Cancelado', '2026-01-11'),
+(13, 1, 'Pendente', 'Status alterado para: Pendente', '2026-01-11');
 
 CREATE TABLE `mensagens` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `remetente_id` int(11) DEFAULT NULL,
   `destinatario_id` int(11) DEFAULT NULL,
   `produto_id` int(11) DEFAULT NULL,
@@ -173,22 +143,14 @@ CREATE TABLE `mensagens` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `mensagens`
---
 
-INSERT INTO `mensagens` (`remetente_id`, `destinatario_id`, `produto_id`, `mensagem`, `created_at`, `updated_at`) VALUES
-(3, 2, 5, 'Olá João! O seu pedido já foi enviado.', '2025-12-06 19:18:55', '2025-12-06 19:18:55'),
-(1, 3, 5, 'Olá eu sou a Luiza', '2025-12-06 19:18:55', '2025-12-06 19:18:55');
+INSERT INTO `mensagens` (`id`, `remetente_id`, `destinatario_id`, `produto_id`, `mensagem`, `created_at`, `updated_at`) VALUES
+(1, 3, 2, NULL, 'Olá João! O seu pedido já foi enviado.', '2025-12-06 19:18:55', '2025-12-06 19:18:55'),
+(2, 1, 3, 5, 'Olá eu sou a Luiza', '2025-12-06 19:18:55', '2025-12-06 19:18:55');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `mensagensadmin`
---
 
 CREATE TABLE `mensagensadmin` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `remetente_id` int(11) DEFAULT NULL,
   `destinatario_id` int(11) DEFAULT NULL,
   `mensagem` text NOT NULL,
@@ -196,21 +158,41 @@ CREATE TABLE `mensagensadmin` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `mensagensadmin`
---
 
-INSERT INTO `mensagensadmin` (`remetente_id`, `destinatario_id`, `mensagem`, `created_at`, `updated_at`) VALUES
-(2, 1, 'Olá João! O seu pedido já foi enviado.', '2025-12-16 22:56:09', '2025-12-16 22:56:09');
+INSERT INTO `mensagensadmin` (`id`, `remetente_id`, `destinatario_id`, `mensagem`, `created_at`, `updated_at`) VALUES
+(1, 2, 1, 'Olá João! O seu pedido já foi enviado.', '2025-12-16 22:56:09', '2025-12-16 22:56:09');
 
--- --------------------------------------------------------
 
---
--- Estrutura da tabela `planos`
---
+CREATE TABLE `notificacoes_preferencias` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `tipo_user` enum('cliente','anunciante') NOT NULL,
+  `email_confirmacao` tinyint(1) DEFAULT 1 COMMENT 'Receber email de confirmação de encomenda',
+  `email_processando` tinyint(1) DEFAULT 1 COMMENT 'Receber email quando encomenda está a ser processada',
+  `email_enviado` tinyint(1) DEFAULT 1 COMMENT 'Receber email quando encomenda é enviada',
+  `email_entregue` tinyint(1) DEFAULT 1 COMMENT 'Receber email quando encomenda é entregue',
+  `email_cancelamento` tinyint(1) DEFAULT 1 COMMENT 'Receber email quando encomenda é cancelada',
+  `email_novas_encomendas_anunciante` tinyint(1) DEFAULT 1 COMMENT 'Receber email de novas encomendas',
+  `email_encomendas_urgentes` tinyint(1) DEFAULT 1 COMMENT 'Receber alertas de encomendas pendentes urgentes',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Preferências de notificações por email dos utilizadores';
+
+
+INSERT INTO `notificacoes_preferencias` (`id`, `user_id`, `tipo_user`, `email_confirmacao`, `email_processando`, `email_enviado`, `email_entregue`, `email_cancelamento`, `email_novas_encomendas_anunciante`, `email_encomendas_urgentes`, `created_at`, `updated_at`) VALUES
+(1, 2, 'cliente', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(2, 7, 'cliente', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(4, 3, 'anunciante', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(5, 4, 'anunciante', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(6, 5, 'anunciante', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(7, 6, 'anunciante', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(8, 8, 'anunciante', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(11, 1, 'anunciante', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25'),
+(12, 3, 'cliente', 1, 1, 1, 1, 1, 1, 1, '2026-01-11 16:21:02', '2026-01-11 16:21:02');
+
 
 CREATE TABLE `planos` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `nome` varchar(200) NOT NULL,
   `preco` decimal(10,2) DEFAULT NULL,
   `limite_produtos` int(11) DEFAULT NULL,
@@ -218,23 +200,14 @@ CREATE TABLE `planos` (
   `relatorio_pdf` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `planos`
---
 
-INSERT INTO `planos` (`nome`, `preco`, `limite_produtos`, `rastreio_tipo`, `relatorio_pdf`) VALUES
-('Plano Essencial Verde', 0.00, 5, 'Basico', 0),
-('Plano Crescimento Circular', 25.00, 10, 'Basico', 1),
-('Plano Profissional Eco+', 100.00, NULL, 'Avancado', 1);
-
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `planos_ativos`
---
+INSERT INTO `planos` (`id`, `nome`, `preco`, `limite_produtos`, `rastreio_tipo`, `relatorio_pdf`) VALUES
+(1, 'Plano Essencial Verde', 0.00, 5, 'Basico', 0),
+(2, 'Plano Crescimento Circular', 25.00, 10, 'Basico', 1),
+(3, 'Plano Profissional Eco+', 100.00, NULL, 'Avancado', 1);
 
 CREATE TABLE `planos_ativos` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `anunciante_id` int(11) NOT NULL,
   `plano_id` int(11) NOT NULL,
   `data_inicio` date DEFAULT curdate(),
@@ -242,21 +215,13 @@ CREATE TABLE `planos_ativos` (
   `ativo` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `planos_ativos`
---
 
-INSERT INTO `planos_ativos` (`anunciante_id`, `plano_id`, `data_inicio`, `data_fim`, `ativo`) VALUES
-(3, 2, '2025-12-06', NULL, 1);
+INSERT INTO `planos_ativos` (`id`, `anunciante_id`, `plano_id`, `data_inicio`, `data_fim`, `ativo`) VALUES
+(1, 3, 2, '2025-12-06', NULL, 1);
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `produtos`
---
 
 CREATE TABLE `produtos` (
-  `Produto_id` INT AUTO_INCREMENT PRIMARY KEY,
+  `Produto_id` int(11) NOT NULL,
   `nome` varchar(150) NOT NULL,
   `tipo_produto_id` int(11) DEFAULT NULL,
   `preco` decimal(10,2) DEFAULT NULL,
@@ -273,172 +238,111 @@ CREATE TABLE `produtos` (
   `stock` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `produtos`
---
 
-INSERT INTO `produtos` (`nome`, `tipo_produto_id`, `preco`, `foto`, `genero`, `anunciante_id`, `designer_id`, `marca`, `tamanho`, `estado`, `descricao`, `data_criacao`, `ativo`, `stock`) VALUES
-('Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', 1, NULL, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.', '2025-12-06', 1, 0),
-('Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, NULL, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.', '2025-12-06', 1, 10),
-('Calças de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', 1, NULL, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.', '2025-12-06', 1, 10),
-('Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', 3, NULL, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.', '2025-12-06', 0, 10),
-('Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', 1, NULL, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.', '2025-12-06', 1, 10),
-('Sweatshirt Billabong', 1, 23.80, 'src/img/6fa73f19c9a53d2c3d32f4c7e8d84300.jpg', 'Homem', 2, NULL, 'Billabong', 'M', 'Excelente', 'Sweatshirt Azul e Amarela da  Billabong, nunca usado.', '2025-12-06', 1, 10),
-('Leggings Yoga', 1, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', 3, NULL, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.', '2025-12-06', 0, 10),
-('Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', 2, NULL, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.', '2025-12-06', 1, 10),
-('Casaco Desportivo Nike', 1, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', 2, NULL, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.', '2025-12-06', 1, 10),
-('Sweatshirt North Face', 1, 18.00, 'src/img/northface.webp', 'Criança', 2, NULL, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.', '2025-12-06', 1, 10),
-('Botas Timbaland', 2, 26.00, 'src/img/image66.webp', 'Criança', 3, NULL, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.', '2025-12-06', 0, 10),
-('Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', 2, NULL, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.', '2025-12-06', 1, 10),
-('Tênis Adidas UltraBoost', 2, 249.99, 'src/img/Adidas Ultraboost Light - lateral 2.jpg', 'Homem', 2, NULL, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.', '2025-12-06', 1, 10),
-('Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/1298bdfb53f943dc29132b4684dbb507.jpg', 'Mulher', 3, NULL, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.', '2025-12-06', 0, 10),
-('Creme Hidratante Nivea', 4, 29.90, 'src/img/b06b57ded4c5ded4bc7e600eada0649c.jpg', 'Mulher', 3, NULL, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea Edição Limitada de 2006 lacrado.', '2025-12-06', 0, 0),
-('Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src/img/s-l1200.webp', 'Homem', 2, NULL, 'Bose', 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.', '2025-12-06', 1, 10),
-('Calças de ganga Levis', 1, 19.00, 'src/img/63ee2e61813747ba02e97868eb523680.jpg', 'Homem', 2, NULL, 'Levis', 'XL', 'Novo', 'Calças de gnaga Levis nunca usadas com etiqueta.', '2025-12-06', 1, 10),
-('Casaco Verde Pistachio', 1, 29.90, 'src/img/image.webp', 'Mulher', 3, NULL, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.', '2025-12-06', 0, 10),
-('Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', 3, NULL, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.', '2025-12-06', 0, 10),
-('Calça de ganga em algodão', 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', 3, NULL, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.', '2025-12-06', 0, 10),
-('Colar Animal Edition', 3, 15.00, 'src/img/animalcross.jpeg', 'Mulher', 4, 1, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar com missangas coloridas e daltamata coleção Animal Cross.', '2025-12-06', 1, 10),
-('Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 5, 1, 'MatildeMayer', 'Tamanho Único', 'Novo', 'Mala branca de missangas feita á mão.', '2025-12-06', 1, 10),
-('Colar Cruz', 3, 12.00, 'src/img/cora-pursley-dupe.jpeg', 'Mulher', 8, 1, 'SolangeJewels', 'Tamanho Único', 'Novo', 'Colar com cruz.', '2025-12-06', 1, 10),
-('T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10),
-('T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10);
-
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `produto_fotos`
---
+INSERT INTO `produtos` (`Produto_id`, `nome`, `tipo_produto_id`, `preco`, `foto`, `genero`, `anunciante_id`, `designer_id`, `marca`, `tamanho`, `estado`, `descricao`, `data_criacao`, `ativo`, `stock`) VALUES
+(1, 'Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', 1, NULL, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.', '2025-12-06', 1, 0),
+(2, 'Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, NULL, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.', '2025-12-06', 0, 10),
+(3, 'Calças de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', 1, NULL, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.', '2025-12-06', 1, 10),
+(4, 'Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', 3, NULL, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.', '2025-12-06', 0, 10),
+(5, 'Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', 1, NULL, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.', '2025-12-06', 1, 10),
+(6, 'Sweatshirt Billabong', 1, 23.80, 'src/img/6fa73f19c9a53d2c3d32f4c7e8d84300.jpg', 'Homem', 2, NULL, 'Billabong', 'M', 'Excelente', 'Sweatshirt Azul e Amarela da  Billabong, nunca usado.', '2025-12-06', 1, 10),
+(7, 'Leggings Yoga', 1, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', 3, NULL, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.', '2025-12-06', 0, 10),
+(8, 'Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', 2, NULL, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.', '2025-12-06', 1, 10),
+(9, 'Casaco Desportivo Nike', 1, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', 2, NULL, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.', '2025-12-06', 1, 10),
+(10, 'Sweatshirt North Face', 1, 18.00, 'src/img/northface.webp', 'Criança', 2, NULL, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.', '2025-12-06', 1, 10),
+(11, 'Botas Timbaland', 2, 26.00, 'src/img/image66.webp', 'Criança', 3, NULL, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.', '2025-12-06', 0, 10),
+(12, 'Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', 2, NULL, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.', '2025-12-06', 1, 10),
+(13, 'Tênis Adidas UltraBoost', 2, 249.99, 'src/img/Adidas Ultraboost Light - lateral 2.jpg', 'Homem', 2, NULL, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.', '2025-12-06', 1, 10),
+(14, 'Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/1298bdfb53f943dc29132b4684dbb507.jpg', 'Mulher', 3, NULL, 'Michael Kors', 'Único tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.', '2025-12-06', 0, 10),
+(15, 'Creme Hidratante Nivea', 4, 29.90, 'src/img/b06b57ded4c5ded4bc7e600eada0649c.jpg', 'Mulher', 3, NULL, 'Nivea', 'Único tamanho', 'Novo', 'Creme hidratante Nivea Edição Limitada de 2006 lacrado.', '2025-12-06', 0, 0),
+(16, 'Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src/img/s-l1200.webp', 'Homem', 2, NULL, 'Bose', 'Único tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.', '2025-12-06', 1, 10),
+(17, 'Calças de ganga Levis', 1, 19.00, 'src/img/63ee2e61813747ba02e97868eb523680.jpg', 'Homem', 2, NULL, 'Levis', 'XL', 'Novo', 'Calças de gnaga Levis nunca usadas com etiqueta.', '2025-12-06', 1, 10),
+(18, 'Casaco Verde Pistachio', 1, 29.90, 'src/img/image.webp', 'Mulher', 3, NULL, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.', '2025-12-06', 0, 10),
+(19, 'Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', 3, NULL, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.', '2025-12-06', 0, 10),
+(20, 'Calça de ganga em algodão', 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Criança', 3, NULL, 'Playup', '4-5 anos', 'Novo', 'Calça de ganga em algodão para criança da Playup.', '2025-12-06', 0, 10),
+(22, 'Colar Animal Edition', 3, 15.00, 'src/img/animalcross.jpeg', 'Mulher', 4, 1, 'HeartKnows', 'Tamanho Único', 'Novo', 'Colar com missangas coloridas e daltamata coleção Animal Cross.', '2025-12-06', 1, 10),
+(23, 'Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 5, 1, 'MatildeMayer', 'Tamanho Único', 'Novo', 'Mala branca de missangas feita á mão.', '2025-12-06', 1, 10),
+(24, 'Colar Cruz', 3, 12.00, 'src/img/cora-pursley-dupe.jpeg', 'Mulher', 8, 1, 'SolangeJewels', 'Tamanho Único', 'Novo', 'Colar com cruz.', '2025-12-06', 1, 10),
+(25, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10),
+(26, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10);
 
 CREATE TABLE `produto_fotos` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `produto_id` int(11) NOT NULL,
   `foto` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `produto_fotos`
---
-
-INSERT INTO `produto_fotos` (`produto_id`, `foto`) VALUES
-(1, 'src/img/m83296720182_6.avif'),
-(1, 'src/img/m83296720182_5.avif');
-
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `ranking`
---
+INSERT INTO `produto_fotos` (`id`, `produto_id`, `foto`) VALUES
+(1, 1, 'src/img/m83296720182_6.avif'),
+(2, 1, 'src/img/m83296720182_5.avif');
 
 CREATE TABLE `ranking` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `nome` varchar(250) DEFAULT NULL,
   `pontos` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `ranking`
---
-
-INSERT INTO `ranking` (`nome`, `pontos`) VALUES
-('Bronze', 0),
-('Ouro', 50),
-('Diamante', 150);
-
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `rendimento`
---
+INSERT INTO `ranking` (`id`, `nome`, `pontos`) VALUES
+(1, 'Bronze', 0),
+(2, 'Ouro', 50),
+(3, 'Diamante', 150);
 
 CREATE TABLE `rendimento` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `valor` decimal(10,2) DEFAULT NULL,
   `anunciante_id` int(11) DEFAULT NULL,
   `descricao` text DEFAULT NULL,
   `data_registo` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `rendimento`
---
 
-INSERT INTO `rendimento` (`valor`, `anunciante_id`, `descricao`, `data_registo`) VALUES
-(25.00, 3, 'Premium comprado!', '2025-12-06 19:18:55'),
-(100.00, 4, 'Enterprize comprado!', '2025-12-06 19:18:55'),
-(25.00, 5, 'Premium comprado!', '2025-12-06 19:18:55'),
-(5.00, NULL, 'Comissão cobrada!', '2025-12-06 19:18:55');
+INSERT INTO `rendimento` (`id`, `valor`, `anunciante_id`, `descricao`, `data_registo`) VALUES
+(1, 25.00, 3, 'Premium comprado!', '2025-12-06 19:18:55'),
+(2, 100.00, 4, 'Enterprize comprado!', '2025-12-06 19:18:55'),
+(3, 25.00, 5, 'Premium comprado!', '2025-12-06 19:18:55'),
+(4, 5.00, NULL, 'Comissão cobrada!', '2025-12-06 19:18:55');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `tipo_produtos`
---
 
 CREATE TABLE `tipo_produtos` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `descricao` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `tipo_produtos`
---
 
-INSERT INTO `tipo_produtos` (`descricao`) VALUES
-('Roupa'),
-('Calçado'),
-('Acessórios'),
-('Beleza'),
-('Outros'),
-('Artesanato');
+INSERT INTO `tipo_produtos` (`id`, `descricao`) VALUES
+(1, 'Roupa'),
+(2, 'Calçado'),
+(3, 'Acessórios'),
+(4, 'Beleza'),
+(5, 'Outros'),
+(6, 'Artesanato');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `tipo_utilizadores`
---
 
 CREATE TABLE `tipo_utilizadores` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `descricao` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `tipo_utilizadores`
---
 
-INSERT INTO `tipo_utilizadores` (`descricao`) VALUES
-('Administrador'),
-('Cliente'),
-('Anunciante');
+INSERT INTO `tipo_utilizadores` (`id`, `descricao`) VALUES
+(1, 'Administrador'),
+(2, 'Cliente'),
+(3, 'Anunciante');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `transportadora`
---
 
 CREATE TABLE `transportadora` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `nome` enum('CTT','DPD') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `transportadora`
---
 
-INSERT INTO `transportadora` (`nome`) VALUES
-('CTT'),
-('DPD');
+INSERT INTO `transportadora` (`id`, `nome`) VALUES
+(1, 'CTT'),
+(2, 'DPD');
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `utilizadores`
---
 
 CREATE TABLE `utilizadores` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `nome` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `nif` varchar(20) DEFAULT NULL,
@@ -453,31 +357,22 @@ CREATE TABLE `utilizadores` (
   `data_criacao` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `utilizadores`
---
 
-INSERT INTO `utilizadores` (`nome`, `email`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`) VALUES
-('Admin WeGreen', 'admin@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 3, 3, 200, NULL),
-('João Silva', 'joao@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL),
-('Maria Santos', 'maria@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 2, 2, 75, NULL),
-('Maria Luiza', 'Luiza@wegreen.pt', NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 3, 3, 54, NULL),
-('Matilde Mayer', 'Matilde@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 2, 3, 350, NULL),
-('Carlos Pereira', 'Carlos@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 3, 98, NULL),
-('Mango', 'mango@wegreen.pt', NULL, NULL, NULL, 'src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg', 'mango123', 2, 1, 1, 10, NULL),
-('Solange Jewels', 'Solange@wegreen.pt', NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 2, 3, 350, NULL),
-('Mariana Brites', 'mariana@wegreen.pt', NULL, NULL, NULL, 'src/img/solanges.jpeg', 'cliente123', 3, 2, 3, 350, NULL);
+INSERT INTO `utilizadores` (`id`, `nome`, `email`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`) VALUES
+(1, 'Admin WeGreen', 'admin@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 3, 3, 200, NULL),
+(2, 'João Silva', 'joao@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL),
+(3, 'Maria Santos', 'maria@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 2, 2, 75, NULL),
+(4, 'Maria Luiza', 'Luiza@wegreen.pt', NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 3, 3, 54, NULL),
+(5, 'Matilde Mayer', 'Matilde@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 2, 3, 350, NULL),
+(6, 'Carlos Pereira', 'Carlos@wegreen.pt', NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 3, 98, NULL),
+(7, 'Mango', 'mango@wegreen.pt', NULL, NULL, NULL, 'src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg', 'mango123', 2, 1, 1, 10, NULL),
+(8, 'Solange Jewels', 'Solange@wegreen.pt', NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 2, 3, 350, NULL);
 
--- --------------------------------------------------------
-
---
--- Estrutura da tabela `vendas`
---
 
 CREATE TABLE `vendas` (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `id` int(11) NOT NULL,
   `encomenda_id` int(11) DEFAULT NULL,
-  `stripe_session_id` varchar(100) DEFAULT NULL COMMENT 'ID da sessão Stripe (cs_xxx)',
+  `stripe_session_id` varchar(100) DEFAULT NULL COMMENT 'ID da sessÒo Stripe',
   `anunciante_id` int(11) NOT NULL,
   `produto_id` int(11) DEFAULT NULL,
   `quantidade` int(11) DEFAULT 1,
@@ -486,15 +381,280 @@ CREATE TABLE `vendas` (
   `data_venda` date DEFAULT curdate()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Extraindo dados da tabela `vendas`
---
 
-INSERT INTO `vendas` (`encomenda_id`, `anunciante_id`, `produto_id`, `quantidade`, `valor`, `lucro`, `data_venda`) VALUES
-(1, 3, 1, 2, 39.98, 2.40, '2025-12-06'),
-(2, 3, 3, 1, 89.99, 5.40, '2025-12-06'),
-(3, 3, 2, 1, 49.99, 3.00, '2025-12-06'),
-(4, 4, 3, 3, 269.97, 16.20, '2025-12-06'),
-(5, 4, 2, 1, 49.99, 3.00, '2025-12-06'),
-(NULL, 3, 1, 2, 100.00, 20.00, '2025-12-08'),
-(NULL, 3, 2, 1, 50.00, 10.00, '2025-12-07');
+INSERT INTO `vendas` (`id`, `encomenda_id`, `stripe_session_id`, `anunciante_id`, `produto_id`, `quantidade`, `valor`, `lucro`, `data_venda`) VALUES
+(1, 1, NULL, 3, 1, 2, 39.98, 2.40, '2025-12-06'),
+(2, 2, NULL, 3, 3, 1, 89.99, 5.40, '2025-12-06'),
+(3, 3, NULL, 3, 2, 1, 49.99, 3.00, '2025-12-06'),
+(4, 4, NULL, 4, 3, 3, 269.97, 16.20, '2025-12-06'),
+(5, 5, NULL, 4, 2, 1, 49.99, 3.00, '2025-12-06'),
+(6, NULL, NULL, 3, 1, 2, 100.00, 20.00, '2025-12-08'),
+(7, NULL, NULL, 3, 2, 1, 50.00, 10.00, '2025-12-07');
+
+ALTER TABLE `carrinho_itens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_product` (`utilizador_id`,`produto_id`),
+  ADD KEY `produto_id` (`produto_id`),
+  ADD KEY `idx_utilizador_id` (`utilizador_id`);
+
+
+ALTER TABLE `denuncias`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `denunciante_id` (`denunciante_id`),
+  ADD KEY `denunciado_id` (`denunciado_id`);
+
+
+ALTER TABLE `encomendas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo_encomenda` (`codigo_encomenda`),
+  ADD KEY `cliente_id` (`cliente_id`),
+  ADD KEY `anunciante_id` (`anunciante_id`),
+  ADD KEY `produto_id` (`produto_id`),
+  ADD KEY `transportadora_id` (`transportadora_id`),
+  ADD KEY `TipoProdutoNome` (`TipoProdutoNome`),
+  ADD KEY `idx_ponto_recolha` (`ponto_recolha_id`),
+  ADD KEY `idx_tipo_entrega` (`tipo_entrega`);
+
+
+ALTER TABLE `fornecedores`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `tipo_produtos_id` (`tipo_produtos_id`);
+
+
+ALTER TABLE `gastos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `anunciante_id` (`anunciante_id`);
+
+
+ALTER TABLE `historico_produtos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `encomenda_id` (`encomenda_id`);
+
+
+ALTER TABLE `mensagens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `remetente_id` (`remetente_id`),
+  ADD KEY `destinatario_id` (`destinatario_id`),
+  ADD KEY `produto_id` (`produto_id`);
+
+
+ALTER TABLE `mensagensadmin`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `remetente_id` (`remetente_id`),
+  ADD KEY `destinatario_id` (`destinatario_id`);
+
+
+ALTER TABLE `notificacoes_preferencias`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_preferencias` (`user_id`,`tipo_user`);
+
+
+ALTER TABLE `planos`
+  ADD PRIMARY KEY (`id`);
+
+
+ALTER TABLE `planos_ativos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `anunciante_id` (`anunciante_id`),
+  ADD KEY `plano_id` (`plano_id`);
+
+
+ALTER TABLE `produtos`
+  ADD PRIMARY KEY (`Produto_id`),
+  ADD KEY `tipo_produto_id` (`tipo_produto_id`),
+  ADD KEY `anunciante_id` (`anunciante_id`);
+
+
+ALTER TABLE `produto_fotos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `produto_id` (`produto_id`);
+
+ALTER TABLE `ranking`
+  ADD PRIMARY KEY (`id`);
+
+
+ALTER TABLE `rendimento`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `anunciante_id` (`anunciante_id`);
+
+
+ALTER TABLE `tipo_produtos`
+  ADD PRIMARY KEY (`id`);
+
+
+ALTER TABLE `tipo_utilizadores`
+  ADD PRIMARY KEY (`id`);
+
+
+ALTER TABLE `transportadora`
+  ADD PRIMARY KEY (`id`);
+
+
+ALTER TABLE `utilizadores`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `ranking_id` (`ranking_id`),
+  ADD KEY `tipo_utilizador_id` (`tipo_utilizador_id`),
+  ADD KEY `plano_id` (`plano_id`);
+
+
+ALTER TABLE `vendas`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `encomenda_id` (`encomenda_id`),
+  ADD KEY `anunciante_id` (`anunciante_id`),
+  ADD KEY `produto_id` (`produto_id`);
+
+
+ALTER TABLE `carrinho_itens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+
+ALTER TABLE `denuncias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `encomendas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+
+ALTER TABLE `fornecedores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+
+ALTER TABLE `gastos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+
+ALTER TABLE `historico_produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+
+ALTER TABLE `mensagens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+
+ALTER TABLE `mensagensadmin`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+
+ALTER TABLE `notificacoes_preferencias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+
+ALTER TABLE `planos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+
+ALTER TABLE `planos_ativos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+
+ALTER TABLE `produtos`
+  MODIFY `Produto_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+
+ALTER TABLE `produto_fotos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+
+ALTER TABLE `ranking`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+
+ALTER TABLE `rendimento`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+
+ALTER TABLE `tipo_produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+
+ALTER TABLE `tipo_utilizadores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+
+ALTER TABLE `transportadora`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+
+ALTER TABLE `utilizadores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+
+ALTER TABLE `vendas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+
+ALTER TABLE `carrinho_itens`
+  ADD CONSTRAINT `carrinho_itens_ibfk_2` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `denuncias`
+  ADD CONSTRAINT `denuncias_ibfk_1` FOREIGN KEY (`denunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `denuncias_ibfk_2` FOREIGN KEY (`denunciado_id`) REFERENCES `utilizadores` (`id`);
+
+
+ALTER TABLE `encomendas`
+  ADD CONSTRAINT `encomendas_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `encomendas_ibfk_2` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `encomendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`),
+  ADD CONSTRAINT `encomendas_ibfk_4` FOREIGN KEY (`transportadora_id`) REFERENCES `transportadora` (`id`),
+  ADD CONSTRAINT `encomendas_ibfk_5` FOREIGN KEY (`TipoProdutoNome`) REFERENCES `tipo_produtos` (`id`);
+
+
+ALTER TABLE `fornecedores`
+  ADD CONSTRAINT `fornecedores_ibfk_1` FOREIGN KEY (`tipo_produtos_id`) REFERENCES `tipo_produtos` (`id`);
+
+
+ALTER TABLE `gastos`
+  ADD CONSTRAINT `gastos_ibfk_1` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`);
+
+
+ALTER TABLE `historico_produtos`
+  ADD CONSTRAINT `historico_produtos_ibfk_1` FOREIGN KEY (`encomenda_id`) REFERENCES `encomendas` (`id`);
+
+
+ALTER TABLE `mensagens`
+  ADD CONSTRAINT `mensagens_ibfk_1` FOREIGN KEY (`remetente_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `mensagens_ibfk_2` FOREIGN KEY (`destinatario_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `mensagens_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`);
+
+
+ALTER TABLE `mensagensadmin`
+  ADD CONSTRAINT `mensagensadmin_ibfk_1` FOREIGN KEY (`remetente_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `mensagensadmin_ibfk_2` FOREIGN KEY (`destinatario_id`) REFERENCES `utilizadores` (`id`);
+
+
+ALTER TABLE `notificacoes_preferencias`
+  ADD CONSTRAINT `notificacoes_preferencias_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `utilizadores` (`id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `planos_ativos`
+  ADD CONSTRAINT `planos_ativos_ibfk_1` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `planos_ativos_ibfk_2` FOREIGN KEY (`plano_id`) REFERENCES `planos` (`id`);
+
+
+ALTER TABLE `produtos`
+  ADD CONSTRAINT `produtos_ibfk_1` FOREIGN KEY (`tipo_produto_id`) REFERENCES `tipo_produtos` (`id`),
+  ADD CONSTRAINT `produtos_ibfk_2` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`);
+
+
+ALTER TABLE `produto_fotos`
+  ADD CONSTRAINT `produto_fotos_ibfk_1` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `rendimento`
+  ADD CONSTRAINT `rendimento_ibfk_1` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`);
+
+
+ALTER TABLE `utilizadores`
+  ADD CONSTRAINT `utilizadores_ibfk_1` FOREIGN KEY (`ranking_id`) REFERENCES `ranking` (`id`),
+  ADD CONSTRAINT `utilizadores_ibfk_2` FOREIGN KEY (`tipo_utilizador_id`) REFERENCES `tipo_utilizadores` (`id`),
+  ADD CONSTRAINT `utilizadores_ibfk_3` FOREIGN KEY (`plano_id`) REFERENCES `planos` (`id`);
+
+
+ALTER TABLE `vendas`
+  ADD CONSTRAINT `vendas_ibfk_1` FOREIGN KEY (`encomenda_id`) REFERENCES `encomendas` (`id`),
+  ADD CONSTRAINT `vendas_ibfk_2` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`),
+  ADD CONSTRAINT `vendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`);
+COMMIT;
