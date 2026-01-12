@@ -82,7 +82,7 @@
                     <nav class="top-navbar">
                         <div class="navbar-left">
                             <i class="navbar-icon fas fa-chart-line"></i>
-                            <h2 class="navbar-title">Dashboard</h2>
+                            <h2 class="navbar-title">Gestão de Clientes</h2>
                         </div>
                         <div class="navbar-right">
                             <button class="navbar-icon-btn">
