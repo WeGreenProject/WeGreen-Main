@@ -28,7 +28,6 @@ AND MensagensAdmin.created_at = (
             $result1 = $conn->query($sql);
             if ($result1->num_rows > 0) {
                 while ($row = $result1->fetch_assoc()) {    
-                    $msg .= "<div class='conversations-list' id='ListaCliente'>";
                     $msg .= "<div class='conversation-item' onclick='getFaixa(".$row['IdUtilizador']."); getBotao(".$row['IdUtilizador']."); getConversas(".$row['IdUtilizador'].");' data-user='".$row['foto']."'>";
                     $msg .= "<img src='" . $row['foto'] . "' class='conversation-avatar' alt='User Photo' id='userPhoto'>";
                     $msg .= "<div class='conversation-info'>";
@@ -66,54 +65,40 @@ AND MensagensAdmin.created_at = (
 
     }
     function getFaixa($ID_User){
-        global $conn;
-        $msg = "";
-        $row = "";
-        $sql = "SELECT * from utilizadores where utilizadores.id =".$ID_User;
-            $result1 = $conn->query($sql);
-            if ($result1->num_rows > 0) {
-                while ($row = $result1->fetch_assoc()) {    
-            $msg .= "<div id='chatContent' style='display: flex; flex: 1; flex-direction: column;'>";
-            $msg .= "<div class='chat-header'>";
-            $msg .= "<div class='chat-header-info'>";
-            $msg .= "<div class='chat-user-avatar' id='chatUserAvatar'><img src='" . $row['foto'] . "'></div>";
-            $msg .= "<div class='chat-user-details'>";
-            $msg .= "<h4 id='chatUserName'>" . $row['nome'] . "</h4>";
-            $msg .= "</div>";
-            $msg .= "</div>";
-            $msg .= "</div>";
-            
+    global $conn;
+    $msg = "";
 
-            $msg .= "<div class='chat-messages' id='chatMessages'></div>";
-            
+    $sql = "SELECT * FROM utilizadores WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $ID_User);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-            $msg .= "<div class='chat-input-container' id='BotaoEscrever'></div>";
-            
-            $msg .= "</div>";
-                }
-            }
-            else
-            {
-                    $msg  = "<div class='conversations-list' id='conversationsList' id='ListaCliente'>";
-                    $msg .= "<div class='conversation-item active' data-user='maria'>";
-                    $msg .= "<img src='" . $row['nome'] . "' class='conversation-avatar' alt='User Photo' id='userPhoto'>";
-                    $msg .= "<div class='conversation-info'>";
-                    $msg .= "<div class='conversation-header'>";
-                    $msg .= "<span class='conversation-name'>Maria Silva</span>";
-                    $msg .= "<span class='conversation-time'>10:30</span>";
-                    $msg .= "</div>";
-                    $msg .= "<div class='conversation-preview'>";
-                    $msg .= "Olá, preciso de ajuda com um pedido";
-                    $msg .= "<span class='conversation-unread'>2</span>";
-                    $msg .= "</div>";
-                    $msg .= "</div>";
-                    $msg .= "</div>";
-            }
-        $conn->close();
-        
-        return ($msg);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();    
 
+        $msg .= "<div id='chatContentWrapper' style='display: flex; flex-direction: column; height: 100%;'>";
+        $msg .= "<div class='chat-header'>";
+        $msg .= "<div class='chat-header-info'>";
+        $msg .= "<div class='chat-user-avatar'><img src='" . $row['foto'] . "' alt='User'></div>";
+        $msg .= "<div class='chat-user-details'>";
+        $msg .= "<h4>" . $row['nome'] . "</h4>";
+        $msg .= "</div>";
+        $msg .= "</div></div>";
+
+        $msg .= "<div class='chat-messages' id='chatMessages'></div>";
+        $msg .= "<div class='chat-input-container' id='BotaoEscrever'></div>";
+        $msg .= "</div>";
+
+    } else {
+        $msg .= "<div style='padding:20px; text-align:center; color:#718096;'>";
+        $msg .= "<p>Usuário não encontrado</p></div>";
     }
+
+    $stmt->close();
+    return $msg;
+}
+
 function getConversas($ID_Anunciante,$ID_Consumidor){
         global $conn;
         $msg = "";
@@ -210,46 +195,48 @@ function getConversas($ID_Anunciante,$ID_Consumidor){
 
     return $resp;
     }
-    function pesquisarChat($pesquisa){
-        global $conn;
-        $msg = "";
-        $row = "";
-        $sql = "SELECT DISTINCT
-            Utilizadores.id,
-            Utilizadores.nome,
-            Utilizadores.foto,
-            MensagensAdmin.mensagem
-        FROM Utilizadores,MensagensAdmin where  Utilizadores.id = MensagensAdmin.remetente_id AND Utilizadores.nome like '%$pesquisa%' ORDER BY MensagensAdmin.created_at DESC;";
-            $result1 = $conn->query($sql);
-            if ($result1->num_rows > 0) {
-                 while ($row = $result1->fetch_assoc()) {    
-                    $msg .= "<h3>Conversas</h3>";
-                    $msg .= "<div class='search-box'>";
-                    $msg .= "<i class='fas fa-search'></i>";
-                    $msg .= "<input type='text' placeholder='Pesquisar conversas...' id='searchInput'>";
-                    $msg .= "</div>";
-                    $msg .= "<div class='chat-messages' id='chatMessages'></div>";
-                    $msg .= "<div class='chat-input-container' id='BotaoEscrever'></div>";
-                    $msg .= "</div>";
-                }
+function pesquisarChat($pesquisa,$ID_Utilizador){
+    global $conn;
 
-            }
-            else
-            {
-                $msg .= "<h3>Conversas</h3>";
-                $msg .= "<div class='search-box'>";
-                $msg .= "<i class='fas fa-search'></i>";
-                $msg .= "<input type='text' placeholder='Pesquisar conversas...' id='searchInput'>";
-                $msg .= "</div>";
-                $msg .= "<div class='chat-messages' id='chatMessages'></div>";
-                $msg .= "<div class='chat-input-container' id='BotaoEscrever'></div>";
-                $msg .= "</div>";
-            }
-        $conn->close();
-        
-        return ($msg);
+    $msg = "";
 
+    $sql = "SELECT DISTINCT
+    Utilizadores.id as IdUtilizador,
+    Utilizadores.nome,
+    Utilizadores.foto,
+    MensagensAdmin.mensagem As MensagemCliente
+FROM Utilizadores, MensagensAdmin
+WHERE Utilizadores.id = MensagensAdmin.remetente_id
+AND MensagensAdmin.destinatario_id = $ID_Utilizador
+AND Utilizadores.nome LIKE '%$pesquisa%'
+ORDER BY MensagensAdmin.created_at DESC;";
+
+    $result1 = $conn->query($sql);
+
+    if ($result1->num_rows > 0) {
+        while ($row = $result1->fetch_assoc()) {    
+                    $msg .= "<div class='conversation-item' onclick='getFaixa(".$row['IdUtilizador']."); getBotao(".$row['IdUtilizador']."); getConversas(".$row['IdUtilizador'].");' data-user='".$row['foto']."'>";
+                    $msg .= "<img src='" . $row['foto'] . "' class='conversation-avatar' alt='User Photo' id='userPhoto'>";
+                    $msg .= "<div class='conversation-info'>";
+                    $msg .= "<div class='conversation-header'>";
+                    $msg .= "<span class='conversation-name'>". $row['nome'] ."</span>";
+                    $msg .= "</div>";
+                    $msg .= "<div class='conversation-preview'>";
+                    $msg .= "". $row['MensagemCliente'] ."";
+                    $msg .= "<span class='conversation-unread'>2</span>";
+                    $msg .= "</div>";
+                    $msg .= "</div>";
+                    $msg .= "</div>";
+        }
+    } else {
+        $msg .= "<div style='padding: 20px; text-align: center; color: #718096;'>";
+        $msg .= "<p>Sem resultados</p>";
+        $msg .= "</div>";
     }
+
+    $conn->close();
+    return $msg;
+}
     function getBotao($ID_User){
         global $conn;
         $msg = "";

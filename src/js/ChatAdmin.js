@@ -122,7 +122,7 @@ function pesquisarChat() {
     dados.append("op", 7);
     dados.append("pesquisa", termo);
 
-        $.ajax({
+    $.ajax({
         url: "src/controller/controllerAdminChat.php",
         method: "POST",
         data: dados,
@@ -132,7 +132,7 @@ function pesquisarChat() {
         processData: false
     })
     .done(function(msg) {
-        $('#PesquisarInput').html(msg);
+        $('#ListaCliente').html(msg);
         console.log(msg);
     })
     .fail(function(jqXHR, textStatus) {

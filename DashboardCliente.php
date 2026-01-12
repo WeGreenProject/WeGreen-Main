@@ -54,6 +54,10 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
 
                 <div class="menu-section">
                     <div class="menu-section-title">Conta</div>
+                    <a href="preferenciasNotificacoes.php" class="menu-item" data-page="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span>Notificações</span>
+                    </a>
                     <a href="#" class="menu-item" data-page="settings">
                         <i class="fas fa-cog"></i>
                         <span>Definições</span>
@@ -68,7 +72,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
             <div class="sidebar-footer">
                 <div class="user-profile">
                     <div class="user-avatar">
-                        <?php 
+                        <?php
                         $nome = isset($_SESSION['nome']) ? $_SESSION['nome'] : 'Cliente';
                         $iniciais = '';
                         $palavras = explode(' ', $nome);

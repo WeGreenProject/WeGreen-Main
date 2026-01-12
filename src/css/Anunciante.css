@@ -1327,6 +1327,29 @@
         border-color: #A6D90C;
     }
 
+    /* Checkbox Styles */
+    #productsTable input[type="checkbox"],
+    #selectAll {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        accent-color: #A6D90C;
+        border: 2px solid #cbd5e0;
+        border-radius: 4px;
+    }
+
+    #productsTable input[type="checkbox"]:hover,
+    #selectAll:hover {
+        border-color: #A6D90C;
+        transform: scale(1.1);
+    }
+
+    #productsTable input[type="checkbox"]:checked,
+    #selectAll:checked {
+        background-color: #A6D90C;
+        border-color: #A6D90C;
+    }
+
     /* Product Limit Indicator */
     #productLimit {
         margin-left: 20px;

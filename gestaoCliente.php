@@ -81,8 +81,13 @@
                 <main class="main-content">
                     <nav class="top-navbar">
                         <div class="navbar-left">
+<<<<<<< HEAD
                             <i class="navbar-icon fas fa-chart-line"></i>
-                            <h2 class="navbar-title">Dashboard</h2>
+                            <h2 class="navbar-title">Gestão de Clientes</h2>
+=======
+                            <i class="navbar-icon fas fa-shopping-bag"></i>
+                            <h2 class="navbar-title">Gestão de Utilizadores </h2>
+>>>>>>> d55834b (atualizaçºoes do chat)
                         </div>
                         <div class="navbar-right">
                             <button class="navbar-icon-btn">

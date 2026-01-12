@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Teste Bibliotecas</title>
+  </head>
+  <body>
+    <h1>Teste de Carregamento de Bibliotecas</h1>
+    <div id="resultados"></div>
+
+    <script src="src/js/lib/jquery.js"></script>
+    <script>
+      const resultados = [];
+
+      // Testar jQuery
+      if (typeof jQuery !== "undefined") {
+        resultados.push("✅ jQuery carregado - versão: " + jQuery.fn.jquery);
+        console.log("✅ jQuery OK");
+      } else {
+        resultados.push("❌ jQuery NÃO carregou!");
+        console.error("❌ jQuery FALHOU");
+      }
+    </script>
+
+    <script src="src/js/lib/datatables.js"></script>
+    <script>
+      if (typeof $.fn.DataTable !== "undefined") {
+        resultados.push("✅ DataTables carregado");
+        console.log("✅ DataTables OK");
+      } else {
+        resultados.push("❌ DataTables NÃO carregou!");
+        console.error("❌ DataTables FALHOU");
+      }
+    </script>
+
+    <script src="src/js/lib/select2.js"></script>
+    <script>
+      if (typeof $.fn.select2 !== "undefined") {
+        resultados.push("✅ Select2 carregado");
+        console.log("✅ Select2 OK");
+      } else {
+        resultados.push("❌ Select2 NÃO carregou!");
+        console.error("❌ Select2 FALHOU");
+      }
+    </script>
+
+    <script src="src/js/lib/sweatalert.js"></script>
+    <script>
+      if (typeof Swal !== "undefined") {
+        resultados.push("✅ SweetAlert carregado");
+        console.log("✅ SweetAlert OK");
+      } else {
+        resultados.push("❌ SweetAlert NÃO carregou!");
+        console.error("❌ SweetAlert FALHOU");
+      }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+      if (typeof jspdf !== "undefined") {
+        resultados.push("✅ jsPDF carregado");
+        console.log("✅ jsPDF OK");
+      } else {
+        resultados.push("❌ jsPDF NÃO carregou!");
+        console.error("❌ jsPDF FALHOU");
+      }
+
+      // Mostrar resultados
+      document.getElementById("resultados").innerHTML = resultados.join("<br>");
+
+      console.log("========================================");
+      console.log("TESTE FINAL: Se vê esta mensagem, scripts executaram!");
+      console.log("========================================");
+
+      alert(
+        "✅ Todas as bibliotecas testadas! Veja resultados na página e no console (F12)"
+      );
+    </script>
+  </body>
+</html>
