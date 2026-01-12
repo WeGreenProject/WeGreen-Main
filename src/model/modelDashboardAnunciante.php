@@ -1,7 +1,6 @@
 <?php
 
 require_once 'connection.php';
-require_once __DIR__ . '/../services/EmailService.php';
 
 class DashboardAnunciante {
 
@@ -389,7 +388,16 @@ function removerProdutosEmMassa($ids) {
                 error_log("Produto $id desativado (tem encomendas ou vendas)");
                 $desativados++;
             } else {
-                // Pode remover - Remove fotos adicionais primeiro
+                // Pode remover - primeiro remove do carrinho
+                $sqlCarrinho = "DELETE FROM Carrinho WHERE produto_id = ?";
+                $stmtCarrinho = $conn->prepare($sqlCarrinho);
+                if ($stmtCarrinho) {
+                    $stmtCarrinho->bind_param("i", $id);
+                    $stmtCarrinho->execute();
+                    $stmtCarrinho->close();
+                }
+
+                // Remove fotos adicionais
                 $sqlFotos = "DELETE FROM Produto_Fotos WHERE produto_id = ?";
                 $stmtFotos = $conn->prepare($sqlFotos);
                 if ($stmtFotos) {
@@ -982,169 +990,27 @@ function getEncomendas($ID_User) {
     function atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao = '', $codigo_rastreio = null) {
         global $conn;
 
-        try {
-            // Obter dados da encomenda antes de atualizar
-            $sql_dados = "SELECT e.cliente_id, e.codigo_encomenda, e.morada, e.transportadora_id, e.data_envio,
-                                 u.nome as cliente_nome, p.nome as produto_nome, p.foto
-                          FROM Encomendas e
-                          INNER JOIN Utilizadores u ON e.cliente_id = u.id
-                          LEFT JOIN Produtos p ON e.produto_id = p.Produto_id
-                          WHERE e.id = ?
-                          LIMIT 1";
-            $stmt_dados = $conn->prepare($sql_dados);
-            $stmt_dados->bind_param("i", $encomenda_id);
-            $stmt_dados->execute();
-            $result_dados = $stmt_dados->get_result();
-            $dados_encomenda = $result_dados->fetch_assoc();
-            $stmt_dados->close();
-
-            if (!$dados_encomenda) {
-                return json_encode(['success' => false, 'message' => 'Encomenda não encontrada']);
-            }
-
-            // Atualiza o estado na tabela Encomendas
-            if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
-                $sql = "UPDATE Encomendas SET estado = ?, codigo_rastreio = ? WHERE id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssi", $novo_estado, $codigo_rastreio, $encomenda_id);
-            } else {
-                $sql = "UPDATE Encomendas SET estado = ? WHERE id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("si", $novo_estado, $encomenda_id);
-            }
-
-            if (!$stmt->execute()) {
-                $stmt->close();
-                return json_encode(['success' => false, 'message' => 'Erro ao atualizar status: ' . $conn->error]);
-            }
-            $stmt->close();
-
-            // Registra no histórico
-            $descricao = empty($observacao) ? "Status alterado para: $novo_estado" : $observacao;
-            if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
-                $descricao .= " - Código de rastreio: $codigo_rastreio";
-            }
-
-            $sqlHist = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao) VALUES (?, ?, ?)";
-            $stmtHist = $conn->prepare($sqlHist);
-            $stmtHist->bind_param("iss", $encomenda_id, $novo_estado, $descricao);
-            $stmtHist->execute();
-            $stmtHist->close();
-
-            // Enviar email ao cliente sobre mudança de status
-            $this->enviarEmailMudancaStatus($dados_encomenda, $novo_estado, $codigo_rastreio);
-
-            return json_encode(['success' => true, 'message' => 'Status atualizado com sucesso']);
-
-        } catch (Exception $e) {
-            error_log('Erro ao atualizar status encomenda: ' . $e->getMessage());
-            return json_encode(['success' => false, 'message' => 'Erro ao processar atualização: ' . $e->getMessage()]);
+        // Atualiza o estado na tabela Encomendas
+        $sql = "UPDATE Encomendas SET estado = '$novo_estado'";
+        if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
+            $sql .= ", codigo_rastreio = '$codigo_rastreio'";
         }
-    }
+        $sql .= " WHERE id = $encomenda_id";
 
-    /**
-     * Enviar email ao cliente quando o status da encomenda muda
-     */
-    private function enviarEmailMudancaStatus($dados_encomenda, $novo_estado, $codigo_rastreio = null) {
-        global $conn;
-
-        try {
-            $emailService = new EmailService();
-
-            // Mapear transportadora
-            $transportadoras = [
-                1 => 'CTT - Correios de Portugal',
-                2 => 'DPD - Entrega Rápida',
-                3 => 'UPS',
-                4 => 'Chronopost',
-                5 => 'Entrega WeGreen'
-            ];
-            $transportadora = $transportadoras[$dados_encomenda['transportadora_id']] ?? 'CTT';
-
-            // Dados base para todos os templates
-            $dadosEmail = [
-                'codigo_encomenda' => $dados_encomenda['codigo_encomenda'],
-                'data_encomenda' => $dados_encomenda['data_envio'],
-                'transportadora' => $transportadora,
-                'morada' => $dados_encomenda['morada']
-            ];
-
-            // Buscar produtos da encomenda
-            $sql_produtos = "SELECT p.nome, p.preco, p.Foto_Produto
-                            FROM Encomendas e
-                            INNER JOIN Produtos p ON e.produto_id = p.Produto_id
-                            WHERE e.codigo_encomenda = '{$dados_encomenda['codigo_encomenda']}'";
-            $result_produtos = $conn->query($sql_produtos);
-            $produtos_array = [];
-
-            if ($result_produtos && $result_produtos->num_rows > 0) {
-                while ($prod = $result_produtos->fetch_assoc()) {
-                    $produtos_array[] = [
-                        'nome' => $prod['nome'],
-                        'preco' => $prod['preco'],
-                        'quantidade' => 1,
-                        'foto' => !empty($prod['Foto_Produto']) ? 'http://localhost/WeGreen-Main/' . $prod['Foto_Produto'] : ''
-                    ];
-                }
-            }
-
-            $dadosEmail['produtos'] = $produtos_array;
-
-            // Selecionar template baseado no novo estado
-            $template = '';
-            switch ($novo_estado) {
-                case 'Processando':
-                    $template = 'status_processando';
-                    break;
-
-                case 'Enviado':
-                    $template = 'status_enviado';
-                    $dadosEmail['codigo_rastreio'] = $codigo_rastreio ?? 'N/A';
-                    $dadosEmail['data_envio'] = date('Y-m-d H:i:s');
-
-                    // Gerar link de rastreio (simplificado - pode ser melhorado)
-                    if ($dados_encomenda['transportadora_id'] == 1) {
-                        $dadosEmail['link_rastreio'] = 'https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?objects=' . urlencode($codigo_rastreio);
-                    } elseif ($dados_encomenda['transportadora_id'] == 2) {
-                        $dadosEmail['link_rastreio'] = 'https://www.dpd.com/pt/pt/tracking/?parcelNumber=' . urlencode($codigo_rastreio);
-                    } else {
-                        $dadosEmail['link_rastreio'] = '#';
-                    }
-
-                    // Calcular prazo estimado (simplificado)
-                    $prazo_dias = ($dados_encomenda['transportadora_id'] == 2) ? 2 : 4;
-                    $data_estimada = date('d/m/Y', strtotime("+{$prazo_dias} days"));
-                    $dadosEmail['prazo_estimado'] = $data_estimada;
-                    break;
-
-                case 'Entregue':
-                    $template = 'status_entregue';
-                    $dadosEmail['data_entregue'] = date('Y-m-d H:i:s');
-                    if (!empty($codigo_rastreio)) {
-                        $dadosEmail['codigo_rastreio'] = $codigo_rastreio;
-                    }
-                    break;
-
-                case 'Cancelado':
-                    $template = 'cancelamento';
-                    $dadosEmail['data_cancelamento'] = date('Y-m-d H:i:s');
-                    $dadosEmail['motivo_cancelamento'] = 'Cancelado pelo vendedor';
-                    break;
-
-                default:
-                    // Não enviar email para outros estados
-                    return;
-            }
-
-            // Enviar email se houver template definido
-            if (!empty($template)) {
-                $emailService->sendToCliente($dados_encomenda['cliente_id'], $template, $dadosEmail);
-            }
-
-        } catch (Exception $e) {
-            error_log("Erro ao enviar email de mudança de status: " . $e->getMessage());
-            // Não falhar o processo se o email falhar
+        if (!$conn->query($sql)) {
+            return json_encode(['success' => false, 'message' => 'Erro ao atualizar status']);
         }
+
+        // Registra no histórico
+        $descricao = empty($observacao) ? "Status alterado para: $novo_estado" : $observacao;
+        if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
+            $descricao .= " - Código de rastreio: $codigo_rastreio";
+        }
+
+        $sqlHist = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao) VALUES ($encomenda_id, '$novo_estado', '$descricao')";
+        $conn->query($sqlHist);
+
+        return json_encode(['success' => true, 'message' => 'Status atualizado com sucesso']);
     }
 
     function getHistoricoEncomenda($encomenda_id) {

@@ -81,8 +81,8 @@
                 <main class="main-content">
                     <nav class="top-navbar">
                         <div class="navbar-left">
-                            <i class="navbar-icon fas fa-shopping-bag"></i>
-                            <h2 class="navbar-title">Gestão de Utilizadores </h2>
+                            <i class="navbar-icon fas fa-chart-line"></i>
+                            <h2 class="navbar-title">Gestão de Clientes</h2>
                         </div>
                         <div class="navbar-right">
                             <button class="navbar-icon-btn">

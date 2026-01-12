@@ -58,14 +58,6 @@ class Encomendas {
             // Buscar transportadora
             $encomenda['transportadora'] = $this->obterTransportadora($encomenda['id']);
 
-            // Adicionar campos de entrega se não existirem
-            if (!isset($encomenda['tipo_entrega'])) {
-                $encomenda['tipo_entrega'] = 'domicilio';
-            }
-            if (!isset($encomenda['morada_completa'])) {
-                $encomenda['morada_completa'] = $encomenda['morada'];
-            }
-
             // Buscar produtos da encomenda
             $encomenda['produtos_detalhes'] = $this->obterProdutosEncomenda($codigo_encomenda);
 

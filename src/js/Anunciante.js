@@ -931,16 +931,9 @@ function editarSelecionado() {
 
 function removerEmMassa() {
   const ids = obterProdutosSelecionados();
-  if (ids.length === 0) {
-    Swal.fire(
-      "Atenção",
-      "Selecione pelo menos um produto para remover.",
-      "warning"
-    );
-    return;
-  }
+  if (ids.length === 0) return;
   Swal.fire({
-    title: `Remover ${ids.length} produto${ids.length > 1 ? "s" : ""}?`,
+    title: `Remover ${ids.length} produtos?`,
     text: "Esta ação não pode ser desfeita!",
     icon: "warning",
     showCancelButton: true,
@@ -950,144 +943,91 @@ function removerEmMassa() {
     cancelButtonText: "Cancelar",
   }).then((resultado) => {
     if (resultado.isConfirmed) {
-      $.ajax({
-        url: "src/controller/controllerDashboardAnunciante.php",
-        method: "POST",
-        data: { op: 36, ids: ids },
-        traditional: true,
-        dataType: "json",
-        success: function (response) {
-          console.log("Response:", response);
-          if (response.success) {
-            // Marcar que estamos recarregando
-            window.isReloading = true;
-            Swal.fire(
-              "Removido!",
-              response.message || "Produtos removidos/desativados com sucesso.",
-              "success"
-            ).then(() => {
-              // Recarregar a página completa para evitar problemas com DataTables
-              window.location.reload();
-            });
-          } else {
-            Swal.fire(
-              "Erro",
-              response.message || "Não foi possível remover os produtos.",
-              "error"
-            );
-          }
-        },
-        error: function (xhr, status, error) {
-          console.error("Erro ao remover:", error, xhr.responseText);
-          Swal.fire("Erro", "Não foi possível remover os produtos.", "error");
-        },
-      });
+      $.post(
+        "src/controller/controllerDashboardAnunciante.php",
+        { op: 36, ids: ids },
+        function () {
+          Swal.fire("Removido!", "Produtos removidos com sucesso.", "success");
+          carregarProdutos();
+          carregarEstatisticasProdutos();
+        }
+      );
     }
   });
 }
 
 function carregarProdutos() {
-  // Evitar recarregar se estamos prestes a fazer reload da página
-  if (window.isReloading) {
-    console.log("Cancelando carregarProdutos: página vai recarregar");
-    return;
-  }
-
-  // Aguardar até que a tabela esteja no DOM
-  const waitForTable = setInterval(function () {
-    if ($("#productsTable").length) {
-      clearInterval(waitForTable);
-      carregarProdutosNow();
-    }
-  }, 100);
-
-  // Timeout de segurança (5 segundos)
-  setTimeout(function () {
-    clearInterval(waitForTable);
-  }, 5000);
-}
-
-function carregarProdutosNow() {
   $.ajax({
     url: "src/controller/controllerDashboardAnunciante.php",
     method: "POST",
     data: { op: 8 },
     dataType: "json",
-  })
-    .done(function (dados) {
-      // Se a DataTable já existe, apenas atualiza os dados
-      if ($.fn.DataTable.isDataTable("#productsTable")) {
-        const table = $("#productsTable").DataTable();
-        table.clear().rows.add(dados).draw();
-        return;
-      }
+  }).done(function (dados) {
+    if ($.fn.DataTable.isDataTable("#productsTable")) {
+      $("#productsTable").DataTable().destroy();
+    }
 
-      // Criar nova DataTable
-      window.tabelaProdutos = $("#productsTable").DataTable({
-        data: dados,
-        columns: [
-          {
-            data: null,
-            orderable: false,
-            render: (dados) =>
-              `<input type="checkbox" class="product-checkbox" data-id="${dados.Produto_id}">`,
-          },
-          {
-            data: "foto",
-            orderable: false,
-            render: (foto) => {
-              const imgSrc = foto ? foto : "src/img/no-image.png";
-              return `<img src="${imgSrc}" alt="Produto" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid #e2e8f0;">`;
-            },
-          },
-          { data: "nome" },
-          { data: "tipo_descricao" },
-          { data: "preco", render: (v) => "€" + parseFloat(v).toFixed(2) },
-          {
-            data: "stock",
-            render: (v) => {
-              const stock = parseInt(v);
-              if (stock < 5) {
-                return `<span class="stock-low"><i class="fas fa-exclamation-triangle"></i> ${stock}</span>`;
-              }
-              return stock;
-            },
-          },
-          { data: "estado" },
-          {
-            data: "ativo",
-            render: (v) =>
-              v
-                ? '<span class="status-active">Sim</span>'
-                : '<span class="status-inactive"><i class="fas fa-exclamation-circle"></i> Não</span>',
-          },
-        ],
-        destroy: true,
-        pageLength: 10,
-        language: {
-          url: "//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese.json",
+    window.tabelaProdutos = $("#productsTable").DataTable({
+      data: dados,
+      columns: [
+        {
+          data: null,
+          orderable: false,
+          render: (dados) =>
+            `<input type="checkbox" class="product-checkbox" data-id="${dados.Produto_id}">`,
         },
-        drawCallback: function () {
-          $("#productsTable tbody tr")
-            .removeClass("even odd")
-            .css("background", "#ffffff");
+        {
+          data: "foto",
+          orderable: false,
+          render: (foto) => {
+            const imgSrc = foto ? foto : "src/img/no-image.png";
+            return `<img src="${imgSrc}" alt="Produto" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid #e2e8f0;">`;
+          },
         },
-      });
-
-      $("#productsTable tbody")
-        .off("click", "tr")
-        .on("click", "tr", function (e) {
-          if ($(e.target).closest(".product-checkbox, button").length) return;
-          const dados = window.tabelaProdutos.row(this).data();
-          if (dados && dados.Produto_id) {
-            visualizarProduto(dados.Produto_id);
-          }
-        });
-    })
-    .fail(function (xhr, status, error) {
-      console.error("Erro ao carregar produtos:", error);
-      Swal.fire("Erro", "Não foi possível carregar os produtos.", "error");
+        { data: "nome" },
+        { data: "tipo_descricao" },
+        { data: "preco", render: (v) => "€" + parseFloat(v).toFixed(2) },
+        {
+          data: "stock",
+          render: (v) => {
+            const stock = parseInt(v);
+            if (stock < 5) {
+              return `<span class="stock-low"><i class="fas fa-exclamation-triangle"></i> ${stock}</span>`;
+            }
+            return stock;
+          },
+        },
+        { data: "estado" },
+        {
+          data: "ativo",
+          render: (v) =>
+            v
+              ? '<span class="status-active">Sim</span>'
+              : '<span class="status-inactive"><i class="fas fa-exclamation-circle"></i> Não</span>',
+        },
+      ],
+      destroy: true,
+      pageLength: 10,
+      language: {
+        url: "//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese.json",
+      },
+      drawCallback: function () {
+        $("#productsTable tbody tr")
+          .removeClass("even odd")
+          .css("background", "#ffffff");
+      },
     });
+
+    $("#productsTable tbody")
+      .off("click", "tr")
+      .on("click", "tr", function (e) {
+        if ($(e.target).closest(".product-checkbox, button").length) return;
+        const dados = window.tabelaProdutos.row(this).data();
+        if (dados && dados.Produto_id) {
+          visualizarProduto(dados.Produto_id);
+        }
+      });
+  });
 }
 
 function abrirModalProduto(titulo, dados = {}) {
@@ -2333,187 +2273,102 @@ function verDetalhesEncomenda(encomendaId) {
       Swal.fire({
         title: `Encomenda #${encomenda.codigo}`,
         html: `
-                    <div style="text-align: left; max-width: 100%; margin: 0;">
+                    <div style="text-align: left; max-width: 700px; margin: 0 auto;">
                         ${
                           diasDesdeEncomenda > 3 &&
                           encomenda.estado === "Pendente"
-                            ? '<div style="padding: 10px; background: #FEE2E2; border-left: 4px solid #EF4444; border-radius: 6px; margin-bottom: 12px;"><strong style="color: #991B1B;">⚠️ Atenção:</strong> Esta encomenda está pendente há ' +
+                            ? '<div style="padding: 12px; background: #FEE2E2; border-left: 4px solid #EF4444; border-radius: 6px; margin-bottom: 20px;"><strong style="color: #991B1B;">⚠️ Atenção:</strong> Esta encomenda está pendente há ' +
                               diasDesdeEncomenda +
                               " dias</div>"
                             : ""
                         }
 
-                        <!-- GRID PRINCIPAL: DADOS + PRODUTO -->
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
-
-                        <!-- COLUNA ESQUERDA: GRID 2x2 COM TODOS OS DADOS -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #A6D90C; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-user" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
-                                Cliente
+                        <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2d3748; display: flex; align-items: center;">
+                                <i class="fas fa-user" style="margin-right: 8px; color: #A6D90C;"></i>
+                                Informações do Cliente
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Nome:</strong> ${
+                            <p style="margin: 5px 0;"><strong>Nome:</strong> ${
                               encomenda.cliente_nome
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;">
-                                <strong style="color: #2d3748;">Email:</strong>
-                                <a href="mailto:${
-                                  encomenda.cliente_email
-                                }" style="color: #3b82f6; text-decoration: none;">
-                                    ${encomenda.cliente_email}
-                                </a>
-                            </p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568; display: flex; align-items: center; gap: 8px;">
-                                <strong style="color: #2d3748;">Morada:</strong> ${
-                                  encomenda.morada
-                                }
-                                <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${encomenda.morada.replace(
-                                  /'/g,
-                                  "\\'"
-                                )}')
-.then(() => Swal.fire({icon: 'success', title: 'Copiado!', text: 'Morada copiada para a área de transferência', timer: 1500, showConfirmButton: false}))
-.catch(() => Swal.fire({icon: 'error', title: 'Erro', text: 'Não foi possível copiar', timer: 1500, showConfirmButton: false}))"
-                                   style="color: #A6D90C; cursor: pointer; font-size: 14px;"
-                                   title="Copiar morada"></i>
-                            </p>
+                            <p style="margin: 5px 0;"><strong>Email:</strong> ${
+                              encomenda.cliente_email
+                            }</p>
+                            <p style="margin: 5px 0;"><strong>Morada de Envio:</strong> ${
+                              encomenda.morada
+                            }</p>
                         </div>
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #A6D90C; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-box" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
-                                Encomenda
+                        <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2d3748; display: flex; align-items: center;">
+                                <i class="fas fa-box" style="margin-right: 8px; color: #A6D90C;"></i>
+                                Detalhes da Encomenda
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Produto:</strong> ${
+                            <p style="margin: 5px 0;"><strong>Produto:</strong> ${
                               encomenda.produto_nome
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Qtd:</strong> ${
+                            <p style="margin: 5px 0;"><strong>Quantidade:</strong> ${
                               encomenda.quantidade
-                            } un.</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #A6D90C; font-weight: bold; font-size: 16px;">€${encomenda.valor.toFixed(
+                            } unidade(s)</p>
+                            <p style="margin: 5px 0;"><strong>Valor Total:</strong> <span style="color: #A6D90C; font-weight: bold; font-size: 18px;">€${encomenda.valor.toFixed(
                               2
                             )}</span></p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${
+                            <p style="margin: 5px 0;"><strong>Data da Encomenda:</strong> ${
                               encomenda.data
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;">
-                                <strong style="color: #2d3748;">Status:</strong>
-                                <span class="badge badge-${statusClass}" style="font-size: 14px; padding: 6px 12px; border-radius: 6px;">
-                                    ${
-                                      encomenda.estado === "Pendente"
-                                        ? "⏳"
-                                        : encomenda.estado === "Entregue"
-                                        ? "✔️"
-                                        : encomenda.estado === "Enviado"
-                                        ? "🚚"
-                                        : encomenda.estado === "Processando"
-                                        ? "📦"
-                                        : "❌"
-                                    }
-                                    ${encomenda.estado}
-                                </span>
-                            </p>
+                            <p style="margin: 5px 0;"><strong>Status Atual:</strong> <span class="badge badge-${statusClass}">${
+          encomenda.estado
+        }</span></p>
                         </div>
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #3b82f6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-shipping-fast" style="margin-right: 8px; color: #3b82f6; font-size: 18px;"></i>
-                                Envio
+                        <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2d3748; display: flex; align-items: center;">
+                                <i class="fas fa-shipping-fast" style="margin-right: 8px; color: #A6D90C;"></i>
+                                Informações de Envio
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Transportadora:</strong> ${
-                              encomenda.transportadora || "N/A"
+                            <p style="margin: 5px 0;"><strong>Transportadora:</strong> ${
+                              encomenda.transportadora || "Não definida"
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Rastreio:</strong> ${
-                              encomenda.codigo_rastreio || "N/A"
+                            <p style="margin: 5px 0;"><strong>Código de Rastreio:</strong> ${
+                              encomenda.codigo_rastreio || "Não disponível"
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Prazo:</strong> ${prazoEntrega}</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
+                            <p style="margin: 5px 0;"><strong>Prazo Estimado:</strong> ${prazoEntrega}</p>
+                            <p style="margin: 5px 0;"><strong>Tempo Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
                         </div>
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #f59e0b; font-size: 18px;"></i>
-                                Financeiros
+                        <div style="margin-bottom: 20px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2d3748; display: flex; align-items: center;">
+                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #A6D90C;"></i>
+                                Detalhes Financeiros
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Pagamento:</strong> ${encomenda.payment_method.toUpperCase()}</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Bruto:</strong> <span style="font-weight: 600;">€${encomenda.valor.toFixed(
+                            <p style="margin: 5px 0;"><strong>Pagamento:</strong> ${encomenda.payment_method.toUpperCase()} - ${encomenda.payment_status.toUpperCase()}</p>
+                            <p style="margin: 5px 0;"><strong>ID Transação:</strong> ${
+                              encomenda.payment_id || "N/A"
+                            }</p>
+                            <p style="margin: 5px 0;"><strong>Valor Bruto:</strong> €${encomenda.valor.toFixed(
+                              2
+                            )}</p>
+                            <p style="margin: 5px 0;"><strong>Comissão (6%):</strong> <span style="color: #dc3545;">-€${encomenda.comissao.toFixed(
                               2
                             )}</span></p>
-                            <p style="margin: 6px 0; font-size: 15px;"><strong style="color: #2d3748;">Comissão:</strong> <span style="color: #ef4444; font-weight: 600; font-size: 15px;">-€${encomenda.comissao.toFixed(
-                              2
-                            )}</span></p>
-                            <p style="margin: 6px 0; font-size: 15px;"><strong style="color: #2d3748;">Líquido:</strong> <span style="color: #10b981; font-weight: 700; font-size: 17px;">€${encomenda.lucro_liquido.toFixed(
+                            <p style="margin: 5px 0;"><strong>Lucro Líquido:</strong> <span style="color: #28a745; font-weight: bold; font-size: 18px;">€${encomenda.lucro_liquido.toFixed(
                               2
                             )}</span></p>
                         </div>
 
-                        </div>
-                        <!-- FIM GRID DADOS -->
-
-                        <!-- COLUNA DIREITA: PRODUTO -->
                         ${
                           encomenda.produto_foto
                             ? `
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #A6D90C; box-shadow: 0 4px 8px rgba(166,217,12,0.15); text-align: center;">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-image" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
-                                Produto
-                            </h4>
-                            <img src="${encomenda.produto_foto}"
-                                 alt="${encomenda.produto_nome}"
-                                 onclick="Swal.fire({imageUrl: '${encomenda.produto_foto}', imageAlt: '${encomenda.produto_nome}', imageWidth: 'auto', imageHeight: '70vh', width: '50%', maxWidth: '500px', showCloseButton: true, showConfirmButton: false, background: '#1a202c', customClass: {popup: 'photo-preview-modal', image: 'photo-preview-image'}})"
-                                 style="max-width: 100%; max-height: 380px; width: auto; height: auto; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;"
-                                 title="Clique para ampliar">
-                        </div>
-                        `
-                            : `<div></div>`
-                        }
-
-                        </div>
-                        <!-- FIM GRID -->
-
-                        <!-- MAPA ABAIXO -->
-                        ${
-                          encomenda.morada
-                            ? `
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #A6D90C; box-shadow: 0 4px 8px rgba(166,217,12,0.15); margin-top: 12px;">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
-                                Localização de Entrega
-                            </h4>
-                            <div style="border-radius: 6px; overflow: hidden; border: 2px solid #e5e7eb;">
-                                <iframe
-                                    width="100%"
-                                    height="300"
-                                    frameborder="0"
-                                    style="border:0"
-                                    src="https://maps.google.com/maps?q=${encodeURIComponent(
-                                      encomenda.morada
-                                    )}&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                                    allowfullscreen>
-                                </iframe>
-                                <div style="padding: 12px; background-color: #f9fafb; text-align: center;">
-                                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                      encomenda.morada
-                                    )}"
-                                       target="_blank"
-                                       style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #A6D90C 0%, #8BC708 100%); color: #000; text-decoration: none; font-weight: 700; font-size: 14px; border-radius: 6px; box-shadow: 0 2px 4px rgba(166,217,12,0.3);">
-                                        <i class="fas fa-external-link-alt" style="margin-right: 6px;"></i>
-                                        Abrir no Google Maps
-                                    </a>
-                                </div>
-                            </div>
+                        <div style="text-align: center; margin-top: 15px;">
+                            <h4 style="margin-bottom: 10px; color: #2d3748;">Produto</h4>
+                            <img src="${encomenda.produto_foto}" alt="${encomenda.produto_nome}" style="max-width: 250px; border-radius: 8px; border: 2px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                         </div>
                         `
                             : ""
                         }
                     </div>
                 `,
-        width: "95%",
-        customClass: {
-          popup: "swal-wide",
-        },
+        width: 750,
         confirmButtonText: "Fechar",
         confirmButtonColor: "#A6D90C",
       });

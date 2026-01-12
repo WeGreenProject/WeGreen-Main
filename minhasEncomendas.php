@@ -26,8 +26,6 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <!-- jsPDF para gerar PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
-
 </head>
 <body>
     <div class="dashboard-container">
@@ -463,46 +461,11 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                     } else {
                         Swal.fire('Erro', response.message, 'error');
                     }
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire('Erro', 'Erro ao carregar detalhes da encomenda', 'error');
                 }
             });
         }
 
         function mostrarDetalhes(encomenda) {
-            // Determinar tipo de entrega
-            const tipoEntrega = encomenda.tipo_entrega || 'domicilio';
-            const tituloMorada = tipoEntrega === 'ponto_recolha' ? '📍 Ponto de Recolha' : '🏠 Morada de Entrega';
-            const moradaCompleta = tipoEntrega === 'ponto_recolha'
-                ? (encomenda.morada_ponto_recolha || encomenda.morada)
-                : (encomenda.morada_completa || encomenda.morada);
-
-            // Gerar URL do mapa
-            const enderecoEncoded = encodeURIComponent(moradaCompleta);
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}`;
-
-            // HTML do mapa (iframe do Google Maps)
-            const mapaHtml = `
-                <div style="margin-top: 15px; border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb;">
-                    <iframe
-                        width="100%"
-                        height="300"
-                        frameborder="0"
-                        style="border:0"
-                        src="https://maps.google.com/maps?q=${enderecoEncoded}&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                        allowfullscreen>
-                    </iframe>
-                    <div style="padding: 10px; background-color: #f3f4f6; text-align: center;">
-                        <a href="${googleMapsUrl}"
-                           target="_blank"
-                           style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 12px;">
-                            📍 Abrir no Google Maps
-                        </a>
-                    </div>
-                </div>
-            `;
-
             const html = `
                 <div style="padding: 20px;">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
@@ -514,12 +477,8 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                             <p><strong>Transportadora:</strong> ${encomenda.transportadora}</p>
                         </div>
                         <div>
-                            <h4 style="color: #3cb371; margin-bottom: 10px;">${tituloMorada}</h4>
-                            ${tipoEntrega === 'ponto_recolha' && encomenda.nome_ponto_recolha ? `
-                                <p style="font-weight: 600; margin-bottom: 5px;">${encomenda.nome_ponto_recolha}</p>
-                            ` : ''}
-                            <p style="white-space: pre-line;">${moradaCompleta}</p>
-                            ${mapaHtml}
+                            <h4 style="color: #3cb371; margin-bottom: 10px;">Morada de Envio</h4>
+                            <p>${encomenda.morada}</p>
                         </div>
                     </div>
                     <div>
@@ -533,7 +492,6 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                     </div>
                 </div>
             `;
-
             $('#detalhesContent').html(html);
             $('#detalhesModal').fadeIn();
         }
