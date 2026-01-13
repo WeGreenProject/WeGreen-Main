@@ -161,7 +161,7 @@ ORDER BY id ASC;";
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
                 $hora = date("H:i", strtotime($row["created_at"]));
-                if ($row["destinatario_id"] == $ID_Consumidor) {
+                if ($row["remetente_id"] == $ID_Consumidor) {
                     $msg .= "<div class='message-wrapper sent'>";
                     $msg .= "<div class='message-content'>";
                     $msg .= "<div class='message-bubble'>";
