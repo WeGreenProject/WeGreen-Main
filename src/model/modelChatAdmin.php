@@ -136,7 +136,7 @@ function getConversas($ID_Anunciante,$ID_Consumidor){
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
                 $hora = date("H:i", strtotime($row["created_at"]));
-                if ($row["remetente_id"] == $ID_Consumidor) {
+                if ($row["destinatario_id"] == $ID_Consumidor) {
                 $msg .= "<div class='message sent'>";
                 $msg .= "<div class='message-avatar'><img src='$fotoPerfil' alt='Admin' class='message-avatar'></div>";
                 $msg .= "<div class='message-content'>";

@@ -101,6 +101,94 @@ class Perfil{
 
         return("Obrigado!");
     }
+    function getContactForm($ID_User){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * from utilizadores where id =".$ID_User;
+
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
+
+                    $msg .= "<div class='row'>";
+
+                    $msg .= "<div class='col-md-6'>";
+                    $msg .= "<label class='form-label fw-semibold'>Nome Completo *</label>";
+                    $msg .= "<input type='text' class='form-control form-control-lg' id='nomeUser' value='".$row["nome"]."' disabled>";
+                    $msg .= "</div>";
+
+                    $msg .= "<div class='col-md-6'>";
+                    $msg .= "<label class='form-label fw-semibold'>Email *</label>";
+                    $msg .= "<input type='email' class='form-control form-control-lg' id='emailUser' value='".$row["email"]."' disabled>";
+                    $msg .= "</div>";
+
+                    $msg .= "</div>";
+
+                    $msg .= "<div class='col-12'>";
+                    $msg .= "<label class='form-label fw-semibold'>Mensagem *</label>";
+                    $msg .= "<textarea class='form-control form-control-lg' rows='5' id='mensagemUser' placeholder='Descreva a sua questão ou sugestão...' required></textarea>";
+                    $msg .= "</div>";
+
+                    $msg .= "<div class='col-12 text-center mt-4'>";
+                    $msg .= "<button type='button' class='btn btn-submit-wegreen btn-lg' onclick='AdicionarMensagemContacto()'>";
+                    $msg .= "<i class='bi bi-send me-2'></i> Enviar Mensagem";
+                    $msg .= "</button>";
+                    $msg .= "</div>";
+
+            }
+        }
+        $conn->close();
+
+        return ($msg);
+
+    }
+function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $email = null){
+    global $conn;
+    $flag = false;
+    $msg = "";
+    $ID_Consumidor = 1; //ID do Admin
+
+    if($ID_Anunciante !== null){
+        $stmt = $conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
+        $stmt->bind_param("iis", $ID_Anunciante, $ID_Consumidor, $mensagem);
+        
+        if($stmt->execute()) {
+            $flag = true;
+            $msg = "Mensagem enviada com sucesso!";
+        } else {
+            $flag = false;
+            $msg = "Erro ao enviar mensagem.";
+        }
+    } else {
+        // Utilizador não autenticado
+        $remetente = 0;
+        $mensagemFull = "Nome: $nome\nEmail: $email\nMensagem: $mensagem";
+        
+        $stmt = $conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
+        $stmt->bind_param("iis", $remetente, $ID_Consumidor, $mensagemFull);
+        
+        if($stmt->execute()) {
+            $flag = true;
+            $msg = "Mensagem enviada com sucesso!";
+        } else {
+            $flag = false;
+            $msg = "Erro ao enviar mensagem.";
+        }
+    }
+    
+    $resp = json_encode([
+        "flag" => $flag,
+        "msg" => $msg
+    ]);
+
+    $stmt->close();
+    $conn->close();
+
+    return $resp;
+}
     function getDadosPlanos($ID_User,$plano,$tpUser){
     global $conn;
     $msg = "";
