@@ -124,7 +124,7 @@ class DashboardAdmin{
 
                 $msg .= "<button class='dropdown-item' onclick=\"showPage('profile', null); closeUserDropdown();\">";
                 $msg .= "    <i class='fas fa-user'></i>";
-                $msg .= "    <span><a href='perfilAnunciante.php'>Meu Perfil</a></span>";
+                $msg .= "    <span><a href='perfilAdmin.php'>Meu Perfil</a></span>";
                 $msg .= "</button>";
 
                 $msg .= "<button class='dropdown-item' onclick='showPasswordModal()'>";
