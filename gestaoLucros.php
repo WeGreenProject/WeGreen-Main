@@ -945,7 +945,6 @@ if($_SESSION['tipo'] == 1){
         </main>
     </div>
     <script src="src/js/GestaoLucros.js"></script>
-    <script src="src/js/Adminstrador.js"></script>
     <?php
 }else{
 header("Location: forbiddenerror.html");
