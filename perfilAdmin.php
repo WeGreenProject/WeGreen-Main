@@ -185,6 +185,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         initProfilePage();
     });
     </script>
+    <script src="src/js/PerfilAdmin.js"></script>
 </body>
 <?php
 }else{
