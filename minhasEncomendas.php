@@ -26,7 +26,8 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <!-- jsPDF para gerar PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-
+    <!-- Sistema de Devoluções -->
+    <script src="assets/js/custom/devolucoes.js"></script>
 
 </head>
 <body>
@@ -117,6 +118,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                                     <option value="processando">Processando</option>
                                     <option value="enviado">Enviado</option>
                                     <option value="entregue">Entregue</option>
+                                    <option value="devolvido">Devolvido</option>
                                     <option value="cancelado">Cancelado</option>
                                 </select>
                             </div>
@@ -272,6 +274,9 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                             <i class="fas fa-eye"></i> Ver Detalhes
                         </button>
                         ${enc.estado.toLowerCase() === 'entregue' ? `
+                            <button class="btn-action btn-warning" onclick="abrirModalDevolucao('${enc.id}', '${enc.codigo_encomenda}', ${JSON.stringify(enc.produtos).replace(/"/g, '&quot;')})">
+                                <i class="fas fa-undo"></i> Solicitar Devolução
+                            </button>
                             <button class="btn-action btn-secondary" onclick="comprarNovamente('${enc.codigo_encomenda}')">
                                 <i class="fas fa-redo"></i> Comprar Novamente
                             </button>
@@ -332,6 +337,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                 'processando': { class: 'status-processando', text: 'Processando' },
                 'enviado': { class: 'status-enviado', text: 'Enviado' },
                 'entregue': { class: 'status-entregue', text: 'Entregue' },
+                'devolvido': { class: 'status-devolvido', text: 'Devolvido' },
                 'cancelado': { class: 'status-cancelado', text: 'Cancelado' }
             };
             return statusMap[estado] || { class: '', text: estado };
@@ -1076,6 +1082,11 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             color: #0f5132;
         }
 
+        .status-devolvido {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
         .status-cancelado {
             background: #f8d7da;
             color: #721c24;
@@ -1167,5 +1178,6 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             }
         }
     </style>
+    <script src="src/js/alternancia.js"></script>
 </body>
 </html>

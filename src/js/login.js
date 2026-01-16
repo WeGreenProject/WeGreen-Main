@@ -1,7 +1,7 @@
 function login1() {
   let dados = new FormData();
   dados.append("op", 1);
-  dados.append("username", $("#usernameLogin").val());
+  dados.append("email", $("#emailLogin").val());
   dados.append("password", $("#passwordLogin").val());
 
   $.ajax({
@@ -19,19 +19,46 @@ function login1() {
       if (obj.flag) {
         alerta2(obj.msg);
 
-        // Verificar se existe parâmetro redirect na URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectUrl = urlParams.get("redirect");
+        // Verificar se tem perfil duplo
+        if (obj.perfil_duplo) {
+          setTimeout(function () {
+            window.location.href = "escolherConta.php";
+          }, 1500);
+        } else {
+          // Verificar se existe parâmetro redirect na URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectUrl = urlParams.get("redirect");
 
-        setTimeout(function () {
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
-          } else {
-            window.location.href = "index.html";
-          }
-        }, 2000);
+          setTimeout(function () {
+            if (redirectUrl) {
+              window.location.href = redirectUrl;
+            } else {
+              window.location.href = "index.html";
+            }
+          }, 2000);
+        }
       } else {
-        alerta("Utilizador", obj.msg, "error");
+        // Verificar se é erro de email não verificado
+        if (obj.email_nao_verificado) {
+          Swal.fire({
+            icon: "warning",
+            title: "Email Não Verificado",
+            text: obj.msg,
+            showCancelButton: true,
+            confirmButtonText: "Reenviar Email",
+            cancelButtonText: "Fechar",
+            confirmButtonColor: "#3cb371",
+            cancelButtonColor: "#6b7280",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href =
+                "reenviar_verificacao.html?email=" +
+                encodeURIComponent(obj.email);
+            }
+          });
+        } else {
+          alerta("Utilizador", obj.msg, "error");
+        }
       }
     })
 
@@ -68,3 +95,22 @@ function alerta(titulo, msg, icon) {
     showConfirmButton: true,
   });
 }
+
+// Toggle password visibility
+document.addEventListener("DOMContentLoaded", function () {
+  const togglePassword = document.querySelector(".toggle-password");
+  const passwordInput = document.querySelector("#passwordLogin");
+
+  if (togglePassword && passwordInput) {
+    togglePassword.addEventListener("click", function () {
+      const type =
+        passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+
+      // Toggle icon
+      const icon = this.querySelector("i");
+      icon.classList.toggle("fa-eye");
+      icon.classList.toggle("fa-eye-slash");
+    });
+  }
+});

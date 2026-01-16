@@ -568,5 +568,6 @@ $is_cliente = ($tipo_user == 2);
             }
         });
     </script>
+    <script src="src/js/alternancia.js"></script>
 </body>
 </html>

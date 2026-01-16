@@ -58,4 +58,24 @@ if ($_POST['op'] == 11) {
         echo json_encode(['error' => 'Sessão não iniciada']);
     }
 }
+
+// op 12 - Verificar conta alternativa
+if ($_POST['op'] == 12) {
+    if(isset($_SESSION['utilizador']) && isset($_SESSION['email']) && isset($_SESSION['tipo'])) {
+        $resp = $func->verificarContaAlternativa($_SESSION['email'], $_SESSION['tipo']);
+        echo $resp;
+    } else {
+        echo json_encode(['existe' => false]);
+    }
+}
+
+// op 13 - Alternar conta
+if ($_POST['op'] == 13) {
+    if(isset($_SESSION['email']) && isset($_POST['tipoAlvo'])) {
+        $resp = $func->alternarConta($_SESSION['email'], $_POST['tipoAlvo']);
+        echo $resp;
+    } else {
+        echo json_encode(['success' => false, 'msg' => 'Dados insuficientes']);
+    }
+}
 ?>

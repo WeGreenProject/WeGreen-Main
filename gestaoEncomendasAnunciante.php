@@ -194,6 +194,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             initSalesPage();
         });
     </script>
+    <script src="src/js/alternancia.js"></script>
 </body>
 <?php
 }else{

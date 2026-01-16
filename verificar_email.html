@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verificação de Email - WeGreen</title>
+    <link rel="stylesheet" href="src/css/login.css" />
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-background">
+        <div class="gradient-overlay"></div>
+        <div class="floating-shapes">
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="logo">
+            <img
+              src="src/img/2-removebg-preview.png"
+              alt="WeGreen"
+              class="logo-img"
+              style="width: auto; height: 40px"
+            />
+          </div>
+          <h1>Verificação de Email</h1>
+          <p id="statusMessage">A verificar o seu email...</p>
+        </div>
+
+        <div id="resultContainer" style="text-align: center; padding: 20px">
+          <i
+            class="fas fa-spinner fa-spin"
+            style="font-size: 48px; color: #3cb371"
+          ></i>
+        </div>
+
+        <div class="auth-links" id="actionLinks" style="display: none">
+          <a href="login.html" class="link-primary">
+            <i class="fas fa-arrow-left"></i> Ir para Login
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Obter token da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get("token");
+
+      if (!token) {
+        showError("Token de verificação não encontrado na URL");
+      } else {
+        verificarEmail(token);
+      }
+
+      async function verificarEmail(token) {
+        try {
+          const formData = new FormData();
+          formData.append("op", "1");
+          formData.append("token", token);
+
+          const response = await fetch(
+            "src/controller/controllerVerificarEmail.php",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          const result = await response.json();
+
+          if (result.flag) {
+            showSuccess(result.msg);
+          } else {
+            showError(result.msg);
+          }
+        } catch (error) {
+          console.error("Erro:", error);
+          showError("Erro ao processar verificação. Tente novamente.");
+        }
+      }
+
+      function showSuccess(message) {
+        document.getElementById("statusMessage").textContent =
+          "Email Verificado!";
+        document.getElementById("resultContainer").innerHTML = `
+            <div style="color: #22c55e; margin-bottom: 20px;">
+                <i class="fas fa-check-circle" style="font-size: 64px;"></i>
+            </div>
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">${message}</p>
+            <p style="color: #6b7280; font-size: 14px; margin-top: 15px;">Pode agora fazer login com as suas credenciais.</p>
+        `;
+        document.getElementById("actionLinks").style.display = "block";
+
+        // Redirecionar automaticamente após 3 segundos
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 3000);
+      }
+
+      function showError(message) {
+        document.getElementById("statusMessage").textContent =
+          "Erro na Verificação";
+        document.getElementById("resultContainer").innerHTML = `
+            <div style="color: #ef4444; margin-bottom: 20px;">
+                <i class="fas fa-times-circle" style="font-size: 64px;"></i>
+            </div>
+            <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">${message}</p>
+            <button onclick="reenviarEmail()" class="btn-primary" style="margin-top: 20px; display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                <i class="fas fa-envelope"></i> Reenviar Email de Verificação
+            </button>
+        `;
+        document.getElementById("actionLinks").style.display = "block";
+      }
+
+      function reenviarEmail() {
+        window.location.href = "reenviar_verificacao.html";
+      }
+    </script>
+  </body>
+</html>

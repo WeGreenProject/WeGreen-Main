@@ -1,10 +1,4 @@
 <?php
-/**
- * EmailService - Serviço de envio de emails com Brevo (SendinBlue)
- *
- * Responsável por enviar emails transacionais para clientes e anunciantes
- * utilizando PHPMailer e configuração do Brevo SMTP.
- */
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -144,7 +138,17 @@ class EmailService {
             'confirmacao_encomenda' => '✅ Confirmação de Encomenda - WeGreen',
             'nova_encomenda_anunciante' => '🛒 Nova Encomenda Recebida - WeGreen',
             'encomenda_enviada' => '📦 Encomenda Enviada - WeGreen',
-            'encomenda_entregue' => '✓ Encomenda Entregue - WeGreen'
+            'encomenda_entregue' => '✓ Encomenda Entregue - WeGreen',
+            'boas_vindas' => '🎉 Bem-vindo ao WeGreen',
+            'reset_password' => '🔑 Recuperação de Password - WeGreen',
+            'verificacao_email' => '✉️ Verificação de Email - WeGreen',
+            'conta_criada_admin' => '✅ A sua conta WeGreen foi criada',
+            // Novos templates de devoluções
+            'devolucao_solicitada' => '📦 Pedido de Devolução Registado - WeGreen',
+            'devolucao_aprovada' => '✅ Devolução Aprovada - WeGreen',
+            'devolucao_rejeitada' => '❌ Devolução Não Aprovada - WeGreen',
+            'reembolso_processado' => '💰 Reembolso Processado - WeGreen',
+            'nova_devolucao_anunciante' => '⚠️ Nova Devolução Solicitada - WeGreen'
         ];
 
         $subject = $subjects[$template] ?? 'Notificação WeGreen';
@@ -193,6 +197,156 @@ class EmailService {
     }
 
     /**
+     * Envia email de boas-vindas após registo de utilizador
+     *
+     * @param string $email Email do utilizador
+     * @param string $nome Nome do utilizador
+     * @param string $data_criacao Data de criação da conta (opcional)
+     * @return bool True se enviado com sucesso
+     */
+    public function sendBoasVindas($email, $nome, $data_criacao = null) {
+        $subject = '🎉 Bem-vindo ao WeGreen';
+
+        // Dados para o template
+        $data = [
+            'nome_utilizador' => $nome,
+            'email_utilizador' => $email,
+            'data_criacao' => $data_criacao ?? date('Y-m-d'),
+            'url_login' => 'http://localhost/WeGreen-Main/login.html'
+        ];
+
+        // Carregar template
+        $templatePath = $this->config['templates']['base_path'] . 'boas_vindas.php';
+
+        if (!file_exists($templatePath)) {
+            error_log("Template de boas-vindas não encontrado: {$templatePath}");
+            return false;
+        }
+
+        // Extrair variáveis para o template
+        extract($data);
+
+        // Capturar output do template
+        ob_start();
+        include $templatePath;
+        $htmlBody = ob_get_clean();
+
+        return $this->send($email, $subject, $htmlBody);
+    }
+
+    /**
+     * Envia email de verificação de conta
+     *
+     * @param string $email Email do utilizador
+     * @param string $nome Nome do utilizador
+     * @param string $link_verificacao Link para verificar email
+     * @return bool True se enviado com sucesso
+     */
+    public function sendVerificacaoEmail($email, $nome, $link_verificacao) {
+        $subject = '✉️ Verificação de Email - WeGreen';
+
+        // Dados para o template
+        $data = [
+            'nome_utilizador' => $nome,
+            'link_verificacao' => $link_verificacao
+        ];
+
+        // Carregar template
+        $templatePath = $this->config['templates']['base_path'] . 'verificacao_email.php';
+
+        if (!file_exists($templatePath)) {
+            error_log("Template de verificação de email não encontrado: {$templatePath}");
+            return false;
+        }
+
+        // Extrair variáveis para o template
+        extract($data);
+
+        // Capturar output do template
+        ob_start();
+        include $templatePath;
+        $htmlBody = ob_get_clean();
+
+        return $this->send($email, $subject, $htmlBody);
+    }
+
+    /**
+     * Envia email de recuperação de password
+     *
+     * @param string $email Email do utilizador
+     * @param string $nome Nome do utilizador
+     * @param string $reset_link Link para redefinir password
+     * @return bool True se enviado com sucesso
+     */
+    public function sendResetPassword($email, $nome, $reset_link) {
+        $subject = '🔑 Recuperação de Password - WeGreen';
+
+        // Dados para o template
+        $data = [
+            'nome_utilizador' => $nome,
+            'reset_link' => $reset_link
+        ];
+
+        // Carregar template
+        $templatePath = $this->config['templates']['base_path'] . 'reset_password.php';
+
+        if (!file_exists($templatePath)) {
+            error_log("Template de reset password não encontrado: {$templatePath}");
+            return false;
+        }
+
+        // Extrair variáveis para o template
+        extract($data);
+
+        // Capturar output do template
+        ob_start();
+        include $templatePath;
+        $htmlBody = ob_get_clean();
+
+        return $this->send($email, $subject, $htmlBody);
+    }
+
+    /**
+     * Envia email quando administrador cria conta para utilizador
+     *
+     * @param string $email Email do utilizador
+     * @param string $nome Nome do utilizador
+     * @param string $password_temporaria Password temporária gerada
+     * @param int $tipo_utilizador Tipo de utilizador (1=Admin, 2=Cliente, 3=Anunciante)
+     * @return bool True se enviado com sucesso
+     */
+    public function sendContaCriadaAdmin($email, $nome, $password_temporaria, $tipo_utilizador = 2) {
+        $subject = 'A sua conta WeGreen foi criada';
+
+        // Dados para o template
+        $data = [
+            'nome_utilizador' => $nome,
+            'email_utilizador' => $email,
+            'password_temporaria' => $password_temporaria,
+            'tipo_utilizador' => $tipo_utilizador,
+            'url_login' => 'http://localhost/WeGreen-Main/login.html'
+        ];
+
+        // Carregar template
+        $templatePath = $this->config['templates']['base_path'] . 'conta_criada_admin.php';
+
+        if (!file_exists($templatePath)) {
+            error_log("Template de conta criada por admin não encontrado: {$templatePath}");
+            return false;
+        }
+
+        // Extrair variáveis para o template
+        extract($data);
+
+        // Capturar output do template
+        ob_start();
+        include $templatePath;
+        $htmlBody = ob_get_clean();
+
+        return $this->send($email, $subject, $htmlBody);
+    }
+
+    /**
      * Envia email de teste para validar configuração
      *
      * @param string $to Email de destino
@@ -216,5 +370,70 @@ class EmailService {
         ';
 
         return $this->send($to, $subject, $body);
+    }
+
+    /**
+     * Envia email genérico usando template e verificando preferências do utilizador
+     *
+     * @param string $email Email do destinatário
+     * @param string $template Nome do template (sem .php)
+     * @param array $data Dados para o template
+     * @param int $utilizador_id ID do utilizador (para verificar preferências)
+     * @param string $tipo Tipo de utilizador ('cliente' ou 'anunciante')
+     * @return bool True se enviado com sucesso
+     */
+    public function enviarEmail($email, $template, $data, $utilizador_id = null, $tipo = 'cliente') {
+        // Verificar preferências do utilizador se ID foi fornecido
+        if ($utilizador_id) {
+            $podeEnviar = $this->modelNotificacoes->verificarPreferencias($utilizador_id, $tipo, $template);
+
+            if (!$podeEnviar) {
+                error_log("Email de tipo '{$template}' bloqueado pelas preferências do utilizador ID {$utilizador_id}");
+                return false; // Usuário desativou este tipo de notificação
+            }
+        }
+
+        // Determinar subject baseado no template
+        $subjects = [
+            'confirmacao_encomenda' => '✅ Confirmação de Encomenda - WeGreen',
+            'nova_encomenda_anunciante' => '🛒 Nova Encomenda Recebida - WeGreen',
+            'status_processando' => '⚙️ Encomenda em Processamento - WeGreen',
+            'status_enviado' => '📦 Encomenda Enviada - WeGreen',
+            'status_entregue' => '✅ Encomenda Entregue - WeGreen',
+            'cancelamento' => '❌ Encomenda Cancelada - WeGreen',
+            'encomendas_pendentes_urgentes' => '⚠️ Encomendas Pendentes Urgentes - WeGreen',
+            'boas_vindas' => '🎉 Bem-vindo ao WeGreen',
+            'reset_password' => '🔑 Recuperação de Password - WeGreen',
+            'verificacao_email' => '✉️ Verificação de Email - WeGreen',
+            'conta_criada_admin' => '✅ A sua conta WeGreen foi criada',
+            // Templates de devoluções
+            'devolucao_solicitada' => '📦 Pedido de Devolução Registado - WeGreen',
+            'devolucao_aprovada' => '✅ Devolução Aprovada - WeGreen',
+            'devolucao_rejeitada' => '❌ Devolução Não Aprovada - WeGreen',
+            'reembolso_processado' => '💰 Reembolso Processado - WeGreen',
+            'nova_devolucao_anunciante' => '⚠️ Nova Devolução Solicitada - WeGreen'
+        ];
+
+        $subject = $subjects[$template] ?? 'Notificação WeGreen';
+
+        // Construir caminho do template
+        $templatePath = $template . '.php';
+        $templateFullPath = $this->config['templates']['base_path'] . $templatePath;
+
+        if (!file_exists($templateFullPath)) {
+            error_log("Template não encontrado: {$templateFullPath}");
+            return false;
+        }
+
+        // Extrair variáveis para o template
+        extract($data);
+
+        // Capturar output do template
+        ob_start();
+        include $templateFullPath;
+        $htmlBody = ob_get_clean();
+
+        // Enviar email
+        return $this->send($email, $subject, $htmlBody);
     }
 }

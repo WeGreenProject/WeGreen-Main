@@ -58,6 +58,12 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="gestaoDevolucoesAnunciante.php">
+                            <span class="nav-icon"><i class="fas fa-undo"></i></span>
+                            <span class="nav-text">Devoluções</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="relatoriosAnunciante.php">
                             <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
                             <span class="nav-text">Relatórios</span>
@@ -109,6 +115,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                         <button class="dropdown-item" onclick="showPasswordModal()">
                             <i class="fas fa-key"></i>
                             <span>Alterar Senha</span>
+                        </button>
+                        <button class="dropdown-item" id="btnAlternarConta" onclick="verificarEAlternarConta()" style="display:none;">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span id="textoAlternar">Alternar Conta</span>
                         </button>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item dropdown-item-danger" onclick="logout()">
@@ -196,4 +206,4 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         $(document).ready(function() {
             initDashboardPage();
         });
-    </script>
+    </script>    <script src="src/js/alternancia.js"></script>

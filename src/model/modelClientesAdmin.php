@@ -103,21 +103,43 @@ class ClienteAdmin{
     $msg = "";
     $flag = true;
     $sql = "";
+    
+    // Guardar password em texto claro para enviar por email (apenas para o email)
+    $password_temporaria = $password;
+    $password_hash = md5($password); // Encriptar para guardar na BD
+    
     $resp = $this->uploads($foto, $nome);
     $resp = json_decode($resp, TRUE);
 
     if($resp['flag']){
         $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password, foto) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssisss", $nome, $email, $telefone, $tipo, $nif, $password, $resp['target']);
+        $stmt->bind_param("sssisss", $nome, $email, $telefone, $tipo, $nif, $password_hash, $resp['target']);
     } else {
         $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssiss", $nome, $email, $telefone, $tipo, $nif, $password);
+        $stmt->bind_param("sssiss", $nome, $email, $telefone, $tipo, $nif, $password_hash);
     }
 
     if ($stmt->execute()) {
         $msg = "Cliente registado com sucesso!";
+        
+        // Enviar email com credenciais de acesso
+        try {
+            require_once __DIR__ . '/../services/EmailService.php';
+            $emailService = new EmailService();
+            $emailEnviado = $emailService->sendContaCriadaAdmin($email, $nome, $password_temporaria, $tipo);
+            
+            if ($emailEnviado) {
+                $msg .= " Email enviado com as credenciais de acesso.";
+            } else {
+                $msg .= " Aviso: Email não foi enviado.";
+                error_log("Email de conta criada não foi enviado para {$email}");
+            }
+        } catch (Exception $e) {
+            error_log("Erro ao enviar email de conta criada: " . $e->getMessage());
+            $msg .= " Aviso: Erro ao enviar email.";
+        }
     } else {
         $flag = false;
         $msg = "Error: " . $stmt->error;

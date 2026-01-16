@@ -34,6 +34,8 @@ class Perfil{
                     $msg .= "<li><a class='dropdown-item' href='minhasEncomendas.php'>As Minhas Encomendas</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='#' id='btnAlternarConta' onclick='verificarEAlternarConta()' style='display:none;'>";
+                    $msg .= "<i class='fas fa-exchange-alt'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
                     $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</li>";
                 }
@@ -45,6 +47,8 @@ class Perfil{
                     $msg .= "<li><a class='dropdown-item' href='DashboardAnunciante.php'>Dashboard</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
                     $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='#' id='btnAlternarConta' onclick='verificarEAlternarConta()' style='display:none;'>";
+                    $msg .= "<i class='fas fa-exchange-alt'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
                     $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</a></li>";
                 }
@@ -93,6 +97,70 @@ class Perfil{
          return "src/img/pexels-beccacorreiaph-31095884.jpg";
 
     }
+
+    function verificarContaAlternativa($email, $tipoAtual) {
+        global $conn;
+
+        // Se é anunciante (2), procura cliente (3) e vice-versa
+        $tipoAlternativo = ($tipoAtual == 2) ? 3 : 2;
+
+        $stmt = $conn->prepare("SELECT id, tipo_utilizador_id FROM Utilizadores WHERE email = ? AND tipo_utilizador_id = ?");
+        $stmt->bind_param("si", $email, $tipoAlternativo);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            return json_encode([
+                'existe' => true,
+                'id' => $row['id'],
+                'tipo' => $row['tipo_utilizador_id'],
+                'nome_tipo' => ($row['tipo_utilizador_id'] == 3) ? 'Anunciante' : 'Cliente'
+            ]);
+        }
+
+        $stmt->close();
+        return json_encode(['existe' => false]);
+    }
+
+    function alternarConta($email, $tipoAlvo) {
+        global $conn;
+
+        $stmt = $conn->prepare("SELECT * FROM Utilizadores WHERE email = ? AND tipo_utilizador_id = ?");
+        $stmt->bind_param("si", $email, $tipoAlvo);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $stmt->close();
+
+            // Atualizar sessão (session_start já foi chamado no controller)
+            $_SESSION['utilizador'] = $row['id'];
+            $_SESSION['nome'] = $row['nome'];
+            $_SESSION['tipo'] = $row['tipo_utilizador_id'];
+            $_SESSION['PontosConf'] = $row['pontos_conf'];
+            $_SESSION['foto'] = $row['foto'];
+            $_SESSION['raking'] = $row['ranking_id'];
+            $_SESSION['plano'] = $row['plano_id'];
+            $_SESSION['data'] = $row['data_criacao'];
+            $_SESSION['email'] = $row['email'];
+
+            // Limpar flag de perfil duplo para não redirecionar novamente para escolherConta.php
+            unset($_SESSION['perfil_duplo']);
+
+            return json_encode([
+                'success' => true,
+                'tipo' => $row['tipo_utilizador_id'],
+                'redirect' => ($row['tipo_utilizador_id'] == 3) ? 'DashboardAnunciante.php' : 'DashboardCliente.php'
+            ]);
+        }
+
+        $stmt->close();
+        return json_encode(['success' => false, 'msg' => 'Conta não encontrada']);
+    }
+
     function logout(){
         if (session_status() === PHP_SESSION_NONE) {
             session_start();

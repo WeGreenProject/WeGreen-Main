@@ -200,6 +200,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             initAnalyticsPage();
         });
     </script>
+    <script src="src/js/alternancia.js"></script>
 </body>
 <?php
 }else{

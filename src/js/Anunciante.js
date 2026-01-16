@@ -264,8 +264,8 @@ function renderRecentProducts() {
           stock > 10
             ? '<span style="background: #A6D90C; color: #000; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Em Stock</span>'
             : stock > 0
-            ? '<span style="background: #F59E0B; color: #000; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Baixo</span>'
-            : '<span style="background: #E53E3E; color: #fff; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Esgotado</span>';
+              ? '<span style="background: #F59E0B; color: #000; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Baixo</span>'
+              : '<span style="background: #E53E3E; color: #fff; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Esgotado</span>';
 
         const preco = parseFloat(produto.preco).toLocaleString("pt-PT", {
           minimumFractionDigits: 2,
@@ -743,9 +743,8 @@ function showPage(pageId, target) {
     profile: { titulo: "Meu Perfil", icone: "fa-user" },
   };
   const pagina = paginas[pageId] || paginas["dashboard"];
-  document.getElementById(
-    "pageBreadcrumb"
-  ).innerHTML = `<i class="navbar-icon fas ${pagina.icone}" id="pageIcon"></i> ${pagina.titulo}`;
+  document.getElementById("pageBreadcrumb").innerHTML =
+    `<i class="navbar-icon fas ${pagina.icone}" id="pageIcon"></i> ${pagina.titulo}`;
   document.getElementById("pageIcon").className =
     "navbar-icon fas " + pagina.icone;
 
@@ -2130,8 +2129,8 @@ function criarLinhaEncomenda(encomenda) {
                         <img src="${
                           encomenda.produto_foto || "src/img/no-image.png"
                         }" alt="${
-    encomenda.produto_nome
-  }" class="product-thumb">
+                          encomenda.produto_nome
+                        }" class="product-thumb">
                         <div>
                             <div class="product-name">${
                               encomenda.produto_nome
@@ -2194,6 +2193,7 @@ function atualizarEstatisticasEncomendas(encomendas) {
   ).length;
   const enviadas = encomendas.filter((e) => e.estado === "Enviado").length;
   const entregues = encomendas.filter((e) => e.estado === "Entregue").length;
+  const devolvidas = encomendas.filter((e) => e.estado === "Devolvido").length;
 
   $("#totalPendentesCard").html(`
     <div class='stat-icon'><i class='fas fa-clock' style='color: #A6D90C;'></i></div>
@@ -2242,6 +2242,7 @@ function getStatusClass(estado) {
     Processando: "info",
     Enviado: "primary",
     Entregue: "success",
+    Devolvido: "dark",
     Cancelado: "danger",
     Cancelada: "danger",
   };
@@ -2404,12 +2405,12 @@ function verDetalhesEncomenda(encomendaId) {
                                       encomenda.estado === "Pendente"
                                         ? "⏳"
                                         : encomenda.estado === "Entregue"
-                                        ? "✔️"
-                                        : encomenda.estado === "Enviado"
-                                        ? "🚚"
-                                        : encomenda.estado === "Processando"
-                                        ? "📦"
-                                        : "❌"
+                                          ? "✔️"
+                                          : encomenda.estado === "Enviado"
+                                            ? "🚚"
+                                            : encomenda.estado === "Processando"
+                                              ? "📦"
+                                              : "❌"
                                     }
                                     ${encomenda.estado}
                                 </span>
@@ -2649,8 +2650,8 @@ function verHistoricoEncomenda(encomendaId) {
             <div style="background: #f7fafc; padding: 12px; border-radius: 8px; border-left: 3px solid var(--badge-${statusClass}-color, #6b7280);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <span class="badge badge-${statusClass}" style="font-size: 12px;">${
-            item.estado
-          }</span>
+                  item.estado
+                }</span>
                 <span style="font-size: 12px; color: #718096;">${
                   item.data
                 }</span>

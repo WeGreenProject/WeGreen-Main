@@ -50,6 +50,10 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                         <i class="fas fa-shopping-bag"></i>
                         <span>As Minhas Encomendas</span>
                     </a>
+                    <a href="minhasEncomendas.php#devolucoes" class="menu-item" data-page="returns">
+                        <i class="fas fa-undo"></i>
+                        <span>Minhas Devoluções</span>
+                    </a>
                 </div>
 
                 <div class="menu-section">
@@ -361,6 +365,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
             }
         });
     </script>
+    <script src="src/js/alternancia.js"></script>
 </body>
 
 </html>

@@ -1,67 +1,95 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registe-se - WeGreen</title>
-<link rel="stylesheet" href="src/css/login.css">
-<link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-
-<div class="auth-container">
-    <div class="auth-background">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registe-se - WeGreen</title>
+    <link rel="stylesheet" href="src/css/login.css" />
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-background">
         <div class="gradient-overlay"></div>
         <div class="floating-shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
+          <div class="shape shape-1"></div>
+          <div class="shape shape-2"></div>
+          <div class="shape shape-3"></div>
         </div>
-    </div>
-    <div class="auth-card">
+      </div>
+      <div class="auth-card">
         <div class="auth-header">
-            <div class="logo">
-                <img src="src\img\2-removebg-preview.png" alt="Wegreen" class="logo-img" style="width: auto; height: 40px;">
-            </div>
-            <h1>Inicie Sessão</h1>
-            <p>Junte-se a nós e torne os seus eventos inesquecíveis</p>
+          <div class="logo">
+            <img
+              src="src\img\2-removebg-preview.png"
+              alt="Wegreen"
+              class="logo-img"
+              style="width: auto; height: 40px"
+            />
+          </div>
+          <h1>Inicie Sessão</h1>
+          <p>Junte-se a nós e torne os seus eventos inesquecíveis</p>
         </div>
 
         <form class="auth-form" id="registerForm">
-            <div class="input-group">
-                <div class="input-icon">
-                    <i class="fas fa-user"></i>
-                </div>
-                <input type="text" id="usernameLogin" placeholder="Nome do utilizador" required>
-                <label>Nome</label>
+          <div class="input-group">
+            <div class="input-icon">
+              <i class="fas fa-envelope"></i>
             </div>
-            <div class="input-group">
-                <div class="input-icon">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <input type="password" id="passwordLogin" placeholder="Palavra-chave" required>
-                <label>Password</label>
-                <button type="button" class="toggle-password">
-                    <i class="fas fa-eye"></i>
-                </button>
+            <input type="email" id="emailLogin" placeholder="Email" required />
+            <label>Email</label>
+          </div>
+          <div class="input-group">
+            <div class="input-icon">
+              <i class="fas fa-lock"></i>
             </div>
-
-            <button type="button" id="btnRegister" class="btn-primary" onclick="login1()">
-                <span >Entrar na sua conta</span>
-                <i class="fas fa-arrow-right"></i>
+            <input
+              type="password"
+              id="passwordLogin"
+              placeholder="Palavra-chave"
+              required
+            />
+            <label>Password</label>
+            <button type="button" class="toggle-password">
+              <i class="fas fa-eye"></i>
             </button>
+          </div>
+
+          <div style="text-align: right; margin-bottom: 15px">
+            <a
+              href="recuperar_password.html"
+              class="link-primary"
+              style="font-size: 14px; text-decoration: none"
+            >
+              Esqueceu a password?
+            </a>
+          </div>
+
+          <button
+            type="button"
+            id="btnRegister"
+            class="btn-primary"
+            onclick="login1()"
+          >
+            <span>Entrar na sua conta</span>
+            <i class="fas fa-arrow-right"></i>
+          </button>
         </form>
 
         <div class="auth-footer">
-            <p>Não tem conta? <a href="registar.html" class="link-primary">Crie aqui</a></p>
+          <p>
+            Não tem conta?
+            <a href="registar.html" class="link-primary">Crie aqui</a>
+          </p>
         </div>
+      </div>
     </div>
-</div>
     <script src="src/js/login.js"></script>
-</body>
+  </body>
 </html>
-
