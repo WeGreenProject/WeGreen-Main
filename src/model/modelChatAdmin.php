@@ -200,15 +200,23 @@ function pesquisarChat($pesquisa,$ID_Utilizador){
 
     $msg = "";
 
-    $sql = "SELECT DISTINCT
-    Utilizadores.id as IdUtilizador,
+    $sql = "SELECT
+    Utilizadores.id AS IdUtilizador,
     Utilizadores.nome,
     Utilizadores.foto,
-    MensagensAdmin.mensagem As MensagemCliente
-FROM Utilizadores, MensagensAdmin
-WHERE Utilizadores.id = MensagensAdmin.remetente_id
-AND MensagensAdmin.destinatario_id = $ID_Utilizador
-AND Utilizadores.nome LIKE '%$pesquisa%'
+    MensagensAdmin.mensagem AS MensagemCliente
+FROM Utilizadores
+JOIN MensagensAdmin
+    ON Utilizadores.id = MensagensAdmin.remetente_id
+JOIN (
+    SELECT remetente_id, MAX(created_at) AS ultima_msg
+    FROM MensagensAdmin
+    WHERE destinatario_id = $ID_Utilizador
+    GROUP BY remetente_id
+) ult
+    ON ult.remetente_id = MensagensAdmin.remetente_id
+   AND ult.ultima_msg = MensagensAdmin.created_at
+WHERE Utilizadores.nome LIKE '%$pesquisa%'
 ORDER BY MensagensAdmin.created_at DESC;";
 
     $result1 = $conn->query($sql);
@@ -223,7 +231,6 @@ ORDER BY MensagensAdmin.created_at DESC;";
                     $msg .= "</div>";
                     $msg .= "<div class='conversation-preview'>";
                     $msg .= "". $row['MensagemCliente'] ."";
-                    $msg .= "<span class='conversation-unread'>2</span>";
                     $msg .= "</div>";
                     $msg .= "</div>";
                     $msg .= "</div>";

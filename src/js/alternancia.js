@@ -38,7 +38,7 @@ function verificarEAlternarConta() {
               // Fazer alternância
               $.post(
                 "src/controller/controllerPerfil.php",
-                { op: 13, tipoAlvo: dados.tipo },
+                { op: 15, tipoAlvo: dados.tipo },
                 function (resposta) {
                   try {
                     const resultado = JSON.parse(resposta);

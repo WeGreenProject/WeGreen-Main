@@ -250,7 +250,7 @@ if(!isset($_SESSION['email']) || !isset($_SESSION['perfil_duplo'])){
     <script>
         function selecionarConta(tipo) {
             $.post("src/controller/controllerPerfil.php", {
-                op: 13,
+                op: 15,
                 tipoAlvo: tipo
             }, function(resp) {
                 console.log("Resposta recebida:", resp);
