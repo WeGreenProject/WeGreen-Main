@@ -639,82 +639,59 @@
 <body>
     <header class="header-main text-white w-100 z-3" style="position: fixed; top: 0; left: 0; right: 0; background-color: #000000; z-index: 1030;">
         <div class="container-fluid px-5">
-            <nav class="navbar navbar-expand-lg py-3">
-                
+            <nav class="navbar navbar-expand-lg py-1">
                 <a class="navbar-brand me-4" href="index.html">
-                    <img src="src\img\2-removebg-preview.png" alt="Wegreen Logo" class="logo-img" style="width: auto; height: 30px;">
+                    <img src="src\img\2-removebg-preview.png" alt="Wegreen Logo" class="logo-img">
                 </a>
-                
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse justify-content-start" id="navbarNav">
                     <ul class="navbar-nav mb-2 mb-lg-0">
-                        
-                        <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Mulher</a>
-                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-                                <li><a class="dropdown-item" href="produtosmulher.html">Ver Tudo</a></li>
-                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
-                                <li><a class="dropdown-item" href="#">Tops e T-shirts</a></li>
-                                <li><a class="dropdown-item" href="#">Calças</a></li>
-                                <li><a class="dropdown-item" href="#">Acessórios</a></li>
-                            </ul>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-white fw-bold d-flex align-items-center" href="marketplace.html">
+                                <i class="bi bi-shop me-2"></i>Marketplace
+                            </a>
                         </li>
-                        
-                        <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Homem</a>
-                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-                                <li><a class="dropdown-item" href="produtoshomem.html">Ver Tudo</a></li>
-                                <li><a class="dropdown-item" href="#">Blusas</a></li>
-                                <li><a class="dropdown-item" href="#">Calças</a></li>
-                                <li><a class="dropdown-item" href="#">Calçado</a></li>
-                            </ul>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-white fw-bold d-flex align-items-center" href="sobrenos.html">
+                                <i class="bi bi-info-circle me-2"></i>Sobre Nós
+                            </a>
                         </li>
-
-                        <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Crianças</a>
-                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-                            <li><a class="dropdown-item" href="produtoscriança.html">Ver Tudo</a></li>
-                                <li><a class="dropdown-item" href="#">Blusas</a></li>
-                                <li><a class="dropdown-item" href="#">Casacos</a></li>
-                                <li><a class="dropdown-item" href="#">T-shirts</a></li>
-                                <li><a class="dropdown-item" href="#">Calças</a></li>
-                                <li><a class="dropdown-item" href="#">Vestidos</a></li>
-                                <li><a class="dropdown-item" href="#">Calçado</a></li>
-                            </ul>
-                        </li>
-                        
-                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="produtosDesigner.html">Designers</a></li>
-                        <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="produtoartesao.html">Artesãos</a></li>
-                        
-                        <li class="nav-item dropdown mx-2">
-                            <a class="nav-link dropdown-toggle text-white fw-bold" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Marcas</a>
-                            <ul class="dropdown-menu dropdown-menu-dark rounded-3">
-                                <li><a class="dropdown-item" href="#">Naz</a></li>
-                                <li><a class="dropdown-item" href="#">Nea Vegan Shoes</a></li>
-                                <li><a class="dropdown-item" href="#">PlayUp®</a></li>
-                                <li><a class="dropdown-item" href="#">Vintage for a Cause</a></li>
-                                <li><a class="dropdown-item" href="#">Isto®</a></li>
-                            </ul>
-                        </li>
-                         <li class="nav-item"><a class="nav-link text-white mx-2 fw-bold" href="suporte.html">Suporte</a></li>
-                    </ul>
+                        <li class="nav-item mx-3">
+                            <a class="nav-link text-white fw-bold d-flex align-items-center" href="suporte.html">
+                                <i class="bi bi-headset me-2"></i>Suporte
+                            </a>
                         </li>
                     </ul>
                 </div>
-                
-                <div class="d-flex align-items-center ms-auto">
-                    
-                    <form class="d-flex search-bar me-3" role="search">
-                        <input class="form-control rounded-pill me-2 border-0 bg-secondary bg-opacity-25 text-white" type="search" placeholder="Pesquisar..." aria-label="Pesquisar">
-                        <button class="btn btn-outline-light rounded-pill" type="submit"><i class="bi bi-search"></i></button>
-                    </form>
 
-                    <a class="nav-link text-white mx-2 fs-5" href="checkout.html"><i class="bi bi-bag"></i></a> 
+                <div class="d-flex align-items-center ms-auto gap-2">
+                    <!-- Barra de Pesquisa -->
+                    <div class="search-container">
+                        <form class="search-form" role="search">
+                            <div class="search-input-wrapper">
+                                <i class="bi bi-search search-icon"></i>
+                                <input class="search-input" type="search" placeholder="Pesquisar produtos..." id="searchInput">
+                            </div>
+                        </form>
+                    </div>
 
-                    <div class="nav-item dropdown" id="Perfil_do_Utilizador">
+                    <!-- Carrinho -->
+                    <a class="cart-button" href="Carrinho.html">
+                        <i class="bi bi-bag-fill"></i>
+                        <span class="cart-badge" id="cartCount" style="display: none;">0</span>
+                    </a>
+
+                    <!-- Utilizador -->
+                    <div class="nav-item dropdown user-dropdown">
+                        <a class="nav-link dropdown-toggle user-avatar-btn" href="#" role="button" data-bs-toggle="dropdown">
+                            <img id="FotoPerfil" src="assets/media/avatars/blank.png" class="user-avatar-img" alt="Perfil">
+                            <i class="bi bi-chevron-down ms-1" style="font-size: 12px;"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu" id="PerfilTipo"></ul>
                     </div>
                 </div>
             </nav>
@@ -870,6 +847,6 @@
             </div>
         </div>
     </section>
-
+<script src="src/js/homepage.js"></script>
 </body>
 </html>

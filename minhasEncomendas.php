@@ -46,46 +46,69 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                 <div class="menu-section">
                     <div class="menu-section-title">Menu</div>
                     <a href="DashboardCliente.php" class="menu-item">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard</span>
+                        <i class="fas fa-home"></i>
+                        <span>Início</span>
                     </a>
                     <a href="minhasEncomendas.php" class="menu-item active">
                         <i class="fas fa-shopping-bag"></i>
                         <span>Minhas Encomendas</span>
                     </a>
-                </div>
-
-                <div class="menu-section">
-                    <div class="menu-section-title">Conta</div>
-                    <a href="DashboardCliente.php#settings" class="menu-item">
-                        <i class="fas fa-cog"></i>
-                        <span>Definições</span>
+                    <a href="meusFavoritos.php" class="menu-item">
+                        <i class="fas fa-heart"></i>
+                        <span>Meus Favoritos</span>
+                        <span class="badge" id="favoritosBadge" style="display:none; background:#3cb371; color:white; padding:2px 8px; border-radius:10px; font-size:11px; margin-left:auto;"></span>
                     </a>
-                    <a href="DashboardCliente.php#support" class="menu-item">
-                        <i class="fas fa-headset"></i>
-                        <span>Suporte</span>
+                    <a href="ChatCliente.php" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
                     </a>
                 </div>
             </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="user-avatar">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=3cb371&color=fff" alt="Avatar">
-                    </div>
-                    <div class="user-info">
-                        <h4><?php echo $_SESSION['nome'] ?? 'Utilizador'; ?></h4>
-                        <p><?php echo $_SESSION['email'] ?? 'user@wegreen.pt'; ?></p>
-                    </div>
-                </div>
-                <button class="btn-logout" onclick="logout()">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
         </aside>
 
         <!-- Conteúdo Principal -->
         <main class="main-content">
+            <nav class="top-navbar">
+                <div class="navbar-left">
+                    <h1 class="page-title"><i class="fas fa-shopping-bag"></i> Minhas Encomendas</h1>
+                </div>
+                <div class="navbar-right">
+                    <button class="btn-upgrade-navbar" onclick="window.location.href='planos.php'">
+                        <i class="fas fa-crown"></i> Upgrade
+                    </button>
+                    <div class="navbar-user" id="userMenuBtn">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Cliente'); ?>&background=3cb371&color=fff" alt="User" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Cliente'; ?></span>
+                            <span class="user-role">Cliente</span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Cliente'); ?>&background=3cb371&color=fff" alt="User" class="dropdown-avatar">
+                            <div>
+                                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Cliente'; ?></div>
+                                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? ''; ?></div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="perfilCliente.php">
+                            <i class="fas fa-user"></i>
+                            <span>Meu Perfil</span>
+                        </a>
+                        <a class="dropdown-item" href="alterarSenha.php">
+                            <i class="fas fa-key"></i>
+                            <span>Alterar Senha</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sair</span>
+                        </button>
+                    </div>
+                </div>
+            </nav>
             <div class="page-content">
                 <header class="dashboard-header">
                     <div class="header-title">
@@ -1178,6 +1201,67 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             }
         }
     </style>
+    <script>
+        // Dropdown do usuário
+        $(document).ready(function() {
+            $("#userMenuBtn").on("click", function(e) {
+                e.stopPropagation();
+                $("#userDropdown").toggleClass("active");
+            });
+
+            $(document).on("click", function(e) {
+                if (!$(e.target).closest(".navbar-user").length) {
+                    $("#userDropdown").removeClass("active");
+                }
+            });
+
+            $("#userDropdown").on("click", function(e) {
+                e.stopPropagation();
+            });
+        });
+
+        function showPasswordModal() {
+            Swal.fire({
+                title: 'Alterar Senha',
+                html: `
+                    <input type="password" id="currentPassword" class="swal2-input" placeholder="Senha Atual">
+                    <input type="password" id="newPassword" class="swal2-input" placeholder="Nova Senha">
+                    <input type="password" id="confirmPassword" class="swal2-input" placeholder="Confirmar Nova Senha">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Alterar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#3cb371',
+                preConfirm: () => {
+                    const currentPassword = document.getElementById('currentPassword').value;
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        Swal.showValidationMessage('Preencha todos os campos');
+                        return false;
+                    }
+
+                    if (newPassword !== confirmPassword) {
+                        Swal.showValidationMessage('As senhas não coincidem');
+                        return false;
+                    }
+
+                    if (newPassword.length < 6) {
+                        Swal.showValidationMessage('A senha deve ter pelo menos 6 caracteres');
+                        return false;
+                    }
+
+                    return { currentPassword, newPassword };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('Sucesso', 'Senha alterada com sucesso!', 'success');
+                    $("#userDropdown").removeClass("active");
+                }
+            });
+        }
+    </script>
     <script src="src/js/alternancia.js"></script>
 </body>
 </html>

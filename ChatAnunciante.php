@@ -458,10 +458,10 @@
     <!-- Top Bar -->
     <header class="header-main text-white position-absolute w-100 z-3">
         <div class="container-fluid px-5">
-            <nav class="navbar navbar-expand-lg py-3">
+            <nav class="navbar navbar-expand-lg py-1">
 
                 <a class="navbar-brand me-4" href="index.html">
-                    <img src="src/img/WeGreen-removebg-preview.png" alt="Wegreen Logo" class="logo-img">
+                    <img src="src/img/2-removebg-preview.png" alt="Wegreen Logo" class="logo-img">
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"

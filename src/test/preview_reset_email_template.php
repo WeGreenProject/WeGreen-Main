@@ -1,9 +1,5 @@
 <?php
-/**
- * Preview do template de email de recuperação de password
- */
 
-// Dados de exemplo para preview
 $nome_utilizador = "João Silva";
 $reset_link = "http://localhost/WeGreen-Main/reset_password.html?token=exemplo1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
 

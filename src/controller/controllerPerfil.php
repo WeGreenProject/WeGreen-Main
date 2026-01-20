@@ -4,7 +4,10 @@ session_start();
 
 $func = new Perfil();
 
-if ($_POST['op'] == 1) {
+// Aceitar GET e POST
+$op = isset($_GET['op']) ? $_GET['op'] : (isset($_POST['op']) ? $_POST['op'] : null);
+
+if ($op == 1) {
     if (isset($_SESSION['utilizador']) && isset($_SESSION['tipo']))
     {
         $resp = $func->getDadosTipoPerfil($_SESSION['utilizador'],$_SESSION['tipo']);
@@ -14,9 +17,11 @@ if ($_POST['op'] == 1) {
         echo "<li><a class='dropdown-item' href='login.html'>Entrar na sua conta</a></li>";
     }
 }
-if ($_POST['op'] == 2) {
+if ($op == 2) {
     $resp = $func->logout();
-    echo $resp;
+    // Redirecionar para login após logout
+    header('Location: ../../login.html');
+    exit();
 }
 if ($_POST['op'] == 3) {
     if(isset($_SESSION['utilizador']) && isset($_SESSION['tipo']))
@@ -113,7 +118,7 @@ if ($_POST['op'] == 14) {
     if(isset($_SESSION['utilizador'])) {
 
         $resp = $func->AdicionarMensagemContacto(
-            $_SESSION['utilizador'], 
+            $_SESSION['utilizador'],
             $_POST['mensagemUser']
         );
 
@@ -137,6 +142,40 @@ if ($_POST['op'] == 15) {
         echo $resp;
     } else {
         echo json_encode(['success' => false, 'msg' => 'Dados insuficientes']);
+    }
+}
+
+// Alterar senha
+if ($_POST['op'] == 'alterarSenha') {
+    if(isset($_SESSION['utilizador']) && isset($_POST['senhaAtual']) && isset($_POST['novaSenha'])) {
+        $resp = $func->alterarSenha($_SESSION['utilizador'], $_POST['senhaAtual'], $_POST['novaSenha']);
+        echo $resp;
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Dados insuficientes']);
+    }
+}
+
+// op 12 - Obter dados do perfil do cliente
+if ($_POST['op'] == 12) {
+    if(isset($_SESSION['utilizador'])) {
+        $resp = $func->getDadosPerfilCliente($_SESSION['utilizador']);
+        echo $resp;
+    } else {
+        echo json_encode(['error' => 'Sessão inválida']);
+    }
+}
+
+// op 13 - Atualizar dados de perfil do cliente
+if ($_POST['op'] == 13) {
+    if(isset($_SESSION['utilizador'])) {
+        $nome = $_POST['nome'];
+        $email = $_POST['email'];
+        $nif = isset($_POST['nif']) ? $_POST['nif'] : null;
+        $telefone = isset($_POST['telefone']) ? $_POST['telefone'] : null;
+        $morada = isset($_POST['morada']) ? $_POST['morada'] : null;
+        echo $func->atualizarPerfilCliente($_SESSION['utilizador'], $nome, $email, $telefone, $nif, $morada);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Sessão inválida']);
     }
 }
 ?>

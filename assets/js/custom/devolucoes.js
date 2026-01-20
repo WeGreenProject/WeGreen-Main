@@ -31,25 +31,35 @@ function abrirModalDevolucao(encomenda_id, codigo_encomenda, produto_nome) {
   // Primeiro verifica elegibilidade
   verificarElegibilidadeDevolucao(encomenda_id)
     .done(function (response) {
-      if (response.success && response.data.elegivel) {
+      console.log("Resposta da verificação de elegibilidade:", response);
+
+      if (response.success && response.data && response.data.elegivel) {
         // Mostra modal
         mostrarModalSolicitarDevolucao(
           encomenda_id,
           codigo_encomenda,
-          produto_nome
+          produto_nome,
         );
       } else {
+        // Verificar se há mensagem de erro ou motivo
+        let mensagem = "Esta encomenda não é elegível para devolução.";
+
+        if (response.message) {
+          mensagem = response.message;
+        } else if (response.data && response.data.motivo) {
+          mensagem = response.data.motivo;
+        }
+
         Swal.fire({
           icon: "warning",
           title: "Devolução não disponível",
-          text:
-            response.data.motivo ||
-            "Esta encomenda não é elegível para devolução.",
+          text: mensagem,
           confirmButtonColor: "#f59e0b",
         });
       }
     })
-    .fail(function () {
+    .fail(function (xhr, status, error) {
+      console.error("Erro na requisição:", xhr.responseText);
       Swal.fire({
         icon: "error",
         title: "Erro",
@@ -65,7 +75,7 @@ function abrirModalDevolucao(encomenda_id, codigo_encomenda, produto_nome) {
 function mostrarModalSolicitarDevolucao(
   encomenda_id,
   codigo_encomenda,
-  produto_nome
+  produto_nome,
 ) {
   const modalHTML = `
         <div class="modal fade" id="modalSolicitarDevolucao" tabindex="-1">
@@ -198,7 +208,7 @@ function handleUploadFotos(event) {
   let uploadCompleto = 0;
 
   $("#previewFotos").html(
-    '<div class="text-muted"><i class="bi bi-hourglass-split"></i> Enviando fotos...</div>'
+    '<div class="text-muted"><i class="bi bi-hourglass-split"></i> Enviando fotos...</div>',
   );
 
   Array.from(files).forEach((file, index) => {
@@ -386,7 +396,7 @@ function renderizarTabelaDevolucoes(devolucoes) {
 
   if (devolucoes.length === 0) {
     tbody.html(
-      '<tr><td colspan="7" class="text-center text-muted">Nenhuma devolução encontrada</td></tr>'
+      '<tr><td colspan="7" class="text-center text-muted">Nenhuma devolução encontrada</td></tr>',
     );
     return;
   }

@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marketplace - WeGreen</title>
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="src/css/style.css" />
+
+    <script src="src/js/lib/jquery.js"></script>
+    <script src="src/js/lib/sweatalert.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding-top: 100px;
+        overflow-x: hidden;
+      }
+
+      html {
+        overflow-x: hidden;
+      }
+
+      .marketplace-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        overflow-x: hidden;
+      }
+
+      .row {
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .col-lg-3,
+      .col-lg-9 {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .filters-sidebar {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        height: auto;
+      }
+
+      .filter-section {
+        margin-bottom: 28px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .filter-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      .filter-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .filter-title i {
+        color: #3cb371;
+        font-size: 16px;
+      }
+
+      .filter-option {
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .filter-option:hover {
+        padding-left: 4px;
+      }
+
+      .filter-option input[type="checkbox"],
+      .filter-option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #3cb371;
+      }
+
+      .filter-option label {
+        margin-left: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #4b5563;
+        flex: 1;
+      }
+
+      .filter-option label:hover {
+        color: #3cb371;
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+      }
+
+      .product-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .product-image {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        background: #f5f5f5;
+      }
+
+      .product-info {
+        padding: 18px;
+      }
+
+      .product-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .product-seller {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+      }
+
+      .product-price {
+        font-size: 22px;
+        font-weight: 700;
+        color: #3cb371;
+        margin-bottom: 8px;
+      }
+
+      .product-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(60, 179, 113, 0.95);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .product-badge.designer {
+        background: rgba(139, 69, 19, 0.95);
+      }
+
+      .btn-favorite {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-favorite:hover {
+        background: #fff;
+        transform: scale(1.1);
+      }
+
+      .btn-favorite i {
+        color: #dc2626;
+        font-size: 18px;
+      }
+
+      .marketplace-header {
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      }
+
+      .marketplace-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+      }
+
+      .marketplace-subtitle {
+        font-size: 15px;
+        color: #6b7280;
+      }
+
+      .results-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .results-count {
+        font-size: 14px;
+        color: #6b7280;
+      }
+
+      .sort-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .btn-clear-filters {
+        width: 100%;
+        background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-clear-filters:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(60, 179, 113, 0.3);
+      }
+
+      .price-range {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .price-input {
+        flex: 1;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header
+      class="header-main text-white w-100 z-3"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: #000000;
+        z-index: 1030;
+      "
+    >
+      <div class="container-fluid px-5">
+        <nav class="navbar navbar-expand-lg py-1">
+          <a class="navbar-brand me-4" href="index.html">
+            <img
+              src="src\img\2-removebg-preview.png"
+              alt="Wegreen Logo"
+              class="logo-img"
+            />
+          </a>
+
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div
+            class="collapse navbar-collapse justify-content-start"
+            id="navbarNav"
+          >
+            <ul class="navbar-nav mb-2 mb-lg-0">
+              <li class="nav-item mx-3">
+                <a
+                  class="nav-link text-white fw-bold d-flex align-items-center"
+                  href="marketplace.html"
+                >
+                  <i class="bi bi-shop me-2"></i>Marketplace
+                </a>
+              </li>
+              <li class="nav-item mx-3">
+                <a
+                  class="nav-link text-white fw-bold d-flex align-items-center"
+                  href="sobrenos.html"
+                >
+                  <i class="bi bi-info-circle me-2"></i>Sobre Nós
+                </a>
+              </li>
+              <li class="nav-item mx-3">
+                <a
+                  class="nav-link text-white fw-bold d-flex align-items-center"
+                  href="suporte.html"
+                >
+                  <i class="bi bi-headset me-2"></i>Suporte
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="d-flex align-items-center ms-auto gap-2">
+            <!-- Barra de Pesquisa -->
+            <div class="search-container">
+              <form class="search-form" role="search">
+                <div class="search-input-wrapper">
+                  <i class="bi bi-search search-icon"></i>
+                  <input
+                    class="search-input"
+                    type="search"
+                    placeholder="Pesquisar produtos..."
+                    id="searchInput"
+                  />
+                </div>
+              </form>
+            </div>
+
+            <!-- Carrinho -->
+            <a class="cart-button" href="Carrinho.html">
+              <i class="bi bi-bag-fill"></i>
+              <span class="cart-badge" id="cartCount" style="display: none"
+                >0</span
+              >
+            </a>
+
+            <!-- Utilizador -->
+            <div class="nav-item dropdown user-dropdown">
+              <a
+                class="nav-link dropdown-toggle user-avatar-btn"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <img
+                  id="FotoPerfil"
+                  src="assets/media/avatars/blank.png"
+                  class="user-avatar-img"
+                  alt="Perfil"
+                />
+                <i class="bi bi-chevron-down ms-1" style="font-size: 12px"></i>
+              </a>
+              <ul
+                class="dropdown-menu dropdown-menu-end user-dropdown-menu"
+                id="PerfilTipo"
+              ></ul>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <div class="marketplace-container">
+      <div class="marketplace-header">
+        <h1 class="marketplace-title">
+          <i class="bi bi-shop text-success me-2"></i>Marketplace WeGreen
+        </h1>
+        <p class="marketplace-subtitle">
+          Descobre moda sustentável de designers e particulares
+        </p>
+      </div>
+
+      <div class="row">
+        <!-- Sidebar de Filtros -->
+        <div class="col-lg-3">
+          <div class="filters-sidebar">
+            <!-- Categoria -->
+            <div class="filter-section">
+              <div class="filter-title">
+                <i class="bi bi-tag"></i>
+                Categoria
+              </div>
+              <div class="filter-option">
+                <input
+                  type="radio"
+                  name="category"
+                  value="all"
+                  id="cat-all"
+                  checked
+                />
+                <label for="cat-all">Todos</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="radio"
+                  name="category"
+                  value="mulher"
+                  id="cat-mulher"
+                />
+                <label for="cat-mulher">Mulher</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="radio"
+                  name="category"
+                  value="homem"
+                  id="cat-homem"
+                />
+                <label for="cat-homem">Homem</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="radio"
+                  name="category"
+                  value="crianca"
+                  id="cat-crianca"
+                />
+                <label for="cat-crianca">Criança</label>
+              </div>
+            </div>
+
+            <!-- Tipo de Vendedor -->
+            <div class="filter-section">
+              <div class="filter-title">
+                <i class="bi bi-person-badge"></i>
+                Tipo de Vendedor
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="designer" id="seller-designer" />
+                <label for="seller-designer">Designers</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  value="particular"
+                  id="seller-particular"
+                />
+                <label for="seller-particular">Particulares</label>
+              </div>
+            </div>
+
+            <!-- Tipo de Produto -->
+            <div class="filter-section">
+              <div class="filter-title">
+                <i class="bi bi-shirt"></i>
+                Tipo de Produto
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="vestidos" id="prod-vestidos" />
+                <label for="prod-vestidos">Vestidos</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="calcas" id="prod-calcas" />
+                <label for="prod-calcas">Calças</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="tshirts" id="prod-tshirts" />
+                <label for="prod-tshirts">T-shirts & Tops</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="casacos" id="prod-casacos" />
+                <label for="prod-casacos">Casacos</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="calcado" id="prod-calcado" />
+                <label for="prod-calcado">Calçado</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  value="acessorios"
+                  id="prod-acessorios"
+                />
+                <label for="prod-acessorios">Acessórios</label>
+              </div>
+            </div>
+
+            <!-- Marcas -->
+            <div class="filter-section">
+              <div class="filter-title">
+                <i class="bi bi-award"></i>
+                Marcas
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="naz" id="brand-naz" />
+                <label for="brand-naz">Naz</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="nea" id="brand-nea" />
+                <label for="brand-nea">Nea Vegan Shoes</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="playup" id="brand-playup" />
+                <label for="brand-playup">PlayUp®</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="vintage" id="brand-vintage" />
+                <label for="brand-vintage">Vintage for a Cause</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="isto" id="brand-isto" />
+                <label for="brand-isto">Isto®</label>
+              </div>
+            </div>
+
+            <!-- Preço -->
+            <div class="filter-section">
+              <div class="filter-title">
+                <i class="bi bi-currency-euro"></i>
+                Preço
+              </div>
+              <div class="price-range">
+                <input
+                  type="number"
+                  class="price-input"
+                  placeholder="Min €"
+                  id="priceMin"
+                />
+                <input
+                  type="number"
+                  class="price-input"
+                  placeholder="Max €"
+                  id="priceMax"
+                />
+              </div>
+            </div>
+
+            <!-- Tamanho -->
+            <div class="filter-section">
+              <div class="filter-title">
+                <i class="bi bi-rulers"></i>
+                Tamanho
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="xs" id="size-xs" />
+                <label for="size-xs">XS</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="s" id="size-s" />
+                <label for="size-s">S</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="m" id="size-m" />
+                <label for="size-m">M</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="l" id="size-l" />
+                <label for="size-l">L</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="xl" id="size-xl" />
+                <label for="size-xl">XL</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="xxl" id="size-xxl" />
+                <label for="size-xxl">XXL</label>
+              </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="filter-section">
+              <div class="filter-title">
+                <i class="bi bi-star"></i>
+                Estado
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="novo" id="cond-novo" />
+                <label for="cond-novo">Novo</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="como-novo" id="cond-como-novo" />
+                <label for="cond-como-novo">Como Novo</label>
+              </div>
+              <div class="filter-option">
+                <input type="checkbox" value="usado-bom" id="cond-usado-bom" />
+                <label for="cond-usado-bom">Usado - Bom Estado</label>
+              </div>
+              <div class="filter-option">
+                <input
+                  type="checkbox"
+                  value="usado-aceitavel"
+                  id="cond-usado-aceitavel"
+                />
+                <label for="cond-usado-aceitavel">Usado - Aceitável</label>
+              </div>
+            </div>
+
+            <button class="btn-clear-filters" onclick="clearAllFilters()">
+              <i class="bi bi-x-circle me-2"></i>Limpar Todos os Filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Grid de Produtos -->
+        <div class="col-lg-9">
+          <div class="results-info">
+            <div class="results-count" id="resultsCount">
+              A carregar produtos...
+            </div>
+            <select class="sort-select" id="sortSelect">
+              <option value="relevant">Mais Relevantes</option>
+              <option value="price-asc">Preço: Menor para Maior</option>
+              <option value="price-desc">Preço: Maior para Menor</option>
+              <option value="newest">Mais Recentes</option>
+            </select>
+          </div>
+
+          <div class="products-grid" id="productsGrid">
+            <!-- Produtos carregados via JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="src/js/homepage.js"></script>
+    <script src="src/js/marketplace.js"></script>
+  </body>
+</html>
