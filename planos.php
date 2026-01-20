@@ -43,30 +43,39 @@ if($userType == 1){
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f8f9fa;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
             min-height: 100vh;
-            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
         }
 
         .container {
             max-width: 1400px;
-            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 30px 20px;
         }
 
         .page-header {
             text-align: center;
-            margin-bottom: 50px;
-            color: #1a202c;
+            margin-bottom: 20px;
+            color: #ffffff;
         }
 
         .back-button {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            background: #ffffff;
-            color: #475569;
-            border: 2px solid #e2e8f0;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             padding: 12px 24px;
             border-radius: 12px;
             text-decoration: none;
@@ -75,61 +84,82 @@ if($userType == 1){
             align-items: center;
             gap: 8px;
             transition: all 0.3s ease;
+            z-index: 1000;
         }
 
         .back-button:hover {
-            background: #f8f9fa;
-            border-color: #A6D90C;
-            color: #A6D90C;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
             transform: translateX(-5px);
         }
 
-        .page-header h1 {
-            font-size: 48px;
-            font-weight: 800;
+        .logo-header {
+            text-align: center;
             margin-bottom: 15px;
         }
 
+        .logo-header img {
+            width: auto;
+            height: 28px;
+            filter: brightness(0) invert(1);
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+
         .page-header p {
-            font-size: 20px;
-            color: #64748b;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
         }
 
         .current-plan-banner {
-            background: #ffffff;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px 30px;
-            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-bottom: 25px;
             display: inline-flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             color: #1a202c;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+        }
+
+        .current-plan-banner i {
+            font-size: 16px;
+            color: #3cb371;
         }
 
         .current-plan-banner i {
             font-size: 24px;
-            color: #A6D90C;
+            color: #3cb371;
         }
 
         .plans-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .plan-card {
-            background: #ffffff;
-            border: 3px solid #e2e8f0;
-            border-radius: 24px;
-            padding: 40px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 14px;
+            padding: 20px;
             transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
 
         .plan-card::before {
@@ -138,8 +168,8 @@ if($userType == 1){
             top: 0;
             left: 0;
             right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #A6D90C 0%, #90c207 100%);
+            height: 5px;
+            background: linear-gradient(90deg, #3cb371 0%, #2e8b57 100%);
             transform: scaleX(0);
             transition: transform 0.4s ease;
         }
@@ -149,129 +179,129 @@ if($userType == 1){
         }
 
         .plan-card.featured {
-            border-color: #A6D90C;
-            box-shadow: 0 20px 60px rgba(166, 217, 12, 0.25);
-            transform: scale(1.05);
+            border-color: #3cb371;
+            box-shadow: 0 20px 50px rgba(60, 179, 113, 0.4);
+            transform: scale(1.03);
         }
 
         .plan-card.current-plan {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            border-color: #3cb371;
+            background: linear-gradient(135deg, rgba(60, 179, 113, 0.1) 0%, rgba(255, 255, 255, 0.98) 100%);
         }
 
         .plan-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
         }
 
         .plan-card.featured:hover {
-            transform: scale(1.05) translateY(-10px);
+            transform: scale(1.03) translateY(-8px);
         }
 
         .plan-badge {
             position: absolute;
-            top: 25px;
-            right: 25px;
-            background: linear-gradient(135deg, #A6D90C 0%, #90c207 100%);
-            color: #1a202c;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(166, 217, 12, 0.4);
+            box-shadow: 0 4px 15px rgba(60, 179, 113, 0.5);
         }
 
         .current-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
             color: #ffffff;
         }
 
         .plan-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #A6D90C 0%, #90c207 100%);
-            border-radius: 20px;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
-            color: #1a202c;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 25px rgba(166, 217, 12, 0.3);
+            font-size: 22px;
+            color: #ffffff;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3);
         }
 
         .plan-name {
-            font-size: 28px;
+            font-size: 18px;
             font-weight: 800;
             color: #1a202c;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
         }
 
         .plan-description {
             color: #64748b;
-            font-size: 15px;
-            line-height: 1.7;
-            margin-bottom: 30px;
-            min-height: 70px;
+            font-size: 12px;
+            line-height: 1.4;
+            margin-bottom: 14px;
+            min-height: 40px;
         }
 
         .plan-price {
             display: flex;
             align-items: baseline;
-            gap: 10px;
-            margin-bottom: 30px;
-            padding-bottom: 30px;
+            gap: 5px;
+            margin-bottom: 14px;
+            padding-bottom: 14px;
             border-bottom: 2px solid #f1f5f9;
         }
 
         .plan-price-currency {
-            font-size: 28px;
+            font-size: 18px;
             font-weight: 700;
-            color: #A6D90C;
+            color: #3cb371;
         }
 
         .plan-price-amount {
-            font-size: 52px;
+            font-size: 32px;
             font-weight: 900;
             color: #1a202c;
             line-height: 1;
         }
 
         .plan-price-period {
-            font-size: 16px;
+            font-size: 12px;
             color: #94a3b8;
             font-weight: 600;
         }
 
         .plan-features {
             list-style: none;
-            margin-bottom: 35px;
+            margin-bottom: 15px;
         }
 
         .plan-features li {
-            padding: 14px 0;
+            padding: 6px 0;
             color: #475569;
-            font-size: 15px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
             font-weight: 500;
         }
 
         .plan-features li i {
-            color: #A6D90C;
-            font-size: 18px;
+            color: #3cb371;
+            font-size: 13px;
             flex-shrink: 0;
         }
 
         .plan-button {
             width: 100%;
-            padding: 18px;
+            padding: 10px;
             border: none;
-            border-radius: 14px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -280,14 +310,14 @@ if($userType == 1){
         }
 
         .plan-button-primary {
-            background: linear-gradient(135deg, #A6D90C 0%, #90c207 100%);
-            color: #1a202c;
-            box-shadow: 0 8px 20px rgba(166, 217, 12, 0.3);
+            background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3);
         }
 
         .plan-button-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(166, 217, 12, 0.4);
+            box-shadow: 0 12px 30px rgba(60, 179, 113, 0.4);
         }
 
         .plan-button-secondary {
@@ -300,30 +330,60 @@ if($userType == 1){
         }
 
         .plan-button-current {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
             color: #ffffff;
             cursor: default;
         }
 
         .plan-button:disabled {
-            opacity: 0.5;
+            opacity: 0.7;
             cursor: not-allowed;
         }
 
-        .features-comparison {
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 50px;
-            margin-top: 60px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        /* Scroll personalizado */
+        .container::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .features-comparison h2 {
-            font-size: 32px;
-            font-weight: 800;
-            color: #1a202c;
-            margin-bottom: 30px;
-            text-align: center;
+        .container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+
+            .container {
+                height: auto;
+                overflow-y: visible;
+            }
+
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 32px;
+            }
+
+            .back-button {
+                top: 15px;
+                left: 15px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
         }
 
 
@@ -337,6 +397,10 @@ if($userType == 1){
     </a>
 
     <div class="container">
+        <div class="logo-header">
+            <img src="src/img/2-removebg-preview.png" alt="WeGreen Logo">
+        </div>
+
         <div class="page-header">
             <h1>Escolha o Seu Plano</h1>
             <p>Encontre o plano perfeito para o seu negócio sustentável</p>
@@ -503,11 +567,11 @@ if($userType == 1){
                     <p style="font-size: 16px; margin-bottom: 20px;">
                         Tem certeza que deseja ${price > 0 ? 'fazer upgrade para' : 'escolher'} o <strong>${planName}</strong>?
                     </p>
-                    ${price > 0 ? `<p style="font-size: 24px; color: #A6D90C; font-weight: 700;">€${price.toFixed(2)}/mês</p>` : ''}
+                    ${price > 0 ? `<p style="font-size: 24px; color: #3cb371; font-weight: 700;">€${price.toFixed(2)}/mês</p>` : ''}
                 `,
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#A6D90C',
+                confirmButtonColor: '#3cb371',
                 cancelButtonColor: '#94a3b8',
                 confirmButtonText: price > 0 ? '<i class="fas fa-credit-card"></i> Prosseguir para Pagamento' : '<i class="fas fa-check"></i> Confirmar',
                 cancelButtonText: 'Cancelar'
@@ -540,7 +604,7 @@ if($userType == 1){
                 title: 'Sucesso!',
                 text: 'Plano ativado com sucesso!',
                 icon: 'success',
-                confirmButtonColor: '#A6D90C'
+                confirmButtonColor: '#3cb371'
             }).then(() => {
                 location.reload();
             });

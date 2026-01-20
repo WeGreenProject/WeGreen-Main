@@ -165,6 +165,15 @@ class Perfil{
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        // Limpar todas as variáveis de sessão
+        $_SESSION = array();
+
+        // Destruir o cookie de sessão se existir
+        if (isset($_COOKIE[session_name()])) {
+            setcookie(session_name(), '', time()-3600, '/');
+        }
+
+        // Destruir a sessão
         session_destroy();
 
         return("Obrigado!");
@@ -222,7 +231,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
     if($ID_Anunciante !== null){
         $stmt = $conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
         $stmt->bind_param("iis", $ID_Anunciante, $ID_Consumidor, $mensagem);
-        
+
         if($stmt->execute()) {
             $flag = true;
             $msg = "Mensagem enviada com sucesso!";
@@ -234,10 +243,10 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
         // Utilizador não autenticado
         $remetente = 0;
         $mensagemFull = "Nome: $nome\nEmail: $email\nMensagem: $mensagem";
-        
+
         $stmt = $conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
         $stmt->bind_param("iis", $remetente, $ID_Consumidor, $mensagemFull);
-        
+
         if($stmt->execute()) {
             $flag = true;
             $msg = "Mensagem enviada com sucesso!";
@@ -246,7 +255,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
             $msg = "Erro ao enviar mensagem.";
         }
     }
-    
+
     $resp = json_encode([
         "flag" => $flag,
         "msg" => $msg
@@ -666,5 +675,131 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
     return ($msg);
 
 }
+
+    // Buscar dados do perfil do cliente
+    function getDadosPerfilCliente($ID_User) {
+        global $conn;
+
+        $sql = "SELECT u.id, u.nome, u.apelido, u.email, u.nif, u.telefone, u.morada, u.foto, u.data_criacao
+                FROM Utilizadores u
+                WHERE u.id = ?";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            // Juntar nome e apelido
+            $nomeCompleto = trim($row['nome'] . ' ' . ($row['apelido'] ?? ''));
+            $row['nome_completo'] = $nomeCompleto;
+
+            $stmt->close();
+            return json_encode($row);
+        }
+
+        $stmt->close();
+        return json_encode(['error' => 'Utilizador não encontrado']);
+    }
+
+    // Atualizar dados do perfil do cliente
+    function atualizarPerfilCliente($ID_User, $nome, $email, $telefone = null, $nif = null, $morada = null) {
+        global $conn;
+
+        // Validações
+        if (empty($nome) || strlen($nome) < 3) {
+            return json_encode(['success' => false, 'message' => 'Nome deve ter no mínimo 3 caracteres']);
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return json_encode(['success' => false, 'message' => 'Email inválido']);
+        }
+
+        if (!empty($nif) && !preg_match('/^[0-9]{9}$/', $nif)) {
+            return json_encode(['success' => false, 'message' => 'NIF deve conter exatamente 9 dígitos']);
+        }
+
+        if (!empty($telefone) && !preg_match('/^[0-9]{9}$/', $telefone)) {
+            return json_encode(['success' => false, 'message' => 'Telefone deve conter exatamente 9 dígitos']);
+        }
+
+        // Verificar se email já existe (exceto o próprio utilizador)
+        $sqlCheck = "SELECT id FROM utilizadores WHERE email = ? AND id != ?";
+        $stmtCheck = $conn->prepare($sqlCheck);
+        $stmtCheck->bind_param("si", $email, $ID_User);
+        $stmtCheck->execute();
+        $resultCheck = $stmtCheck->get_result();
+
+        if ($resultCheck->num_rows > 0) {
+            $stmtCheck->close();
+            return json_encode(['success' => false, 'message' => 'Email já está em uso']);
+        }
+        $stmtCheck->close();
+
+        // Separar nome e apelido
+        $partesNome = explode(' ', trim($nome), 2);
+        $primeiroNome = $partesNome[0];
+        $apelido = isset($partesNome[1]) ? $partesNome[1] : null;
+
+        // Atualizar dados
+        $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $ID_User);
+
+        if ($stmt->execute()) {
+            // Atualizar sessão
+            $_SESSION['nome'] = $primeiroNome;
+            $_SESSION['email'] = $email;
+
+            $stmt->close();
+            return json_encode(['success' => true, 'message' => 'Perfil atualizado com sucesso']);
+        }
+
+        $stmt->close();
+        return json_encode(['success' => false, 'message' => 'Erro ao atualizar perfil']);
+    }
+
+    // Alterar senha do utilizador
+    function alterarSenha($idUser, $senhaAtual, $novaSenha) {
+        global $conn;
+
+        // Verificar senha atual
+        $sql = "SELECT password FROM Utilizadores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $idUser);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+
+            // Verificar se a senha atual está correta
+            if(password_verify($senhaAtual, $row['password'])) {
+                // Hash da nova senha
+                $novaSenhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
+
+                // Atualizar senha
+                $sqlUpdate = "UPDATE Utilizadores SET password = ? WHERE id = ?";
+                $stmtUpdate = $conn->prepare($sqlUpdate);
+                $stmtUpdate->bind_param("si", $novaSenhaHash, $idUser);
+
+                if($stmtUpdate->execute()) {
+                    $stmt->close();
+                    $stmtUpdate->close();
+                    return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso!']);
+                } else {
+                    $stmt->close();
+                    $stmtUpdate->close();
+                    return json_encode(['success' => false, 'message' => 'Erro ao atualizar a senha.']);
+                }
+            } else {
+                $stmt->close();
+                return json_encode(['success' => false, 'message' => 'Senha atual incorreta.']);
+            }
+        } else {
+            $stmt->close();
+            return json_encode(['success' => false, 'message' => 'Utilizador não encontrado.']);
+        }
+    }
 }
 ?>

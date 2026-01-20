@@ -28,7 +28,7 @@ function removerDoCarrinho(produto_id) {
           Swal.fire(
             "Removido!",
             "O produto foi removido do carrinho.",
-            "success"
+            "success",
           );
           loadCarrinho(); // Recarregar carrinho
         })
@@ -277,7 +277,7 @@ function loadCarrinho() {
         displayCarrinho(data.produtos, data.total);
       } else {
         $("#cartItemsStep1").html(
-          '<p class="text-center text-muted py-4">O carrinho está vazio.</p>'
+          '<p class="text-center text-muted py-4">O carrinho está vazio.</p>',
         );
       }
     })
@@ -343,7 +343,7 @@ function setQuantidade(produtoId, novaQuantidade) {
   }
 
   const currentQty = parseInt(
-    $("#qty-" + produtoId).data("original-qty") || $("#qty-" + produtoId).val()
+    $("#qty-" + produtoId).data("original-qty") || $("#qty-" + produtoId).val(),
   );
   const mudanca = qty - currentQty;
 
@@ -469,12 +469,12 @@ function displayCarrinho(items, total) {
                   item.id
                 }">
                     <img src="${item.foto}" alt="${
-        item.nome
-      }" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" />
+                      item.nome
+                    }" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;" />
                     <div class="ms-3 flex-grow-1">
                         <h6 class="mb-1">${item.nome}</h6>
                         <p class="text-muted mb-1">Preço unitário: ${parseFloat(
-                          item.preco
+                          item.preco,
                         )
                           .toFixed(2)
                           .replace(".", ",")} €</p>
@@ -509,10 +509,10 @@ function displayCarrinho(items, total) {
                     </div>
                     <div class="text-end d-flex flex-column align-items-end gap-2">
                         <strong class="item-total" id="total-${item.id}">${(
-        item.preco * item.quantidade
-      )
-        .toFixed(2)
-        .replace(".", ",")} €</strong>
+                          item.preco * item.quantidade
+                        )
+                          .toFixed(2)
+                          .replace(".", ",")} €</strong>
                         <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart(${
                           item.id
                         })" title="Remover produto">
@@ -525,7 +525,7 @@ function displayCarrinho(items, total) {
     html += `
             <div class="cart-total mt-3 p-3 bg-success text-white rounded">
                 <h5 class="mb-0">Total: <span id="cart-grand-total">${parseFloat(
-                  total
+                  total,
                 )
                   .toFixed(2)
                   .replace(".", ",")} €</span></h5>
@@ -790,8 +790,8 @@ function displayShippingReview() {
   const html = `
         <div class="shipping-details">
             <p><strong>Nome:</strong> ${shippingInfo.firstName || "N/A"} ${
-    shippingInfo.lastName || "N/A"
-  }</p>
+              shippingInfo.lastName || "N/A"
+            }</p>
             <p><strong>Morada:</strong> ${shippingInfo.address1 || "N/A"}</p>
             ${address2Line}
             <p><strong>Cidade:</strong> ${shippingInfo.city || "N/A"}</p>
@@ -844,7 +844,7 @@ function displayTransportadoraReview() {
               transportadoraNomes[transportadoraId] || "N/A"
             }</p>
             <p><strong>Custo de Envio:</strong> ${parseFloat(
-              transportadoraPrice || 0
+              transportadoraPrice || 0,
             ).toFixed(2)}€</p>
             ${pickupInfo}
         </div>
@@ -867,8 +867,8 @@ function displayCartReview() {
         html += `
                     <div class="cart-item d-flex align-items-center mb-3 p-3 bg-light rounded">
                         <img src="${item.imagem}" alt="${
-          item.nome
-        }" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
+                          item.nome
+                        }" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
                         <div class="ms-3 flex-grow-1">
                             <h6 class="mb-1">${item.nome}</h6>
                             <p class="text-muted mb-0">Qtd: ${
@@ -877,7 +877,7 @@ function displayCartReview() {
                         </div>
                         <div class="text-end">
                             <strong>${(item.preco * item.quantidade).toFixed(
-                              2
+                              2,
                             )}€</strong>
                         </div>
                     </div>
@@ -885,7 +885,7 @@ function displayCartReview() {
       });
 
       const transportadoraPrice = parseFloat(
-        localStorage.getItem("transportadora_price") || 0
+        localStorage.getItem("transportadora_price") || 0,
       );
       const subtotal = parseFloat(data.total);
       const total = subtotal + transportadoraPrice;
@@ -904,7 +904,7 @@ function displayCartReview() {
                     <div class="d-flex justify-content-between">
                         <span class="h5 mb-0">Total:</span>
                         <strong class="h5 mb-0 text-success">${total.toFixed(
-                          2
+                          2,
                         )}€</strong>
                     </div>
                 </div>
@@ -982,29 +982,19 @@ function finalizarPedido() {
 
 // Logout
 function logout() {
-  let dados = new FormData();
-  dados.append("op", 2);
-
-  $.ajax({
-    url: "src/controller/controllerPerfil.php",
-    method: "POST",
-    data: dados,
-    dataType: "html",
-    cache: false,
-    contentType: false,
-    processData: false,
-  }).done(function (msg) {
-    sessionStorage.clear();
-    localStorage.clear();
-    Swal.fire({
-      icon: "success",
-      title: "Sessão Encerrada",
-      text: msg,
-      timer: 2000,
-      showConfirmButton: false,
-    }).then(() => {
-      window.location.href = "index.html";
-    });
+  Swal.fire({
+    title: "Terminar Sessão?",
+    text: "Tem a certeza que pretende sair?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Sim, sair",
+    cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = "src/controller/controllerPerfil.php?op=2";
+    }
   });
 }
 
@@ -1013,7 +1003,7 @@ function updateOrderSummary() {
   const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
   const transportadoraId = localStorage.getItem("transportadora_id");
   const transportadoraPrice = parseFloat(
-    localStorage.getItem("transportadora_price") || 0
+    localStorage.getItem("transportadora_price") || 0,
   );
   const pickupPointName = localStorage.getItem("pickup_point_name");
 
@@ -2015,7 +2005,7 @@ function showPickupMap(transportadoraId) {
   let mapContainer = $("#pickupMapContainer");
   if (mapContainer.length === 0) {
     const shippingInfo = JSON.parse(
-      localStorage.getItem("shippingInfo") || "{}"
+      localStorage.getItem("shippingInfo") || "{}",
     );
     const cityFilter = shippingInfo.state
       ? `<small class="text-muted">Mostrando pontos em <strong>${shippingInfo.state}</strong></small>`
@@ -2035,13 +2025,13 @@ function showPickupMap(transportadoraId) {
   } else {
     // Atualizar subtítulo com cidade filtrada
     const shippingInfo = JSON.parse(
-      localStorage.getItem("shippingInfo") || "{}"
+      localStorage.getItem("shippingInfo") || "{}",
     );
     const cityFilter = shippingInfo.state
       ? `<small class="text-muted">Mostrando pontos em <strong>${shippingInfo.state}</strong></small>`
       : "";
     $(".pickup-subtitle").html(
-      `Selecione o ponto mais próximo de si ${cityFilter}`
+      `Selecione o ponto mais próximo de si ${cityFilter}`,
     );
     mapContainer.show();
   }
@@ -2081,7 +2071,7 @@ function initPickupMap(transportadoraId) {
     if (filteredPoints.length > 0) {
       points = filteredPoints;
       console.log(
-        `Filtrados ${filteredPoints.length} pontos para ${selectedCity}`
+        `Filtrados ${filteredPoints.length} pontos para ${selectedCity}`,
       );
     } else {
       // Se não encontrar pontos para a cidade, mostrar aviso
@@ -2093,7 +2083,7 @@ function initPickupMap(transportadoraId) {
         showConfirmButton: false,
       });
       console.log(
-        `Nenhum ponto encontrado para ${selectedCity}. Mostrando todos.`
+        `Nenhum ponto encontrado para ${selectedCity}. Mostrando todos.`,
       );
     }
   }
@@ -2146,7 +2136,7 @@ function initPickupMap(transportadoraId) {
   // Adicionar marcadores
   points.forEach((point) => {
     const marker = L.marker([point.lat, point.lng], { icon: greenIcon }).addTo(
-      pickupMap
+      pickupMap,
     );
 
     const popupContent = `
@@ -2205,14 +2195,14 @@ function initPickupMap(transportadoraId) {
         const allLngs = [...points.map((p) => p.lng), userLocation.lng];
         const bounds = L.latLngBounds(
           [Math.min(...allLats), Math.min(...allLngs)],
-          [Math.max(...allLats), Math.max(...allLngs)]
+          [Math.max(...allLats), Math.max(...allLngs)],
         );
         pickupMap.fitBounds(bounds, { padding: [50, 50] });
       },
       (error) => {
         console.log("Geolocalização não disponível:", error);
         renderPickupPointsList(points);
-      }
+      },
     );
   } else {
     renderPickupPointsList(points);
@@ -2226,7 +2216,7 @@ function calculateDistances(points, userLoc) {
         userLoc.lat,
         userLoc.lng,
         point.lat,
-        point.lng
+        point.lng,
       );
       return { ...point, distance };
     })
@@ -2252,8 +2242,8 @@ function renderPickupPointsList(points) {
     .map(
       (point) => `
     <div class="pickup-point-item" onclick="focusPickupPoint(${point.lat}, ${
-        point.lng
-      })">
+      point.lng
+    })">
       <div class="pickup-point-icon">
         <i class="bi bi-geo-alt-fill"></i>
       </div>
@@ -2269,7 +2259,7 @@ function renderPickupPointsList(points) {
         ${
           point.distance
             ? `<p class="distance"><i class="bi bi-pin-map"></i> ${point.distance.toFixed(
-                1
+                1,
               )} km de si</p>`
             : ""
         }
@@ -2280,7 +2270,7 @@ function renderPickupPointsList(points) {
         Selecionar
       </button>
     </div>
-  `
+  `,
     )
     .join("");
 

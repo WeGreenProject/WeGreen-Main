@@ -13,7 +13,8 @@ class ModelDevolucoes {
     }
 
     function solicitarDevolucao($encomenda_id, $cliente_id, $motivo, $motivo_detalhe = '', $notas_cliente = '', $fotos = []) {
-        // 1. Verificar elegibilidade
+        try {
+            // 1. Verificar elegibilidade
             $elegibilidade = $this->verificarElegibilidade($encomenda_id, $cliente_id);
             if (!$elegibilidade['elegivel']) {
                 return [
@@ -45,7 +46,7 @@ class ModelDevolucoes {
                 $cliente_id,
                 $encomenda['anunciante_id'],
                 $encomenda['produto_id'],
-                $encomenda['valor_total'],
+                $encomenda['valor'],
                 $motivo,
                 $motivo_detalhe,
                 $notas_cliente,
@@ -90,7 +91,7 @@ class ModelDevolucoes {
      */
     public function verificarElegibilidade($encomenda_id, $cliente_id) {
         // Buscar dados da encomenda
-        $sql = "SELECT e.*, v.valor_total, v.payment_intent_id as payment_id
+        $sql = "SELECT e.*, v.valor, e.payment_id
                 FROM encomendas e
                 LEFT JOIN vendas v ON e.id = v.encomenda_id
                 WHERE e.id = ? AND e.cliente_id = ?";

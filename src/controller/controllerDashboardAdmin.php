@@ -42,7 +42,9 @@ if ($_POST['op'] == 9) {
 }
 if ($_POST['op'] == 10) {
     $resp = $func->logout();
-    echo $resp;
+    // Redirecionar para index após logout
+    header('Location: ../../index.html');
+    exit();
 }
  if ($_POST['op'] == 21) {
     $resp = $func->getAdminPerfil($_SESSION["utilizador"]);

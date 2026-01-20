@@ -24,20 +24,20 @@ $userEmail = $_SESSION['email'] ?? '';
 $plans = [
     1 => [
         'id' => 1,
-        'name' => 'Plano Básico',
+        'name' => 'Plano Essencial Verde',
         'price' => 0,
         'price_id' => null // Plano gratuito não precisa de Stripe
     ],
     2 => [
         'id' => 2,
-        'name' => 'Plano Crescimento',
-        'price' => 19.99,
+        'name' => 'Plano Crescimento Circular',
+        'price' => 25.00,
         'price_id' => 'price_crescimento' // Você precisará criar este Price ID no Stripe Dashboard
     ],
     3 => [
         'id' => 3,
-        'name' => 'Plano Premium',
-        'price' => 49.99,
+        'name' => 'Plano Profissional Eco+',
+        'price' => 100.00,
         'price_id' => 'price_premium' // Você precisará criar este Price ID no Stripe Dashboard
     ]
 ];

@@ -92,6 +92,14 @@ function getProdutosMulher() {
 
     .done(function (msg) {
       $("#ProdutoMulherVenda").html(msg);
+
+      // Verificar quais produtos estão nos favoritos
+      setTimeout(function () {
+        $(".btn-favorito").each(function () {
+          const produtoId = $(this).data("produto-id");
+          verificarFavorito(produtoId, this);
+        });
+      }, 100);
     })
 
     .fail(function (jqXHR, textStatus) {
@@ -200,6 +208,6 @@ $(function () {
     "change",
     function () {
       getProdutosMulher();
-    }
+    },
   );
 });

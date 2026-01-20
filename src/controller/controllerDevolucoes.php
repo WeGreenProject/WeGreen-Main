@@ -6,18 +6,14 @@ $func = new ModelDevolucoes();
 
 header('Content-Type: application/json');
 
-// Verificar se usuário está autenticado
-if (!isset($_SESSION['utilizador'])) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Não autenticado. Faça login.'
-    ]);
-    exit;
-}
-
 // op=1: Solicitar devolução
-if ($_POST['op'] == 1) {
+if (isset($_POST['op']) && $_POST['op'] == 1) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado. Faça login.']);
+            exit;
+        }
+
         $encomenda_id = $_POST['encomenda_id'];
         $motivo = $_POST['motivo'];
         $motivo_detalhe = $_POST['motivo_detalhe'] ?? '';
@@ -50,8 +46,13 @@ if ($_POST['op'] == 1) {
 }
 
 // op=2: Listar devoluções do cliente
-if ($_POST['op'] == 2) {
+if (isset($_POST['op']) && $_POST['op'] == 2) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
         if ($_SESSION['tipo'] != 2) {
             echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
             exit;
@@ -67,8 +68,13 @@ if ($_POST['op'] == 2) {
 }
 
 // op=3: Listar devoluções do anunciante
-if ($_POST['op'] == 3 || $_GET['op'] == 3) {
+if ((isset($_POST['op']) && $_POST['op'] == 4) || (isset($_GET['op']) && $_GET['op'] == 4)) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
         if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 1) {
             echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
             exit;
@@ -85,7 +91,7 @@ if ($_POST['op'] == 3 || $_GET['op'] == 3) {
 }
 
 // op=4: Obter detalhes
-if ($_POST['op'] == 4 || $_GET['op'] == 4) {
+if ((isset($_POST['op']) && $_POST['op'] == 4) || (isset($_GET['op']) && $_GET['op'] == 4)) {
     try {
         $devolucao_id = $_POST['devolucao_id'] ?? $_GET['devolucao_id'];
         $detalhes = $func->obterDetalhes($devolucao_id);
@@ -102,8 +108,13 @@ if ($_POST['op'] == 4 || $_GET['op'] == 4) {
 }
 
 // op=5: Aprovar devolução
-if ($_POST['op'] == 5) {
+if (isset($_POST['op']) && $_POST['op'] == 5) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
         if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 1) {
             echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
             exit;
@@ -122,8 +133,13 @@ if ($_POST['op'] == 5) {
 }
 
 // op=6: Rejeitar devolução
-if ($_POST['op'] == 6) {
+if (isset($_POST['op']) && $_POST['op'] == 6) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
         if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 1) {
             echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
             exit;
@@ -147,8 +163,13 @@ if ($_POST['op'] == 6) {
 }
 
 // op=7: Processar reembolso
-if ($_POST['op'] == 7) {
+if (isset($_POST['op']) && $_POST['op'] == 7) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
         if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 1) {
             echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
             exit;
@@ -164,22 +185,51 @@ if ($_POST['op'] == 7) {
 }
 
 // op=8: Verificar elegibilidade
-if ($_GET['op'] == 8) {
+if (isset($_GET['op']) && $_GET['op'] == 8) {
     try {
+        // Debug: log da requisição
+        error_log("DEBUG op=8: Iniciando verificação de elegibilidade");
+        error_log("DEBUG: GET params: " . print_r($_GET, true));
+        error_log("DEBUG: SESSION: " . print_r($_SESSION, true));
+
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            error_log("DEBUG: Não autenticado");
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
+        if (!isset($_GET['encomenda_id'])) {
+            error_log("DEBUG: ID da encomenda não fornecido");
+            echo json_encode(['success' => false, 'message' => 'ID da encomenda não fornecido.']);
+            exit;
+        }
+
         $encomenda_id = $_GET['encomenda_id'];
         $cliente_id = $_SESSION['utilizador'];
 
+        error_log("DEBUG: encomenda_id=$encomenda_id, cliente_id=$cliente_id");
+
         $elegibilidade = $func->verificarElegibilidade($encomenda_id, $cliente_id);
+
+        error_log("DEBUG: Resultado: " . print_r($elegibilidade, true));
+
         echo json_encode(['success' => true, 'data' => $elegibilidade]);
 
     } catch (Exception $e) {
+        error_log("DEBUG: Exception: " . $e->getMessage());
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
+    exit;
 }
 
 // op=9: Upload de foto
-if ($_POST['op'] == 9) {
+if (isset($_POST['op']) && $_POST['op'] == 9) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
         if (!isset($_FILES['foto']) || $_FILES['foto']['error'] !== UPLOAD_ERR_OK) {
             echo json_encode(['success' => false, 'message' => 'Erro no upload da foto.']);
             exit;
@@ -219,8 +269,13 @@ if ($_POST['op'] == 9) {
 }
 
 // op=10: Estatísticas
-if ($_GET['op'] == 10) {
+if (isset($_GET['op']) && $_GET['op'] == 10) {
     try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
         if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 1) {
             echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
             exit;

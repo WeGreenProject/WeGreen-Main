@@ -15,7 +15,7 @@ function getDadosPlanos() {
           <div class='stat-content'><div class='stat-label'>Plano Atual</div><div class='stat-value'>N/A</div></div>
         `);
       }
-    }
+    },
   ).fail(function (jqXHR, textStatus) {
     console.error("Erro ao carregar Plano:", textStatus);
   });
@@ -31,7 +31,7 @@ function CarregaProdutos() {
         <div class='stat-icon'><i class='fas fa-box' style='color: #A6D90C;'></i></div>
         <div class='stat-content'><div class='stat-label'>Total Produtos</div><div class='stat-value'>${data.total}</div></div>
       `);
-    }
+    },
   ).fail(function (jqXHR, textStatus) {
     console.error("Erro ao carregar Produtos:", textStatus);
   });
@@ -47,7 +47,7 @@ function CarregaPontos() {
         <div class='stat-icon'><i class='fas fa-star' style='color: #A6D90C;'></i></div>
         <div class='stat-content'><div class='stat-label'>Pontos Confiança</div><div class='stat-value'>${data.pontos}</div></div>
       `);
-    }
+    },
   ).fail(function (jqXHR, textStatus) {
     console.error("Erro ao carregar Pontos:", textStatus);
   });
@@ -63,7 +63,7 @@ function getGastos() {
         <div class='stat-icon'><i class='fas fa-wallet' style='color: #A6D90C;'></i></div>
         <div class='stat-content'><div class='stat-label'>Gastos Totais</div><div class='stat-value'>€${gastos}</div></div>
       `);
-    }
+    },
   ).fail(function (jqXHR, textStatus) {
     console.error("Erro ao carregar Gastos:", textStatus);
   });
@@ -338,7 +338,7 @@ function renderRecentProducts() {
     .fail(function (xhr, status, error) {
       console.error("Erro ao carregar produtos recentes:", error);
       $("#recentProducts").html(
-        '<div style="color: #E53E3E; text-align: center; padding: 20px;">Erro ao carregar produtos</div>'
+        '<div style="color: #E53E3E; text-align: center; padding: 20px;">Erro ao carregar produtos</div>',
       );
     });
 }
@@ -515,12 +515,12 @@ function carregarTiposProduto() {
       if (Array.isArray(data)) {
         data.forEach((t) =>
           $("#tipo_produto_id").append(
-            `<option value="${t.id}">${t.descricao}</option>`
-          )
+            `<option value="${t.id}">${t.descricao}</option>`,
+          ),
         );
       }
     },
-    "json"
+    "json",
   );
 }
 
@@ -532,28 +532,28 @@ function loadReportStats() {
     { op: 19, periodo: periodo },
     function (res) {
       $("#totalRevenue").text("€" + parseFloat(res).toFixed(2));
-    }
+    },
   );
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
     { op: 20, periodo: periodo },
     function (res) {
       $("#totalOrders").text(res);
-    }
+    },
   );
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
     { op: 21, periodo: periodo },
     function (res) {
       $("#avgTicket").text("€" + parseFloat(res).toFixed(2));
-    }
+    },
   );
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
     { op: 22, periodo: periodo },
     function (res) {
       $("#profitMargin").text(parseFloat(res).toFixed(2) + "%");
-    }
+    },
   );
 }
 
@@ -594,7 +594,7 @@ function loadCategorySalesChart() {
         },
       });
     },
-    "json"
+    "json",
   );
 }
 
@@ -687,7 +687,7 @@ function loadDailyRevenueChart() {
 
       window.dailyRevenueChart = new Chart(ctx, chartConfig);
     },
-    "json"
+    "json",
   );
 }
 
@@ -718,7 +718,7 @@ function loadReportsTable() {
         },
       });
     },
-    "json"
+    "json",
   );
 }
 
@@ -797,7 +797,7 @@ function visualizarProduto(id) {
                 (f, i) =>
                   `<img src="${f}" onclick="document.getElementById('mainImage').src='${f}'" class="${
                     i === 0 ? "active" : ""
-                  }" />`
+                  }" />`,
               )
               .join("")}
           </div>
@@ -815,7 +815,7 @@ function visualizarProduto(id) {
             <div class="modal-view-left">${galeriaHTML}</div>
             <div class="modal-view-right">
               <div class="info-group"><label>Preço</label><span class="price">€${parseFloat(
-                dados.preco
+                dados.preco,
               ).toFixed(2)}</span></div>
               <div class="info-group"><label>Tipo</label><span>${
                 dados.tipo_descricao || "N/A"
@@ -852,7 +852,7 @@ function visualizarProduto(id) {
         });
       }
     },
-    "json"
+    "json",
   );
 }
 
@@ -867,7 +867,7 @@ function editarProduto(id) {
         Swal.fire("Erro", "Erro ao carregar dados do produto", "error");
       }
     },
-    "json"
+    "json",
   ).fail(function () {
     Swal.fire("Erro", "Erro na requisição", "error");
   });
@@ -891,7 +891,7 @@ function removerProduto(id) {
         function () {
           Swal.fire("Removido!", "Produto removido com sucesso.", "success");
           carregarProdutos();
-        }
+        },
       );
     }
   });
@@ -934,7 +934,7 @@ function removerEmMassa() {
     Swal.fire(
       "Atenção",
       "Selecione pelo menos um produto para remover.",
-      "warning"
+      "warning",
     );
     return;
   }
@@ -963,7 +963,7 @@ function removerEmMassa() {
             Swal.fire(
               "Removido!",
               response.message || "Produtos removidos/desativados com sucesso.",
-              "success"
+              "success",
             ).then(() => {
               // Recarregar a página completa para evitar problemas com DataTables
               window.location.reload();
@@ -972,7 +972,7 @@ function removerEmMassa() {
             Swal.fire(
               "Erro",
               response.message || "Não foi possível remover os produtos.",
-              "error"
+              "error",
             );
           }
         },
@@ -1190,7 +1190,7 @@ function abrirModalProduto(titulo, dados = {}) {
 
         if (files.length + selectedFiles.length > maxPhotos) {
           Swal.showValidationMessage(
-            `Você pode adicionar no máximo ${maxPhotos} fotos`
+            `Você pode adicionar no máximo ${maxPhotos} fotos`,
           );
           e.target.value = "";
           return;
@@ -1371,7 +1371,7 @@ function abrirModalProduto(titulo, dados = {}) {
                         background: #8BC34A !important;
                         transform: scale(1.05);
                       }
-                    `
+                    `,
                     )
                     .appendTo("head");
                 }
@@ -1399,7 +1399,7 @@ function abrirModalProduto(titulo, dados = {}) {
           background: #DC2626 !important;
           transform: scale(1.1);
         }
-      `
+      `,
         )
         .appendTo("head");
     },
@@ -1455,7 +1455,7 @@ function abrirModalProduto(titulo, dados = {}) {
           } catch (e) {
             console.error("Erro ao processar resposta:", e);
             Swal.showValidationMessage(
-              "Erro ao processar resposta do servidor"
+              "Erro ao processar resposta do servidor",
             );
             return false;
           }
@@ -1473,7 +1473,7 @@ function abrirModalProduto(titulo, dados = {}) {
             return true;
           } else {
             Swal.showValidationMessage(
-              dados.message || "Erro ao guardar produto"
+              dados.message || "Erro ao guardar produto",
             );
             return false;
           }
@@ -1481,7 +1481,7 @@ function abrirModalProduto(titulo, dados = {}) {
         .catch((error) => {
           console.error("Erro ao guardar produto:", error);
           Swal.showValidationMessage(
-            "Erro ao guardar produto. Tente novamente."
+            "Erro ao guardar produto. Tente novamente.",
           );
           return false;
         });
@@ -1500,7 +1500,7 @@ function verificarPlanoUpgrade() {
       } else {
         $("#upgradeBtn").hide();
       }
-    }
+    },
   );
 }
 
@@ -1587,7 +1587,7 @@ function carregarPerfil() {
 
         progressoPct = Math.min(
           (pontosProgresso / pontosNecessarios) * 100,
-          100
+          100,
         );
         pontosTexto = `${pontosAtuais} / ${pontosProximoRanking} pontos`;
         proximoRankingInfo = `<span class='badge-next'>Próximo: ${dados.proximo_ranking_nome}</span>`;
@@ -1603,7 +1603,7 @@ function carregarPerfil() {
           <span class='plan-label'>Plano Atual</span>
           <span class='plan-name'>${dados.plano_nome || "Free"}</span>
           <span class='plan-price'>€${parseFloat(
-            dados.plano_preco || 0
+            dados.plano_preco || 0,
           ).toFixed(2)}/mês</span>
         </div>
         <div class='plan-limits'><div class='limit-item'><i class='fas fa-box'></i><span>Produtos: ${
@@ -1626,7 +1626,7 @@ function carregarPerfil() {
         <button class='btn btn-secondary' onclick='showPasswordModal()' style='width: 100%; margin-top: 15px;'><i class='fas fa-lock'></i> Alterar Password</button>
       </div>
     `);
-    }
+    },
   ).fail(function (jqXHR, textStatus, errorThrown) {
     console.error("Erro ao carregar perfil:", textStatus, errorThrown);
     Swal.fire("Erro", "Não foi possível carregar o perfil.", "error");
@@ -1663,7 +1663,7 @@ function guardarDadosPerfil() {
       } else {
         Swal.fire("Erro", dados.message, "error");
       }
-    }
+    },
   );
 }
 
@@ -1781,12 +1781,12 @@ function carregarEstatisticasProdutos() {
             });
           }
         },
-        "json"
+        "json",
       ).fail(function (xhr, status, error) {
         console.error("Erro ao carregar limite:", error, xhr.responseText);
       });
     },
-    "json"
+    "json",
   ).fail(function (xhr, status, error) {
     console.error("Erro ao carregar estatísticas:", error, xhr.responseText);
   });
@@ -1809,12 +1809,12 @@ $(document).ready(function () {
       if (Array.isArray(data)) {
         data.forEach((t) =>
           $("#filterTipo, #tipo_produto_id").append(
-            `<option value="${t.id}">${t.descricao}</option>`
-          )
+            `<option value="${t.id}">${t.descricao}</option>`,
+          ),
         );
       }
     },
-    "json"
+    "json",
   );
 
   $("#filterTipo").on("change", function () {
@@ -1919,7 +1919,7 @@ $(document).ready(function () {
 
   const paginaAtiva = window.location.hash.replace("#", "") || "dashboard";
   const botaoAtivo = document.querySelector(
-    `.nav-link[onclick*="${paginaAtiva}"]`
+    `.nav-link[onclick*="${paginaAtiva}"]`,
   );
   if (botaoAtivo) {
     showPage(paginaAtiva, botaoAtivo);
@@ -1964,7 +1964,7 @@ $(document).ready(function () {
         } else {
           Swal.fire("Erro", dados.message, "error");
         }
-      }
+      },
     );
   });
 });
@@ -1987,7 +1987,7 @@ function carregarEncomendas() {
         console.error("Erro ao carregar encomendas:", e);
         Swal.fire("Erro", "Não foi possível carregar as encomendas", "error");
       }
-    }
+    },
   );
 }
 
@@ -2067,7 +2067,7 @@ function criarLinhaEncomenda(encomenda) {
   const dataEncomenda = new Date(encomenda.data_completa);
   const hoje = new Date();
   const diasDesdeEncomenda = Math.floor(
-    (hoje - dataEncomenda) / (1000 * 60 * 60 * 24)
+    (hoje - dataEncomenda) / (1000 * 60 * 60 * 24),
   );
 
   // Badge "Novo" para últimas 24h
@@ -2098,9 +2098,9 @@ function criarLinhaEncomenda(encomenda) {
   const comissao = encomenda.comissao || 0;
   const lucroLiquido = encomenda.lucro_liquido || 0;
   const lucroTooltip = `Valor Bruto: €${encomenda.valor.toFixed(
-    2
+    2,
   )}\nComissão (6%): €${comissao.toFixed(
-    2
+    2,
   )}\nLucro Líquido: €${lucroLiquido.toFixed(2)}`;
 
   const row = `
@@ -2189,7 +2189,7 @@ function criarLinhaEncomenda(encomenda) {
 function atualizarEstatisticasEncomendas(encomendas) {
   const pendentes = encomendas.filter((e) => e.estado === "Pendente").length;
   const processando = encomendas.filter(
-    (e) => e.estado === "Processando"
+    (e) => e.estado === "Processando",
   ).length;
   const enviadas = encomendas.filter((e) => e.estado === "Enviado").length;
   const entregues = encomendas.filter((e) => e.estado === "Entregue").length;
@@ -2254,7 +2254,7 @@ function aplicarFiltrosEncomendas() {
     "change",
     function () {
       filtrarEncomendas();
-    }
+    },
   );
 }
 
@@ -2279,7 +2279,7 @@ function filtrarEncomendas() {
       const encomendaDate = new Date(
         dataParts[2],
         dataParts[1] - 1,
-        dataParts[0]
+        dataParts[0],
       );
 
       if (dateFrom) {
@@ -2320,7 +2320,7 @@ function verDetalhesEncomenda(encomendaId) {
       const dataEncomenda = new Date(encomenda.data_completa);
       const hoje = new Date();
       const diasDesdeEncomenda = Math.floor(
-        (hoje - dataEncomenda) / (1000 * 60 * 60 * 24)
+        (hoje - dataEncomenda) / (1000 * 60 * 60 * 24),
       );
 
       // Prazo estimado de entrega (3 dias após envio)
@@ -2372,7 +2372,7 @@ function verDetalhesEncomenda(encomendaId) {
                                 }
                                 <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${encomenda.morada.replace(
                                   /'/g,
-                                  "\\'"
+                                  "\\'",
                                 )}')
 .then(() => Swal.fire({icon: 'success', title: 'Copiado!', text: 'Morada copiada para a área de transferência', timer: 1500, showConfirmButton: false}))
 .catch(() => Swal.fire({icon: 'error', title: 'Erro', text: 'Não foi possível copiar', timer: 1500, showConfirmButton: false}))"
@@ -2393,7 +2393,7 @@ function verDetalhesEncomenda(encomendaId) {
                               encomenda.quantidade
                             } un.</p>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #A6D90C; font-weight: bold; font-size: 16px;">€${encomenda.valor.toFixed(
-                              2
+                              2,
                             )}</span></p>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${
                               encomenda.data
@@ -2439,13 +2439,13 @@ function verDetalhesEncomenda(encomendaId) {
                             </h4>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Pagamento:</strong> ${encomenda.payment_method.toUpperCase()}</p>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Bruto:</strong> <span style="font-weight: 600;">€${encomenda.valor.toFixed(
-                              2
+                              2,
                             )}</span></p>
                             <p style="margin: 6px 0; font-size: 15px;"><strong style="color: #2d3748;">Comissão:</strong> <span style="color: #ef4444; font-weight: 600; font-size: 15px;">-€${encomenda.comissao.toFixed(
-                              2
+                              2,
                             )}</span></p>
                             <p style="margin: 6px 0; font-size: 15px;"><strong style="color: #2d3748;">Líquido:</strong> <span style="color: #10b981; font-weight: 700; font-size: 17px;">€${encomenda.lucro_liquido.toFixed(
-                              2
+                              2,
                             )}</span></p>
                         </div>
 
@@ -2490,13 +2490,13 @@ function verDetalhesEncomenda(encomendaId) {
                                     frameborder="0"
                                     style="border:0"
                                     src="https://maps.google.com/maps?q=${encodeURIComponent(
-                                      encomenda.morada
+                                      encomenda.morada,
                                     )}&t=&z=15&ie=UTF8&iwloc=&output=embed"
                                     allowfullscreen>
                                 </iframe>
                                 <div style="padding: 12px; background-color: #f9fafb; text-align: center;">
                                     <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                      encomenda.morada
+                                      encomenda.morada,
                                     )}"
                                        target="_blank"
                                        style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #A6D90C 0%, #8BC708 100%); color: #000; text-decoration: none; font-weight: 700; font-size: 14px; border-radius: 6px; box-shadow: 0 2px 4px rgba(166,217,12,0.3);">
@@ -2518,7 +2518,7 @@ function verDetalhesEncomenda(encomendaId) {
         confirmButtonText: "Fechar",
         confirmButtonColor: "#A6D90C",
       });
-    }
+    },
   );
 }
 
@@ -2569,7 +2569,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
 
       if (status === "Enviado" && !codigoRastreio.trim()) {
         Swal.showValidationMessage(
-          'Código de rastreio é obrigatório ao marcar como "Enviado"'
+          'Código de rastreio é obrigatório ao marcar como "Enviado"',
         );
         return false;
       }
@@ -2606,7 +2606,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
           } else {
             Swal.fire("Erro", dados.message, "error");
           }
-        }
+        },
       ).fail(function () {
         Swal.fire("Erro", "Falha ao comunicar com o servidor", "error");
       });
@@ -2625,7 +2625,7 @@ function verHistoricoEncomenda(encomendaId) {
         Swal.fire(
           "Info",
           "Nenhum histórico encontrado para esta encomenda",
-          "info"
+          "info",
         );
         return;
       }
@@ -2690,7 +2690,7 @@ function verHistoricoEncomenda(encomendaId) {
         confirmButtonText: "Fechar",
         confirmButtonColor: "#A6D90C",
       });
-    }
+    },
   ).fail(function () {
     Swal.fire("Erro", "Falha ao carregar histórico", "error");
   });
@@ -2745,32 +2745,17 @@ function initProfilePage() {
 
 // Função de Logout
 function logout() {
-  let dados = new FormData();
-  dados.append("op", 2);
-
-  $.ajax({
-    url: "src/controller/controllerPerfil.php",
-    method: "POST",
-    data: dados,
-    dataType: "html",
-    cache: false,
-    contentType: false,
-    processData: false,
-  })
-    .done(function (msg) {
-      Swal.fire({
-        icon: "success",
-        title: "Sessão Terminada",
-        text: msg,
-        confirmButtonColor: "#A6D90C",
-        timer: 2000,
-        timerProgressBar: true,
-      }).then(() => {
-        window.location.href = "index.html";
-      });
-    })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Erro ao fazer logout:", textStatus);
-      window.location.href = "index.html";
-    });
+  Swal.fire({
+    title: "Terminar Sessão?",
+    text: "Tem a certeza que pretende sair?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Sim, sair",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#A6D90C",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = "src/controller/controllerPerfil.php?op=2";
+    }
+  });
 }
