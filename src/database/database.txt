@@ -11,6 +11,10 @@ CREATE TABLE `carrinho_itens` (
   `data_atualizacao` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `carrinho_itens`
+--
+
 INSERT INTO `carrinho_itens` (`id`, `utilizador_id`, `produto_id`, `quantidade`, `data_adicao`, `data_atualizacao`) VALUES
 (1, '1', 1, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
 (5, '1', 5, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
@@ -21,10 +25,16 @@ INSERT INTO `carrinho_itens` (`id`, `utilizador_id`, `produto_id`, `quantidade`,
 (18, '3', 9, 1, '2025-12-30 17:58:24', '2025-12-30 23:52:44'),
 (19, '3', 3, 1, '2025-12-30 23:41:40', '2025-12-30 23:52:44'),
 (20, 'temp_69546823d71d2', 1, 1, '2025-12-31 00:02:53', '2025-12-31 00:02:53'),
-(21, '2', 1, 6, '2026-01-01 00:10:47', '2026-01-11 20:39:49'),
+(21, '2', 1, 7, '2026-01-01 00:10:47', '2026-01-20 20:45:35'),
 (27, '2', 6, 5, '2026-01-07 20:40:33', '2026-01-07 20:44:44'),
-(28, '2', 10, 6, '2026-01-07 20:40:38', '2026-01-07 20:44:44');
+(28, '2', 10, 6, '2026-01-07 20:40:38', '2026-01-07 20:44:44'),
+(31, '2', 26, 1, '2026-01-20 20:46:29', '2026-01-20 20:46:29');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `denuncias`
+--
 
 CREATE TABLE `denuncias` (
   `id` int(11) NOT NULL,
@@ -35,6 +45,12 @@ CREATE TABLE `denuncias` (
   `estado` varchar(250) DEFAULT 'Pendente',
   `data_registo` date DEFAULT curdate()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `devolucoes`
+--
 
 CREATE TABLE `devolucoes` (
   `id` int(11) NOT NULL,
@@ -63,6 +79,9 @@ CREATE TABLE `devolucoes` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Acionadores `devolucoes`
+--
 DELIMITER $$
 CREATE TRIGGER `after_devolucao_update` AFTER UPDATE ON `devolucoes` FOR EACH ROW BEGIN
   IF OLD.estado != NEW.estado THEN
@@ -79,6 +98,11 @@ END
 $$
 DELIMITER ;
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `encomendas`
+--
 
 CREATE TABLE `encomendas` (
   `id` int(11) NOT NULL,
@@ -121,6 +145,31 @@ INSERT INTO `encomendas` (`id`, `codigo_encomenda`, `payment_id`, `payment_metho
 (10, 'WG12351', NULL, NULL, 'paid', 7, 4, 2, 3, 2, '2025-12-06', 'Rua dos Cedros 18, Leiria', 'domicilio', NULL, NULL, NULL, 'Cancelada', 'B?sico', NULL, NULL, NULL),
 (11, 'WG12355', NULL, NULL, 'paid', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL);
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `favoritos`
+--
+
+CREATE TABLE `favoritos` (
+  `id` int(11) NOT NULL,
+  `cliente_id` int(11) NOT NULL,
+  `produto_id` int(11) NOT NULL,
+  `data_adicao` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `favoritos`
+--
+
+INSERT INTO `favoritos` (`id`, `cliente_id`, `produto_id`, `data_adicao`) VALUES
+(1, 2, 1, '2026-01-19 17:27:28');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `fornecedores`
+--
 
 CREATE TABLE `fornecedores` (
   `id` int(11) NOT NULL,
@@ -132,6 +181,9 @@ CREATE TABLE `fornecedores` (
   `morada` varchar(250) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `fornecedores`
+--
 
 INSERT INTO `fornecedores` (`id`, `nome`, `descricao`, `tipo_produtos_id`, `email`, `telefone`, `morada`) VALUES
 (1, 'ModaCenter', 'Fornecedor de vestu?rio masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
@@ -140,6 +192,11 @@ INSERT INTO `fornecedores` (`id`, `nome`, `descricao`, `tipo_produtos_id`, `emai
 (4, 'BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
 (5, 'MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `gastos`
+--
 
 CREATE TABLE `gastos` (
   `id` int(11) NOT NULL,
@@ -149,10 +206,18 @@ CREATE TABLE `gastos` (
   `data_registo` date DEFAULT curdate()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `gastos`
+--
 
 INSERT INTO `gastos` (`id`, `anunciante_id`, `valor`, `descricao`, `data_registo`) VALUES
 (1, 3, 50.00, 'Publicidade online', '2025-12-06');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `historico_devolucoes`
+--
 
 CREATE TABLE `historico_devolucoes` (
   `id` int(11) NOT NULL,
@@ -164,6 +229,11 @@ CREATE TABLE `historico_devolucoes` (
   `data_alteracao` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `historico_produtos`
+--
 
 CREATE TABLE `historico_produtos` (
   `id` int(11) NOT NULL,
@@ -173,6 +243,9 @@ CREATE TABLE `historico_produtos` (
   `data_atualizacao` date DEFAULT curdate()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `historico_produtos`
+--
 
 INSERT INTO `historico_produtos` (`id`, `encomenda_id`, `estado_encomenda`, `descricao`, `data_atualizacao`) VALUES
 (1, 2, 'Entregue', 'Produto entregue ao cliente.', '2025-12-06'),
@@ -189,6 +262,11 @@ INSERT INTO `historico_produtos` (`id`, `encomenda_id`, `estado_encomenda`, `des
 (12, 2, 'Cancelado', 'Status alterado para: Cancelado', '2026-01-11'),
 (13, 1, 'Pendente', 'Status alterado para: Pendente', '2026-01-11');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `mensagens`
+--
 
 CREATE TABLE `mensagens` (
   `id` int(11) NOT NULL,
@@ -200,11 +278,19 @@ CREATE TABLE `mensagens` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `mensagens`
+--
 
 INSERT INTO `mensagens` (`id`, `remetente_id`, `destinatario_id`, `produto_id`, `mensagem`, `created_at`, `updated_at`) VALUES
 (1, 3, 2, NULL, 'Ol? Jo?o! O seu pedido j? foi enviado.', '2025-12-06 19:18:55', '2025-12-06 19:18:55'),
 (2, 1, 3, 5, 'Ol? eu sou a Luiza', '2025-12-06 19:18:55', '2025-12-06 19:18:55');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `mensagensadmin`
+--
 
 CREATE TABLE `mensagensadmin` (
   `id` int(11) NOT NULL,
@@ -215,10 +301,36 @@ CREATE TABLE `mensagensadmin` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `mensagensadmin`
+--
 
 INSERT INTO `mensagensadmin` (`id`, `remetente_id`, `destinatario_id`, `mensagem`, `created_at`, `updated_at`) VALUES
-(1, 2, 1, 'Ol? Jo?o! O seu pedido j? foi enviado.', '2025-12-16 22:56:09', '2025-12-16 22:56:09');
+(1, 2, 1, 'Ol? Jo?o! O seu pedido j? foi enviado.', '2025-12-16 22:56:09', '2025-12-16 22:56:09'),
+(2, 3, 2, 'Olá! Bem-vindo à WeGreen. Como posso ajudar?', '2026-01-17 10:00:00', '2026-01-18 21:25:54'),
+(3, 2, 3, 'Olá! Gostaria de saber mais sobre os produtos eco-friendly.', '2026-01-17 10:05:00', '2026-01-18 21:25:54'),
+(4, 3, 2, 'Temos uma grande variedade de produtos sustentáveis. Que tipo procura?', '2026-01-17 10:10:00', '2026-01-18 21:25:54'),
+(5, 2, 3, 'Estou interessado em roupa de algodão orgânico.', '2026-01-17 10:15:00', '2026-01-18 21:25:54'),
+(6, 3, 2, 'Perfeito! Veja nossa coleção de roupa orgânica. Temos peças certificadas.', '2026-01-17 10:20:00', '2026-01-18 21:25:54'),
+(7, 1, 2, 'Olá! Em que posso ajudar?', '2026-01-17 14:00:00', '2026-01-18 21:26:28'),
+(8, 2, 1, 'Olá! Gostaria de saber sobre o estado da minha encomenda.', '2026-01-17 14:05:00', '2026-01-18 21:26:28'),
+(9, 1, 2, 'Claro! Pode fornecer o número da encomenda?', '2026-01-17 14:10:00', '2026-01-18 21:26:28'),
+(10, 2, 1, 'Sim, é a encomenda #12345', '2026-01-17 14:12:00', '2026-01-18 21:26:28'),
+(11, 1, 2, 'Obrigado! A sua encomenda foi enviada ontem e deverá chegar em 2-3 dias úteis.', '2026-01-17 14:15:00', '2026-01-18 21:26:28'),
+(12, 2, 1, 'Perfeito! Muito obrigado pela ajuda! 😊', '2026-01-17 14:20:00', '2026-01-18 21:26:28'),
+(13, 3, 2, 'Olá! Vi que adicionou um dos meus produtos aos favoritos. Posso ajudar?', '2026-01-18 10:00:00', '2026-01-18 21:26:28'),
+(14, 2, 3, 'Olá Maria! Sim, estou interessado no casaco verde. Tem em tamanho M?', '2026-01-18 10:15:00', '2026-01-18 21:26:28'),
+(15, 3, 2, 'Sim, temos em tamanho M! É feito com algodão orgânico certificado. Quer que reserve?', '2026-01-18 10:20:00', '2026-01-18 21:26:28'),
+(16, 2, 3, 'Sim, por favor! Quanto fica com o envio?', '2026-01-18 10:25:00', '2026-01-18 21:26:28'),
+(17, 3, 2, 'O produto custa 45€ e o envio é grátis em encomendas acima de 30€! 🎉', '2026-01-18 10:30:00', '2026-01-18 21:26:28'),
+(29, 2, 1, 'asd', '2026-01-18 21:59:39', '2026-01-18 21:59:39'),
+(30, 2, 1, 'ada', '2026-01-18 22:49:06', '2026-01-18 22:49:06');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `notificacoes_preferencias`
+--
 
 CREATE TABLE `notificacoes_preferencias` (
   `id` int(11) NOT NULL,
@@ -240,6 +352,10 @@ CREATE TABLE `notificacoes_preferencias` (
   `email_nova_devolucao_anunciante` tinyint(1) DEFAULT 1 COMMENT 'Anunciante: Nova devolu????o solicitada'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Prefer?ncias de notifica??es por email dos utilizadores';
 
+--
+-- Extraindo dados da tabela `notificacoes_preferencias`
+--
+
 INSERT INTO `notificacoes_preferencias` (`id`, `user_id`, `tipo_user`, `email_confirmacao`, `email_processando`, `email_enviado`, `email_entregue`, `email_cancelamento`, `email_novas_encomendas_anunciante`, `email_encomendas_urgentes`, `created_at`, `updated_at`, `email_devolucao_solicitada`, `email_devolucao_aprovada`, `email_devolucao_rejeitada`, `email_reembolso_processado`, `email_nova_devolucao_anunciante`) VALUES
 (1, 2, 'cliente', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25', 1, 1, 1, 1, 1),
 (2, 7, 'cliente', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25', 1, 1, 1, 1, 1),
@@ -251,6 +367,11 @@ INSERT INTO `notificacoes_preferencias` (`id`, `user_id`, `tipo_user`, `email_co
 (11, 1, 'anunciante', 1, 1, 1, 1, 1, 1, 1, '2026-01-10 19:41:25', '2026-01-10 19:41:25', 1, 1, 1, 1, 1),
 (12, 3, 'cliente', 1, 1, 1, 1, 1, 1, 1, '2026-01-11 16:21:02', '2026-01-11 16:21:02', 1, 1, 1, 1, 1);
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `password_resets`
+--
 
 CREATE TABLE `password_resets` (
   `id` int(11) NOT NULL COMMENT 'ID único do pedido de reset',
@@ -265,6 +386,11 @@ CREATE TABLE `password_resets` (
   `user_agent` varchar(255) DEFAULT NULL COMMENT 'User agent do browser'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `planos`
+--
 
 CREATE TABLE `planos` (
   `id` int(11) NOT NULL,
@@ -275,12 +401,20 @@ CREATE TABLE `planos` (
   `relatorio_pdf` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `planos`
+--
 
 INSERT INTO `planos` (`id`, `nome`, `preco`, `limite_produtos`, `rastreio_tipo`, `relatorio_pdf`) VALUES
 (1, 'Plano Essencial Verde', 0.00, 5, 'Basico', 0),
 (2, 'Plano Crescimento Circular', 25.00, 10, 'Basico', 1),
 (3, 'Plano Profissional Eco+', 100.00, NULL, 'Avancado', 1);
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `planos_ativos`
+--
 
 CREATE TABLE `planos_ativos` (
   `id` int(11) NOT NULL,
@@ -291,10 +425,18 @@ CREATE TABLE `planos_ativos` (
   `ativo` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `planos_ativos`
+--
 
 INSERT INTO `planos_ativos` (`id`, `anunciante_id`, `plano_id`, `data_inicio`, `data_fim`, `ativo`) VALUES
 (1, 3, 2, '2025-12-06', NULL, 1);
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `produtos`
+--
 
 CREATE TABLE `produtos` (
   `Produto_id` int(11) NOT NULL,
@@ -314,6 +456,9 @@ CREATE TABLE `produtos` (
   `stock` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `produtos`
+--
 
 INSERT INTO `produtos` (`Produto_id`, `nome`, `tipo_produto_id`, `preco`, `foto`, `genero`, `anunciante_id`, `designer_id`, `marca`, `tamanho`, `estado`, `descricao`, `data_criacao`, `ativo`, `stock`) VALUES
 (1, 'Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', 1, NULL, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.', '2025-12-06', 1, 0),
@@ -342,6 +487,11 @@ INSERT INTO `produtos` (`Produto_id`, `nome`, `tipo_produto_id`, `preco`, `foto`
 (25, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10),
 (26, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10);
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `produto_fotos`
+--
 
 CREATE TABLE `produto_fotos` (
   `id` int(11) NOT NULL,
@@ -349,11 +499,19 @@ CREATE TABLE `produto_fotos` (
   `foto` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `produto_fotos`
+--
 
 INSERT INTO `produto_fotos` (`id`, `produto_id`, `foto`) VALUES
 (1, 1, 'src/img/m83296720182_6.avif'),
 (2, 1, 'src/img/m83296720182_5.avif');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `ranking`
+--
 
 CREATE TABLE `ranking` (
   `id` int(11) NOT NULL,
@@ -361,12 +519,20 @@ CREATE TABLE `ranking` (
   `pontos` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `ranking`
+--
 
 INSERT INTO `ranking` (`id`, `nome`, `pontos`) VALUES
 (1, 'Bronze', 0),
 (2, 'Ouro', 50),
 (3, 'Diamante', 150);
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `rendimento`
+--
 
 CREATE TABLE `rendimento` (
   `id` int(11) NOT NULL,
@@ -376,6 +542,9 @@ CREATE TABLE `rendimento` (
   `data_registo` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `rendimento`
+--
 
 INSERT INTO `rendimento` (`id`, `valor`, `anunciante_id`, `descricao`, `data_registo`) VALUES
 (1, 25.00, 3, 'Premium comprado!', '2025-12-06 19:18:55'),
@@ -383,6 +552,12 @@ INSERT INTO `rendimento` (`id`, `valor`, `anunciante_id`, `descricao`, `data_reg
 (3, 25.00, 5, 'Premium comprado!', '2025-12-06 19:18:55'),
 (4, 5.00, NULL, 'Comiss?o cobrada!', '2025-12-06 19:18:55');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura stand-in para vista `stats_devolucoes_anunciante`
+-- (Veja abaixo para a view atual)
+--
 CREATE TABLE `stats_devolucoes_anunciante` (
 `anunciante_id` int(11)
 ,`total_devolucoes` bigint(21)
@@ -393,12 +568,20 @@ CREATE TABLE `stats_devolucoes_anunciante` (
 ,`valor_total_reembolsado` decimal(32,2)
 );
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `tipo_produtos`
+--
 
 CREATE TABLE `tipo_produtos` (
   `id` int(11) NOT NULL,
   `descricao` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Extraindo dados da tabela `tipo_produtos`
+--
 
 INSERT INTO `tipo_produtos` (`id`, `descricao`) VALUES
 (1, 'Roupa'),
@@ -408,33 +591,50 @@ INSERT INTO `tipo_produtos` (`id`, `descricao`) VALUES
 (5, 'Outros'),
 (6, 'Artesanato');
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `tipo_utilizadores`
+--
 
 CREATE TABLE `tipo_utilizadores` (
   `id` int(11) NOT NULL,
   `descricao` varchar(250) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+--
+-- Extraindo dados da tabela `tipo_utilizadores`
+--
 
 INSERT INTO `tipo_utilizadores` (`id`, `descricao`) VALUES
 (1, 'Administrador'),
 (2, 'Cliente'),
 (3, 'Anunciante');
 
+-- --------------------------------------------------------
 
+--
+-- Estrutura da tabela `transportadora`
+--
 
 CREATE TABLE `transportadora` (
   `id` int(11) NOT NULL,
   `nome` enum('CTT','DPD') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+--
+-- Extraindo dados da tabela `transportadora`
+--
 
 INSERT INTO `transportadora` (`id`, `nome`) VALUES
 (1, 'CTT'),
 (2, 'DPD');
 
+-- --------------------------------------------------------
 
+--
+-- Estrutura da tabela `utilizadores`
+--
 
 CREATE TABLE `utilizadores` (
   `id` int(11) NOT NULL,
@@ -456,7 +656,9 @@ CREATE TABLE `utilizadores` (
   `data_criacao` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+--
+-- Extraindo dados da tabela `utilizadores`
+--
 
 INSERT INTO `utilizadores` (`id`, `nome`, `apelido`, `email`, `email_verificado`, `token_verificacao`, `token_expira_em`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`) VALUES
 (1, 'Admin WeGreen', NULL, 'admin@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 3, 3, 200, NULL),
@@ -604,6 +806,17 @@ ALTER TABLE `encomendas`
   ADD KEY `idx_tipo_entrega` (`tipo_entrega`);
 
 --
+-- Índices para tabela `favoritos`
+--
+ALTER TABLE `favoritos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_favorito` (`cliente_id`,`produto_id`),
+  ADD KEY `idx_cliente` (`cliente_id`),
+  ADD KEY `idx_produto` (`produto_id`),
+  ADD KEY `idx_data` (`data_adicao`),
+  ADD KEY `idx_cliente_data` (`cliente_id`,`data_adicao`);
+
+--
 -- Índices para tabela `fornecedores`
 --
 ALTER TABLE `fornecedores`
@@ -745,8 +958,15 @@ ALTER TABLE `vendas`
   ADD KEY `anunciante_id` (`anunciante_id`),
   ADD KEY `produto_id` (`produto_id`);
 
+--
+-- AUTO_INCREMENT de tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `carrinho_itens`
+--
 ALTER TABLE `carrinho_itens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de tabela `denuncias`
@@ -765,6 +985,12 @@ ALTER TABLE `devolucoes`
 --
 ALTER TABLE `encomendas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de tabela `favoritos`
+--
+ALTER TABLE `favoritos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de tabela `fornecedores`
@@ -800,7 +1026,7 @@ ALTER TABLE `mensagens`
 -- AUTO_INCREMENT de tabela `mensagensadmin`
 --
 ALTER TABLE `mensagensadmin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de tabela `notificacoes_preferencias`
@@ -880,6 +1106,13 @@ ALTER TABLE `utilizadores`
 ALTER TABLE `vendas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
+--
+-- Restrições para despejos de tabelas
+--
+
+--
+-- Limitadores para a tabela `carrinho_itens`
+--
 ALTER TABLE `carrinho_itens`
   ADD CONSTRAINT `carrinho_itens_ibfk_2` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`) ON DELETE CASCADE;
 
@@ -899,6 +1132,13 @@ ALTER TABLE `encomendas`
   ADD CONSTRAINT `encomendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`),
   ADD CONSTRAINT `encomendas_ibfk_4` FOREIGN KEY (`transportadora_id`) REFERENCES `transportadora` (`id`),
   ADD CONSTRAINT `encomendas_ibfk_5` FOREIGN KEY (`TipoProdutoNome`) REFERENCES `tipo_produtos` (`id`);
+
+--
+-- Limitadores para a tabela `favoritos`
+--
+ALTER TABLE `favoritos`
+  ADD CONSTRAINT `fk_favorito_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `utilizadores` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_favorito_produto` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`) ON DELETE CASCADE;
 
 --
 -- Limitadores para a tabela `fornecedores`
@@ -987,3 +1227,7 @@ ALTER TABLE `vendas`
   ADD CONSTRAINT `vendas_ibfk_2` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`),
   ADD CONSTRAINT `vendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`);
 COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
