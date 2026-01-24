@@ -30,7 +30,7 @@
             </a>
             <nav>
                 <ul class="nav-menu">
-                    <li class="nav-item">
+                                        <li class="nav-item">
                         <a class="nav-link" href="DashboardAdmin.php">
                             <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                             <span class="nav-text">Dashboard</span>
@@ -66,7 +66,12 @@
                             <span class="nav-text">Gestão de Fornecedores</span>
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="logAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-history"></i></span>
+                            <span class="nav-text">Logs do Sistema</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>

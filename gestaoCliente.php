@@ -37,42 +37,48 @@
                     </a>
                     <nav>
                         <ul class="nav-menu">
-                            <li class="nav-item">
-                                <a class="nav-link" href="DashboardAdmin.php">
-                                    <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                                    <span class="nav-text">Dashboard</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="gestaoProdutosAdmin.php">
-                                    <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                                    <span class="nav-text">Produtos</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link active" href="gestaoCliente.php">
-                                    <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                                    <span class="nav-text">Gestao de Utilizadores</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="gestaoLucros.php">
-                                    <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                                    <span class="nav-text">Gestão de Lucros</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="Chatadmin.php">
-                                    <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                                    <span class="nav-text">Chats</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="fornecedores.php">
-                                    <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                                    <span class="nav-text">Gestão de Fornecedores</span>
-                                </a>
-                            </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="DashboardAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
+                            <span class="nav-text">Produtos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="gestaoCliente.php">
+                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
+                            <span class="nav-text">Gestao de Utilizadores</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestaoLucros.php">
+                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
+                            <span class="nav-text">Gestão de Lucros</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Chatadmin.php">
+                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
+                            <span class="nav-text">Chats</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="fornecedores.php">
+                            <span class="nav-icon"><i class="fas fa-truck"></i></span>
+                            <span class="nav-text">Gestão de Fornecedores</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-history"></i></span>
+                            <span class="nav-text">Logs do Sistema</span>
+                        </a>
+                    </li>
 
                         </ul>
                     </nav>
@@ -81,13 +87,8 @@
                 <main class="main-content">
                     <nav class="top-navbar">
                         <div class="navbar-left">
-<<<<<<< HEAD
-                            <i class="navbar-icon fas fa-chart-line"></i>
-                            <h2 class="navbar-title">Gestão de Clientes</h2>
-=======
                             <i class="navbar-icon fas fa-shopping-bag"></i>
                             <h2 class="navbar-title">Gestão de Utilizadores </h2>
->>>>>>> d55834b (atualizaçºoes do chat)
                         </div>
                         <div class="navbar-right">
                             <button class="navbar-icon-btn">
@@ -121,15 +122,6 @@
 
                         <div class="stats-grid" id="CardTipoutilizadores">
 
-                        </div>
-
-                        <div class="filters">
-                            <select id="filterTipo" onchange="filterTable()">
-                                <option value="">Todos os Tipos</option>
-                                <option value="1">Administrador</option>
-                                <option value="2">Cliente</option>
-                                <option value="3">Anunciante</option>
-                            </select>
                         </div>
 
                         <div class="table-container">
