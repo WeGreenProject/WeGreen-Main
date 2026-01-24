@@ -24,22 +24,22 @@
   border-color: #3cb371;
 }
 
-/* Estilos da Navegação - NAVBAR BRANCO COM TEXTO PRETO */
+/* Estilos da Navegação - NAVBAR PRETO COM TEXTO BRANCO */
 .header-main {
-  top: 2.2rem;
+  top: 0 !important;
   background-color: #000000 !important;
 }
 
 .header-main .nav-link {
-  color: #000000 !important;
+  color: #ffffff !important;
 }
 
 .header-main .navbar-nav .nav-link {
-  color: #fffefe !important;
+  color: #ffffff !important;
 }
 
 .header-main .dropdown-menu {
-  background-color: #000000 !important;
+  background-color: #ffffff !important;
 }
 
 .header-main .dropdown-item {
@@ -51,20 +51,20 @@
   color: #000000 !important;
 }
 
-/* Ícone do carrinho em verde lima */
+/* Ícone do carrinho em branco */
 .header-main .bi-bag {
-  color: #6b8e23 !important;
+  color: #ffffff !important;
   font-size: 1.5rem;
 }
 
 .header-main .btn-outline-light {
-  border-color: #000000 !important;
-  color: #000000 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .header-main .btn-outline-light:hover {
-  background-color: #000000 !important;
-  color: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 .header-main .search-bar .form-control {

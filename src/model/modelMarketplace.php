@@ -3,7 +3,7 @@ require_once __DIR__ . '/connection.php';
 
 class Marketplace {
 
-    function getProdutos($categoria, $tipoVendedor, $tipoProduto, $marca, $precoMin, $precoMax, $tamanho, $estado, $pesquisa, $ordenacao) {
+    function getProdutos($categoria, $tipoVendedor, $tipoProduto, $marca, $precoMin, $precoMax, $tamanho, $estado, $pesquisa, $ordenacao, $limite = null) {
         global $conn;
 
         $sql = "SELECT
@@ -17,8 +17,10 @@ class Marketplace {
                     p.tamanho,
                     p.designer_id,
                     p.anunciante_id,
+                    u.tipo_utilizador_id,
                     CASE
                         WHEN p.designer_id IS NOT NULL THEN 'designer'
+                        WHEN u.tipo_utilizador_id = 4 THEN 'artesao'
                         ELSE 'particular'
                     END as tipo_vendedor,
                     COALESCE(u.nome, 'Vendedor') as nome_vendedor
@@ -40,8 +42,10 @@ class Marketplace {
                 foreach ($tiposArray as $tipo) {
                     if ($tipo == 'designer') {
                         $condicoes[] = "p.designer_id IS NOT NULL";
+                    } elseif ($tipo == 'artesao') {
+                        $condicoes[] = "u.tipo_utilizador_id = 4";
                     } elseif ($tipo == 'particular') {
-                        $condicoes[] = "p.designer_id IS NULL";
+                        $condicoes[] = "(p.designer_id IS NULL AND (u.tipo_utilizador_id IS NULL OR u.tipo_utilizador_id != 4))";
                     }
                 }
                 if (!empty($condicoes)) {
@@ -132,8 +136,21 @@ class Marketplace {
             case 'newest':
                 $sql .= " ORDER BY p.Produto_id DESC";
                 break;
+            case 'popular':
+                // Produtos mais vendidos (baseado em vendas)
+                $sql .= " ORDER BY (SELECT COUNT(*) FROM vendas v WHERE v.produto_id = p.Produto_id) DESC, p.Produto_id DESC";
+                break;
+            case 'featured':
+                // Produtos em destaque: designers e artesãos primeiro, depois por preço
+                $sql .= " ORDER BY CASE WHEN p.designer_id IS NOT NULL THEN 1 WHEN u.tipo_utilizador_id = 4 THEN 2 ELSE 3 END, p.preco DESC";
+                break;
             default:
                 $sql .= " ORDER BY p.Produto_id DESC";
+        }
+
+        // Limite de resultados
+        if ($limite !== null && $limite > 0) {
+            $sql .= " LIMIT " . (int)$limite;
         }
 
         $result = $conn->query($sql);

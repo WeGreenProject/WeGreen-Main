@@ -19,38 +19,36 @@ class Perfil{
                     $msg  = "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
                     $msg .= "</div></li>";
-                    $msg .= "<li><a class='dropdown-item' href='DashboardAdmin.php'>Dashboard Administrador</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href='#'>Definições de Perfil</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='DashboardAdmin.php'><i class='fas fa-chart-line me-2'></i>Dashboard</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='perfilAdmin.php'><i class='fas fa-user-cog me-2'></i>Perfil</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</a></li>";
+                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
                 }
                 else if($tpUser == 2)
                 {
                     $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
                     $msg .= "</div></li>";
-                    $msg .= "<li><a class='dropdown-item' href='DashboardCliente.php'>Dashboard</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href='minhasEncomendas.php'>As Minhas Encomendas</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='DashboardCliente.php'><i class='fas fa-home me-2'></i>Dashboard</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='minhasEncomendas.php'><i class='fas fa-shopping-bag me-2'></i>As Minhas Encomendas</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='meusFavoritos.php'><i class='fas fa-heart me-2'></i>Meus Favoritos</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='perfilCliente.php'><i class='fas fa-user-cog me-2'></i>Perfil</a></li>";
                     $msg .= "<li><a class='dropdown-item' href='#' id='btnAlternarConta' onclick='verificarEAlternarConta()' style='display:none;'>";
-                    $msg .= "<i class='fas fa-exchange-alt'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
+                    $msg .= "<i class='fas fa-exchange-alt me-2'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</li>";
+                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'><i class='fas fa-sign-out-alt me-2'></i>Sair</li>";
                 }
                 else if($tpUser == 3)
                 {
                     $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
                     $msg .= "</div></li>";
-                    $msg .= "<li><a class='dropdown-item' href='DashboardAnunciante.php'>Dashboard</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href=''>Definições de Perfil</a></li>";
-                    $msg .= "<li><a class='dropdown-item' href=''>Checkout</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='DashboardAnunciante.php'><i class='fas fa-store me-2'></i>Dashboard</a></li>";
+                    $msg .= "<li><a class='dropdown-item' href='perfilAnunciante.php'><i class='fas fa-user-cog me-2'></i>Perfil</a></li>";
                     $msg .= "<li><a class='dropdown-item' href='#' id='btnAlternarConta' onclick='verificarEAlternarConta()' style='display:none;'>";
-                    $msg .= "<i class='fas fa-exchange-alt'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
+                    $msg .= "<i class='fas fa-exchange-alt me-2'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'>Sair</a></li>";
+                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
                 }
                 else
                 {
@@ -190,29 +188,19 @@ class Perfil{
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
 
-                    $msg .= "<div class='row'>";
-
                     $msg .= "<div class='col-md-6'>";
                     $msg .= "<label class='form-label fw-semibold'>Nome Completo *</label>";
-                    $msg .= "<input type='text' class='form-control form-control-lg' id='nomeUser' value='".$row["nome"]."' disabled>";
+                    $msg .= "<input type='text' class='form-control' id='nomeUser' value='".$row["nome"]."' readonly>";
                     $msg .= "</div>";
 
                     $msg .= "<div class='col-md-6'>";
                     $msg .= "<label class='form-label fw-semibold'>Email *</label>";
-                    $msg .= "<input type='email' class='form-control form-control-lg' id='emailUser' value='".$row["email"]."' disabled>";
-                    $msg .= "</div>";
-
+                    $msg .= "<input type='email' class='form-control' id='emailUser' value='".$row["email"]."' readonly>";
                     $msg .= "</div>";
 
                     $msg .= "<div class='col-12'>";
-                    $msg .= "<label class='form-label fw-semibold'>Mensagem *</label>";
-                    $msg .= "<textarea class='form-control form-control-lg' rows='5' id='mensagemUser' placeholder='Descreva a sua questão ou sugestão...' required></textarea>";
-                    $msg .= "</div>";
-
-                    $msg .= "<div class='col-12 text-center mt-4'>";
-                    $msg .= "<button type='button' class='btn btn-submit-wegreen btn-lg' onclick='AdicionarMensagemContacto()'>";
-                    $msg .= "<i class='bi bi-send me-2'></i> Enviar Mensagem";
-                    $msg .= "</button>";
+                    $msg .= "<label class='form-label fw-semibold'>Assunto *</label>";
+                    $msg .= "<input type='text' class='form-control' id='assuntoContato' required>";
                     $msg .= "</div>";
 
             }
@@ -301,7 +289,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge “Iniciante Sustentável” no perfil</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Taxas reduzidas em categorias ecológicas certificadas.</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold'>Selecionado</a>";
+                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO PREMIUM ===
@@ -309,14 +297,13 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Crescimento Circular</h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>10 produtos ativos</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido </li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Taxas reduzidas em categorias ecológicas certificadas.</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Até 10 produtos ativos</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável: visível (para comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança: visível</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios básicos de vendas e audiência</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Notificações de desempenho: alertas simples sobre produtos com baixa performance ou vendas atípicas</li>";
                 $msg .= "</ul>";
                 $msg .= "<a href='checkout.php?plano=crescimentocircular&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
@@ -326,16 +313,15 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Profissional Eco+ </h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>70€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos Anunciados ilimitados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>>Chat direto com clientes para suporte rápido</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Taxas reduzidas em categorias ecológicas certificadas.</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos ilimitados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável (comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança (visual)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios avançados de impacto ambiental</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ferramentas de fidelização (cupões, packs eco, marketing recorrente)</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='checkout.php?plano=eco&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=eco&preco=70' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>"; // fecha row
@@ -363,7 +349,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos simples</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO PREMIUM ===
@@ -371,15 +357,15 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold mb-3 text-white'>Plano Crescimento Circular</h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>10 produtos ativos</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido </li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Até 10 produtos ativos</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável: visível (para comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança: visível</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios básicos de vendas e audiência</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Notificações de desempenho: alertas simples sobre produtos com baixa performance ou vendas atípicas</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold'>Selecionado</a>";
+                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
@@ -387,15 +373,15 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Profissional Eco+ </h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>70€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos Anunciados ilimitados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos ilimitados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável (comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança (visual)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios avançados de impacto ambiental</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ferramentas de fidelização (cupões, packs eco, marketing recorrente)</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='checkout.php?plano=eco&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=eco&preco=70' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>";
@@ -425,7 +411,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge “Iniciante Sustentável” no perfil</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Taxas reduzidas em categorias ecológicas certificadas.</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO PREMIUM ===
@@ -433,15 +419,15 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Crescimento Circular</h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>10 produtos ativos</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido </li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Até 10 produtos ativos</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável: visível (para comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança: visível</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios básicos de vendas e audiência</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Notificações de desempenho: alertas simples sobre produtos com baixa performance ou vendas atípicas</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='checkout.php?plano=crescimentocircular&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
@@ -449,15 +435,15 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold mb-3 text-white'>Plano Profissional Eco+ </h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>70€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos Anunciados ilimitados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos ilimitados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável (comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança (visual)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios avançados de impacto ambiental</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ferramentas de fidelização (cupões, packs eco, marketing recorrente)</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold'>Selecionado</a>";
+                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>";
@@ -501,13 +487,13 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Crescimento Circular</h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>10 produtos ativos</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido </li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Até 10 produtos ativos</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável: visível (para comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança: visível</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios básicos de vendas e audiência</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Notificações de desempenho</li>";
                 $msg .= "</ul>";
                 $msg .= "<a href='checkout.php?plano=premium&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
@@ -517,15 +503,15 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold mb-3 text-white'>Plano Profissional Eco+ </h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>70€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos Anunciados ilimitados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos ilimitados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável (comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança (visual)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios avançados de impacto ambiental</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ferramentas de fidelização (cupões, packs eco, marketing recorrente)</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='checkout.php?plano=eco&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=eco&preco=70' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>"; // fecha row
@@ -555,22 +541,22 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge “Iniciante Sustentável” no perfil</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Taxas reduzidas em categorias ecológicas certificadas.</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold mb-3 text-white'>Plano Crescimento Circular</h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>10 produtos ativos</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido </li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Até 10 produtos ativos</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável: visível (para comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança: visível</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios básicos de vendas e audiência</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Notificações de desempenho</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold'>Selecionado</a>";
+                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
@@ -578,15 +564,15 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Profissional Eco+ </h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>70€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos Anunciados ilimitados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos ilimitados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável (comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança (visual)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios avançados de impacto ambiental</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ferramentas de fidelização (cupões, packs eco, marketing recorrente)</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='checkout.php?plano=eco&preco=100' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='checkout.php?plano=eco&preco=70' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>";
@@ -616,7 +602,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge “Iniciante Sustentável” no perfil</li>";
                 $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Taxas reduzidas em categorias ecológicas certificadas.</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO PREMIUM ===
@@ -624,31 +610,31 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
                 $msg .= "<h4 class='fw-bold text-wegreen-accent mb-3'>Plano Crescimento Circular</h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês</span></h2>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>25€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>10 produtos ativos</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido </li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Até 10 produtos ativos</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável: visível (para comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança: visível</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios básicos de vendas e audiência</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Notificações de desempenho: alertas simples sobre produtos com baixa performance ou vendas atípicas</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='checkout.php?plano=crescimentocircular&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
+                $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
                 // === PLANO ENTERPRISE ===
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
-                $msg .= "<h4 class='ffw-bold mb-3 text-white'>Plano Profissional Eco+ </h4>";
-                $msg .= "<h2 class='display-5 fw-bold mb-4'>100€<span class='fs-5  fw-bold mb-3 text-whitetext-muted'>/mês</span></h2>";
+                $msg .= "<h4 class='fw-bold mb-3 text-white'>Plano Profissional Eco+ </h4>";
+                $msg .= "<h2 class='display-5 fw-bold mb-4'>70€<span class='fs-5 text-muted'>/mês (30 dias)</span></h2>";
                 $msg .= "<ul class='list-unstyled mb-4 text-start px-4'>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Acesso ao ranking sustentabilidade</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ranking Confiança de Vendas: visualização das métricas individuais de vendas, atendimento e entrega.</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos Anunciados ilimitados</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Chat direto com clientes para suporte rápido</li>";
-                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Histórico completo de vendas, com gráficos avançados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Produtos ilimitados</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Sustentável (comissão)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Badge Confiança (visual)</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Relatórios avançados de impacto ambiental</li>";
+                $msg .= "<li><i class='bi bi-check-circle text-success me-2'></i>Ferramentas de fidelização (cupões, packs eco, marketing recorrente)</li>";
                 $msg .= "</ul>";
-                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold'>Selecionado</a>";
+                $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
                 $msg .= "</div>";

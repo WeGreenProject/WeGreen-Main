@@ -19,6 +19,7 @@ if (isset($_POST['op']) && $_POST['op'] == 1) {
     $estado = isset($_POST["estado"]) ? $_POST["estado"] : null;
     $pesquisa = isset($_POST["pesquisa"]) ? $_POST["pesquisa"] : null;
     $ordenacao = isset($_POST["ordenacao"]) ? $_POST["ordenacao"] : 'relevant';
+    $limite = isset($_POST["limite"]) ? (int)$_POST["limite"] : null;
 
     $resp = $func->getProdutos(
         $categoria,
@@ -30,7 +31,8 @@ if (isset($_POST['op']) && $_POST['op'] == 1) {
         $tamanho,
         $estado,
         $pesquisa,
-        $ordenacao
+        $ordenacao,
+        $limite
     );
     echo $resp;
 }

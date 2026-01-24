@@ -160,6 +160,9 @@ if($userType == 1){
             position: relative;
             overflow: hidden;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .plan-card::before {
@@ -278,6 +281,7 @@ if($userType == 1){
         .plan-features {
             list-style: none;
             margin-bottom: 15px;
+            flex-grow: 1;
         }
 
         .plan-features li {
@@ -307,6 +311,7 @@ if($userType == 1){
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-top: auto;
         }
 
         .plan-button-primary {
@@ -423,6 +428,7 @@ if($userType == 1){
 
     <script>
         let currentUserPlan = null;
+        let currentUserPlanId = null;
 
         $(document).ready(function() {
             loadPlans();
@@ -436,6 +442,8 @@ if($userType == 1){
                 const data = JSON.parse(response);
                 if (data.success && data.plano) {
                     currentUserPlan = data.plano;
+                    // Usar o plano_id retornado diretamente do backend
+                    currentUserPlanId = data.plano_id || 1;
                     $('#currentPlanName').text(data.plano);
                     $('#currentPlanBanner').show();
                 }
@@ -454,11 +462,13 @@ if($userType == 1){
                     period: "Gratuito",
                     icon: "fa-seedling",
                     features: [
-                        "Até 5 produtos",
-                        "Rastreio básico",
-                        "Suporte por email",
-                        "Acesso à comunidade",
-                        "Perfil público"
+                        "5 produtos ativos",
+                        "Acesso ao ranking sustentabilidade",
+                        "Ranking Confiança de Vendas",
+                        "Chat direto com clientes",
+                        "Histórico de vendas (gráficos simples)",
+                        "Badge 'Iniciante Sustentável'",
+                        "Taxas reduzidas em categorias ecológicas"
                     ],
                     featured: false
                 },
@@ -467,16 +477,15 @@ if($userType == 1){
                     name: "Plano Crescimento Circular",
                     description: "Para empreendedores que querem expandir o seu negócio sustentável",
                     price: 25.00,
-                    period: "mês",
+                    period: "30 dias",
                     icon: "fa-chart-line",
                     features: [
-                        "Até 10 produtos",
-                        "Rastreio básico",
-                        "Suporte prioritário",
-                        "Relatórios PDF",
-                        "Badge verificado",
-                        "Destaque em pesquisas",
-                        "Análises detalhadas"
+                        "Até 10 produtos ativos",
+                        "Badge Sustentável: visível (para comissão)",
+                        "Badge Confiança: visível",
+                        "Relatórios básicos de vendas e audiência",
+                        "Notificações de desempenho",
+                        "Alertas sobre produtos com baixa performance"
                     ],
                     featured: false
                 },
@@ -484,19 +493,18 @@ if($userType == 1){
                     id: 3,
                     name: "Plano Profissional Eco+",
                     description: "Para quem leva a sustentabilidade a sério e quer resultados profissionais",
-                    price: 100.00,
-                    period: "mês",
+                    price: 70.00,
+                    period: "30 dias",
                     icon: "fa-crown",
                     features: [
                         "Produtos ilimitados",
-                        "Rastreio avançado",
-                        "Suporte VIP 24/7",
-                        "Relatórios PDF personalizados",
-                        "Badge premium dourado",
-                        "Prioridade máxima",
-                        "Consultoria mensal",
-                        "API de integração",
-                        "Gestor dedicado"
+                        "Badge Sustentável (comissão)",
+                        "Badge Confiança (visual)",
+                        "Relatórios avançados de impacto ambiental",
+                        "Ferramentas de fidelização",
+                        "Cupões e packs eco",
+                        "Marketing recorrente",
+                        "Análises detalhadas de performance"
                     ],
                     featured: true
                 }
@@ -510,7 +518,37 @@ if($userType == 1){
             grid.empty();
 
             plans.forEach(plan => {
-                const isCurrentPlan = currentUserPlan && plan.name.includes(currentUserPlan);
+                const isCurrentPlan = currentUserPlanId === plan.id;
+                const isDowngrade = currentUserPlanId && plan.id < currentUserPlanId;
+                const isFree = plan.price === 0;
+
+                let buttonHtml = '';
+                if (isCurrentPlan) {
+                    buttonHtml = `
+                        <button class="plan-button plan-button-current" disabled>
+                            <i class="fas fa-check"></i> Plano Atual
+                        </button>
+                    `;
+                } else if (isDowngrade) {
+                    buttonHtml = `
+                        <button class="plan-button plan-button-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">
+                            <i class="fas fa-ban"></i> Downgrade Não Permitido
+                        </button>
+                    `;
+                } else if (isFree) {
+                    buttonHtml = `
+                        <button class="plan-button plan-button-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">
+                            <i class="fas fa-lock"></i> Plano Gratuito
+                        </button>
+                    `;
+                } else {
+                    buttonHtml = `
+                        <button class="plan-button ${plan.featured ? 'plan-button-primary' : 'plan-button-secondary'}"
+                                onclick="selectPlan(${plan.id}, '${plan.name}', ${plan.price})">
+                            <i class="fas fa-bolt"></i> ${currentUserPlanId ? 'Fazer Upgrade' : 'Escolher Plano'}
+                        </button>
+                    `;
+                }
 
                 const card = `
                     <div class="plan-card ${plan.featured ? 'featured' : ''} ${isCurrentPlan ? 'current-plan' : ''}">
@@ -543,16 +581,7 @@ if($userType == 1){
                             `).join('')}
                         </ul>
 
-                        ${isCurrentPlan ? `
-                            <button class="plan-button plan-button-current" disabled>
-                                <i class="fas fa-check"></i> Plano Atual
-                            </button>
-                        ` : `
-                            <button class="plan-button ${plan.featured ? 'plan-button-primary' : 'plan-button-secondary'}"
-                                    onclick="selectPlan(${plan.id}, '${plan.name}', ${plan.price})">
-                                <i class="fas fa-bolt"></i> ${plan.price > 0 ? 'Escolher Plano' : 'Começar Grátis'}
-                            </button>
-                        `}
+                        ${buttonHtml}
                     </div>
                 `;
 

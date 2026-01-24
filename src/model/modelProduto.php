@@ -87,7 +87,7 @@ class Produto{
                 $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
                 $msg .= "<div class='d-flex align-items-center'>";
                 $msg .= "<div class='position-relative me-3'>";
-                $msg .= "<img src='".$rowProduto["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm' width='90' height='90' style='object-fit: cover;'>";
+                $msg .= "<img src='".$rowProduto["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm' width='90' height='90' style='object-fit: cover;' onerror=\"this.src='assets/media/avatars/blank.png'\">";
                 $msg .= "</div>";
                 $msg .= "<div>";
                 $msg .= "<h5 class='fw-bold text-wegreen-accent mb-1'>".$rowProduto["NomeAnunciante"]."</h5>";

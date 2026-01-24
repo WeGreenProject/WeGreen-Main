@@ -463,7 +463,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             e.preventDefault();
 
             const dados = {
-                op: 13,
+                op: 16,
                 nome: $('#nome').val().trim(),
                 email: $('#email').val().trim(),
                 telefone: $('#telefone').val().trim(),

@@ -83,102 +83,38 @@ class DashboardCliente {
     }
 
     /**
-     * Obter produtos recomendados para o cliente
-     * Baseado em: 1) Categorias compradas, 2) Novidades
+     * Obter produtos adquiridos recentemente pelo cliente
+     * Mostra os últimos produtos comprados com suas informações
      */
     public function getProdutosRecomendados($cliente_id, $limit = 6) {
         global $conn;
 
+        // Buscar produtos comprados recentemente pelo cliente
+        $sql = "SELECT DISTINCT
+                    p.Produto_id,
+                    p.nome,
+                    p.preco,
+                    p.foto,
+                    tp.descricao as categoria,
+                    v.data_venda,
+                    e.data_envio,
+                    e.codigo_encomenda
+                FROM produtos p
+                INNER JOIN vendas v ON p.Produto_id = v.produto_id
+                INNER JOIN encomendas e ON v.encomenda_id = e.id
+                LEFT JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id
+                WHERE e.cliente_id = ?
+                ORDER BY v.data_venda DESC
+                LIMIT ?";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ii", $cliente_id, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
         $produtos = [];
-
-        // 1. Buscar categorias das compras anteriores
-        $sqlCategorias = "SELECT DISTINCT p.tipo_produto_id
-                          FROM produtos p
-                          INNER JOIN vendas v ON p.Produto_id = v.produto_id
-                          INNER JOIN encomendas e ON v.encomenda_id = e.id
-                          WHERE e.cliente_id = ?
-                          LIMIT 3";
-
-        $stmtCat = $conn->prepare($sqlCategorias);
-        $stmtCat->bind_param("i", $cliente_id);
-        $stmtCat->execute();
-        $resultCat = $stmtCat->get_result();
-
-        $categorias = [];
-        while($row = $resultCat->fetch_assoc()) {
-            $categorias[] = $row['tipo_produto_id'];
-        }
-
-        // 2. Se tem categorias de compras, buscar produtos dessas categorias
-        if(count($categorias) > 0) {
-            $placeholders = implode(',', array_fill(0, count($categorias), '?'));
-            $sql = "SELECT DISTINCT p.Produto_id, p.nome, p.preco, p.foto,
-                           tp.descricao as categoria
-                    FROM produtos p
-                    LEFT JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id
-                    WHERE p.ativo = 1
-                    AND p.tipo_produto_id IN ($placeholders)
-                    AND p.Produto_id NOT IN (
-                        SELECT v.produto_id
-                        FROM vendas v
-                        INNER JOIN encomendas e ON v.encomenda_id = e.id
-                        WHERE e.cliente_id = ?
-                    )
-                    ORDER BY p.Produto_id DESC
-                    LIMIT ?";
-
-            $types = str_repeat('i', count($categorias)) . 'ii';
-            $params = array_merge($categorias, [$cliente_id, $limit]);
-
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param($types, ...$params);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            while($row = $result->fetch_assoc()) {
-                $produtos[] = $row;
-            }
-        }
-
-        // 3. Se não encontrou suficientes, preencher com novidades
-        if(count($produtos) < $limit) {
-            $remaining = $limit - count($produtos);
-            $excludeIds = array_column($produtos, 'Produto_id');
-
-            if(count($excludeIds) > 0) {
-                $placeholders = implode(',', array_fill(0, count($excludeIds), '?'));
-                $sql2 = "SELECT p.Produto_id, p.nome, p.preco, p.foto,
-                                tp.descricao as categoria
-                         FROM produtos p
-                         LEFT JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id
-                         WHERE p.ativo = 1 AND p.Produto_id NOT IN ($placeholders)
-                         ORDER BY p.Produto_id DESC
-                         LIMIT ?";
-
-                $types = str_repeat('i', count($excludeIds)) . 'i';
-                $params = array_merge($excludeIds, [$remaining]);
-
-                $stmt2 = $conn->prepare($sql2);
-                $stmt2->bind_param($types, ...$params);
-            } else {
-                $sql2 = "SELECT p.Produto_id, p.nome, p.preco, p.foto,
-                                tp.descricao as categoria
-                         FROM produtos p
-                         LEFT JOIN Tipo_Produtos tp ON p.tipo_produto_id = tp.id
-                         WHERE p.ativo = 1
-                         ORDER BY p.Produto_id DESC
-                         LIMIT ?";
-
-                $stmt2 = $conn->prepare($sql2);
-                $stmt2->bind_param("i", $remaining);
-            }
-
-            $stmt2->execute();
-            $result2 = $stmt2->get_result();
-
-            while($row = $result2->fetch_assoc()) {
-                $produtos[] = $row;
-            }
+        while($row = $result->fetch_assoc()) {
+            $produtos[] = $row;
         }
 
         return json_encode(['success' => true, 'data' => $produtos]);

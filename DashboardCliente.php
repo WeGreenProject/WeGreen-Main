@@ -24,13 +24,13 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
   <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-logo">
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
                 <i class="fas fa-leaf"></i>
                 <div class="logo-text">
                     <h2>WeGreen</h2>
                     <p>Moda Sustentável</p>
                 </div>
-            </div>
+            </a>
 
             <nav class="sidebar-menu">
                 <div class="menu-section">
@@ -108,14 +108,14 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                         <p>Descobre os nossos produtos sustentáveis</p>
                     </div>
 
-                    <!-- Produtos Recomendados -->
+                    <!-- Produtos Adquiridos Recentemente -->
                     <div class="section-card">
                         <div class="section-header">
                             <h2 class="section-title">
-                                <i class="fas fa-star"></i> Recomendado Para Ti
+                                <i class="fas fa-history"></i> Produtos Adquiridos Recentemente
                             </h2>
-                            <a href="ecommerce.html" class="btn-ver-todas">
-                                Ver Mais <i class="fas fa-arrow-right"></i>
+                            <a href="minhasEncomendas.php" class="btn-ver-todas">
+                                Ver Todas as Compras <i class="fas fa-arrow-right"></i>
                             </a>
                         </div>
                         <div id="recomendacoesContainer">
@@ -290,10 +290,10 @@ function renderRecomendacoes(produtos) {
             const html = `
                 <div class="empty-state">
                     <i class="fas fa-shopping-bag"></i>
-                    <h4>Descobre os nossos produtos</h4>
-                    <p>Explora a nossa coleção de moda sustentável!</p>
-                    <a href="ecommerce.html" class="btn-primary">
-                        <i class="fas fa-search"></i> Explorar Loja
+                    <h4>Ainda não compraste nada</h4>
+                    <p>Explora a nossa coleção de moda sustentável e faz a tua primeira compra!</p>
+                    <a href="marketplace.html" class="btn-primary">
+                        <i class="fas fa-search"></i> Explorar Produtos
                     </a>
                 </div>
             `;
