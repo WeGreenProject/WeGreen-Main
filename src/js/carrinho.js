@@ -566,20 +566,19 @@ function showStep(step) {
     }
   });
 
-  // Scroll suave para o topo do step
-  setTimeout(() => {
-    $(".steps-progress-container")[0]?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, 100);
+  // Scroll suave para o topo do step - DESATIVADO para evitar scroll no carregamento inicial
+  // setTimeout(() => {
+  //   $(".steps-progress-container")[0]?.scrollIntoView({
+  //     behavior: "smooth",
+  //     block: "start",
+  //   });
 }
 
 // Ir para próximo step
 function nextStep() {
   if (currentStep < totalSteps) {
     if (validateStep(currentStep)) {
-      showStep(currentStep + 1);
+      showStep(currentStep + 1, true);
     }
   }
 }
@@ -587,7 +586,7 @@ function nextStep() {
 // Voltar step anterior
 function previousStep() {
   if (currentStep > 1) {
-    showStep(currentStep - 1);
+    showStep(currentStep - 1, true);
   }
 }
 

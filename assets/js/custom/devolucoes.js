@@ -1,17 +1,3 @@
-/**
- * JavaScript para Gestão de Devoluções
- * WeGreen - Sistema de Devoluções para Clientes e Anunciantes
- * @version 1.0
- * @date 2026-01-16
- */
-
-// ========================================
-// FUNÇÕES PARA CLIENTES
-// ========================================
-
-/**
- * Verifica se a encomenda é elegível para devolução
- */
 function verificarElegibilidadeDevolucao(encomenda_id) {
   return $.ajax({
     url: "src/controller/controllerDevolucoes.php",
@@ -151,7 +137,7 @@ function mostrarModalSolicitarDevolucao(
 
                         <!-- Informações sobre o processo -->
                         <div class="alert alert-light border">
-                            <h6 class="fw-bold">📋 Próximos Passos:</h6>
+                            <h6 class="fw-bold"Próximos Passos:</h6>
                             <ol class="mb-0 small">
                                 <li>O vendedor irá analisar o seu pedido em até 3 dias úteis</li>
                                 <li>Se aprovada, receberá instruções de devolução por email</li>
@@ -359,13 +345,6 @@ function enviarSolicitacaoDevolucao() {
   });
 }
 
-// ========================================
-// FUNÇÕES PARA ANUNCIANTES
-// ========================================
-
-/**
- * Carrega lista de devoluções do anunciante
- */
 function carregarDevolucoesAnunciante(filtroEstado = null) {
   let url = "src/controller/controllerDevolucoes.php?op=3";
   if (filtroEstado) {
@@ -387,9 +366,6 @@ function carregarDevolucoesAnunciante(filtroEstado = null) {
   });
 }
 
-/**
- * Renderiza tabela de devoluções
- */
 function renderizarTabelaDevolucoes(devolucoes) {
   const tbody = $("#tabelaDevolucoes tbody");
   tbody.empty();

@@ -8,7 +8,7 @@ class DashboardAnunciante {
     function getDadosPlanos($ID_User, $plano) {
         global $conn;
 
-        $sql = "SELECT p.nome AS plano_nome FROM Utilizadores u LEFT JOIN Planos p ON u.plano_id = p.id WHERE u.id = ?";
+        $sql = "SELECT p.id AS plano_id, p.nome AS plano_nome FROM Utilizadores u LEFT JOIN Planos p ON u.plano_id = p.id WHERE u.id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
@@ -17,9 +17,10 @@ class DashboardAnunciante {
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $planoNome = $row['plano_nome'] ?? 'N/A';
+            $planoId = $row['plano_id'] ?? 1; // Default para plano gratuito
 
             $stmt->close();
-            return json_encode(['success' => true, 'plano' => $planoNome]);
+            return json_encode(['success' => true, 'plano' => $planoNome, 'plano_id' => $planoId]);
         }
 
         $stmt->close();

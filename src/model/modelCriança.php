@@ -30,7 +30,15 @@ function getProdutosCriança($categoria, $tamanho, $estado)
 
         while ($row = $result->fetch_assoc()) {
             $msg .= "<div class='col-md-3 col-sm-6'>";
-            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-80'>";
+            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-80' style='position: relative;'>";
+
+            // Adicionar botão de favorito (apenas para clientes logados)
+            if(isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2) {
+                $msg .= "<button class='btn-favorito' data-produto-id='".$row['Produto_id']."' onclick='toggleFavorito(".$row['Produto_id'].", this)'>";
+                $msg .= "<i class='far fa-heart'></i>";
+                $msg .= "</button>";
+            }
+
             $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."'>";
             $msg .= "<div class='card-body text-center'>";
             $msg .= "<h6 class='fw-bold mb-1'>".$row["nome"]."</h6>";
@@ -145,7 +153,14 @@ function getProdutoCriançaMostrar($ID_Produto){
     if ($result->num_rows > 0) {
         while ($rowProduto = $result->fetch_assoc()) {
             $msg .= "<div class='col-md-6'>";
-            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100'>";
+            $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100' style='position: relative;'>";
+
+            // Adicionar botão de favorito na galeria
+            if(isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2) {
+                $msg .= "<button class='btn-favorito' id='btnFavorito' data-produto-id='".$rowProduto['Produto_id']."' onclick='toggleFavorito(".$rowProduto['Produto_id'].", this)' style='position: absolute; top: 20px; right: 20px; z-index: 100;'>";
+                $msg .= "<i class='far fa-heart'></i>";
+                $msg .= "</button>";
+            }
 
             $msg .= "<div id='productGallery' class='carousel slide' data-bs-ride='carousel'>";
 
@@ -200,7 +215,7 @@ function getProdutoCriançaMostrar($ID_Produto){
             $msg .= "<div id='AnuncianteInfo' class='vendedora-card p-4 rounded-4 shadow-sm bg-white border border-success-subtle d-flex align-items-center justify-content-between flex-wrap mb-5'>";
             $msg .= "<div class='d-flex align-items-center'>";
             $msg .= "<div class='position-relative me-3'>";
-            $msg .= "<img src='".$rowProduto["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm' width='90' height='90' style='object-fit: cover;'>";
+            $msg .= "<img src='".$rowProduto["FotoPerfil"]."' class='rounded-circle border border-2 border-success shadow-sm' width='90' height='90' style='object-fit: cover;' onerror=\"this.src='assets/media/avatars/blank.png'\">";
             $msg .= "</div>";
             $msg .= "<div>";
             $msg .= "<h5 class='fw-bold text-wegreen-accent mb-1'>".$rowProduto["NomeAnunciante"]."</h5>";

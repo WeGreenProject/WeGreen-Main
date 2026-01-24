@@ -15,6 +15,10 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
     <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
       href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
       rel="stylesheet"
     />
@@ -22,6 +26,7 @@
     <link rel="stylesheet" href="src/css/lib/datatables.css" />
     <link rel="stylesheet" href="src/css/lib/select2.css" />
     <link rel="stylesheet" href="src/css/style.css" />
+    <link rel="stylesheet" href="src/css/searchAutocomplete.css" />
 
     <script src="src/js/lib/jquery.js"></script>
     <script
@@ -32,6 +37,7 @@
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/searchAutocomplete.js" defer></script>
     <style>
       .contact-form-card {
         background: white;
@@ -64,6 +70,11 @@
         box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
       }
 
+      .container:not(.container-fluid),
+      .container-lg {
+        max-width: 1700px !important;
+      }
+
       .form-icon {
         width: 50px;
         height: 50px;
@@ -75,6 +86,50 @@
         color: white;
         font-size: 1.3rem;
         margin: 0 auto 20px;
+      }
+
+      .accordion-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px !important;
+        margin-bottom: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+      }
+
+      .accordion-item:hover {
+        box-shadow: 0 4px 16px rgba(62, 179, 113, 0.1);
+        border-color: #3cb371;
+      }
+
+      .accordion-button {
+        font-weight: 600;
+        color: #1a1a1a;
+        padding: 18px 24px;
+        border-radius: 12px !important;
+      }
+
+      .accordion-button:not(.collapsed) {
+        background-color: #f0fdf4;
+        color: #2e8b57;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .accordion-button:focus {
+        box-shadow: none;
+        border-color: #3cb371;
+      }
+
+      .accordion-body {
+        padding: 24px;
+        color: #4b5563;
+        line-height: 1.7;
+      }
+
+      .nav-link.active {
+        color: #3cb371 !important;
+        border-bottom: 2px solid #3cb371;
+        padding-bottom: 8px;
       }
     </style>
   </head>
@@ -132,7 +187,7 @@
               </li>
               <li class="nav-item mx-3">
                 <a
-                  class="nav-link text-white fw-bold d-flex align-items-center"
+                  class="nav-link text-white fw-bold d-flex align-items-center active"
                   href="suporte.html"
                 >
                   <i class="bi bi-headset me-2"></i>Suporte
@@ -178,6 +233,7 @@
                   src="assets/media/avatars/blank.png"
                   class="user-avatar-img"
                   alt="Perfil"
+                  onerror="this.src = 'assets/media/avatars/blank.png'"
                 />
                 <i class="bi bi-chevron-down ms-1" style="font-size: 12px"></i>
               </a>
@@ -191,13 +247,26 @@
       </div>
     </header>
 
-    <section class="text-center py-5" style="margin-top: 50px">
-      <h1 class="fw-bold" style="font-size: 3rem">Suporte Wegreen</h1>
-      <p class="text-muted lead mt-2">
-        Estamos aqui para ajudar a navegar no marketplace sustentável e
-        colaborativo.
-      </p>
-    </section>
+    <!-- Hero Section -->
+    <div class="container" style="margin-top: 100px">
+      <div
+        class="hero-support"
+        style="
+          background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+          padding: 60px 40px;
+          border-radius: 20px;
+          margin-bottom: 40px;
+          text-align: center;
+          color: white;
+        "
+      >
+        <h1 class="fw-bold mb-3" style="font-size: 3rem">Suporte Wegreen</h1>
+        <p class="lead mb-0" style="font-size: 1.2rem">
+          Estamos aqui para ajudar a navegar no marketplace sustentável e
+          colaborativo.
+        </p>
+      </div>
+    </div>
 
     <!-- FORMULÁRIO DE CONTACTO -->
     <section class="container py-4">
@@ -240,398 +309,643 @@
     </section>
 
     <!-- FAQ SECTION -->
-    <section class="container py-4">
+    <section class="container py-5">
       <div class="text-center mb-5">
-        <h2 class="fw-bold" style="font-size: 2.5rem">Perguntas Frequentes</h2>
+        <h2 class="fw-bold mb-3" style="font-size: 2.5rem; color: #1a1a1a">
+          Perguntas Frequentes
+        </h2>
         <p class="text-muted lead">
           Encontre respostas rápidas para as dúvidas mais comuns
         </p>
       </div>
 
-      <div class="accordion" id="accordionExample">
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingOne">
-            <button
-              class="accordion-button"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseOne"
-              aria-expanded="true"
-              aria-controls="collapseOne"
-            >
-              Recuperar Palavra-Passe
-            </button>
-          </h2>
-          <div
-            id="collapseOne"
-            class="accordion-collapse collapse show"
-            aria-labelledby="headingOne"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>
-                Se tiver dificuldades em aceder à sua conta, esta secção explica
-                como recuperar rapidamente o acesso.
-              </p>
-              <ul>
-                <li>Introduza o seu e-mail na página de recuperação.</li>
-                <li>Receberá um link para criar uma nova palavra-passe.</li>
-                <li>
-                  Verifique também o spam caso não encontre a mensagem na caixa
-                  de entrada.
-                </li>
-                <li>
-                  O link tem validade limitada, por isso utilize-o o quanto
-                  antes.
-                </li>
-              </ul>
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingOne">
+                <button
+                  class="accordion-button"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseOne"
+                  aria-expanded="true"
+                  aria-controls="collapseOne"
+                >
+                  Recuperar Palavra-Passe
+                </button>
+              </h2>
+              <div
+                id="collapseOne"
+                class="accordion-collapse collapse show"
+                aria-labelledby="headingOne"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Se tiver dificuldades em aceder à sua conta, esta secção
+                    explica como recuperar rapidamente o acesso.
+                  </p>
+                  <ul>
+                    <li>Introduza o seu e-mail na página de recuperação.</li>
+                    <li>Receberá um link para criar uma nova palavra-passe.</li>
+                    <li>
+                      Verifique também o spam caso não encontre a mensagem na
+                      caixa de entrada.
+                    </li>
+                    <li>
+                      O link tem validade limitada, por isso utilize-o o quanto
+                      antes.
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingTwo">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseTwo"
-              aria-expanded="false"
-              aria-controls="collapseTwo"
-            >
-              Ajuda com Login e Conta
-            </button>
-          </h2>
-          <div
-            id="collapseTwo"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingTwo"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>
-                Encontrará aqui orientações para resolver problemas de acesso e
-                gestão da conta.
-              </p>
-              <ul>
-                <li>Confirme que o e-mail está corretamente escrito.</li>
-                <li>
-                  Verifique se a palavra-passe corresponde à mais recente.
-                </li>
-                <li>
-                  Se criou a conta com Google ou Apple, utilize o mesmo método
-                  para entrar.
-                </li>
-                <li>
-                  Se continuar com dificuldades, o suporte pode verificar o
-                  estado da sua conta.
-                </li>
-              </ul>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingTwo">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseTwo"
+                  aria-expanded="false"
+                  aria-controls="collapseTwo"
+                >
+                  Ajuda com Login e Conta
+                </button>
+              </h2>
+              <div
+                id="collapseTwo"
+                class="accordion-collapse collapse"
+                aria-labelledby="headingTwo"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Encontrará aqui orientações para resolver problemas de
+                    acesso e gestão da conta.
+                  </p>
+                  <ul>
+                    <li>Confirme que o e-mail está corretamente escrito.</li>
+                    <li>
+                      Verifique se a palavra-passe corresponde à mais recente.
+                    </li>
+                    <li>
+                      Se criou a conta com Google ou Apple, utilize o mesmo
+                      método para entrar.
+                    </li>
+                    <li>
+                      Se continuar com dificuldades, o suporte pode verificar o
+                      estado da sua conta.
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingThree">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseThree"
-              aria-expanded="false"
-              aria-controls="collapseThree"
-            >
-              Comprar
-            </button>
-          </h2>
-          <div
-            id="collapseThree"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingThree"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>
-                Um guia completo para todo o processo de compra na plataforma.
-              </p>
-              <ul>
-                <li>
-                  <strong>Comprar:</strong> Selecione o produto, escolha as
-                  opções desejadas e finalize a compra.
-                </li>
-                <li>
-                  <strong>Métodos de pagamento:</strong> Disponibilizamos
-                  cartão, MBWay e outras opções seguras.
-                </li>
-                <li>
-                  <strong>Cancelar encomenda:</strong> Possível enquanto o
-                  vendedor ainda não enviou o produto.
-                </li>
-                <li>
-                  <strong>Processo de compra:</strong> Após o pagamento, o
-                  vendedor prepara o envio e pode acompanhar tudo no painel.
-                </li>
-                <li>
-                  <strong>Envio e entrega:</strong> Cada vendedor define o
-                  prazo. Receberá um código de rastreio quando o produto for
-                  enviado.
-                </li>
-              </ul>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingThree">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseThree"
+                  aria-expanded="false"
+                  aria-controls="collapseThree"
+                >
+                  Comprar
+                </button>
+              </h2>
+              <div
+                id="collapseThree"
+                class="accordion-collapse collapse"
+                aria-labelledby="headingThree"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Um guia completo para todo o processo de compra na
+                    plataforma.
+                  </p>
+                  <ul>
+                    <li>
+                      <strong>Comprar:</strong> Selecione o produto, escolha as
+                      opções desejadas e finalize a compra.
+                    </li>
+                    <li>
+                      <strong>Métodos de pagamento:</strong> Disponibilizamos
+                      cartão, MBWay e outras opções seguras.
+                    </li>
+                    <li>
+                      <strong>Cancelar encomenda:</strong> Possível enquanto o
+                      vendedor ainda não enviou o produto.
+                    </li>
+                    <li>
+                      <strong>Processo de compra:</strong> Após o pagamento, o
+                      vendedor prepara o envio e pode acompanhar tudo no painel.
+                    </li>
+                    <li>
+                      <strong>Envio e entrega:</strong> Cada vendedor define o
+                      prazo. Receberá um código de rastreio quando o produto for
+                      enviado.
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingFour">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseFour"
-              aria-expanded="false"
-              aria-controls="collapseFour"
-            >
-              Como Podemos Ajudá-lo
-            </button>
-          </h2>
-          <div
-            id="collapseFour"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingFour"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>
-                Esta secção reúne as principais áreas em que o suporte pode
-                ajudar.
-              </p>
-              <ul>
-                <li>Dúvidas sobre pagamentos e transações.</li>
-                <li>Questões sobre encomendas ou entregas.</li>
-                <li>Problemas no acesso à conta.</li>
-                <li>Questões sobre vendedores ou anúncios.</li>
-                <li>Sugestões e melhoria da experiência na plataforma.</li>
-              </ul>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFour">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseFour"
+                  aria-expanded="false"
+                  aria-controls="collapseFour"
+                >
+                  Como Podemos Ajudá-lo
+                </button>
+              </h2>
+              <div
+                id="collapseFour"
+                class="accordion-collapse collapse"
+                aria-labelledby="headingFour"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Esta secção reúne as principais áreas em que o suporte pode
+                    ajudar.
+                  </p>
+                  <ul>
+                    <li>Dúvidas sobre pagamentos e transações.</li>
+                    <li>Questões sobre encomendas ou entregas.</li>
+                    <li>Problemas no acesso à conta.</li>
+                    <li>Questões sobre vendedores ou anúncios.</li>
+                    <li>Sugestões e melhoria da experiência na plataforma.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingFive">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseFive"
-              aria-expanded="false"
-              aria-controls="collapseFive"
-            >
-              Gerencie a sua Conta
-            </button>
-          </h2>
-          <div
-            id="collapseFive"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingFive"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>
-                Todas as opções relacionadas à gestão da sua conta estão
-                reunidas aqui.
-              </p>
-              <ul>
-                <li>Alterar dados pessoais ou e-mail.</li>
-                <li>Atualizar moradas.</li>
-                <li>Consultar histórico de compras.</li>
-                <li>Eliminar a conta, se assim desejar.</li>
-              </ul>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingFive">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseFive"
+                  aria-expanded="false"
+                  aria-controls="collapseFive"
+                >
+                  Gerencie a sua Conta
+                </button>
+              </h2>
+              <div
+                id="collapseFive"
+                class="accordion-collapse collapse"
+                aria-labelledby="headingFive"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Todas as opções relacionadas à gestão da sua conta estão
+                    reunidas aqui.
+                  </p>
+                  <ul>
+                    <li>Alterar dados pessoais ou e-mail.</li>
+                    <li>Atualizar moradas.</li>
+                    <li>Consultar histórico de compras.</li>
+                    <li>Eliminar a conta, se assim desejar.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingSix">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseSix"
-              aria-expanded="false"
-              aria-controls="collapseSix"
-            >
-              Como Entrar
-            </button>
-          </h2>
-          <div
-            id="collapseSix"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingSix"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>Escolha a forma de acesso mais conveniente.</p>
-              <ul>
-                <li>Login com e-mail e palavra-passe.</li>
-                <li>Acesso através de conta Google.</li>
-                <li>Acesso através de conta Apple.</li>
-                <li>
-                  Se criou conta com Google ou Apple, utilize sempre o mesmo
-                  método.
-                </li>
-              </ul>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingSix">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseSix"
+                  aria-expanded="false"
+                  aria-controls="collapseSix"
+                >
+                  Como Entrar
+                </button>
+              </h2>
+              <div
+                id="collapseSix"
+                class="accordion-collapse collapse"
+                aria-labelledby="headingSix"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>Escolha a forma de acesso mais conveniente.</p>
+                  <ul>
+                    <li>Login com e-mail e palavra-passe.</li>
+                    <li>Acesso através de conta Google.</li>
+                    <li>Acesso através de conta Apple.</li>
+                    <li>
+                      Se criou conta com Google ou Apple, utilize sempre o mesmo
+                      método.
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingSeven">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseSeven"
-              aria-expanded="false"
-              aria-controls="collapseSeven"
-            >
-              Ajuda com o Perfil
-            </button>
-          </h2>
-          <div
-            id="collapseSeven"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingSeven"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>Encontre aqui tudo o que pode personalizar no seu perfil.</p>
-              <ul>
-                <li>Alterar fotografia e nome.</li>
-                <li>Gerir notificações e preferências.</li>
-                <li>
-                  Ver avaliações recebidas (para utilizadores vendedores).
-                </li>
-                <li>Atualizar palavra-passe.</li>
-              </ul>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingSeven">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseSeven"
+                  aria-expanded="false"
+                  aria-controls="collapseSeven"
+                >
+                  Ajuda com o Perfil
+                </button>
+              </h2>
+              <div
+                id="collapseSeven"
+                class="accordion-collapse collapse"
+                aria-labelledby="headingSeven"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Encontre aqui tudo o que pode personalizar no seu perfil.
+                  </p>
+                  <ul>
+                    <li>Alterar fotografia e nome.</li>
+                    <li>Gerir notificações e preferências.</li>
+                    <li>
+                      Ver avaliações recebidas (para utilizadores vendedores).
+                    </li>
+                    <li>Atualizar palavra-passe.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingEight">
-            <button
-              class="accordion-button collapsed"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#collapseEight"
-              aria-expanded="false"
-              aria-controls="collapseEight"
-            >
-              Configurações da Conta
-            </button>
-          </h2>
-          <div
-            id="collapseEight"
-            class="accordion-collapse collapse"
-            aria-labelledby="headingEight"
-            data-bs-parent="#accordionExample"
-          >
-            <div class="accordion-body">
-              <p>
-                Aqui estão todas as definições essenciais de segurança e
-                personalização.
-              </p>
-              <ul>
-                <li>Gerir privacidade e segurança.</li>
-                <li>Configurar notificações por e-mail.</li>
-                <li>Alterar idioma e preferências gerais.</li>
-                <li>Gerir métodos de pagamento guardados.</li>
-                <li>
-                  Encerrar sessões ativas caso suspeite de atividade incomum.
-                </li>
-              </ul>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="headingEight">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#collapseEight"
+                  aria-expanded="false"
+                  aria-controls="collapseEight"
+                >
+                  Configurações da Conta
+                </button>
+              </h2>
+              <div
+                id="collapseEight"
+                class="accordion-collapse collapse"
+                aria-labelledby="headingEight"
+                data-bs-parent="#accordionExample"
+              >
+                <div class="accordion-body">
+                  <p>
+                    Aqui estão todas as definições essenciais de segurança e
+                    personalização.
+                  </p>
+                  <ul>
+                    <li>Gerir privacidade e segurança.</li>
+                    <li>Configurar notificações por e-mail.</li>
+                    <li>Alterar idioma e preferências gerais.</li>
+                    <li>Gerir métodos de pagamento guardados.</li>
+                    <li>
+                      Encerrar sessões ativas caso suspeite de atividade
+                      incomum.
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <footer class="bg-dark text-white pt-5 pb-3 mt-5">
-      <div class="container">
-        <div class="row gy-4 align-items-start">
-          <div class="col-md-4 text-center text-md-start">
-            <div class="mb-3">
-              <img
-                src="src/img/2-removebg-preview.png"
-                alt="Wegreen"
-                class="logo-img"
-                style="width: auto; height: 45px"
-              />
+    <!-- Footer -->
+    <footer style="margin-top: 80px">
+      <!-- Main Footer -->
+      <div
+        class="pt-5 pb-4"
+        style="background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)"
+      >
+        <div class="container">
+          <div class="row gy-4 justify-content-center text-center">
+            <!-- Logo & Descrição -->
+            <div class="col-lg-5 col-md-6">
+              <div class="mb-3">
+                <img
+                  src="src\img\2-removebg-preview.png"
+                  alt="Wegreen"
+                  style="width: auto; height: 50px"
+                />
+              </div>
+              <p style="color: #a0a0a0; line-height: 1.7">
+                Dê uma nova vida à moda, de forma consciente.<br />
+                A Wegreen conecta designers, marcas e consumidores num movimento
+                por um futuro sustentável.
+              </p>
             </div>
-            <p class="text-white-50 mb-4">
-              Dê uma nova vida à moda, de forma consciente. A Wegreen conecta
-              designers, marcas e consumidores num movimento por um futuro
-              sustentável.
-            </p>
-            <div
-              class="d-flex justify-content-center justify-content-md-start gap-3 mt-3"
-            >
-              <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
-              <a href="#" class="social-link"
-                ><i class="bi bi-instagram"></i
-              ></a>
-              <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
-              <a href="#" class="social-link"><i class="bi bi-envelope"></i></a>
+
+            <!-- Explorar -->
+            <div class="col-lg-3 col-md-3 col-6">
+              <h5 class="fw-bold mb-3" style="color: white">Explorar</h5>
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <a
+                    href="marketplace.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Loja Wegreen</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="sobrenos.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Sobre Nós</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="produtosDesigner.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Designers</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="produtoartesao.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Artesãos</a
+                  >
+                </li>
+              </ul>
             </div>
-          </div>
-          <div class="col-md-3 text-center text-md-start">
-            <h5 class="fw-bold mb-3 text-wegreen-accent">Explorar</h5>
-            <ul class="list-unstyled">
-              <li><a href="#loja" class="footer-link">Loja Wegreen</a></li>
-              <li><a href="#essencia" class="footer-link">Sobre Nós</a></li>
-              <li><a href="#" class="footer-link">Designers & Artesãos</a></li>
-              <li><a href="#" class="footer-link">Marcas Sustentáveis</a></li>
-              <li><a href="#" class="footer-link">Contactos</a></li>
-            </ul>
+
+            <!-- Suporte -->
+            <div class="col-lg-4 col-md-3 col-6">
+              <h5 class="fw-bold mb-3" style="color: white">Suporte</h5>
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <a
+                    href="suporte.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Ajuda & Suporte</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="registar.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Criar Conta</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="login.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Iniciar Sessão</a
+                  >
+                </li>
+              </ul>
+            </div>
           </div>
 
-          <div class="col-md-3 text-center text-md-start">
-            <h5 class="fw-bold mb-3 text-wegreen-accent">Suporte</h5>
-            <ul class="list-unstyled">
-              <li><a href="#" class="footer-link">Ajuda & FAQ</a></li>
-              <li><a href="#" class="footer-link">Termos e Condições</a></li>
-              <li>
-                <a href="#" class="footer-link">Política de Privacidade</a>
-              </li>
-              <li><a href="#" class="footer-link">Envios & Devoluções</a></li>
-            </ul>
-          </div>
-
-          <div class="col-md-2 text-center text-md-start">
-            <h5 class="fw-bold mb-3 text-wegreen-accent">Newsletter</h5>
-            <p class="text-white-50 small">
-              Subscreve e recebe novidades sobre moda sustentável.
-            </p>
-            <form class="d-flex mt-2">
-              <input
-                type="email"
-                class="form-control form-control-sm rounded-start-pill"
-                placeholder="O teu email"
-              />
-              <button class="btn btn-wegreen-accent btn-sm rounded-end-pill">
-                <i class="bi bi-send"></i>
-              </button>
-            </form>
+          <!-- Stats Row -->
+          <div
+            class="row text-center align-items-center justify-content-center mt-4 pt-3"
+          >
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-box-open"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    750+
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Produtos Únicos
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-users"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    50+
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Designers & Artesãos
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-leaf"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    100%
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Sustentável
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-shipping-fast"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    24-48h
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Envio Rápido
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        <hr class="my-4 border-secondary" />
-
-        <div class="text-center">
-          <p class="mb-0 text-white-50">
-            &copy; 2025 <strong>Wegreen</strong> — Dê uma nova vida à moda, de
-            forma consciente.
-          </p>
+      <!-- Copyright Bar -->
+      <div
+        class="py-3"
+        style="
+          background: #000000;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        "
+      >
+        <div class="container">
+          <div class="text-center">
+            <p class="mb-0" style="color: #808080; font-size: 14px">
+              © 2025 <strong style="color: #3cb371">Wegreen</strong> — Dê uma
+              nova vida à moda, de forma consciente.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -18,15 +18,17 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="src/css/style.css" />
+    <link rel="stylesheet" href="src/css/searchAutocomplete.css" />
 
     <script src="src/js/lib/jquery.js"></script>
+    <script src="src/js/searchAutocomplete.js" defer></script>
     <script src="src/js/lib/sweatalert.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
       body {
         background-color: #f8f9fa;
-        padding-top: 100px;
+        padding-top: 80px;
         overflow-x: hidden;
       }
 
@@ -34,8 +36,14 @@
         overflow-x: hidden;
       }
 
+      .nav-link.active {
+        color: #3cb371 !important;
+        border-bottom: 2px solid #3cb371;
+        padding-bottom: 8px;
+      }
+
       .marketplace-container {
-        max-width: 1400px;
+        max-width: 1700px;
         margin: 0 auto;
         padding: 30px 20px;
         overflow-x: hidden;
@@ -132,6 +140,9 @@
         transition: all 0.3s ease;
         cursor: pointer;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
       }
 
       .product-card:hover {
@@ -148,6 +159,9 @@
 
       .product-info {
         padding: 18px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
       }
 
       .product-name {
@@ -241,7 +255,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
       }
 
       .results-count {
@@ -277,16 +291,193 @@
 
       .price-range {
         display: flex;
-        gap: 10px;
+        gap: 8px;
         margin-top: 10px;
       }
 
       .price-input {
-        flex: 1;
+        width: 100%;
+        max-width: 145px;
         border: 2px solid #e5e7eb;
         border-radius: 8px;
-        padding: 8px;
+        padding: 8px 10px;
         font-size: 13px;
+      }
+
+      /* Hero Banner */
+      .marketplace-hero {
+        background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
+        padding: 40px 40px;
+        margin-bottom: 20px;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+      }
+
+      .marketplace-hero::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 70%
+        );
+        border-radius: 50%;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: white;
+      }
+
+      .hero-content h1 {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .hero-content p {
+        font-size: 16px;
+        opacity: 0.95;
+        margin-bottom: 0;
+      }
+
+      /* Active Filters Chips */
+      .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 8px;
+        min-height: 0;
+      }
+
+      .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #f0fdf4;
+        color: #166534;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        border: 1px solid #bbf7d0;
+        transition: all 0.2s;
+      }
+
+      .filter-chip:hover {
+        background: #dcfce7;
+      }
+
+      .filter-chip i {
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .filter-chip i:hover {
+        color: #dc2626;
+      }
+
+      /* View Toggle */
+      .view-toggle {
+        display: flex;
+        gap: 8px;
+        background: #f3f4f6;
+        padding: 4px;
+        border-radius: 10px;
+      }
+
+      .view-toggle button {
+        background: transparent;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #6b7280;
+      }
+
+      .view-toggle button.active {
+        background: white;
+        color: #3cb371;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .view-toggle button:hover:not(.active) {
+        color: #3cb371;
+      }
+
+      /* List View */
+      .products-grid.list-view {
+        grid-template-columns: 1fr;
+      }
+
+      .products-grid.list-view .product-card {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .products-grid.list-view .product-image {
+        width: 280px;
+        height: 280px;
+        flex-shrink: 0;
+      }
+
+      .products-grid.list-view .product-info {
+        flex: 1;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      /* Mobile Filters */
+      .mobile-filters-toggle {
+        display: none;
+        width: 100%;
+        background: #3cb371;
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+
+      @media (max-width: 991px) {
+        .mobile-filters-toggle {
+          display: block;
+        }
+
+        .filters-sidebar {
+          display: none;
+        }
+
+        .products-grid.list-view .product-card {
+          flex-direction: column;
+        }
+
+        .products-grid.list-view .product-image {
+          width: 100%;
+          height: 320px;
+        }
+
+        .marketplace-hero {
+          padding: 40px 20px;
+        }
+
+        .hero-content h1 {
+          font-size: 32px;
+        }
       }
     </style>
   </head>
@@ -329,7 +520,7 @@
             <ul class="navbar-nav mb-2 mb-lg-0">
               <li class="nav-item mx-3">
                 <a
-                  class="nav-link text-white fw-bold d-flex align-items-center"
+                  class="nav-link text-white fw-bold d-flex align-items-center active"
                   href="marketplace.html"
                 >
                   <i class="bi bi-shop me-2"></i>Marketplace
@@ -391,6 +582,7 @@
                   src="assets/media/avatars/blank.png"
                   class="user-avatar-img"
                   alt="Perfil"
+                  onerror="this.src = 'assets/media/avatars/blank.png'"
                 />
                 <i class="bi bi-chevron-down ms-1" style="font-size: 12px"></i>
               </a>
@@ -405,14 +597,19 @@
     </header>
 
     <!-- Conteúdo Principal -->
-    <div class="marketplace-container">
-      <div class="marketplace-header">
-        <h1 class="marketplace-title">
-          <i class="bi bi-shop text-success me-2"></i>Marketplace WeGreen
-        </h1>
-        <p class="marketplace-subtitle">
-          Descobre moda sustentável de designers e particulares
-        </p>
+    <div
+      class="marketplace-container"
+      style="margin-top: 10px; padding-top: 10px"
+    >
+      <!-- Hero Banner -->
+      <div class="marketplace-hero">
+        <div class="hero-content">
+          <h1>Moda Sustentável para Todos</h1>
+          <p>
+            Descubra peças únicas de designers, artesãos e particulares
+            comprometidos com o futuro
+          </p>
+        </div>
       </div>
 
       <div class="row">
@@ -475,6 +672,10 @@
                 <label for="seller-designer">Designers</label>
               </div>
               <div class="filter-option">
+                <input type="checkbox" value="artesao" id="seller-artesao" />
+                <label for="seller-artesao">Artesãos</label>
+              </div>
+              <div class="filter-option">
                 <input
                   type="checkbox"
                   value="particular"
@@ -491,60 +692,28 @@
                 Tipo de Produto
               </div>
               <div class="filter-option">
-                <input type="checkbox" value="vestidos" id="prod-vestidos" />
+                <input type="checkbox" value="vestido" id="prod-vestidos" />
                 <label for="prod-vestidos">Vestidos</label>
               </div>
               <div class="filter-option">
-                <input type="checkbox" value="calcas" id="prod-calcas" />
+                <input type="checkbox" value="calca" id="prod-calcas" />
                 <label for="prod-calcas">Calças</label>
               </div>
               <div class="filter-option">
-                <input type="checkbox" value="tshirts" id="prod-tshirts" />
+                <input type="checkbox" value="tshirt" id="prod-tshirts" />
                 <label for="prod-tshirts">T-shirts & Tops</label>
               </div>
               <div class="filter-option">
-                <input type="checkbox" value="casacos" id="prod-casacos" />
+                <input type="checkbox" value="casaco" id="prod-casacos" />
                 <label for="prod-casacos">Casacos</label>
               </div>
               <div class="filter-option">
-                <input type="checkbox" value="calcado" id="prod-calcado" />
+                <input type="checkbox" value="sapato" id="prod-calcado" />
                 <label for="prod-calcado">Calçado</label>
               </div>
               <div class="filter-option">
-                <input
-                  type="checkbox"
-                  value="acessorios"
-                  id="prod-acessorios"
-                />
+                <input type="checkbox" value="acessorio" id="prod-acessorios" />
                 <label for="prod-acessorios">Acessórios</label>
-              </div>
-            </div>
-
-            <!-- Marcas -->
-            <div class="filter-section">
-              <div class="filter-title">
-                <i class="bi bi-award"></i>
-                Marcas
-              </div>
-              <div class="filter-option">
-                <input type="checkbox" value="naz" id="brand-naz" />
-                <label for="brand-naz">Naz</label>
-              </div>
-              <div class="filter-option">
-                <input type="checkbox" value="nea" id="brand-nea" />
-                <label for="brand-nea">Nea Vegan Shoes</label>
-              </div>
-              <div class="filter-option">
-                <input type="checkbox" value="playup" id="brand-playup" />
-                <label for="brand-playup">PlayUp®</label>
-              </div>
-              <div class="filter-option">
-                <input type="checkbox" value="vintage" id="brand-vintage" />
-                <label for="brand-vintage">Vintage for a Cause</label>
-              </div>
-              <div class="filter-option">
-                <input type="checkbox" value="isto" id="brand-isto" />
-                <label for="brand-isto">Isto®</label>
               </div>
             </div>
 
@@ -558,14 +727,18 @@
                 <input
                   type="number"
                   class="price-input"
-                  placeholder="Min €"
+                  placeholder="Mínimo (€)"
                   id="priceMin"
+                  min="0"
+                  step="0.01"
                 />
                 <input
                   type="number"
                   class="price-input"
-                  placeholder="Max €"
+                  placeholder="Máximo (€)"
                   id="priceMax"
+                  min="0"
+                  step="0.01"
                 />
               </div>
             </div>
@@ -638,16 +811,44 @@
 
         <!-- Grid de Produtos -->
         <div class="col-lg-9">
+          <!-- Mobile Filters Toggle -->
+          <button
+            class="mobile-filters-toggle"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#mobileFilters"
+          >
+            <i class="bi bi-funnel me-2"></i>Filtros
+          </button>
+
+          <!-- Active Filters -->
+          <div class="active-filters" id="activeFilters">
+            <!-- Chips de filtros ativos serão adicionados aqui via JavaScript -->
+          </div>
+
           <div class="results-info">
             <div class="results-count" id="resultsCount">
               A carregar produtos...
             </div>
-            <select class="sort-select" id="sortSelect">
-              <option value="relevant">Mais Relevantes</option>
-              <option value="price-asc">Preço: Menor para Maior</option>
-              <option value="price-desc">Preço: Maior para Menor</option>
-              <option value="newest">Mais Recentes</option>
-            </select>
+            <div class="d-flex gap-3 align-items-center">
+              <div class="view-toggle">
+                <button
+                  class="active"
+                  id="gridView"
+                  onclick="toggleView('grid')"
+                >
+                  <i class="bi bi-grid-3x3-gap"></i>
+                </button>
+                <button id="listView" onclick="toggleView('list')">
+                  <i class="bi bi-list-ul"></i>
+                </button>
+              </div>
+              <select class="sort-select" id="sortSelect">
+                <option value="relevant">Mais Relevantes</option>
+                <option value="price-asc">Preço: Menor para Maior</option>
+                <option value="price-desc">Preço: Maior para Menor</option>
+                <option value="newest">Mais Recentes</option>
+              </select>
+            </div>
           </div>
 
           <div class="products-grid" id="productsGrid">
@@ -656,6 +857,504 @@
         </div>
       </div>
     </div>
+
+    <!-- Mobile Filters Offcanvas -->
+    <div
+      class="offcanvas offcanvas-start"
+      tabindex="-1"
+      id="mobileFilters"
+      aria-labelledby="mobileFiltersLabel"
+    >
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileFiltersLabel">
+          <i class="bi bi-funnel me-2"></i>Filtros
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <div
+          class="filters-sidebar"
+          style="display: block; box-shadow: none; padding: 0"
+        >
+          <!-- Categoria -->
+          <div class="filter-section">
+            <div class="filter-title">
+              <i class="bi bi-tag"></i>
+              Categoria
+            </div>
+            <div class="filter-option">
+              <input
+                type="radio"
+                name="category-mobile"
+                value="all"
+                id="cat-all-mobile"
+                checked
+              />
+              <label for="cat-all-mobile">Todos</label>
+            </div>
+            <div class="filter-option">
+              <input
+                type="radio"
+                name="category-mobile"
+                value="mulher"
+                id="cat-mulher-mobile"
+              />
+              <label for="cat-mulher-mobile">Mulher</label>
+            </div>
+            <div class="filter-option">
+              <input
+                type="radio"
+                name="category-mobile"
+                value="homem"
+                id="cat-homem-mobile"
+              />
+              <label for="cat-homem-mobile">Homem</label>
+            </div>
+            <div class="filter-option">
+              <input
+                type="radio"
+                name="category-mobile"
+                value="crianca"
+                id="cat-crianca-mobile"
+              />
+              <label for="cat-crianca-mobile">Criança</label>
+            </div>
+          </div>
+
+          <!-- Tipo de Vendedor -->
+          <div class="filter-section">
+            <div class="filter-title">
+              <i class="bi bi-person-badge"></i>
+              Tipo de Vendedor
+            </div>
+            <div class="filter-option">
+              <input
+                type="checkbox"
+                value="designer"
+                id="seller-designer-mobile"
+              />
+              <label for="seller-designer-mobile">Designers</label>
+            </div>
+            <div class="filter-option">
+              <input
+                type="checkbox"
+                value="artesao"
+                id="seller-artesao-mobile"
+              />
+              <label for="seller-artesao-mobile">Artesãos</label>
+            </div>
+            <div class="filter-option">
+              <input
+                type="checkbox"
+                value="particular"
+                id="seller-particular-mobile"
+              />
+              <label for="seller-particular-mobile">Particulares</label>
+            </div>
+          </div>
+
+          <button
+            class="btn-clear-filters"
+            onclick="
+              clearAllFilters();
+              bootstrap.Offcanvas.getInstance(
+                document.getElementById('mobileFilters'),
+              ).hide();
+            "
+          >
+            <i class="bi bi-x-circle me-2"></i>Limpar Filtros
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top: 80px">
+      <!-- Main Footer -->
+      <div
+        class="pt-5 pb-4"
+        style="background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)"
+      >
+        <div class="container">
+          <div class="row gy-4 justify-content-center text-center">
+            <!-- Logo & Descrição -->
+            <div class="col-lg-5 col-md-6">
+              <div class="mb-3">
+                <img
+                  src="src\img\2-removebg-preview.png"
+                  alt="Wegreen"
+                  style="width: auto; height: 50px"
+                />
+              </div>
+              <p style="color: #a0a0a0; line-height: 1.7">
+                Dê uma nova vida à moda, de forma consciente.<br />
+                A Wegreen conecta designers, marcas e consumidores num movimento
+                por um futuro sustentável.
+              </p>
+            </div>
+
+            <!-- Explorar -->
+            <div class="col-lg-3 col-md-3 col-6">
+              <h5 class="fw-bold mb-3" style="color: white">Explorar</h5>
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <a
+                    href="marketplace.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Loja Wegreen</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="sobrenos.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Sobre Nós</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="produtosDesigner.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Designers</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="produtoartesao.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Artesãos</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <!-- Suporte -->
+            <div class="col-lg-4 col-md-3 col-6">
+              <h5 class="fw-bold mb-3" style="color: white">Suporte</h5>
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <a
+                    href="suporte.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Ajuda & Suporte</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="registar.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Criar Conta</a
+                  >
+                </li>
+                <li class="mb-2">
+                  <a
+                    href="login.html"
+                    style="
+                      color: #a0a0a0;
+                      text-decoration: none;
+                      transition: all 0.3s ease;
+                      display: inline-block;
+                    "
+                    onmouseover="
+                      this.style.color = '#3cb371';
+                      this.style.paddingLeft = '5px';
+                    "
+                    onmouseout="
+                      this.style.color = '#a0a0a0';
+                      this.style.paddingLeft = '0';
+                    "
+                    >Iniciar Sessão</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div
+            class="row text-center align-items-center justify-content-center mt-4 pt-3"
+          >
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-box-open"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    750+
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Produtos Únicos
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-users"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    50+
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Designers & Artesãos
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-leaf"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    100%
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Sustentável
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+              <div
+                class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2"
+              >
+                <i
+                  class="fas fa-shipping-fast"
+                  style="font-size: 28px; color: #3cb371"
+                ></i>
+                <div class="text-center text-md-start">
+                  <div
+                    style="
+                      color: white;
+                      font-weight: 700;
+                      font-size: 24px;
+                      line-height: 1;
+                    "
+                  >
+                    24-48h
+                  </div>
+                  <div
+                    style="color: #a0a0a0; font-size: 13px; font-weight: 500"
+                  >
+                    Envio Rápido
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copyright Bar -->
+      <div
+        class="py-3"
+        style="
+          background: #000000;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        "
+      >
+        <div class="container">
+          <div class="text-center">
+            <p class="mb-0" style="color: #808080; font-size: 14px">
+              © 2025 <strong style="color: #3cb371">Wegreen</strong> — Dê uma
+              nova vida à moda, de forma consciente.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Toggle between grid and list view
+      function toggleView(view) {
+        const grid = document.getElementById("productsGrid");
+        const gridBtn = document.getElementById("gridView");
+        const listBtn = document.getElementById("listView");
+
+        if (view === "grid") {
+          grid.classList.remove("list-view");
+          gridBtn.classList.add("active");
+          listBtn.classList.remove("active");
+        } else {
+          grid.classList.add("list-view");
+          listBtn.classList.add("active");
+          gridBtn.classList.remove("active");
+        }
+      }
+
+      // Add active filter chip
+      function addFilterChip(label, value, type) {
+        const container = document.getElementById("activeFilters");
+        const chip = document.createElement("div");
+        chip.className = "filter-chip";
+        chip.innerHTML = `
+          <span>${label}</span>
+          <i class="bi bi-x" onclick="removeFilterChip(this, '${value}', '${type}')"></i>
+        `;
+        chip.dataset.value = value;
+        chip.dataset.type = type;
+        container.appendChild(chip);
+      }
+
+      // Remove filter chip
+      function removeFilterChip(element, value, type) {
+        element.parentElement.remove();
+        // Uncheck corresponding filter
+        const input = document.querySelector(`input[value="${value}"]`);
+        if (input) input.checked = false;
+        // Trigger filter update if marketplace.js is loaded
+        if (typeof applyFilters === "function") applyFilters();
+      }
+
+      // Monitor filter changes to add/remove chips
+      document.addEventListener("DOMContentLoaded", function () {
+        const filterInputs = document.querySelectorAll(
+          '.filter-option input[type="checkbox"]',
+        );
+        filterInputs.forEach((input) => {
+          input.addEventListener("change", function () {
+            const container = document.getElementById("activeFilters");
+            const existingChip = container.querySelector(
+              `[data-value="${this.value}"]`,
+            );
+
+            if (this.checked && !existingChip) {
+              addFilterChip(
+                this.nextElementSibling.textContent,
+                this.value,
+                this.name || "filter",
+              );
+            } else if (!this.checked && existingChip) {
+              existingChip.remove();
+            }
+          });
+        });
+      });
+    </script>
 
     <script src="src/js/homepage.js"></script>
     <script src="src/js/marketplace.js"></script>

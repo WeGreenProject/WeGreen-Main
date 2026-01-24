@@ -37,7 +37,7 @@ $plans = [
     3 => [
         'id' => 3,
         'name' => 'Plano Profissional Eco+',
-        'price' => 100.00,
+        'price' => 70.00,
         'price_id' => 'price_premium' // Você precisará criar este Price ID no Stripe Dashboard
     ]
 ];
@@ -71,6 +71,7 @@ try {
                 'unit_amount' => intval(round($selectedPlan['price'] * 100)), // Converter para centavos
                 'recurring' => [
                     'interval' => 'month',
+                    'interval_count' => 1, // 1 mês = ~30 dias
                 ],
             ],
             'quantity' => 1,

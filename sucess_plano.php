@@ -52,9 +52,12 @@ try {
         $stmt->bind_param("i", $utilizador_id);
         $stmt->execute();
 
-        // Inserir novo plano ativo
-        $stmt = $conn->prepare("INSERT INTO planos_ativos (anunciante_id, plano_id, data_inicio, ativo) VALUES (?, ?, NOW(), 1)");
-        $stmt->bind_param("ii", $utilizador_id, $plano_id);
+        // Calcular data de fim (30 dias a partir de hoje)
+        $data_fim = date('Y-m-d', strtotime('+30 days'));
+
+        // Inserir novo plano ativo com data de fim
+        $stmt = $conn->prepare("INSERT INTO planos_ativos (anunciante_id, plano_id, data_inicio, data_fim, ativo) VALUES (?, ?, NOW(), ?, 1)");
+        $stmt->bind_param("iis", $utilizador_id, $plano_id, $data_fim);
         $stmt->execute();
     }
 
@@ -114,11 +117,15 @@ try {
             </div>
             <div class="detail-item">
                 <span class="detail-label">Valor:</span>
-                <span class="detail-value">€<?php echo number_format($valor ?? 0, 2, ',', '.'); ?>/mês</span>
+                <span class="detail-value">€<?php echo number_format($valor ?? 0, 2, ',', '.'); ?>/30 dias</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Data de Ativação:</span>
                 <span class="detail-value"><?php echo date('d/m/Y H:i'); ?></span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Próxima Renovação:</span>
+                <span class="detail-value"><?php echo date('d/m/Y', strtotime('+30 days')); ?></span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">ID da Transação:</span>

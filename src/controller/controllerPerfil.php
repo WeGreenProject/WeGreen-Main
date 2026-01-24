@@ -76,7 +76,8 @@ if ($_POST['op'] == 12) {
 
 // op 13 - Formulário de contato (do merge remoto)
 if ($_POST['op'] == 13) {
-    if(isset($_SESSION['utilizador']))
+    // Verifica se utilizador está logado E não é um ID temporário
+    if(isset($_SESSION['utilizador']) && strpos($_SESSION['utilizador'], 'temp_') !== 0)
     {
         $resp = $func->getContactForm($_SESSION['utilizador']);
         echo $resp;
@@ -84,29 +85,19 @@ if ($_POST['op'] == 13) {
     else
     {
 echo "
-<div class='row'>
+<div class='col-md-6'>
+    <label class='form-label fw-semibold'>Nome Completo *</label>
+    <input type='text' id='nomeUser' class='form-control' required>
+</div>
 
-    <div class='col-md-6'>
-        <label class='form-label fw-semibold'>Nome Completo *</label>
-        <input type='text' id='nomeUser' class='form-control form-control-lg' required>
-    </div>
-
-    <div class='col-md-6'>
-        <label class='form-label fw-semibold'>Email *</label>
-        <input type='email' id='emailUser' class='form-control form-control-lg' required>
-    </div>
-
+<div class='col-md-6'>
+    <label class='form-label fw-semibold'>Email *</label>
+    <input type='email' id='emailUser' class='form-control' required>
 </div>
 
 <div class='col-12'>
-    <label class='form-label fw-semibold'>Mensagem *</label>
-    <textarea id='mensagemUser' class='form-control form-control-lg' rows='5' required></textarea>
-</div>
-
-<div class='col-12 text-center mt-4'>
-<button type='button' class='btn btn-submit-wegreen btn-lg' onclick='AdicionarMensagemContacto()'>
-    <i class='bi bi-send me-2'></i> Enviar Mensagem
-</button>
+    <label class='form-label fw-semibold'>Assunto *</label>
+    <input type='text' class='form-control' id='assuntoContato' required>
 </div>
 ";
 }
@@ -165,8 +156,8 @@ if ($_POST['op'] == 12) {
     }
 }
 
-// op 13 - Atualizar dados de perfil do cliente
-if ($_POST['op'] == 13) {
+// op 16 - Atualizar dados de perfil do cliente
+if ($_POST['op'] == 16) {
     if(isset($_SESSION['utilizador'])) {
         $nome = $_POST['nome'];
         $email = $_POST['email'];

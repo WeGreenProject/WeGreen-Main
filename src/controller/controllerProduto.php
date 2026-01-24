@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: application/json; charset=utf-8');
+mb_internal_encoding('UTF-8');
 include_once '../model/modelProduto.php';
 session_start();
 
