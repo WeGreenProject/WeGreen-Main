@@ -68,7 +68,7 @@ if (isset($_POST['op']) && $_POST['op'] == 2) {
 }
 
 // op=3: Listar devoluções do anunciante
-if ((isset($_POST['op']) && $_POST['op'] == 4) || (isset($_GET['op']) && $_GET['op'] == 4)) {
+if ((isset($_POST['op']) && $_POST['op'] == 3) || (isset($_GET['op']) && $_GET['op'] == 3)) {
     try {
         if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
             echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
@@ -125,6 +125,28 @@ if (isset($_POST['op']) && $_POST['op'] == 5) {
         $notas_anunciante = $_POST['notas_anunciante'] ?? '';
 
         $resultado = $func->aprovarDevolucao($devolucao_id, $anunciante_id, $notas_anunciante);
+
+        // Enviar email ao cliente
+        if ($resultado['success']) {
+            try {
+                require_once(__DIR__ . '/../services/EmailService.php');
+                $detalhes = $func->obterDetalhes($devolucao_id);
+
+                if ($detalhes) {
+                    $emailService = new EmailService();
+                    $emailService->enviarEmailDevolucao(
+                        $detalhes['cliente_email'],
+                        $detalhes['cliente_nome'],
+                        $detalhes['codigo_devolucao'],
+                        'aprovada',
+                        $notas_anunciante
+                    );
+                }
+            } catch (Exception $e) {
+                error_log("Erro ao enviar email de devolução: " . $e->getMessage());
+            }
+        }
+
         echo json_encode($resultado);
 
     } catch (Exception $e) {
@@ -155,6 +177,28 @@ if (isset($_POST['op']) && $_POST['op'] == 6) {
         }
 
         $resultado = $func->rejeitarDevolucao($devolucao_id, $anunciante_id, $notas_anunciante);
+
+        // Enviar email ao cliente
+        if ($resultado['success']) {
+            try {
+                require_once(__DIR__ . '/../services/EmailService.php');
+                $detalhes = $func->obterDetalhes($devolucao_id);
+
+                if ($detalhes) {
+                    $emailService = new EmailService();
+                    $emailService->enviarEmailDevolucao(
+                        $detalhes['cliente_email'],
+                        $detalhes['cliente_nome'],
+                        $detalhes['codigo_devolucao'],
+                        'rejeitada',
+                        $notas_anunciante
+                    );
+                }
+            } catch (Exception $e) {
+                error_log("Erro ao enviar email de devolução: " . $e->getMessage());
+            }
+        }
+
         echo json_encode($resultado);
 
     } catch (Exception $e) {
@@ -284,6 +328,56 @@ if (isset($_GET['op']) && $_GET['op'] == 10) {
         $anunciante_id = $_SESSION['utilizador'];
         $estatisticas = $func->obterEstatisticas($anunciante_id);
         echo json_encode(['success' => true, 'data' => $estatisticas]);
+
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+// op=11: Confirmar envio pelo cliente
+if (isset($_POST['op']) && $_POST['op'] == 11) {
+    try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
+        if ($_SESSION['tipo'] != 2) {
+            echo json_encode(['success' => false, 'message' => 'Apenas clientes podem confirmar envio.']);
+            exit;
+        }
+
+        $devolucao_id = $_POST['devolucao_id'];
+        $codigo_rastreio = $_POST['codigo_rastreio'] ?? '';
+        $cliente_id = $_SESSION['utilizador'];
+
+        $resultado = $func->confirmarEnvioCliente($devolucao_id, $cliente_id, $codigo_rastreio);
+        echo json_encode($resultado);
+
+    } catch (Exception $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+// op=12: Confirmar recebimento pelo vendedor
+if (isset($_POST['op']) && $_POST['op'] == 12) {
+    try {
+        if (!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
+            echo json_encode(['success' => false, 'message' => 'Não autenticado.']);
+            exit;
+        }
+
+        if ($_SESSION['tipo'] != 3 && $_SESSION['tipo'] != 1) {
+            echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
+            exit;
+        }
+
+        $devolucao_id = $_POST['devolucao_id'];
+        $notas_recebimento = $_POST['notas_recebimento'] ?? '';
+        $anunciante_id = $_SESSION['utilizador'];
+
+        $resultado = $func->confirmarRecebimentoVendedor($devolucao_id, $anunciante_id, $notas_recebimento);
+        echo json_encode($resultado);
 
     } catch (Exception $e) {
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);

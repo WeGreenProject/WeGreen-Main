@@ -14,13 +14,27 @@ class Encomendas {
                     e.estado,
                     e.morada,
                     e.plano_rastreio,
-                    GROUP_CONCAT(DISTINCT p.nome SEPARATOR ', ') as produtos,
-                    MIN(p.foto) as foto_produto,
-                    SUM(p.preco) as total
+                    (SELECT GROUP_CONCAT(DISTINCT p.nome SEPARATOR ', ')
+                     FROM vendas v
+                     INNER JOIN produtos p ON v.produto_id = p.Produto_id
+                     WHERE v.encomenda_id = e.id) as produtos,
+                    (SELECT p.foto
+                     FROM vendas v
+                     INNER JOIN produtos p ON v.produto_id = p.Produto_id
+                     WHERE v.encomenda_id = e.id
+                     LIMIT 1) as foto_produto,
+                    (SELECT SUM(v.valor)
+                     FROM vendas v
+                     WHERE v.encomenda_id = e.id) as total,
+                    -- Informações de devolução ativa
+                    d.id as devolucao_id,
+                    d.codigo_devolucao as devolucao_codigo,
+                    d.estado as devolucao_estado,
+                    CASE WHEN d.id IS NOT NULL THEN 1 ELSE 0 END as devolucao_ativa
                 FROM encomendas e
-                LEFT JOIN Produtos p ON e.produto_id = p.Produto_id
+                LEFT JOIN devolucoes d ON e.id = d.encomenda_id
+                    AND d.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')
                 WHERE e.cliente_id = $cliente_id
-                GROUP BY e.codigo_encomenda
                 ORDER BY e.data_envio DESC";
 
         $result = $conn->query($sql);
@@ -89,13 +103,13 @@ class Encomendas {
             $row = $result->fetch_assoc();
             $transportadora_id = $row['transportadora_id'];
 
-            // Mapear IDs para nomes (baseado nos dados de exemplo)
+            // Mapear IDs para nomes (conforme carrinho.js)
             $transportadoras = [
-                1 => 'CTT',
-                2 => 'DPD',
-                3 => 'UPS',
-                4 => 'Chronopost',
-                5 => 'Entrega WeGreen'
+                1 => 'CTT - Correios de Portugal',
+                2 => 'CTT - Ponto de Recolha',
+                3 => 'DPD - Entrega Rápida',
+                4 => 'DPD - Ponto de Recolha',
+                5 => 'Entrega em Casa'
             ];
 
             return $transportadoras[$transportadora_id] ?? 'Transportadora Desconhecida';
@@ -109,11 +123,13 @@ class Encomendas {
 
         $sql = "SELECT
                     p.nome,
-                    p.preco,
+                    v.quantidade,
+                    v.valor,
                     p.descricao,
                     p.foto
                 FROM encomendas e
-                INNER JOIN Produtos p ON e.produto_id = p.Produto_id
+                INNER JOIN vendas v ON e.id = v.encomenda_id
+                INNER JOIN produtos p ON v.produto_id = p.Produto_id
                 WHERE e.codigo_encomenda = '$codigo_encomenda'";
 
         $result = $conn->query($sql);
@@ -121,6 +137,7 @@ class Encomendas {
         $html = '<table style="width: 100%; border-collapse: collapse;">';
         $html .= '<tr style="background: #f5f5f5; font-weight: bold;">';
         $html .= '<th style="padding: 10px; text-align: left;">Produto</th>';
+        $html .= '<th style="padding: 10px; text-align: center;">Qtd</th>';
         $html .= '<th style="padding: 10px; text-align: right;">Preço</th>';
         $html .= '</tr>';
 
@@ -128,7 +145,8 @@ class Encomendas {
             while($row = $result->fetch_assoc()) {
                 $html .= '<tr style="border-bottom: 1px solid #eee;">';
                 $html .= '<td style="padding: 10px;">' . htmlspecialchars($row['nome']) . '</td>';
-                $html .= '<td style="padding: 10px; text-align: right;">€' . number_format($row['preco'], 2) . '</td>';
+                $html .= '<td style="padding: 10px; text-align: center;">' . $row['quantidade'] . '</td>';
+                $html .= '<td style="padding: 10px; text-align: right;">€' . number_format($row['valor'], 2) . '</td>';
                 $html .= '</tr>';
             }
         }
@@ -141,9 +159,9 @@ class Encomendas {
     private function calcularTotal($codigo_encomenda) {
         global $conn;
 
-        $sql = "SELECT SUM(p.preco) as total
+        $sql = "SELECT SUM(v.valor) as total
                 FROM encomendas e
-                INNER JOIN Produtos p ON e.produto_id = p.Produto_id
+                INNER JOIN vendas v ON e.id = v.encomenda_id
                 WHERE e.codigo_encomenda = '$codigo_encomenda'";
 
         $result = $conn->query($sql);

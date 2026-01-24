@@ -299,7 +299,33 @@ if ($_POST['op'] == 33) {
     $novo_estado = $_POST['novo_estado'];
     $observacao = $_POST['observacao'] ?? '';
     $codigo_rastreio = $_POST['codigo_rastreio'] ?? null;
+
     $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao, $codigo_rastreio);
+
+    // Enviar email ao cliente sobre a alteração de status
+    $resposta = json_decode($resp, true);
+    if ($resposta['success']) {
+        try {
+            require_once(__DIR__ . '/../services/EmailService.php');
+
+            // Buscar dados do cliente e encomenda
+            $detalhes = $func->obterDetalhesEncomenda($encomenda_id);
+            if ($detalhes) {
+                $emailService = new EmailService();
+                $emailService->enviarEmailStatusEncomenda(
+                    $detalhes['cliente_email'],
+                    $detalhes['cliente_nome'],
+                    $detalhes['codigo_encomenda'],
+                    $novo_estado,
+                    $codigo_rastreio
+                );
+            }
+        } catch (Exception $e) {
+            error_log("Erro ao enviar email de status: " . $e->getMessage());
+            // Não falhar a operação se o email não enviar
+        }
+    }
+
     echo $resp;
 }
 

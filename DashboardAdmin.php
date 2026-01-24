@@ -15,12 +15,14 @@ if($_SESSION['tipo'] == 1){
     <link rel="stylesheet" href="src/css/admin.css">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
+    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/notifications.js"></script>
 </head>
 
 <body>
@@ -88,10 +90,7 @@ if($_SESSION['tipo'] == 1){
                     <h2 class="navbar-title">Dashboard</h2>
                 </div>
                 <div class="navbar-right">
-                    <button class="navbar-icon-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user">
                         <div id="AdminPerfilInfo" style="display:flex;"></div>
                         <i class=" fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>

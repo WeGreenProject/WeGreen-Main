@@ -12,9 +12,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Anunciante - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/Anunciante.css">
+    <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
+    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
@@ -24,84 +26,69 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="src/js/notifications.js"></script>
     <script src="src/js/Anunciante.js"></script>
 </head>
 
 <body>
-    <div class="container">
+    <div class="dashboard-container">
         <aside class="sidebar">
-                <div class="logo">
-                    <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                    <div class="logo-text">
-                        <h1>WeGreen</h1>
-                        <p>Moda Sustentável</p>
-                    </div>
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <i class="fas fa-leaf"></i>
+                <div class="logo-text">
+                    <h2>WeGreen</h2>
+                    <p>Moda Sustentável</p>
                 </div>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="DashboardAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoEncomendasAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Encomendas</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoDevolucoesAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-undo"></i></span>
-                            <span class="nav-text">Devoluções</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="relatoriosAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
-                            <span class="nav-text">Relatórios</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="preferenciasNotificacoes.php">
-                            <span class="nav-icon"><i class="fas fa-bell"></i></span>
-                            <span class="nav-text">Notificações</span>
-                        </a>
-                    </li>
-                </ul>
+            </a>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu</div>
+                    <a href="DashboardAnunciante.php" class="menu-item active">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="gestaoProdutosAnunciante.php" class="menu-item">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Produtos</span>
+                    </a>
+                    <a href="gestaoEncomendasAnunciante.php" class="menu-item">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Encomendas</span>
+                    </a>
+                    <a href="gestaoDevolucoesAnunciante.php" class="menu-item">
+                        <i class="fas fa-undo"></i>
+                        <span>Devoluções</span>
+                    </a>
+                    <a href="ChatAnunciante.php" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
+                    </a>
+                </div>
             </nav>
         </aside>
 
         <main class="main-content">
             <nav class="top-navbar">
                 <div class="navbar-left">
+                    <h1 class="page-title"><i class="fas fa-chart-line"></i> Dashboard</h1>
                 </div>
                 <div class="navbar-right">
-                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;">
+                    <?php include 'src/views/notifications-widget.php'; ?>
+                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;" <?php echo (isset($_SESSION['plano']) && $_SESSION['plano'] == 3) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>>
                         <i class="fas fa-crown"></i> Upgrade
                     </button>
-                    <button class="navbar-icon-btn" id="notificationBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
                     <div class="navbar-user" id="userMenuBtn">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff" alt="Usuário" class="user-avatar">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=3cb371&color=fff" alt="Usuário" class="user-avatar">
                         <div class="user-info">
                             <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></span>
                             <span class="user-role">Anunciante</span>
                         </div>
-                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #4a5568;"></i>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
                     </div>
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-header">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff" alt="Usuário" class="dropdown-avatar">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=3cb371&color=fff" alt="Usuário" class="dropdown-avatar">
                             <div>
                                 <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></div>
                                 <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'user@email.com'; ?></div>
@@ -112,10 +99,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             <i class="fas fa-user"></i>
                             <span>Meu Perfil</span>
                         </a>
-                        <button class="dropdown-item" onclick="showPasswordModal()">
+                        <a class="dropdown-item" href="alterarSenha.php">
                             <i class="fas fa-key"></i>
                             <span>Alterar Senha</span>
-                        </button>
+                        </a>
                         <button class="dropdown-item" id="btnAlternarConta" onclick="verificarEAlternarConta()" style="display:none;">
                             <i class="fas fa-exchange-alt"></i>
                             <span id="textoAlternar">Alternar Conta</span>
@@ -129,14 +116,16 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 </div>
             </nav>
 
-            <div id="dashboard" class="page active">
-                <div class="stats-grid stats-grid-compact">
-                    <div id="PontosConfianca" class="stat-card stat-card-compact"></div>
-                    <div id="GastosCard" class="stat-card stat-card-compact"></div>
-                    <div id="ProdutoStock" class="stat-card stat-card-compact"></div>
-                    <div id="PlanosAtual" class="stat-card stat-card-compact"></div>
+            <div class="content-area">
+                <!-- KPIs/Stats Cards -->
+                <div class="stats-grid-compact">
+                    <div id="PontosConfianca" class="stat-card-compact"></div>
+                    <div id="GastosCard" class="stat-card-compact"></div>
+                    <div id="ProdutoStock" class="stat-card-compact"></div>
+                    <div id="PlanosAtual" class="stat-card-compact"></div>
                 </div>
 
+                <!-- Charts Section -->
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
@@ -154,43 +143,19 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </div>
                 </div>
 
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Produtos Recentes</h3>
-                        <p>Últimos produtos adicionados</p>
+                <!-- Recent Products Section -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-box"></i> Produtos Recentes
+                        </h2>
+                        <a href="gestaoProdutosAnunciante.php" class="btn-ver-todas">
+                            Ver Todos <i class="fas fa-arrow-right"></i>
+                        </a>
                     </div>
                     <div id="recentProducts"></div>
                 </div>
             </div>
-
-<!-- Modal Alterar Senha -->
-<div id="passwordModal" class="modal">
-    <div class="modal-content" style="max-width: 500px;">
-        <div class="modal-header">
-            <h3>Alterar Senha</h3>
-            <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
-        </div>
-        <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
-            <input type="text" name="username" autocomplete="username" value="<?php echo $_SESSION['email'] ?? ''; ?>" style="display: none;" readonly>
-            <div class="form-group">
-                <label>Senha Atual</label>
-                <input type="password" id="currentPassword" autocomplete="current-password" required>
-            </div>
-            <div class="form-group">
-                <label>Nova Senha</label>
-                <input type="password" id="newPassword" autocomplete="new-password" required>
-            </div>
-            <div class="form-group">
-                <label>Confirmar Nova Senha</label>
-                <input type="password" id="confirmPassword" autocomplete="new-password" required>
-            </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-                <i class="fas fa-key"></i> Alterar Senha
-            </button>
-        </form>
-    </div>
-</div>
-
         </main>
     </div>
 </body>

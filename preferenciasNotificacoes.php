@@ -237,13 +237,13 @@ $is_cliente = ($tipo_user == 2);
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-logo">
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
                 <i class="fas fa-leaf"></i>
                 <div class="logo-text">
                     <h2>WeGreen</h2>
                     <p>Moda Sustentável</p>
                 </div>
-            </div>
+            </a>
 
             <nav class="sidebar-menu">
                 <div class="menu-section">

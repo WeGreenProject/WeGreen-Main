@@ -90,10 +90,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </div>
                 </div>
                 <div class="navbar-right">
-                    <button class="navbar-icon-btn" id="notificationBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user" id="userMenuBtn">
 
                     </div>

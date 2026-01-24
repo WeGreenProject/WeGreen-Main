@@ -69,6 +69,19 @@ class SucessoCarrinho {
                 $session->metadata->shipping_state
             );
 
+            // Se morada estiver vazia, buscar do perfil do utilizador
+            if (empty($morada) || empty($morada_completa)) {
+                $sql_user = "SELECT nome, morada FROM Utilizadores WHERE id = $utilizador_id LIMIT 1";
+                $result_user = $conn->query($sql_user);
+
+                if ($result_user && $result_user->num_rows > 0) {
+                    $user_data = $result_user->fetch_assoc();
+                    $nome_destinatario = $user_data['nome'];
+                    $morada = $user_data['morada'] ?? 'Morada não cadastrada';
+                    $morada_completa = $nome_destinatario . ', ' . $morada;
+                }
+            }
+
             // Buscar produtos do carrinho
             $sql = "SELECT ci.produto_id, ci.quantidade, p.preco, p.nome, p.anunciante_id
                     FROM Carrinho_Itens ci

@@ -1,3 +1,5 @@
+// Sistema de notificações carregado via notifications.js
+
 function getDadosPlanos() {
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
@@ -6,12 +8,12 @@ function getDadosPlanos() {
       const data = JSON.parse(response);
       if (data.success) {
         $("#PlanosAtual").html(`
-          <div class='stat-icon'><i class='fas fa-crown' style='color: #A6D90C;'></i></div>
+          <div class='stat-icon'><i class='fas fa-crown' style='color: #ffffff;'></i></div>
           <div class='stat-content'><div class='stat-label'>Plano Atual</div><div class='stat-value'>${data.plano}</div></div>
         `);
       } else {
         $("#PlanosAtual").html(`
-          <div class='stat-icon'><i class='fas fa-crown' style='color: #A6D90C;'></i></div>
+          <div class='stat-icon'><i class='fas fa-crown' style='color: #ffffff;'></i></div>
           <div class='stat-content'><div class='stat-label'>Plano Atual</div><div class='stat-value'>N/A</div></div>
         `);
       }
@@ -28,7 +30,7 @@ function CarregaProdutos() {
     function (response) {
       const data = JSON.parse(response);
       $("#ProdutoStock").html(`
-        <div class='stat-icon'><i class='fas fa-box' style='color: #A6D90C;'></i></div>
+        <div class='stat-icon'><i class='fas fa-box' style='color: #ffffff;'></i></div>
         <div class='stat-content'><div class='stat-label'>Total Produtos</div><div class='stat-value'>${data.total}</div></div>
       `);
     },
@@ -44,7 +46,7 @@ function CarregaPontos() {
     function (response) {
       const data = JSON.parse(response);
       $("#PontosConfianca").html(`
-        <div class='stat-icon'><i class='fas fa-star' style='color: #A6D90C;'></i></div>
+        <div class='stat-icon'><i class='fas fa-star' style='color: #ffffff;'></i></div>
         <div class='stat-content'><div class='stat-label'>Pontos Confiança</div><div class='stat-value'>${data.pontos}</div></div>
       `);
     },
@@ -60,7 +62,7 @@ function getGastos() {
       const data = JSON.parse(response);
       const gastos = parseFloat(data.total).toFixed(2);
       $("#GastosCard").html(`
-        <div class='stat-icon'><i class='fas fa-wallet' style='color: #A6D90C;'></i></div>
+        <div class='stat-icon'><i class='fas fa-wallet' style='color: #ffffff;'></i></div>
         <div class='stat-content'><div class='stat-label'>Gastos Totais</div><div class='stat-value'>€${gastos}</div></div>
       `);
     },
@@ -93,13 +95,13 @@ function getVendasMensais() {
             {
               label: "Vendas (€)",
               data: response.dados2,
-              borderColor: "#A6D90C",
-              backgroundColor: "rgba(166, 217, 12, 0.1)",
+              borderColor: "#3cb371",
+              backgroundColor: "rgba(60, 179, 113, 0.1)",
               borderWidth: 3,
               tension: 0.4,
               fill: true,
               pointRadius: 4,
-              pointBackgroundColor: "#A6D90C",
+              pointBackgroundColor: "#3cb371",
               pointBorderColor: "#fff",
               pointBorderWidth: 2,
             },
@@ -107,7 +109,7 @@ function getVendasMensais() {
         },
         options: {
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: {
               display: true,
@@ -181,11 +183,14 @@ function renderTopProductsChart() {
           {
             data: resp.map((p) => p.vendidos),
             backgroundColor: [
-              "#A6D90C", // Verde WeGreen principal
-              "#8BC34A", // Verde claro
-              "#66BB6A", // Verde médio
-              "#4CAF50", // Verde escuro
-              "#81C784", // Verde suave
+              "#3cb371", // Verde WeGreen principal
+              "#2d2d2d", // Preto/cinza escuro
+              "#2e8b57", // Verde escuro
+              "#1a1a1a", // Preto
+              "#5fd8a0", // Verde claro
+              "#3a3a3a", // Cinza escuro
+              "#45b8ac", // Verde-água
+              "#252525", // Preto médio
             ],
             borderColor: "#ffffff",
             borderWidth: 3,
@@ -196,7 +201,7 @@ function renderTopProductsChart() {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
             position: "bottom",
@@ -255,85 +260,63 @@ function renderRecentProducts() {
         return;
       }
 
-      let html = '<div style="display: grid; gap: 14px;">';
+      let html = "";
 
       produtos.forEach((produto) => {
         const foto = produto.foto || "src/img/no-image.png";
         const stock = produto.stock || 0;
-        const stockBadge =
-          stock > 10
-            ? '<span style="background: #A6D90C; color: #000; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Em Stock</span>'
-            : stock > 0
-              ? '<span style="background: #F59E0B; color: #000; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Baixo</span>'
-              : '<span style="background: #E53E3E; color: #fff; padding: 4px 10px; border-radius: 5px; font-size: 12px; font-weight: 700;">Esgotado</span>';
+
+        // Status badge similar às encomendas
+        let statusClass = "status-badge ";
+        let statusText = "";
+        if (stock > 10) {
+          statusClass += "status-entregue";
+          statusText = "Em Stock";
+        } else if (stock > 0) {
+          statusClass += "status-enviado";
+          statusText = `Stock Baixo (${stock})`;
+        } else {
+          statusClass += "status-cancelado";
+          statusText = "Sem Stock";
+        }
 
         const preco = parseFloat(produto.preco).toLocaleString("pt-PT", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
 
+        const produtoNome =
+          produto.nome.length > 50
+            ? produto.nome.substring(0, 50) + "..."
+            : produto.nome;
+
         html += `
-          <div class="recent-product-card" style="
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 16px;
-            background: linear-gradient(135deg, rgba(45, 55, 72, 0.95), rgba(26, 32, 44, 0.95));
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(166, 217, 12, 0.1);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            cursor: pointer;"
-            onmouseover="this.style.borderColor='#A6D90C'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(166, 217, 12, 0.3)'"
-            onmouseout="this.style.borderColor='rgba(166, 217, 12, 0.1)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.2)'">
-
-            <img class="product-photo-preview"
-                 src="${foto}"
-                 alt="${produto.nome}"
-                 data-foto="${foto}"
-                 data-nome="${produto.nome}"
-                 style="width: 65px; height: 65px; object-fit: cover; border-radius: 8px; border: 3px solid #A6D90C; box-shadow: 0 2px 6px rgba(0,0,0,0.3); cursor: zoom-in; transition: transform 0.2s;"
-                 onmouseover="this.style.transform='scale(1.05)'"
-                 onmouseout="this.style.transform='scale(1)'"
+          <div class="produto-card-recent">
+            <img src="${foto}" alt="${produto.nome}" class="produto-card-img"
+                 onclick="visualizarFoto('${foto}', '${produto.nome}')"
                  onerror="this.src='src/img/no-image.png'">
-
-            <div style="flex: 1; min-width: 0;">
-              <div style="font-weight: 700; color: #ffffff; font-size: 16px; margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                ${produto.nome}
+            <div class="produto-card-content">
+              <div class="produto-card-header">
+                <h4 class="produto-card-title" title="${produto.nome}">${produtoNome}</h4>
+                <span class="${statusClass}">${statusText}</span>
               </div>
-              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <span style="color: #cbd5e0; font-size: 13px; background: rgba(166, 217, 12, 0.1); padding: 3px 8px; border-radius: 4px;">
-                  <i class="fas fa-tag" style="margin-right: 4px;"></i>${
-                    produto.tipo_produto || "Produto"
-                  }
-                </span>
-                ${stockBadge}
+              <div class="produto-card-meta">
+                <span><i class="fas fa-tag"></i> ${produto.tipo_produto || "Produto"}</span>
+                <span><i class="fas fa-calendar"></i> ${produto.data_formatada}</span>
+                <span><i class="fas fa-box"></i> Stock: ${stock}</span>
               </div>
-            </div>
-
-            <div style="text-align: right; flex-shrink: 0; padding: 8px 12px; background: rgba(166, 217, 12, 0.1); border-radius: 8px;">
-              <div style="color: #A6D90C; font-weight: 800; font-size: 20px; line-height: 1;">€${preco}</div>
-              <div style="color: #94a3b8; font-size: 12px; margin-top: 4px;">
-                <i class="far fa-calendar-alt" style="margin-right: 4px;"></i>${
-                  produto.data_formatada
-                }
+              <div class="produto-card-footer">
+                <div class="produto-card-price">€${preco}</div>
+                <button class="btn-edit-produto" onclick="window.location.href='gestaoProdutosAnunciante.php'">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
               </div>
             </div>
           </div>
         `;
       });
 
-      html += "</div>";
-
       container.html(html);
-
-      // Adicionar event listeners para pré-visualização de fotos
-      $(".product-photo-preview").on("click", function (e) {
-        e.stopPropagation();
-        const foto = $(this).data("foto");
-        const nome = $(this).data("nome");
-        visualizarFoto(foto, nome);
-      });
     })
     .fail(function (xhr, status, error) {
       console.error("Erro ao carregar produtos recentes:", error);
@@ -346,51 +329,42 @@ function renderRecentProducts() {
 function visualizarFoto(fotoUrl, nomeProduto) {
   Swal.fire({
     title: nomeProduto,
-    imageUrl: fotoUrl,
-    imageAlt: nomeProduto,
-    imageWidth: "100%",
-    imageHeight: "auto",
-    width: "90%",
+    html: `
+      <div style="max-height: 60vh; display: flex; align-items: center; justify-content: center;">
+        <img src="${fotoUrl}"
+             alt="${nomeProduto}"
+             style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 8px;">
+      </div>
+    `,
+    width: "80%",
     maxWidth: "800px",
     showCloseButton: true,
     showConfirmButton: false,
-    background: "#1a202c",
+    background: "#ffffff",
+    padding: "0",
     customClass: {
-      popup: "photo-preview-modal",
-      image: "photo-preview-image",
-      title: "photo-preview-title",
+      popup: "photo-gallery-modal",
+      title: "photo-gallery-title",
+      htmlContainer: "photo-gallery-content",
     },
     didOpen: () => {
-      // Adicionar estilos para o modal de foto
-      if (!document.getElementById("photoPreviewStyles")) {
-        const style = document.createElement("style");
-        style.id = "photoPreviewStyles";
-        style.textContent = `
-          .photo-preview-modal {
-            border: 3px solid #A6D90C !important;
-            box-shadow: 0 8px 32px rgba(166, 217, 12, 0.3) !important;
-          }
-          .photo-preview-image {
-            border-radius: 12px !important;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-            max-height: 70vh !important;
-            object-fit: contain !important;
-          }
-          .photo-preview-title {
-            color: #A6D90C !important;
-            font-weight: 700 !important;
-            font-size: 20px !important;
-            margin-bottom: 20px !important;
-          }
-          .swal2-close {
-            color: #A6D90C !important;
-            font-size: 32px !important;
-          }
-          .swal2-close:hover {
-            color: #fff !important;
-          }
-        `;
-        document.head.appendChild(style);
+      // Forçar estilos do cabeçalho verde com letras brancas
+      const title = document.querySelector(".photo-gallery-title");
+      if (title) {
+        title.style.background =
+          "linear-gradient(135deg, #3cb371 0%, #2e8b57 100%)";
+        title.style.color = "#ffffff";
+        title.style.padding = "16px 28px";
+        title.style.margin = "0";
+        title.style.borderRadius = "16px 16px 0 0";
+      }
+
+      // Botão X branco
+      const closeBtn = document.querySelector(
+        ".photo-gallery-modal .swal2-close",
+      );
+      if (closeBtn) {
+        closeBtn.style.color = "#ffffff";
       }
     },
   });
@@ -582,7 +556,7 @@ function loadCategorySalesChart() {
             {
               label: "Vendas (unidades)",
               data: data.map((d) => d.vendas),
-              backgroundColor: "#A6D90C",
+              backgroundColor: "#3cb371",
               borderColor: "#2d3748",
               borderWidth: 1,
             },
@@ -638,9 +612,9 @@ function loadDailyRevenueChart() {
             {
               label: chartLabel,
               data: data.map((d) => d.receita),
-              borderColor: "#A6D90C",
+              borderColor: "#3cb371",
               backgroundColor:
-                chartType === "bar" ? "#A6D90C" : "rgba(166, 217, 12, 0.15)",
+                chartType === "bar" ? "#3cb371" : "rgba(60, 179, 113, 0.15)",
               borderWidth: 2,
               hoverBackgroundColor: "#90c207",
             },
@@ -679,9 +653,9 @@ function loadDailyRevenueChart() {
         chartConfig.data.datasets[0].pointHoverRadius =
           data.length <= 3 ? 8 : 5;
         chartConfig.data.datasets[0].pointBackgroundColor = "#2d3748";
-        chartConfig.data.datasets[0].pointBorderColor = "#A6D90C";
+        chartConfig.data.datasets[0].pointBorderColor = "#3cb371";
         chartConfig.data.datasets[0].pointBorderWidth = 2;
-        chartConfig.data.datasets[0].pointHoverBackgroundColor = "#A6D90C";
+        chartConfig.data.datasets[0].pointHoverBackgroundColor = "#3cb371";
         chartConfig.data.datasets[0].pointHoverBorderColor = "#2d3748";
       }
 
@@ -814,37 +788,83 @@ function visualizarProduto(id) {
           <div class="modal-view-container">
             <div class="modal-view-left">${galeriaHTML}</div>
             <div class="modal-view-right">
-              <div class="info-group"><label>Preço</label><span class="price">€${parseFloat(
-                dados.preco,
-              ).toFixed(2)}</span></div>
-              <div class="info-group"><label>Tipo</label><span>${
-                dados.tipo_descricao || "N/A"
-              }</span></div>
-              <div class="info-group"><label>Stock</label><span>${
-                dados.stock
-              } unidades</span></div>
-              <div class="info-group"><label>Estado</label><span>${
-                dados.estado
-              }</span></div>
-              <div class="info-group"><label>Género</label><span>${
-                dados.genero || "N/A"
-              }</span></div>
-              <div class="info-group"><label>Marca</label><span>${
-                dados.marca || "N/A"
-              }</span></div>
-              <div class="info-group"><label>Tamanho</label><span>${
-                dados.tamanho || "N/A"
-              }</span></div>
-              <div class="info-group"><label>Ativo</label><span>${ativo}</span></div>
-              <div class="info-group full-width"><label>Descrição</label><p>${
-                dados.descricao || "Sem descrição"
-              }</p></div>
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-euro-sign" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Preço</label>
+                    <span class="price">€${parseFloat(dados.preco).toFixed(2)}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-list" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Tipo</label>
+                    <span>${dados.tipo_descricao || "N/A"}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-boxes" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Stock</label>
+                    <span>${dados.stock} unidades</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-star" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Estado</label>
+                    <span>${dados.estado}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-venus-mars" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Género</label>
+                    <span>${dados.genero || "N/A"}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-copyright" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Marca</label>
+                    <span>${dados.marca || "N/A"}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-row">
+                <div class="info-item">
+                  <i class="fas fa-ruler" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Tamanho</label>
+                    <span>${dados.tamanho || "N/A"}</span>
+                  </div>
+                </div>
+                <div class="info-item">
+                  <i class="fas fa-toggle-on" style="color: #3cb371;"></i>
+                  <div>
+                    <label>Ativo</label>
+                    <span>${ativo}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="info-description">
+                <i class="fas fa-align-left" style="color: #3cb371;"></i>
+                <div>
+                  <label>Descrição</label>
+                  <p>${dados.descricao || "Sem descrição"}</p>
+                </div>
+              </div>
             </div>
           </div>
         `,
           showCloseButton: true,
           showConfirmButton: false,
-          width: 900,
+          width: 800,
           customClass: {
             popup: "product-modal-view",
             htmlContainer: "modal-view-wrapper",
@@ -895,6 +915,11 @@ function removerProduto(id) {
       );
     }
   });
+}
+
+// Alias para remover produto (usado na coluna de ações)
+function confirmarRemoverProduto(id) {
+  removerProduto(id);
 }
 
 function obterProdutosSelecionados() {
@@ -1057,8 +1082,8 @@ function carregarProdutosNow() {
             data: "ativo",
             render: (v) =>
               v
-                ? '<span class="status-active">Sim</span>'
-                : '<span class="status-inactive"><i class="fas fa-exclamation-circle"></i> Não</span>',
+                ? '<span class="status-badge badge-ativo"><i class="fas fa-check-circle"></i> Ativo</span>'
+                : '<span class="status-badge badge-inativo"><i class="fas fa-times-circle"></i> Inativo</span>',
           },
         ],
         destroy: true,
@@ -1100,29 +1125,42 @@ function abrirModalProduto(titulo, dados = {}) {
       <form id="productFormSwal" style="text-align: left;">
         <input type="hidden" id="productId" value="${dados.Produto_id || ""}">
         <div class="form-row">
-          <div class="form-col"><label>Nome</label><input type="text" id="nome" value="${
-            dados.nome || ""
-          }" required></div>
-          <div class="form-col"><label>Tipo</label><select id="tipo_produto_id" required></select></div>
+          <div class="form-col">
+            <label><i class="fas fa-tag" style="color: #3cb371; margin-right: 6px;"></i>Nome</label>
+            <input type="text" id="nome" value="${dados.nome || ""}" required>
+          </div>
+          <div class="form-col">
+            <label><i class="fas fa-list" style="color: #3cb371; margin-right: 6px;"></i>Tipo</label>
+            <select id="tipo_produto_id" required></select>
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-col"><label>Preço (€)</label><input type="number" step="0.01" id="preco" value="${
-            dados.preco || ""
-          }" required></div>
-          <div class="form-col"><label>Stock</label><input type="number" id="stock" value="${
-            dados.stock || ""
-          }" min="0"></div>
+          <div class="form-col">
+            <label><i class="fas fa-euro-sign" style="color: #3cb371; margin-right: 6px;"></i>Preço (€)</label>
+            <input type="number" step="0.01" id="preco" value="${
+              dados.preco || ""
+            }" required>
+          </div>
+          <div class="form-col">
+            <label><i class="fas fa-boxes" style="color: #3cb371; margin-right: 6px;"></i>Stock</label>
+            <input type="number" id="stock" value="${
+              dados.stock || ""
+            }" min="0">
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-col"><label>Marca</label><input type="text" id="marca" value="${
-            dados.marca || ""
-          }"></div>
-          <div class="form-col"><label>Tamanho</label><input type="text" id="tamanho" value="${
-            dados.tamanho || ""
-          }"></div>
+          <div class="form-col">
+            <label><i class="fas fa-copyright" style="color: #3cb371; margin-right: 6px;"></i>Marca</label>
+            <input type="text" id="marca" value="${dados.marca || ""}">
+          </div>
+          <div class="form-col">
+            <label><i class="fas fa-ruler" style="color: #3cb371; margin-right: 6px;"></i>Tamanho</label>
+            <input type="text" id="tamanho" value="${dados.tamanho || ""}">
+          </div>
         </div>
         <div class="form-row">
-          <div class="form-col"><label>Estado</label>
+          <div class="form-col">
+            <label><i class="fas fa-star" style="color: #3cb371; margin-right: 6px;"></i>Estado</label>
             <select id="estado">
               <option ${
                 dados.estado === "Excelente" ? "selected" : ""
@@ -1133,7 +1171,8 @@ function abrirModalProduto(titulo, dados = {}) {
               <option ${dados.estado === "Novo" ? "selected" : ""}>Novo</option>
             </select>
           </div>
-          <div class="form-col"><label>Género</label>
+          <div class="form-col">
+            <label><i class="fas fa-venus-mars" style="color: #3cb371; margin-right: 6px;"></i>Género</label>
             <select id="genero">
               <option ${
                 dados.genero === "Mulher" ? "selected" : ""
@@ -1147,20 +1186,21 @@ function abrirModalProduto(titulo, dados = {}) {
             </select>
           </div>
         </div>
-        <div class="form-row-full"><label>Descrição</label><textarea id="descricao" rows="3">${
-          dados.descricao || ""
-        }</textarea></div>
         <div class="form-row-full">
-          <label>Fotos do Produto <span id="photoCount" style="color: #A6D90C; font-weight: 600;">(0/${maxPhotos})</span></label>
+          <label><i class="fas fa-align-left" style="color: #3cb371; margin-right: 6px;"></i>Descrição</label>
+          <textarea id="descricao" rows="3">${dados.descricao || ""}</textarea>
+        </div>
+        <div class="form-row-full">
+          <label><i class="fas fa-camera" style="color: #3cb371; margin-right: 6px;"></i>Fotos do Produto <span id="photoCount" style="color: #3cb371; font-weight: 600;">(0/${maxPhotos})</span></label>
           <div style="position: relative;">
             <input type="file" id="foto" accept="image/*" multiple style="display: none;">
-            <button type="button" id="selectPhotosBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #A6D90C, #8BC34A); color: #000; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.3s;">
+            <button type="button" id="selectPhotosBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: all 0.3s;">
               <i class="fas fa-images"></i> Selecionar Fotos (até ${maxPhotos})
             </button>
           </div>
-          <small style="color: #94a3b8; margin-top: 8px; display: block;">Formatos aceitos: JPG, PNG, WEBP, GIF</small>
+          <small style="color: #64748b; margin-top: 6px; display: block; font-size: 11px;">💡 Formatos aceitos: JPG, PNG, WEBP, GIF</small>
         </div>
-        <div id="photoPreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px;"></div>
+        <div id="photoPreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 12px;"></div>
       </form>
     `,
     showCancelButton: true,
@@ -1224,7 +1264,7 @@ function abrirModalProduto(titulo, dados = {}) {
           const reader = new FileReader();
           reader.onload = function (e) {
             const photoCard = $(`
-              <div class="photo-preview-card" data-index="${index}" style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; border: 2px solid #A6D90C; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: zoom-in; transition: all 0.2s;">
+              <div class="photo-preview-card" data-index="${index}" style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; border: 2px solid #3cb371; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: zoom-in; transition: all 0.2s;">
                 <img src="${e.target.result}"
                      data-photo-url="${e.target.result}"
                      style="width: 100%; height: 100%; object-fit: cover;">
@@ -1233,7 +1273,7 @@ function abrirModalProduto(titulo, dados = {}) {
                 </button>
                 ${
                   index === 0
-                    ? '<div style="position: absolute; bottom: 5px; left: 5px; background: #A6D90C; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Principal</div>'
+                    ? '<div style="position: absolute; bottom: 5px; left: 5px; background: #3cb371; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Principal</div>'
                     : ""
                 }
               </div>
@@ -1263,7 +1303,7 @@ function abrirModalProduto(titulo, dados = {}) {
             .on("mouseenter", function () {
               $(this).css({
                 transform: "scale(1.05)",
-                boxShadow: "0 4px 16px rgba(166, 217, 12, 0.4)",
+                boxShadow: "0 4px 16px rgba(60, 179, 113, 0.4)",
               });
             })
             .on("mouseleave", function () {
@@ -1286,13 +1326,13 @@ function abrirModalProduto(titulo, dados = {}) {
               totalFotos > 1
                 ? `
                 <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
-                  <button id="prevPhoto" style="padding: 10px 20px; background: #A6D90C; color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                  <button id="prevPhoto" style="padding: 10px 20px; background: #3cb371; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
                     <i class="fas fa-chevron-left"></i> Anterior
                   </button>
-                  <span style="padding: 10px 20px; background: rgba(166, 217, 12, 0.1); border-radius: 6px; color: #A6D90C; font-weight: 600;">
+                  <span style="padding: 10px 20px; background: rgba(60, 179, 113, 0.1); border-radius: 6px; color: #3cb371; font-weight: 600;">
                     ${index + 1} / ${totalFotos}
                   </span>
-                  <button id="nextPhoto" style="padding: 10px 20px; background: #A6D90C; color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
+                  <button id="nextPhoto" style="padding: 10px 20px; background: #3cb371; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s;">
                     Próxima <i class="fas fa-chevron-right"></i>
                   </button>
                 </div>
@@ -1314,8 +1354,8 @@ function abrirModalProduto(titulo, dados = {}) {
               maxWidth: "800px",
               showConfirmButton: false,
               showCloseButton: true,
-              background: "#1a202c",
-              padding: "20px",
+              background: "#ffffff",
+              padding: "0",
               customClass: {
                 popup: "photo-gallery-modal",
                 title: "photo-gallery-title",
@@ -1352,23 +1392,35 @@ function abrirModalProduto(titulo, dados = {}) {
                     .text(
                       `
                       .photo-gallery-modal {
-                        border: 3px solid #A6D90C !important;
-                        overflow: visible !important;
+                        border-radius: 16px !important;
+                        overflow: hidden !important;
                       }
                       .photo-gallery-title {
-                        color: #A6D90C !important;
+                        background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%) !important;
+                        color: #ffffff !important;
                         font-size: 18px !important;
-                        margin-bottom: 10px !important;
+                        font-weight: 600 !important;
+                        padding: 16px 28px !important;
+                        margin: 0 !important;
+                        border-radius: 16px 16px 0 0 !important;
                       }
                       .photo-gallery-content {
                         overflow: visible !important;
                         max-height: none !important;
+                        padding: 24px !important;
                       }
                       .swal2-html-container {
                         overflow: visible !important;
                       }
+                      .photo-gallery-modal .swal2-close {
+                        color: #ffffff !important;
+                        opacity: 0.9 !important;
+                      }
+                      .photo-gallery-modal .swal2-close:hover {
+                        opacity: 1 !important;
+                      }
                       #prevPhoto:hover, #nextPhoto:hover {
-                        background: #8BC34A !important;
+                        background: #2e8b57 !important;
                         transform: scale(1.05);
                       }
                     `,
@@ -1393,7 +1445,7 @@ function abrirModalProduto(titulo, dados = {}) {
           `
         #selectPhotosBtn:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(166, 217, 12, 0.4);
+          box-shadow: 0 4px 12px rgba(60, 179, 113, 0.4);
         }
         .remove-photo:hover {
           background: #DC2626 !important;
@@ -1672,8 +1724,8 @@ function mostrarPlanosUpgrade() {
     title: "Planos Disponíveis",
     html: `
       <div style="text-align: left; padding: 20px;">
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #A6D90C;">
-          <h3 style="margin: 0 0 10px 0; color: #A6D90C;">🌱 Free</h3>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #3cb371;">
+          <h3 style="margin: 0 0 10px 0; color: #3cb371;">🌱 Free</h3>
           <p style="font-size: 24px; font-weight: bold; margin: 5px 0;">€0/mês</p>
           <ul style="margin: 10px 0; padding-left: 20px;"><li>Até 3 produtos</li><li>Rastreio básico</li></ul>
         </div>
@@ -1690,7 +1742,7 @@ function mostrarPlanosUpgrade() {
       </div>
     `,
     confirmButtonText: "Fechar",
-    confirmButtonColor: "#A6D90C",
+    confirmButtonColor: "#3cb371",
     width: 600,
   });
 }
@@ -1742,22 +1794,22 @@ function carregarEstatisticasProdutos() {
     { op: 31 },
     function (stats) {
       $("#produtosAtivosCard").html(`
-      <div class='stat-icon'><i class='fas fa-check-circle' style='color: #A6D90C;'></i></div>
-      <div class='stat-content'><div class='stat-label'>Produtos Ativos</div><div class='stat-value' style='color: #A6D90C;'>${stats.ativos}</div></div>
+      <div class='stat-icon'><i class='fas fa-check-circle' style='color: #ffffff;'></i></div>
+      <div class='stat-content'><div class='stat-label'>Produtos Ativos</div><div class='stat-value'>${stats.ativos}</div></div>
     `);
 
       $("#produtosInativosCard").html(`
-      <div class='stat-icon'><i class='fas fa-exclamation-circle' style='color: #A6D90C;'></i></div>
-      <div class='stat-content'><div class='stat-label'>Produtos Inativos</div><div class='stat-value' style='color: #fbbf24;'>${stats.inativos}</div></div>
+      <div class='stat-icon'><i class='fas fa-exclamation-circle' style='color: #ffffff;'></i></div>
+      <div class='stat-content'><div class='stat-label'>Produtos Inativos</div><div class='stat-value'>${stats.inativos}</div></div>
     `);
 
       $("#stockCriticoCard").html(`
-      <div class='stat-icon'><i class='fas fa-exclamation-triangle' style='color: #A6D90C;'></i></div>
-      <div class='stat-content'><div class='stat-label'>Stock Crítico (&lt;5)</div><div class='stat-value' style='color: #ef4444;'>${stats.stockBaixo}</div></div>
+      <div class='stat-icon'><i class='fas fa-exclamation-triangle' style='color: #ffffff;'></i></div>
+      <div class='stat-content'><div class='stat-label'>Stock Crítico (&lt;5)</div><div class='stat-value'>${stats.stockBaixo}</div></div>
     `);
 
       $("#totalProdutosCard").html(`
-      <div class='stat-icon'><i class='fas fa-box' style='color: #A6D90C;'></i></div>
+      <div class='stat-icon'><i class='fas fa-box' style='color: #ffffff;'></i></div>
       <div class='stat-content'><div class='stat-label'>Total de Produtos</div><div class='stat-value'>${stats.total}</div><div class='stat-progress' id='totalProgress'></div></div>
     `);
 
@@ -1766,7 +1818,7 @@ function carregarEstatisticasProdutos() {
         { op: 14 },
         function (limite) {
           const percentagem = (limite.current / limite.max) * 100;
-          let corBarra = "#A6D90C";
+          let corBarra = "#3cb371";
           if (percentagem >= 90) corBarra = "#ef4444";
           else if (percentagem >= 70) corBarra = "#fbbf24";
 
@@ -1847,6 +1899,11 @@ $(document).ready(function () {
     }
   });
 
+  // Pesquisa global
+  $("#searchProduct").on("keyup", function () {
+    $("#productsTable").DataTable().search($(this).val()).draw();
+  });
+
   $(document).on("change", "#selectAll", function () {
     $(".product-checkbox").prop("checked", $(this).prop("checked"));
     atualizarAcoesEmMassa();
@@ -1906,6 +1963,133 @@ $(document).ready(function () {
     });
 
     doc.save("produtos_" + new Date().toISOString().split("T")[0] + ".pdf");
+  });
+
+  // Exportar Encomendas PDF
+  $("#exportEncomendasBtn").on("click", function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("l"); // landscape
+    const tabela = $("#encomendasTable").DataTable();
+    const dados = tabela.rows({ search: "applied" }).data();
+
+    doc.setFontSize(18);
+    doc.setTextColor(166, 217, 12);
+    doc.text("WeGreen - Lista de Encomendas", 14, 22);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Data: " + new Date().toLocaleDateString("pt-PT"), 14, 30);
+
+    const linhasTabela = [];
+    dados.each(function (linha) {
+      linhasTabela.push([
+        linha.codigo_encomenda || "",
+        linha.cliente_nome || "",
+        "€" + parseFloat(linha.total || 0).toFixed(2),
+        linha.estado || "",
+        linha.data_encomenda || "",
+        linha.metodo_pagamento || "",
+        linha.codigo_rastreio || "N/A",
+      ]);
+    });
+
+    doc.autoTable({
+      startY: 35,
+      head: [
+        [
+          "Código",
+          "Cliente",
+          "Total",
+          "Estado",
+          "Data",
+          "Pagamento",
+          "Rastreio",
+        ],
+      ],
+      body: linhasTabela,
+      theme: "striped",
+      headStyles: {
+        fillColor: [166, 217, 12],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+      styles: { fontSize: 8, cellPadding: 2 },
+      columnStyles: {
+        0: { cellWidth: 35 },
+        1: { cellWidth: 45 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 30 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 30 },
+        6: { cellWidth: 35 },
+      },
+    });
+
+    doc.save("encomendas_" + new Date().toISOString().split("T")[0] + ".pdf");
+  });
+
+  // Exportar Devoluções PDF
+  $("#exportDevolucoesBtn").on("click", function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF("l"); // landscape
+    const tabela = $("#tabelaDevolucoes").DataTable();
+    const dados = tabela.rows({ search: "applied" }).data();
+
+    doc.setFontSize(18);
+    doc.setTextColor(166, 217, 12);
+    doc.text("WeGreen - Lista de Devoluções", 14, 22);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("Data: " + new Date().toLocaleDateString("pt-PT"), 14, 30);
+
+    const linhasTabela = [];
+    dados.each(function (linha) {
+      linhasTabela.push([
+        linha.codigo_devolucao || "",
+        linha.codigo_encomenda || "",
+        linha.produto_nome || "",
+        linha.cliente_nome || "",
+        linha.motivo || "",
+        "€" + parseFloat(linha.valor || 0).toFixed(2),
+        linha.data_criacao || "",
+        linha.estado || "",
+      ]);
+    });
+
+    doc.autoTable({
+      startY: 35,
+      head: [
+        [
+          "Cód. Devolução",
+          "Encomenda",
+          "Produto",
+          "Cliente",
+          "Motivo",
+          "Valor",
+          "Data",
+          "Estado",
+        ],
+      ],
+      body: linhasTabela,
+      theme: "striped",
+      headStyles: {
+        fillColor: [166, 217, 12],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+      styles: { fontSize: 8, cellPadding: 2 },
+      columnStyles: {
+        0: { cellWidth: 30 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 35 },
+        4: { cellWidth: 30 },
+        5: { cellWidth: 25 },
+        6: { cellWidth: 25 },
+        7: { cellWidth: 25 },
+      },
+    });
+
+    doc.save("devolucoes_" + new Date().toISOString().split("T")[0] + ".pdf");
   });
 
   carregarEstatisticasProdutos();
@@ -2143,7 +2327,7 @@ function criarLinhaEncomenda(encomenda) {
                 </td>
                 <td>
                     <div class="transportadora-info">
-                        <i class="fas fa-truck" style="color: #A6D90C; margin-right: 5px;"></i>
+                        <i class="fas fa-truck" style="color: #3cb371; margin-right: 5px;"></i>
                         <span>${encomenda.transportadora || "N/A"}</span>
                     </div>
                 </td>
@@ -2196,22 +2380,22 @@ function atualizarEstatisticasEncomendas(encomendas) {
   const devolvidas = encomendas.filter((e) => e.estado === "Devolvido").length;
 
   $("#totalPendentesCard").html(`
-    <div class='stat-icon'><i class='fas fa-clock' style='color: #A6D90C;'></i></div>
+    <div class='stat-icon'><i class='fas fa-clock' style='color: #3cb371;'></i></div>
     <div class='stat-content'><div class='stat-label'>Pendentes</div><div class='stat-value' style='color: #f59e0b;'>${pendentes}</div></div>
   `);
 
   $("#totalProcessandoCard").html(`
-    <div class='stat-icon'><i class='fas fa-box-open' style='color: #A6D90C;'></i></div>
+    <div class='stat-icon'><i class='fas fa-box-open' style='color: #3cb371;'></i></div>
     <div class='stat-content'><div class='stat-label'>Processando</div><div class='stat-value' style='color: #3b82f6;'>${processando}</div></div>
   `);
 
   $("#totalEnviadasCard").html(`
-    <div class='stat-icon'><i class='fas fa-shipping-fast' style='color: #A6D90C;'></i></div>
+    <div class='stat-icon'><i class='fas fa-shipping-fast' style='color: #3cb371;'></i></div>
     <div class='stat-content'><div class='stat-label'>Enviadas</div><div class='stat-value' style='color: #8b5cf6;'>${enviadas}</div></div>
   `);
 
   $("#totalEntreguesCard").html(`
-    <div class='stat-icon'><i class='fas fa-check-circle' style='color: #A6D90C;'></i></div>
+    <div class='stat-icon'><i class='fas fa-check-circle' style='color: #3cb371;'></i></div>
     <div class='stat-content'><div class='stat-label'>Entregues</div><div class='stat-value' style='color: #10b981;'>${entregues}</div></div>
   `);
 }
@@ -2350,9 +2534,9 @@ function verDetalhesEncomenda(encomendaId) {
                         <!-- COLUNA ESQUERDA: GRID 2x2 COM TODOS OS DADOS -->
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #A6D90C; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #3cb371; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-user" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
+                                <i class="fas fa-user" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Cliente
                             </h4>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Nome:</strong> ${
@@ -2376,14 +2560,14 @@ function verDetalhesEncomenda(encomendaId) {
                                 )}')
 .then(() => Swal.fire({icon: 'success', title: 'Copiado!', text: 'Morada copiada para a área de transferência', timer: 1500, showConfirmButton: false}))
 .catch(() => Swal.fire({icon: 'error', title: 'Erro', text: 'Não foi possível copiar', timer: 1500, showConfirmButton: false}))"
-                                   style="color: #A6D90C; cursor: pointer; font-size: 14px;"
+                                   style="color: #3cb371; cursor: pointer; font-size: 14px;"
                                    title="Copiar morada"></i>
                             </p>
                         </div>
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #A6D90C; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #3cb371; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-box" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
+                                <i class="fas fa-box" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Encomenda
                             </h4>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Produto:</strong> ${
@@ -2392,7 +2576,7 @@ function verDetalhesEncomenda(encomendaId) {
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Qtd:</strong> ${
                               encomenda.quantidade
                             } un.</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #A6D90C; font-weight: bold; font-size: 16px;">€${encomenda.valor.toFixed(
+                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #3cb371; font-weight: bold; font-size: 16px;">€${encomenda.valor.toFixed(
                               2,
                             )}</span></p>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${
@@ -2456,9 +2640,9 @@ function verDetalhesEncomenda(encomendaId) {
                         ${
                           encomenda.produto_foto
                             ? `
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #A6D90C; box-shadow: 0 4px 8px rgba(166,217,12,0.15); text-align: center;">
+                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #3cb371; box-shadow: 0 4px 8px rgba(166,217,12,0.15); text-align: center;">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-image" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
+                                <i class="fas fa-image" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Produto
                             </h4>
                             <img src="${encomenda.produto_foto}"
@@ -2478,9 +2662,9 @@ function verDetalhesEncomenda(encomendaId) {
                         ${
                           encomenda.morada
                             ? `
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #A6D90C; box-shadow: 0 4px 8px rgba(166,217,12,0.15); margin-top: 12px;">
+                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #3cb371; box-shadow: 0 4px 8px rgba(166,217,12,0.15); margin-top: 12px;">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #A6D90C; font-size: 18px;"></i>
+                                <i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Localização de Entrega
                             </h4>
                             <div style="border-radius: 6px; overflow: hidden; border: 2px solid #e5e7eb;">
@@ -2499,7 +2683,7 @@ function verDetalhesEncomenda(encomendaId) {
                                       encomenda.morada,
                                     )}"
                                        target="_blank"
-                                       style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #A6D90C 0%, #8BC708 100%); color: #000; text-decoration: none; font-weight: 700; font-size: 14px; border-radius: 6px; box-shadow: 0 2px 4px rgba(166,217,12,0.3);">
+                                       style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #3cb371 0%, #8BC708 100%); color: #000; text-decoration: none; font-weight: 700; font-size: 14px; border-radius: 6px; box-shadow: 0 2px 4px rgba(166,217,12,0.3);">
                                         <i class="fas fa-external-link-alt" style="margin-right: 6px;"></i>
                                         Abrir no Google Maps
                                     </a>
@@ -2516,7 +2700,7 @@ function verDetalhesEncomenda(encomendaId) {
           popup: "swal-wide",
         },
         confirmButtonText: "Fechar",
-        confirmButtonColor: "#A6D90C",
+        confirmButtonColor: "#3cb371",
       });
     },
   );
@@ -2561,7 +2745,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
     showCancelButton: true,
     confirmButtonText: "Atualizar",
     cancelButtonText: "Cancelar",
-    confirmButtonColor: "#A6D90C",
+    confirmButtonColor: "#3cb371",
     width: 600,
     preConfirm: () => {
       const status = document.getElementById("novoStatus").value;
@@ -2599,7 +2783,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
               title: "Status Atualizado!",
               text: dados.message,
               icon: "success",
-              confirmButtonColor: "#A6D90C",
+              confirmButtonColor: "#3cb371",
             }).then(() => {
               carregarEncomendas();
             });
@@ -2688,7 +2872,7 @@ function verHistoricoEncomenda(encomendaId) {
         `,
         width: 700,
         confirmButtonText: "Fechar",
-        confirmButtonColor: "#A6D90C",
+        confirmButtonColor: "#3cb371",
       });
     },
   ).fail(function () {
@@ -2752,10 +2936,23 @@ function logout() {
     showCancelButton: true,
     confirmButtonText: "Sim, sair",
     cancelButtonText: "Cancelar",
-    confirmButtonColor: "#A6D90C",
+    confirmButtonColor: "#3cb371",
   }).then((result) => {
     if (result.isConfirmed) {
       window.location.href = "src/controller/controllerPerfil.php?op=2";
     }
   });
+}
+
+// Limpar filtros de produtos
+function limparFiltrosProdutos() {
+  $("#searchProduct").val("");
+  $("#filterTipo").val("").trigger("change");
+  $("#filterEstado").val("").trigger("change");
+  $("#filterGenero").val("").trigger("change");
+  $("#filterAtivo").val("").trigger("change");
+
+  if ($("#productsTable").DataTable()) {
+    $("#productsTable").DataTable().search("").columns().search("").draw();
+  }
 }

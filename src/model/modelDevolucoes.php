@@ -164,12 +164,12 @@ class ModelDevolucoes {
                     e.codigo_encomenda,
                     e.data_envio,
                     p.nome as produto_nome,
-                    p.imagem as produto_imagem,
-                    a.nome as anunciante_nome
+                    p.foto as produto_imagem,
+                    u.nome as anunciante_nome
                 FROM devolucoes d
                 INNER JOIN encomendas e ON d.encomenda_id = e.id
-                INNER JOIN produtos p ON d.produto_id = p.id
-                INNER JOIN anunciante a ON d.anunciante_id = a.id
+                INNER JOIN produtos p ON d.produto_id = p.Produto_id
+                INNER JOIN Utilizadores u ON d.anunciante_id = u.id
                 WHERE d.cliente_id = ?
                 ORDER BY d.data_solicitacao DESC";
 
@@ -205,13 +205,13 @@ class ModelDevolucoes {
                     e.codigo_encomenda,
                     e.data_envio,
                     p.nome as produto_nome,
-                    p.imagem as produto_imagem,
-                    c.nome as cliente_nome,
-                    c.email as cliente_email
+                    p.foto as produto_imagem,
+                    u.nome as cliente_nome,
+                    u.email as cliente_email
                 FROM devolucoes d
                 INNER JOIN encomendas e ON d.encomenda_id = e.id
-                INNER JOIN produtos p ON d.produto_id = p.id
-                INNER JOIN cliente c ON d.cliente_id = c.id
+                INNER JOIN produtos p ON d.produto_id = p.Produto_id
+                INNER JOIN Utilizadores u ON d.cliente_id = u.id
                 WHERE d.anunciante_id = ?";
 
         if ($filtro_estado) {
@@ -380,6 +380,117 @@ class ModelDevolucoes {
     }
 
     /**
+     * Confirmar envio do produto pelo cliente
+     *
+     * @param int $devolucao_id
+     * @param int $cliente_id
+     * @param string $codigo_rastreio
+     * @return array
+     */
+    public function confirmarEnvioCliente($devolucao_id, $cliente_id, $codigo_rastreio = '') {
+        try {
+            $devolucao = $this->obterDetalhes($devolucao_id);
+
+            if (!$devolucao) {
+                return ['success' => false, 'message' => 'Devolução não encontrada.'];
+            }
+
+            if ($devolucao['cliente_id'] != $cliente_id) {
+                return ['success' => false, 'message' => 'Sem permissão para confirmar esta devolução.'];
+            }
+
+            if ($devolucao['estado'] !== 'aprovada') {
+                return ['success' => false, 'message' => 'Apenas devoluções aprovadas podem ter envio confirmado.'];
+            }
+
+            // Atualizar estado
+            $sql = "UPDATE devolucoes
+                    SET estado = 'enviada',
+                        codigo_rastreio = ?,
+                        data_envio_cliente = NOW()
+                    WHERE id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param('si', $codigo_rastreio, $devolucao_id);
+
+            if (!$stmt->execute()) {
+                throw new Exception("Erro ao confirmar envio");
+            }
+
+            // Registrar histórico
+            $obs = $codigo_rastreio ? "Código de rastreio: {$codigo_rastreio}" : "Sem código de rastreio";
+            $this->registrarHistorico($devolucao_id, 'aprovada', 'enviada', 'cliente', $obs);
+
+            // Enviar notificação ao anunciante
+            $this->enviarNotificacaoEnvio($devolucao_id);
+
+            return [
+                'success' => true,
+                'message' => 'Envio confirmado! O vendedor será notificado.'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Erro em confirmarEnvioCliente: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Erro ao confirmar envio.'];
+        }
+    }
+
+    /**
+     * Confirmar recebimento do produto pelo vendedor
+     *
+     * @param int $devolucao_id
+     * @param int $anunciante_id
+     * @param string $notas_recebimento
+     * @return array
+     */
+    public function confirmarRecebimentoVendedor($devolucao_id, $anunciante_id, $notas_recebimento = '') {
+        try {
+            $devolucao = $this->obterDetalhes($devolucao_id);
+
+            if (!$devolucao) {
+                return ['success' => false, 'message' => 'Devolução não encontrada.'];
+            }
+
+            if ($devolucao['anunciante_id'] != $anunciante_id) {
+                return ['success' => false, 'message' => 'Sem permissão para confirmar esta devolução.'];
+            }
+
+            if ($devolucao['estado'] !== 'enviada') {
+                return ['success' => false, 'message' => 'Produto ainda não foi enviado pelo cliente.'];
+            }
+
+            // Atualizar estado
+            $sql = "UPDATE devolucoes
+                    SET estado = 'recebida',
+                        notas_recebimento = ?,
+                        data_recebimento = NOW()
+                    WHERE id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param('si', $notas_recebimento, $devolucao_id);
+
+            if (!$stmt->execute()) {
+                throw new Exception("Erro ao confirmar recebimento");
+            }
+
+            // Registrar histórico
+            $this->registrarHistorico($devolucao_id, 'enviada', 'recebida', 'anunciante', $notas_recebimento);
+
+            // Enviar notificação ao cliente
+            $this->enviarNotificacaoRecebimento($devolucao_id);
+
+            return [
+                'success' => true,
+                'message' => 'Recebimento confirmado! Agora você pode processar o reembolso.'
+            ];
+
+        } catch (Exception $e) {
+            error_log("Erro em confirmarRecebimentoVendedor: " . $e->getMessage());
+            return ['success' => false, 'message' => 'Erro ao confirmar recebimento.'];
+        }
+    }
+
+    /**
      * Processar reembolso via Stripe
      *
      * @param int $devolucao_id
@@ -396,6 +507,11 @@ class ModelDevolucoes {
             // Verificar se já foi reembolsada
             if ($devolucao['estado'] === 'reembolsada') {
                 return ['success' => false, 'message' => 'Esta devolução já foi reembolsada.'];
+            }
+
+            // VALIDAÇÃO: Só processar reembolso se produto foi recebido
+            if ($devolucao['estado'] !== 'recebida') {
+                return ['success' => false, 'message' => 'Você precisa confirmar o recebimento do produto antes de processar o reembolso.'];
             }
 
             // Verificar se tem payment_intent
@@ -592,12 +708,22 @@ class ModelDevolucoes {
             $emailService = new EmailService();
             $devolucao = $this->obterDetalhes($devolucao_id);
 
+            // 1. Enviar email
             $emailService->enviarEmail(
                 $devolucao['cliente_email'],
                 'devolucao_aprovada',
                 $devolucao,
                 $devolucao['cliente_id'],
                 'cliente'
+            );
+
+            // 2. Criar notificação in-app para o cliente
+            $this->criarNotificacaoSistema(
+                $devolucao['cliente_id'],
+                'devolucao_aprovada',
+                "✅ Devolução Aprovada",
+                "Sua devolução #{$devolucao['codigo_devolucao']} foi aprovada! Por favor, envie o produto de volta e confirme o envio no sistema.",
+                $devolucao_id
             );
 
         } catch (Exception $e) {
@@ -644,6 +770,93 @@ class ModelDevolucoes {
 
         } catch (Exception $e) {
             error_log("Erro ao enviar notificação de reembolso: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Enviar notificação de envio confirmado (para anunciante)
+     */
+    private function enviarNotificacaoEnvio($devolucao_id) {
+        try {
+            $emailService = new EmailService();
+            $devolucao = $this->obterDetalhes($devolucao_id);
+
+            // 1. Enviar email para anunciante
+            $emailService->enviarEmail(
+                $devolucao['anunciante_email'],
+                'devolucao_enviada',
+                $devolucao,
+                $devolucao['anunciante_id'],
+                'anunciante'
+            );
+
+            // 2. Criar notificação in-app para o anunciante
+            $rastreio = !empty($devolucao['codigo_rastreio']) ? " (Rastreio: {$devolucao['codigo_rastreio']})" : "";
+            $this->criarNotificacaoSistema(
+                $devolucao['anunciante_id'],
+                'devolucao_enviada',
+                "📦 Cliente Enviou Produto",
+                "O cliente confirmou o envio do produto da devolução #{$devolucao['codigo_devolucao']}{$rastreio}. Aguarde recebimento e confirme no sistema.",
+                $devolucao_id
+            );
+
+        } catch (Exception $e) {
+            error_log("Erro ao enviar notificação de envio: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Enviar notificação de recebimento confirmado (para cliente)
+     */
+    private function enviarNotificacaoRecebimento($devolucao_id) {
+        try {
+            $emailService = new EmailService();
+            $devolucao = $this->obterDetalhes($devolucao_id);
+
+            // 1. Enviar email para cliente
+            $emailService->enviarEmail(
+                $devolucao['cliente_email'],
+                'devolucao_recebida',
+                $devolucao,
+                $devolucao['cliente_id'],
+                'cliente'
+            );
+
+            // 2. Criar notificação in-app para o cliente
+            $this->criarNotificacaoSistema(
+                $devolucao['cliente_id'],
+                'devolucao_recebida',
+                "✅ Produto Recebido",
+                "O vendedor confirmou o recebimento do produto da devolução #{$devolucao['codigo_devolucao']}. O reembolso será processado em breve (5-10 dias úteis).",
+                $devolucao_id
+            );
+
+        } catch (Exception $e) {
+            error_log("Erro ao enviar notificação de recebimento: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Criar notificação in-app no sistema WeGreen
+     * (Armazena na própria tabela devolucoes, será exibida pelo sistema de notificações)
+     *
+     * @param int $utilizador_id ID do utilizador que receberá a notificação
+     * @param string $tipo Tipo da notificação (devolucao_aprovada, devolucao_enviada, etc.)
+     * @param string $titulo Título da notificação
+     * @param string $mensagem Mensagem da notificação
+     * @param int $referencia_id ID da devolução relacionada
+     */
+    private function criarNotificacaoSistema($utilizador_id, $tipo, $titulo, $mensagem, $referencia_id) {
+        try {
+            // O sistema WeGreen exibe notificações baseadas nas tabelas devolucoes e encomendas
+            // Não há tabela separada de notificações, então apenas logamos
+            error_log("[NOTIFICAÇÃO SISTEMA] User: $utilizador_id | Tipo: $tipo | Título: $titulo | Devolução ID: $referencia_id");
+
+            // A notificação será exibida automaticamente pelo ModelNotifications
+            // que consulta a tabela devolucoes com estados aprovada/enviada/recebida/reembolsada
+
+        } catch (Exception $e) {
+            error_log("Erro ao criar notificação in-app: " . $e->getMessage());
         }
     }
 

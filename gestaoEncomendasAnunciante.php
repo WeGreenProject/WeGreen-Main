@@ -12,7 +12,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Encomendas - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/Anunciante.css">
+    <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,42 +29,40 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 </head>
 
 <body>
-    <div class="container">
+    <div class="dashboard-container">
         <aside class="sidebar">
-            <div class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <i class="fas fa-leaf"></i>
                 <div class="logo-text">
-                    <h1>WeGreen</h1>
+                    <h2>WeGreen</h2>
                     <p>Moda Sustentável</p>
                 </div>
-            </div>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="DashboardAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="gestaoEncomendasAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Encomendas</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="relatoriosAnunciante.php">
-                            <span class="nav-icon"><i class="fas fa-chart-bar"></i></span>
-                            <span class="nav-text">Relatórios</span>
-                        </a>
-                    </li>
-                </ul>
+            </a>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu</div>
+                    <a href="DashboardAnunciante.php" class="menu-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="gestaoProdutosAnunciante.php" class="menu-item">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Produtos</span>
+                    </a>
+                    <a href="gestaoEncomendasAnunciante.php" class="menu-item active">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Encomendas</span>
+                    </a>
+                    <a href="gestaoDevolucoesAnunciante.php" class="menu-item">
+                        <i class="fas fa-undo"></i>
+                        <span>Devoluções</span>
+                    </a>
+                    <a href="ChatAnunciante.php" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
+                    </a>
+                </div>
             </nav>
         </aside>
 
@@ -72,13 +71,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 <div class="navbar-left">
                 </div>
                 <div class="navbar-right">
-                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;">
+                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;" <?php echo (isset($_SESSION['plano']) && $_SESSION['plano'] == 3) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>>
                         <i class="fas fa-crown"></i> Upgrade
                     </button>
-                    <button class="navbar-icon-btn" id="notificationBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user" id="userMenuBtn">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff" alt="Usuário" class="user-avatar">
                         <div class="user-info">
@@ -136,6 +132,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </select>
                     <input type="date" id="filterDateFrom" placeholder="Data Inicial">
                     <input type="date" id="filterDateTo" placeholder="Data Final">
+                    <button id="exportEncomendasBtn" class="btn btn-secondary" style="margin-left: auto;"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
                 </div>
 
                 <div class="table-container">
