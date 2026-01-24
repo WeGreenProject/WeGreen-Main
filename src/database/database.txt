@@ -408,7 +408,7 @@ CREATE TABLE `planos` (
 INSERT INTO `planos` (`id`, `nome`, `preco`, `limite_produtos`, `rastreio_tipo`, `relatorio_pdf`) VALUES
 (1, 'Plano Essencial Verde', 0.00, 5, 'Basico', 0),
 (2, 'Plano Crescimento Circular', 25.00, 10, 'Basico', 1),
-(3, 'Plano Profissional Eco+', 100.00, NULL, 'Avancado', 1);
+(3, 'Plano Profissional Eco+', 70.00, NULL, 'Avancado', 1);
 
 -- --------------------------------------------------------
 

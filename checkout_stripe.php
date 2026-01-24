@@ -51,17 +51,8 @@ foreach ($produtos as $produto) {
     ];
 }
 
-$line_items[] = [
-    'price_data' => [
-        'currency' => 'eur',
-        'product_data' => [
-            'name' => 'Envio',
-            'description' => 'Taxa de envio',
-        ],
-        'unit_amount' => 500, // €5.00
-    ],
-    'quantity' => 1,
-];
+// NOTA: Custo de envio é cobrado via shipping_options do Stripe (linhas abaixo)
+// NÃO adicionar aqui para evitar cobrança duplicada
 
 $discounts = [];
 if (isset($_SESSION['cupao_desconto']) && $_SESSION['cupao_desconto'] > 0) {

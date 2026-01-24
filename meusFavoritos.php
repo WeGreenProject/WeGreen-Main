@@ -425,27 +425,31 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
                 html += `
                     <div class="produto-favorito-card" id="produto-${fav.produto_id}">
-                        <img src="${fav.foto}" alt="${fav.nome}" class="produto-foto" onerror="this.src='src/img/placeholder-produto.jpg'">
-                        <div class="produto-info">
-                            <h3 class="produto-nome">${fav.nome}</h3>
-                            <div class="produto-preco">€${parseFloat(fav.preco).toFixed(2)}</div>
-                            <div class="produto-detalhes">
-                                <i class="fas fa-tag"></i> ${fav.marca || 'Sem marca'} |
-                                <i class="fas fa-tshirt"></i> ${fav.tamanho || 'Único'}
+                        <a href="produto.php?id=${fav.produto_id}" style="text-decoration: none; color: inherit;">
+                            <img src="${fav.foto}" alt="${fav.nome}" class="produto-foto" onerror="this.src='src/img/placeholder-produto.jpg'">
+                            <div class="produto-info">
+                                <h3 class="produto-nome">${fav.nome}</h3>
+                                <div class="produto-preco">€${parseFloat(fav.preco).toFixed(2)}</div>
+                                <div class="produto-detalhes">
+                                    <i class="fas fa-tag"></i> ${fav.marca || 'Sem marca'} |
+                                    <i class="fas fa-tshirt"></i> ${fav.tamanho || 'Único'}
+                                </div>
+                                <div class="produto-detalhes">
+                                    <i class="fas fa-store"></i> ${fav.anunciante_nome}
+                                </div>
+                                <span class="produto-status ${disponivel ? 'status-disponivel' : 'status-indisponivel'}">
+                                    ${disponivel ? '✓ Disponível' : '✗ Indisponível'}
+                                </span>
                             </div>
-                            <div class="produto-detalhes">
-                                <i class="fas fa-store"></i> ${fav.anunciante_nome}
-                            </div>
-                            <span class="produto-status ${disponivel ? 'status-disponivel' : 'status-indisponivel'}">
-                                ${disponivel ? '✓ Disponível' : '✗ Indisponível'}
-                            </span>
+                        </a>
+                        <div class="produto-info" style="padding-top: 0;">
                             <div class="produto-acoes">
                                 ${disponivel ? `
-                                    <button class="btn-action btn-carrinho" onclick="adicionarCarrinho(${fav.produto_id})">
+                                    <button class="btn-action btn-carrinho" onclick="event.stopPropagation(); adicionarCarrinho(${fav.produto_id})">
                                         <i class="fas fa-shopping-cart"></i> Comprar
                                     </button>
                                 ` : ''}
-                                <button class="btn-action btn-remover" onclick="removerFavorito(${fav.produto_id}, this)">
+                                <button class="btn-action btn-remover" onclick="event.stopPropagation(); removerFavorito(${fav.produto_id}, this)">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

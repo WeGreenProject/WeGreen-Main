@@ -96,7 +96,7 @@ class EmailService {
 
                 // Mostrar erro no output também
                 echo "<div style='background:#f8d7da;padding:10px;margin:5px 0;border-left:4px solid #dc3545;'>";
-                echo "<strong>❌ Erro (tentativa {$attempts}/{$maxAttempts}):</strong> " . htmlspecialchars($e->getMessage());
+                echo "<strong>Erro (tentativa {$attempts}/{$maxAttempts}):</strong> " . htmlspecialchars($e->getMessage());
                 echo "</div>";
 
                 if ($attempts < $maxAttempts) {
@@ -182,28 +182,6 @@ class EmailService {
         return $this->send($to, $subject, $htmlBody);
     }
 
-    /**
-     * Verifica se o utilizador tem notificações ativadas
-     *
-     * @param int $utilizador_id ID do utilizador
-     * @param string $tipo Tipo de utilizador ('cliente' ou 'anunciante')
-     * @param string $template Tipo de notificação
-     * @return bool True se pode enviar
-     */
-    private function verificarPreferencias($utilizador_id, $tipo, $template) {
-        // Por enquanto sempre retorna true
-        // Futuramente pode verificar na tabela de preferências
-        return true;
-    }
-
-    /**
-     * Envia email de boas-vindas após registo de utilizador
-     *
-     * @param string $email Email do utilizador
-     * @param string $nome Nome do utilizador
-     * @param string $data_criacao Data de criação da conta (opcional)
-     * @return bool True se enviado com sucesso
-     */
     public function sendBoasVindas($email, $nome, $data_criacao = null) {
         $subject = '🎉 Bem-vindo ao WeGreen';
 
@@ -234,14 +212,6 @@ class EmailService {
         return $this->send($email, $subject, $htmlBody);
     }
 
-    /**
-     * Envia email de verificação de conta
-     *
-     * @param string $email Email do utilizador
-     * @param string $nome Nome do utilizador
-     * @param string $link_verificacao Link para verificar email
-     * @return bool True se enviado com sucesso
-     */
     public function sendVerificacaoEmail($email, $nome, $link_verificacao) {
         $subject = '✉️ Verificação de Email - WeGreen';
 
@@ -270,14 +240,6 @@ class EmailService {
         return $this->send($email, $subject, $htmlBody);
     }
 
-    /**
-     * Envia email de recuperação de password
-     *
-     * @param string $email Email do utilizador
-     * @param string $nome Nome do utilizador
-     * @param string $reset_link Link para redefinir password
-     * @return bool True se enviado com sucesso
-     */
     public function sendResetPassword($email, $nome, $reset_link) {
         $subject = '🔑 Recuperação de Password - WeGreen';
 
@@ -306,15 +268,6 @@ class EmailService {
         return $this->send($email, $subject, $htmlBody);
     }
 
-    /**
-     * Envia email quando administrador cria conta para utilizador
-     *
-     * @param string $email Email do utilizador
-     * @param string $nome Nome do utilizador
-     * @param string $password_temporaria Password temporária gerada
-     * @param int $tipo_utilizador Tipo de utilizador (1=Admin, 2=Cliente, 3=Anunciante)
-     * @return bool True se enviado com sucesso
-     */
     public function sendContaCriadaAdmin($email, $nome, $password_temporaria, $tipo_utilizador = 2) {
         $subject = 'A sua conta WeGreen foi criada';
 
@@ -346,18 +299,12 @@ class EmailService {
         return $this->send($email, $subject, $htmlBody);
     }
 
-    /**
-     * Envia email de teste para validar configuração
-     *
-     * @param string $to Email de destino
-     * @return bool True se enviado com sucesso
-     */
     public function sendTestEmail($to) {
         $subject = 'Teste de Configuração - WeGreen';
         $body = '
             <html>
             <body style="font-family: Arial, sans-serif; padding: 20px;">
-                <h2 style="color: #22c55e;">✅ Configuração de Email OK!</h2>
+                <h2 style="color: #22c55e;">Configuração de Email OK!</h2>
                 <p>Este é um email de teste do sistema WeGreen.</p>
                 <p>Se recebeu esta mensagem, o serviço de email está configurado corretamente.</p>
                 <hr>
@@ -372,16 +319,6 @@ class EmailService {
         return $this->send($to, $subject, $body);
     }
 
-    /**
-     * Envia email genérico usando template e verificando preferências do utilizador
-     *
-     * @param string $email Email do destinatário
-     * @param string $template Nome do template (sem .php)
-     * @param array $data Dados para o template
-     * @param int $utilizador_id ID do utilizador (para verificar preferências)
-     * @param string $tipo Tipo de utilizador ('cliente' ou 'anunciante')
-     * @return bool True se enviado com sucesso
-     */
     public function enviarEmail($email, $template, $data, $utilizador_id = null, $tipo = 'cliente') {
         // Verificar preferências do utilizador se ID foi fornecido
         if ($utilizador_id) {

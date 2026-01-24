@@ -42,8 +42,8 @@ if ($_POST['op'] == 9) {
 }
 if ($_POST['op'] == 10) {
     $resp = $func->logout();
-    // Redirecionar para index após logout
-    header('Location: ../../index.html');
+    // Redirecionar para Dashboard Admin após logout
+    header('Location: ../../DashboardAdmin.php');
     exit();
 }
  if ($_POST['op'] == 21) {

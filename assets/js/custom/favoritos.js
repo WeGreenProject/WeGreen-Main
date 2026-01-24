@@ -1,15 +1,3 @@
-/**
- * Sistema de Favoritos/Wishlist
- * Gestão completa da lista de desejos do cliente
- */
-
-// ========================================
-// ADICIONAR/REMOVER FAVORITOS
-// ========================================
-
-/**
- * Toggle favorito (adicionar ou remover)
- */
 function toggleFavorito(produtoId, botaoElement) {
   const isFavorito = $(botaoElement).hasClass("favorito-ativo");
 
