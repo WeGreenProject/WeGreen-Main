@@ -4,14 +4,24 @@ function registaUser() {
   const apelido = $("#apelido").val().trim();
   const email = $("#email").val().trim();
   const nif = $("#nif").val().trim();
+  const morada = $("#morada").val().trim();
   const password = $("#password").val();
   const tipoUtilizador = $("#tipoUtilizador").val();
 
-  if (!nome || !apelido || !email || !password) {
+  if (!nome || !apelido || !email || !password || !morada) {
     alerta(
       "Atenção",
       "Por favor, preencha todos os campos obrigatórios",
-      "warning"
+      "warning",
+    );
+    return;
+  }
+
+  if (morada.length < 10) {
+    alerta(
+      "Atenção",
+      "A morada deve ter pelo menos 10 caracteres (Rua, Número, Código Postal, Cidade)",
+      "warning",
     );
     return;
   }
@@ -31,7 +41,7 @@ function registaUser() {
     alerta(
       "Atenção",
       "NIF deve conter exatamente 9 dígitos numéricos",
-      "warning"
+      "warning",
     );
     return;
   }
@@ -42,6 +52,7 @@ function registaUser() {
   dados.append("apelido", apelido);
   dados.append("email", email);
   dados.append("nif", nif);
+  dados.append("morada", morada);
   dados.append("password", password);
   dados.append("tipoUtilizador", tipoUtilizador);
 

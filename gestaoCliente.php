@@ -90,10 +90,7 @@
 >>>>>>> d55834b (atualizaçºoes do chat)
                         </div>
                         <div class="navbar-right">
-                            <button class="navbar-icon-btn">
-                                <i class="fas fa-bell"></i>
-                                <span class="notification-badge">3</span>
-                            </button>
+                            <?php include 'src/views/notifications-widget.php'; ?>
                             <div class="navbar-user">
                                 <div id="AdminPerfilInfo" style="display:flex;"></div>
                                 <i class=" fas fa-chevron-down user-trigger"

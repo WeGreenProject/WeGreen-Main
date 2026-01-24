@@ -525,10 +525,7 @@ if($_SESSION['tipo'] == 1){
                     <h2 class="navbar-title">Gestão de Planos</h2>
                 </div>
                 <div class="navbar-right">
-                    <button class="navbar-icon-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user" onclick="toggleUserDropdown()">
                         <div class="user-avatar">A</div>
                         <div class="user-info">
@@ -728,7 +725,7 @@ if($_SESSION['tipo'] == 1){
         grid.innerHTML = plans.map(plan => `
                 <div class="plan-card ${plan.featured ? 'featured' : ''}">
                     ${plan.featured ? '<div class="plan-badge">Em Destaque</div>' : ''}
-                    
+
                     <div class="plan-icon">
                         <i class="fas ${plan.icon}"></i>
                     </div>

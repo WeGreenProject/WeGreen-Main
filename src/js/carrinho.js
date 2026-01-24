@@ -578,9 +578,65 @@ function showStep(step) {
 function nextStep() {
   if (currentStep < totalSteps) {
     if (validateStep(currentStep)) {
+      // Se indo para step 2 (entrega), preencher dados do utilizador
+      if (currentStep === 1) {
+        preencherDadosUtilizador();
+      }
       showStep(currentStep + 1, true);
     }
   }
+}
+
+// Preencher dados do utilizador automaticamente
+function preencherDadosUtilizador() {
+  $.ajax({
+    url: "src/controller/controllerPerfil.php",
+    method: "POST",
+    data: { op: 12 },
+    dataType: "json",
+    success: function (response) {
+      if (response.success && response.data) {
+        const dados = response.data;
+
+        // Preencher nome e apelido
+        if (dados.nome) {
+          const nomeCompleto = dados.nome.split(" ");
+          $("#firstName").val(nomeCompleto[0] || "");
+          $("#lastName").val(nomeCompleto.slice(1).join(" ") || "");
+        }
+
+        // Preencher morada se disponível
+        if (dados.morada && dados.morada !== "Morada não cadastrada") {
+          // Tentar extrair partes da morada
+          const moradaParts = dados.morada.split(",");
+          if (moradaParts.length > 0) {
+            $("#address1").val(moradaParts[0].trim());
+          }
+          if (moradaParts.length > 1) {
+            $("#address2").val(moradaParts[1].trim());
+          }
+
+          // Tentar extrair código postal (formato XXXX-XXX)
+          const zipMatch = dados.morada.match(/\d{4}-\d{3}/);
+          if (zipMatch) {
+            $("#zipCode").val(zipMatch[0]);
+          }
+
+          // Tentar extrair cidade
+          const cidadeMatch = dados.morada.match(
+            /[A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Ú][a-zà-ú]+)*/,
+          );
+          if (cidadeMatch) {
+            $("#city").val(cidadeMatch[0]);
+            $("#state").val(cidadeMatch[0]);
+          }
+        }
+      }
+    },
+    error: function (xhr, status, error) {
+      console.log("Erro ao carregar dados do utilizador:", error);
+    },
+  });
 }
 
 // Voltar step anterior
@@ -1125,6 +1181,20 @@ function loadShippingInfo() {
 }
 
 $(function () {
+  console.log("Carrinho.js iniciado");
+  console.log("Bootstrap disponível:", typeof bootstrap !== "undefined");
+
+  // Inicializar Bootstrap Dropdowns manualmente
+  if (typeof bootstrap !== "undefined") {
+    var dropdownElementList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="dropdown"]'),
+    );
+    var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+      return new bootstrap.Dropdown(dropdownToggleEl);
+    });
+    console.log("Dropdowns Bootstrap inicializados:", dropdownList.length);
+  }
+
   // Inicializar steps
   showStep(1);
   loadUserName();

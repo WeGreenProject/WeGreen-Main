@@ -9,6 +9,7 @@ if ($_POST['op'] == 1) {
         $_POST['apelido'],
         $_POST['email'],
         $_POST['nif'],
+        $_POST['morada'],
         $_POST['password'],
         $_POST['tipoUtilizador']
     );

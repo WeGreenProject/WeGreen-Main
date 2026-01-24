@@ -64,8 +64,18 @@ if ($_POST['op'] == 11) {
     }
 }
 
-// op 12 - Verificar conta alternativa
-if ($_POST['op'] == 12) {
+// op 12 - Obter dados do perfil do cliente
+if ((isset($_POST['op']) && $_POST['op'] == 12) || (isset($_GET['op']) && $_GET['op'] == 12)) {
+    if(isset($_SESSION['utilizador'])) {
+        $resp = $func->getDadosPerfilCliente($_SESSION['utilizador']);
+        echo $resp;
+    } else {
+        echo json_encode(['error' => 'Sessão inválida']);
+    }
+}
+
+// op 17 - Verificar conta alternativa (renomeado de op 12 duplicado)
+if ($_POST['op'] == 17) {
     if(isset($_SESSION['utilizador']) && isset($_SESSION['email']) && isset($_SESSION['tipo'])) {
         $resp = $func->verificarContaAlternativa($_SESSION['email'], $_SESSION['tipo']);
         echo $resp;
@@ -146,16 +156,6 @@ if ($_POST['op'] == 'alterarSenha') {
     }
 }
 
-// op 12 - Obter dados do perfil do cliente
-if ($_POST['op'] == 12) {
-    if(isset($_SESSION['utilizador'])) {
-        $resp = $func->getDadosPerfilCliente($_SESSION['utilizador']);
-        echo $resp;
-    } else {
-        echo json_encode(['error' => 'Sessão inválida']);
-    }
-}
-
 // op 16 - Atualizar dados de perfil do cliente
 if ($_POST['op'] == 16) {
     if(isset($_SESSION['utilizador'])) {
@@ -164,7 +164,9 @@ if ($_POST['op'] == 16) {
         $nif = isset($_POST['nif']) ? $_POST['nif'] : null;
         $telefone = isset($_POST['telefone']) ? $_POST['telefone'] : null;
         $morada = isset($_POST['morada']) ? $_POST['morada'] : null;
-        echo $func->atualizarPerfilCliente($_SESSION['utilizador'], $nome, $email, $telefone, $nif, $morada);
+        $distrito = isset($_POST['distrito']) ? $_POST['distrito'] : null;
+        $localidade = isset($_POST['localidade']) ? $_POST['localidade'] : null;
+        echo $func->atualizarPerfilCliente($_SESSION['utilizador'], $nome, $email, $telefone, $nif, $morada, $distrito, $localidade);
     } else {
         echo json_encode(['success' => false, 'message' => 'Sessão inválida']);
     }

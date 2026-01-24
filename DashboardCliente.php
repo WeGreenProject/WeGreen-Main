@@ -14,10 +14,12 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
     <title>Dashboard Cliente - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/DashboardCliente.css">
+    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/notifications.js"></script>
 
 </head>
 <body>
@@ -63,9 +65,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                     <h1 class="page-title"><i class="fas fa-home"></i> Dashboard</h1>
                 </div>
                 <div class="navbar-right">
-                    <button class="btn-upgrade-navbar" onclick="window.location.href='planos.php'">
-                        <i class="fas fa-crown"></i> Upgrade
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user" id="userMenuBtn">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Cliente'); ?>&background=3cb371&color=fff" alt="User" class="user-avatar">
                         <div class="user-info">
@@ -211,6 +211,13 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                 const statusInfo = getStatusInfo(enc.estado);
                 const data = formatarData(enc.data_envio);
 
+                // Usar ícone SVG como placeholder se não houver foto
+                const foto = enc.foto_produto || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="%23cbd5e0" stroke-width="2"%3E%3Crect x="3" y="3" width="18" height="18" rx="2" ry="2"%3E%3C/rect%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"%3E%3C/circle%3E%3Cpolyline points="21 15 16 10 5 21"%3E%3C/polyline%3E%3C/svg%3E';
+
+                const produtos = enc.nomes_produtos || 'Produto';
+                const produtosTexto = produtos.length > 50 ? produtos.substring(0, 50) + '...' : produtos;
+                const transportadora = enc.transportadora || 'N/A';
+
                 html += `
                     <div class="encomenda-card">
                         <div class="encomenda-header">
@@ -221,8 +228,15 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                             <span class="status-badge ${statusInfo.class}">${statusInfo.text}</span>
                         </div>
                         <div class="encomenda-body">
-                            <div class="encomenda-detalhes">
-                                <span><i class="fas fa-box"></i> ${enc.total_produtos || 0} produto(s)</span>
+                            <div class="encomenda-produto-info">
+                                <img src="${foto}" alt="Produto" class="produto-thumbnail" style="background: #f7fafc;">
+                                <div class="encomenda-produto-detalhes">
+                                    <div class="encomenda-produto-nome" title="${produtos}">${produtosTexto}</div>
+                                    <div class="encomenda-produto-meta">
+                                        <span><i class="fas fa-box"></i> ${enc.total_produtos || 0} item(s)</span>
+                                        <span><i class="fas fa-truck"></i> ${transportadora}</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="encomenda-valor">
                                 <div class="valor-label">Total</div>

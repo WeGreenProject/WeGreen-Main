@@ -1114,8 +1114,61 @@ body {
 .encomenda-body {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 16px;
+  gap: 20px;
+}
+
+.encomenda-produto-info {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  gap: 12px;
+}
+
+.produto-thumbnail {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.encomenda-produto-detalhes {
+  flex: 1;
+  min-width: 0;
+}
+
+.encomenda-produto-nome {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.encomenda-produto-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.encomenda-produto-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.encomenda-produto-meta i {
+  color: #3cb371;
+  font-size: 12px;
 }
 
 .encomenda-detalhes {
@@ -1132,6 +1185,8 @@ body {
 
 .encomenda-valor {
   text-align: right;
+  flex-shrink: 0;
+  min-width: 100px;
 }
 
 .valor-label {

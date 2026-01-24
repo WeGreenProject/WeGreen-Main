@@ -666,7 +666,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
     function getDadosPerfilCliente($ID_User) {
         global $conn;
 
-        $sql = "SELECT u.id, u.nome, u.apelido, u.email, u.nif, u.telefone, u.morada, u.foto, u.data_criacao
+        $sql = "SELECT u.id, u.nome, u.apelido, u.email, u.nif, u.telefone, u.morada, u.distrito, u.localidade, u.foto, u.data_criacao
                 FROM Utilizadores u
                 WHERE u.id = ?";
 
@@ -689,7 +689,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
     }
 
     // Atualizar dados do perfil do cliente
-    function atualizarPerfilCliente($ID_User, $nome, $email, $telefone = null, $nif = null, $morada = null) {
+    function atualizarPerfilCliente($ID_User, $nome, $email, $telefone = null, $nif = null, $morada = null, $distrito = null, $localidade = null) {
         global $conn;
 
         // Validações
@@ -699,6 +699,18 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return json_encode(['success' => false, 'message' => 'Email inválido']);
+        }
+
+        if (empty($morada) || strlen(trim($morada)) < 10) {
+            return json_encode(['success' => false, 'message' => 'Morada completa é obrigatória (mínimo 10 caracteres)']);
+        }
+
+        if (empty($distrito)) {
+            return json_encode(['success' => false, 'message' => 'Distrito é obrigatório']);
+        }
+
+        if (empty($localidade) || strlen(trim($localidade)) < 2) {
+            return json_encode(['success' => false, 'message' => 'Localidade é obrigatória']);
         }
 
         if (!empty($nif) && !preg_match('/^[0-9]{9}$/', $nif)) {
@@ -728,9 +740,9 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
         $apelido = isset($partesNome[1]) ? $partesNome[1] : null;
 
         // Atualizar dados
-        $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ? WHERE id = ?";
+        $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ?, distrito = ?, localidade = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $ID_User);
+        $stmt->bind_param("ssssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $distrito, $localidade, $ID_User);
 
         if ($stmt->execute()) {
             // Atualizar sessão

@@ -1,0 +1,130 @@
+/* Estilos específicos para Gestão de Devoluções */
+
+.btn-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-solicitada {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-aprovada {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-rejeitada {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-produto_recebido {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-reembolsada {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelada {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-icon {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.btn-icon:hover {
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-success:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-danger:hover {
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.btn-info:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filters select,
+.filters input {
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.filters select:focus,
+.filters input:focus {
+  outline: none;
+  border-color: #a6d90c;
+  box-shadow: 0 0 0 3px rgba(166, 217, 12, 0.1);
+}
+
+.stats-grid-compact {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}

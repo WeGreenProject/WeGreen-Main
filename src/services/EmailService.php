@@ -373,4 +373,141 @@ class EmailService {
         // Enviar email
         return $this->send($email, $subject, $htmlBody);
     }
+
+    /**
+     * Enviar email de alteração de status de encomenda
+     */
+    public function enviarEmailStatusEncomenda($cliente_email, $cliente_nome, $codigo_encomenda, $novo_status, $codigo_rastreio = null) {
+        $status_texto = [
+            'Pendente' => 'Pendente de Processamento',
+            'Processando' => 'Em Processamento',
+            'Enviado' => 'Enviada',
+            'Entregue' => 'Entregue',
+            'Cancelado' => 'Cancelada'
+        ];
+
+        $rastreio_html = '';
+        if ($codigo_rastreio && $novo_status === 'Enviado') {
+            $rastreio_html = "
+                <div style='background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;'>
+                    <h3 style='color: #1f2937; margin-bottom: 10px;'>📦 Código de Rastreio</h3>
+                    <p style='font-size: 18px; font-weight: bold; color: #A6D90C; font-family: monospace;'>{$codigo_rastreio}</p>
+                    <p style='color: #6b7280; font-size: 14px; margin-top: 10px;'>Use este código para acompanhar sua encomenda no site da transportadora.</p>
+                </div>
+            ";
+        }
+
+        $htmlBody = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;'>
+                <div style='background: linear-gradient(135deg, #A6D90C 0%, #8ab80a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>
+                    <h1 style='color: white; margin: 0; font-size: 32px;'>🌿 WeGreen</h1>
+                    <p style='color: white; margin: 10px 0 0 0; font-size: 14px;'>Moda Sustentável</p>
+                </div>
+
+                <div style='background-color: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none;'>
+                    <h2 style='color: #1f2937; margin-bottom: 20px;'>Olá, {$cliente_nome}! 👋</h2>
+                    <p style='color: #4b5563; font-size: 16px; line-height: 1.6;'>A sua encomenda foi atualizada:</p>
+
+                    <div style='background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #A6D90C;'>
+                        <p style='margin: 0; color: #6b7280; font-size: 14px;'><strong>Código da Encomenda:</strong></p>
+                        <p style='font-size: 20px; font-weight: bold; color: #1f2937; margin: 5px 0 15px 0;'>#{$codigo_encomenda}</p>
+                        <p style='margin: 0; color: #6b7280; font-size: 14px;'><strong>Novo Status:</strong></p>
+                        <p style='margin: 5px 0 0 0;'><span style='background-color: #A6D90C; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px;'>{$status_texto[$novo_status]}</span></p>
+                    </div>
+
+                    {$rastreio_html}
+
+                    <p style='color: #6b7280; margin-top: 25px; font-size: 15px; line-height: 1.6;'>Pode acompanhar o estado da sua encomenda na sua conta WeGreen.</p>
+
+                    <div style='text-align: center; margin-top: 30px;'>
+                        <a href='http://localhost/WeGreen-Main/minhasEncomendas.php' style='background-color: #A6D90C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px;'>Ver Minhas Encomendas</a>
+                    </div>
+                </div>
+
+                <div style='background-color: #f3f4f6; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;'>
+                    <p style='color: #6b7280; font-size: 12px; margin: 0;'>© 2026 WeGreen. Todos os direitos reservados.</p>
+                    <p style='color: #9ca3af; font-size: 11px; margin: 5px 0 0 0;'>Este é um email automático, por favor não responda.</p>
+                </div>
+            </div>
+        ";
+
+        $subject = "Encomenda #{$codigo_encomenda} - {$status_texto[$novo_status]}";
+        return $this->send($cliente_email, $subject, $htmlBody);
+    }
+
+    /**
+     * Enviar email de devolução aprovada/rejeitada
+     */
+    public function enviarEmailDevolucao($cliente_email, $cliente_nome, $codigo_devolucao, $status, $notas_anunciante = null) {
+        $aprovado = $status === 'aprovada';
+        $cor_status = $aprovado ? '#10b981' : '#ef4444';
+        $texto_status = $aprovado ? 'APROVADA ✓' : 'REJEITADA ✗';
+        $emoji_status = $aprovado ? '✅' : '❌';
+
+        $instrucoes_html = '';
+        if ($aprovado) {
+            $instrucoes_html = "
+                <div style='background-color: #d1fae5; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #10b981;'>
+                    <h3 style='color: #065f46; margin: 0 0 15px 0; font-size: 16px;'>📋 Próximos Passos</h3>
+                    <div style='color: #065f46;'>
+                        <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
+                            <span style='position: absolute; left: 0;'>1️⃣</span> Embale o produto com segurança
+                        </p>
+                        <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
+                            <span style='position: absolute; left: 0;'>2️⃣</span> Aguarde instruções de envio na sua conta
+                        </p>
+                        <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
+                            <span style='position: absolute; left: 0;'>3️⃣</span> O reembolso será processado após recebermos o produto
+                        </p>
+                    </div>
+                </div>
+            ";
+        }
+
+        $notas_html = '';
+        if ($notas_anunciante) {
+            $notas_html = "
+                <div style='background-color: #fff7ed; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #f59e0b;'>
+                    <h3 style='color: #92400e; margin: 0 0 10px 0; font-size: 16px;'>💬 Observações do Vendedor</h3>
+                    <p style='color: #78350f; margin: 0; line-height: 1.6;'>{$notas_anunciante}</p>
+                </div>
+            ";
+        }
+
+        $htmlBody = "
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;'>
+                <div style='background: linear-gradient(135deg, #A6D90C 0%, #8ab80a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>
+                    <h1 style='color: white; margin: 0; font-size: 32px;'>🌿 WeGreen</h1>
+                    <p style='color: white; margin: 10px 0 0 0; font-size: 14px;'>Moda Sustentável</p>
+                </div>
+
+                <div style='background-color: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none;'>
+                    <h2 style='color: #1f2937; margin-bottom: 20px;'>Olá, {$cliente_nome}! 👋</h2>
+                    <p style='color: #4b5563; font-size: 16px; line-height: 1.6;'>A sua devolução foi processada:</p>
+
+                    <div style='background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid {$cor_status};'>
+                        <p style='margin: 0; color: #6b7280; font-size: 14px;'><strong>Código da Devolução:</strong></p>
+                        <p style='font-size: 20px; font-weight: bold; color: #1f2937; margin: 5px 0 15px 0;'>#{$codigo_devolucao}</p>
+                        <p style='margin: 0; color: #6b7280; font-size: 14px;'><strong>Status:</strong></p>
+                        <p style='margin: 5px 0 0 0;'><span style='background-color: {$cor_status}; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 14px;'>{$texto_status}</span></p>
+                    </div>
+
+                    {$notas_html}
+                    {$instrucoes_html}
+
+                    <div style='text-align: center; margin-top: 30px;'>
+                        <a href='http://localhost/WeGreen-Main/DashboardCliente.php' style='background-color: #A6D90C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px;'>Ver Minhas Devoluções</a>
+                    </div>
+                </div>
+
+                <div style='background-color: #f3f4f6; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;'>
+                    <p style='color: #6b7280; font-size: 12px; margin: 0;'>© 2026 WeGreen. Todos os direitos reservados.</p>
+                    <p style='color: #9ca3af; font-size: 11px; margin: 5px 0 0 0;'>Este é um email automático, por favor não responda.</p>
+                </div>
+            </div>
+        ";
+
+        $subject = "Devolução #{$codigo_devolucao} - " . ($aprovado ? "Aprovada" : "Rejeitada");
+        return $this->send($cliente_email, $subject, $htmlBody);
+    }
 }

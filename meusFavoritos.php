@@ -15,10 +15,12 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <title>Meus Favoritos - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/DashboardCliente.css">
+    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/notifications.js"></script>
     <script src="assets/js/custom/favoritos.js"></script>
 
     <style>
@@ -249,13 +251,13 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-logo">
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
                 <i class="fas fa-leaf"></i>
                 <div class="logo-text">
                     <h2>WeGreen</h2>
                     <p>Moda Sustentável</p>
                 </div>
-            </div>
+            </a>
 
             <nav class="sidebar-menu">
                 <div class="menu-section">
@@ -288,9 +290,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                     <h1 class="page-title"><i class="fas fa-heart"></i> Meus Favoritos</h1>
                 </div>
                 <div class="navbar-right">
-                    <button class="btn-upgrade-navbar" onclick="window.location.href='planos.php'">
-                        <i class="fas fa-crown"></i> Upgrade
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user" id="userMenuBtn">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Cliente'); ?>&background=3cb371&color=fff" alt="User" class="user-avatar">
                         <div class="user-info">
@@ -337,7 +337,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                         </button>
                         <button class="btn-continue-shopping" onclick="window.location.href='index.html'">
                             <i class="fas fa-shopping-cart"></i>
-                            <span>Continuar Comprando</span>
+                            <span>Continuar a Comprar</span>
                         </button>
                     </div>
                 </header>

@@ -770,10 +770,7 @@ if($_SESSION['tipo'] == 1){
                     <h2 class="navbar-title">Gestão de Lucros</h2>
                 </div>
                 <div class="navbar-right">
-                    <button class="navbar-icon-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user">
                         <div id="AdminPerfilInfo" style="display:flex;"></div>
                         <i class="fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>

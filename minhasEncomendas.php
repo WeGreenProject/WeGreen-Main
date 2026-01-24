@@ -15,6 +15,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <title>Minhas Encomendas - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/DashboardCliente.css">
+    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,6 +24,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/notifications.js"></script>
     <!-- jsPDF para gerar PDFs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -34,13 +36,13 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <div class="dashboard-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-logo">
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
                 <i class="fas fa-leaf"></i>
                 <div class="logo-text">
                     <h2>WeGreen</h2>
                     <p>Moda Sustentável</p>
                 </div>
-            </div>
+            </a>
 
             <nav class="sidebar-menu">
                 <div class="menu-section">
@@ -73,9 +75,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                     <h1 class="page-title"><i class="fas fa-shopping-bag"></i> Minhas Encomendas</h1>
                 </div>
                 <div class="navbar-right">
-                    <button class="btn-upgrade-navbar" onclick="window.location.href='planos.php'">
-                        <i class="fas fa-crown"></i> Upgrade
-                    </button>
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user" id="userMenuBtn">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Cliente'); ?>&background=3cb371&color=fff" alt="User" class="user-avatar">
                         <div class="user-info">
@@ -118,7 +118,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                     <div class="header-actions">
                         <button class="btn-continue-shopping" onclick="window.location.href='index.html'">
                             <i class="fas fa-shopping-cart"></i>
-                            <span>Continuar Comprando</span>
+                            <span>Continuar a Comprar</span>
                         </button>
                     </div>
                 </header>
@@ -296,7 +296,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                         <button class="btn-action btn-primary" onclick="verDetalhes('${enc.codigo_encomenda}')">
                             <i class="fas fa-eye"></i> Ver Detalhes
                         </button>
-                        ${enc.estado.toLowerCase() === 'entregue' ? `
+                        ${enc.estado.toLowerCase() === 'entregue' && !enc.devolucao_ativa ? `
                             <button class="btn-action btn-warning" onclick="abrirModalDevolucao('${enc.id}', '${enc.codigo_encomenda}', ${JSON.stringify(enc.produtos).replace(/"/g, '&quot;')})">
                                 <i class="fas fa-undo"></i> Solicitar Devolução
                             </button>
@@ -307,10 +307,20 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                                 <i class="fas fa-star"></i> Avaliar
                             </button>
                         ` : ''}
-                        ${(enc.estado.toLowerCase() === 'enviado') ? `
-                            <button class="btn-action btn-secondary" onclick="rastrearEncomenda('${enc.codigo_encomenda}')">
-                                <i class="fas fa-map-marker-alt"></i> Rastrear
+                        ${enc.devolucao_ativa && enc.devolucao_estado === 'aprovada' ? `
+                            <button class="btn-action btn-success" onclick="mostrarModalConfirmarEnvio(${enc.devolucao_id}, '${enc.devolucao_codigo}')">
+                                <i class="fas fa-shipping-fast"></i> Confirmar Envio
                             </button>
+                        ` : ''}
+                        ${enc.devolucao_ativa && enc.devolucao_estado === 'enviada' ? `
+                            <span class="badge-info" style="padding: 8px 16px; background: #3b82f6; color: white; border-radius: 6px; font-size: 13px;">
+                                <i class="fas fa-truck"></i> Devolução enviada - aguardando confirmação
+                            </span>
+                        ` : ''}
+                        ${enc.devolucao_ativa && enc.devolucao_estado === 'recebida' ? `
+                            <span class="badge-success" style="padding: 8px 16px; background: #10b981; color: white; border-radius: 6px; font-size: 13px;">
+                                <i class="fas fa-check-double"></i> Produto recebido - aguardando reembolso
+                            </span>
                         ` : ''}
                         <button class="btn-action btn-outline" onclick="descarregarFatura('${enc.codigo_encomenda}')">
                             <i class="fas fa-download"></i> Fatura
@@ -427,14 +437,6 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             renderizarEncomendas(todasEncomendas);
         }
 
-        function rastrearEncomenda(codigo) {
-            Swal.fire({
-                title: 'Rastreamento',
-                html: '<p>Funcionalidade de rastreamento em tempo real será implementada em breve.</p>',
-                icon: 'info'
-            });
-        }
-
         function comprarNovamente(codigo) {
             Swal.fire({
                 title: 'Comprar Novamente?',
@@ -504,33 +506,39 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             const tipoEntrega = encomenda.tipo_entrega || 'domicilio';
             const tituloMorada = tipoEntrega === 'ponto_recolha' ? '📍 Ponto de Recolha' : '🏠 Morada de Entrega';
             const moradaCompleta = tipoEntrega === 'ponto_recolha'
-                ? (encomenda.morada_ponto_recolha || encomenda.morada)
-                : (encomenda.morada_completa || encomenda.morada);
+                ? (encomenda.morada_ponto_recolha || encomenda.morada || 'Morada não disponível')
+                : (encomenda.morada_completa || encomenda.morada || 'Morada não disponível');
 
-            // Gerar URL do mapa
-            const enderecoEncoded = encodeURIComponent(moradaCompleta);
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}`;
+            // Só mostrar mapa se houver morada válida
+            const temMorada = moradaCompleta && moradaCompleta !== 'Morada não disponível' && moradaCompleta !== 'null';
 
-            // HTML do mapa (iframe do Google Maps)
-            const mapaHtml = `
-                <div style="margin-top: 15px; border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb;">
-                    <iframe
-                        width="100%"
-                        height="300"
-                        frameborder="0"
-                        style="border:0"
-                        src="https://maps.google.com/maps?q=${enderecoEncoded}&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                        allowfullscreen>
-                    </iframe>
-                    <div style="padding: 10px; background-color: #f3f4f6; text-align: center;">
-                        <a href="${googleMapsUrl}"
-                           target="_blank"
-                           style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 12px;">
-                            📍 Abrir no Google Maps
-                        </a>
+            let mapaHtml = '';
+            if(temMorada) {
+                // Gerar URL do mapa
+                const enderecoEncoded = encodeURIComponent(moradaCompleta);
+                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}`;
+
+                // HTML do mapa (iframe do Google Maps)
+                mapaHtml = `
+                    <div style="margin-top: 15px; border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb;">
+                        <iframe
+                            width="100%"
+                            height="300"
+                            frameborder="0"
+                            style="border:0"
+                            src="https://maps.google.com/maps?q=${enderecoEncoded}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            allowfullscreen>
+                        </iframe>
+                        <div style="padding: 10px; background-color: #f3f4f6; text-align: center;">
+                            <a href="${googleMapsUrl}"
+                               target="_blank"
+                               style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 12px;">
+                                📍 Abrir no Google Maps
+                            </a>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
 
             const html = `
                 <div style="padding: 20px;">

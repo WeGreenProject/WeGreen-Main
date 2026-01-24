@@ -62,8 +62,20 @@ class DashboardCliente {
                     e.data_envio,
                     e.estado,
                     e.codigo_encomenda,
+                    e.transportadora_id,
+                    e.morada,
                     (SELECT COUNT(*) FROM vendas WHERE encomenda_id = e.id) as total_produtos,
-                    (SELECT SUM(v.valor) FROM vendas v WHERE v.encomenda_id = e.id) as valor_total
+                    (SELECT SUM(v.valor) FROM vendas v WHERE v.encomenda_id = e.id) as valor_total,
+                    (SELECT GROUP_CONCAT(p.nome SEPARATOR ', ')
+                     FROM produtos p
+                     INNER JOIN vendas v ON p.Produto_id = v.produto_id
+                     WHERE v.encomenda_id = e.id
+                     LIMIT 3) as nomes_produtos,
+                    (SELECT p.foto
+                     FROM produtos p
+                     INNER JOIN vendas v ON p.Produto_id = v.produto_id
+                     WHERE v.encomenda_id = e.id
+                     LIMIT 1) as foto_produto
                 FROM encomendas e
                 WHERE e.cliente_id = ?
                 ORDER BY e.data_envio DESC
@@ -76,6 +88,16 @@ class DashboardCliente {
 
         $encomendas = [];
         while($row = $result->fetch_assoc()) {
+            // Adicionar nome da transportadora (conforme carrinho.js)
+            $transportadoras = [
+                1 => 'CTT - Correios de Portugal',
+                2 => 'CTT - Ponto de Recolha',
+                3 => 'DPD - Entrega Rápida',
+                4 => 'DPD - Ponto de Recolha',
+                5 => 'Entrega em Casa'
+            ];
+            $row['transportadora'] = $transportadoras[$row['transportadora_id']] ?? 'N/A';
+
             $encomendas[] = $row;
         }
 

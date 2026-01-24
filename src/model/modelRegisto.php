@@ -5,17 +5,24 @@ require_once __DIR__ . '/../services/EmailService.php';
 
 class Registo{
 
-    function registaUser($nome, $apelido, $email, $nif, $password, $tipoUtilizador = 3){
+    function registaUser($nome, $apelido, $email, $nif, $morada, $password, $tipoUtilizador = 3){
 
         global $conn;
         $msg = "";
         $flag = false;
 
         // Validações
-        if (empty($nome) || empty($apelido) || empty($email) || empty($password)) {
+        if (empty($nome) || empty($apelido) || empty($email) || empty($password) || empty($morada)) {
             return json_encode([
                 "flag" => false,
                 "msg" => "Todos os campos obrigatórios devem ser preenchidos"
+            ]);
+        }
+
+        if (strlen($morada) < 10) {
+            return json_encode([
+                "flag" => false,
+                "msg" => "A morada deve ter pelo menos 10 caracteres"
             ]);
         }
 
@@ -73,9 +80,9 @@ class Registo{
         $password = md5($password);
 
         $stmt = $conn->prepare("INSERT INTO Utilizadores
-            (nome, apelido, email, nif, foto, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf, data_criacao)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssssiiiis", $nome, $apelido, $email, $nif, $foto, $password, $tipo_utilizador_id, $plano_id, $ranking_id, $pontos_conf, $data_criacao);
+            (nome, apelido, email, nif, morada, foto, password, tipo_utilizador_id, plano_id, ranking_id, pontos_conf, data_criacao)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssssiiiis", $nome, $apelido, $email, $nif, $morada, $foto, $password, $tipo_utilizador_id, $plano_id, $ranking_id, $pontos_conf, $data_criacao);
 
         if ($stmt->execute()) {
             $msg = "Conta criada! Verifique o seu email para confirmar a conta.";
