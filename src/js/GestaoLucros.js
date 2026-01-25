@@ -22,50 +22,6 @@ function getCards()
     });
 
 }
-function GraficoReceita() {
-        $.ajax({
-            url: "src/controller/controllerGestaoLucros.php",
-            type: "POST",
-            data: { op: 2 },
-            dataType: "json",
-            success: function(response) {
-                console.log("Resposta AJAX:", response);
-                if (response.flag) {
-                    const ctx = document.getElementById('evolucaoChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: response.dados1,
-                            datasets: [{
-                                label: 'Receita ao longo do tempo!',
-                                data: response.dados2, 
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: value => value + " €"
-                                    }
-                                }
-                            }
-                        }
-                    });
-                } else {
-                    alert(response.msg);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Erro AJAX:", error);
-            }
-        });
-}
-
 function getTransicoes(){
 
     
@@ -87,7 +43,6 @@ function getTransicoes(){
     })
     
     .done(function( msg ) {
-        console.log(msg);
         $('#transacoesBody').html(msg);
         $('#transacoesTable').DataTable();
         
@@ -98,8 +53,218 @@ function getTransicoes(){
 });
 
 }
+function getRendimentos(){
+
+    
+    if ( $.fn.DataTable.isDataTable('#tblRendimentos') ) {
+        $('#tblRendimentos').DataTable().destroy();
+    }
+
+    let dados = new FormData();
+    dados.append("op", 5);
+
+    $.ajax({
+    url: "src/controller/controllerGestaoLucros.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+        console.log(msg);
+        $('#listagemRendimentos').html(msg);
+        $('#tblRendimentos').DataTable();
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+});
+
+}
+function getGastos(){
+
+    
+    if ( $.fn.DataTable.isDataTable('#tblGastos') ) {
+        $('#tblGastos').DataTable().destroy();
+    }
+
+    let dados = new FormData();
+    dados.append("op", 6);
+
+    $.ajax({
+    url: "src/controller/controllerGestaoLucros.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+        console.log(msg);
+        $('#listagemGastos').html(msg);
+        $('#tblGastos').DataTable();
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+});
+
+}
+function alerta(titulo,msg,icon){
+    Swal.fire({
+        position: 'center',
+        icon: icon,
+        title: titulo,
+        text: msg,
+        showConfirmButton: true,
+
+      })
+}
+function removerGastos(id){
+
+    let dados = new FormData();
+    dados.append("op", 7);
+    dados.append("ID_Gasto", id);
+
+    $.ajax({
+    url: "src/controller/controllerGestaoLucros.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+
+        let obj = JSON.parse(msg);
+        if(obj.flag){
+            alerta("Gastos",obj.msg,"success");
+            getGastos();    
+        }else{
+            alerta("Gastos",obj.msg,"error");    
+        }
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
+function removerRendimentos(id){
+
+    let dados = new FormData();
+    dados.append("op", 8);
+    dados.append("ID_Rendimento", id);
+
+    $.ajax({
+    url: "src/controller/controllerGestaoLucros.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+
+        let obj = JSON.parse(msg);
+        if(obj.flag){
+            alerta("Rendimento",obj.msg,"success");
+            getRendimentos();    
+        }else{
+            alerta("Rendimento",obj.msg,"error");    
+        }
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+
+}
+function registaGastos(){
+
+    let dados = new FormData();
+    dados.append("op", 10);
+    dados.append("descricao", $('#descricaoGasto').val());
+    dados.append("valor", $('#valorGasto').val());
+    dados.append("data", $('#dataGasto').val());
+
+    $.ajax({
+    url: "src/controller/controllerGestaoLucros.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+
+        let obj = JSON.parse(msg);
+        if(obj.flag){
+            alerta("Gastos",obj.msg,"success");
+            getListaGastos();
+        }else{
+            alerta("Gastos",obj.msg,"error");    
+        }
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
+function registaRendimentos(){
+
+    let dados = new FormData();
+    dados.append("op", 9);
+    dados.append("descricao", $('#descricaoRendimento').val());
+    dados.append("valor", $('#valorRendimento').val());
+    dados.append("data", $('#dataRendimento').val());
+
+    $.ajax({
+    url: "src/controller/controllerGestaoLucros.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false
+    })
+    
+    .done(function( msg ) {
+
+        let obj = JSON.parse(msg);
+        if(obj.flag){
+            alerta("Gastos",obj.msg,"success");
+            getListaGastos();
+        }else{
+            alerta("Gastos",obj.msg,"error");    
+        }
+        
+    })
+    
+    .fail(function( jqXHR, textStatus ) {
+    alert( "Request failed: " + textStatus );
+    });
+}
 $(function() {
+        getGastos();
     getTransicoes();
     getCards();
-    GraficoReceita();
+    getRendimentos();
+
 });

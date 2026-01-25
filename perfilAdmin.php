@@ -66,12 +66,6 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             <span class="nav-text">Chats</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="fornecedores.php">
-                            <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                            <span class="nav-text">Gestão de Fornecedores</span>
-                        </a>
-                    </li>
                 </ul>
             </nav>
         </aside>

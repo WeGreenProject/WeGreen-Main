@@ -23,7 +23,6 @@ if($_SESSION['tipo'] == 1){
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-    /* Estilos específicos para Gestão de Lucros */
     .lucros-filters {
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -722,7 +721,7 @@ if($_SESSION['tipo'] == 1){
             </a>
             <nav>
                 <ul class="nav-menu">
-                   <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="DashboardAdmin.php">
                             <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                             <span class="nav-text">Dashboard</span>
@@ -790,17 +789,11 @@ if($_SESSION['tipo'] == 1){
                     <p>Análise detalhada de receitas, despesas e margem de lucro</p>
                 </div>
 
-                <!-- Resumo Financeiro -->
                 <div class="lucros-summary">
 
                 </div>
-
-
-                <!-- Substituir a div .charts-lucros por este código -->
                 <div class="forms-lucros">
-                    <!-- Coluna Gastos -->
                     <div class="form-section">
-                        <!-- Card Adicionar Gastos -->
                         <div class="form-card">
                             <div class="form-header">
                                 <h3><i class="fas fa-wallet"></i> Adicionar Gastos</h3>
@@ -833,10 +826,6 @@ if($_SESSION['tipo'] == 1){
                         <div class="table-card">
                             <div class="table-card-header">
                                 <h3><i class="fas fa-list"></i> Lista de Gastos</h3>
-                                <button class="btn-export-sm">
-                                    <i class="fas fa-download"></i>
-                                    Exportar
-                                </button>
                             </div>
                             <div class="table-responsive">
                                 <table class="data-table" id="tblGastos">
@@ -851,7 +840,7 @@ if($_SESSION['tipo'] == 1){
                                         </tr>
                                     </thead>
                                     <tbody id="listagemGastos">
-                                        <!-- Dados dinâmicos via JavaScript -->
+
                                     </tbody>
                                 </table>
                             </div>
@@ -893,10 +882,7 @@ if($_SESSION['tipo'] == 1){
                         <div class="table-card">
                             <div class="table-card-header">
                                 <h3><i class="fas fa-list"></i> Lista de Rendimentos</h3>
-                                <button class="btn-export-sm">
-                                    <i class="fas fa-download"></i>
-                                    Exportar
-                                </button>
+
                             </div>
                             <div class="table-responsive">
                                 <table class="data-table" id="tblRendimentos">
@@ -911,7 +897,7 @@ if($_SESSION['tipo'] == 1){
                                         </tr>
                                     </thead>
                                     <tbody id="listagemRendimentos">
-                                        <!-- Dados dinâmicos via JavaScript -->
+
                                     </tbody>
                                 </table>
                             </div>
@@ -947,7 +933,6 @@ if($_SESSION['tipo'] == 1){
         </main>
     </div>
     <script src="src/js/GestaoLucros.js"></script>
-    <script src="src/js/Adminstrador.js"></script>
     <?php
 }else{
 header("Location: forbiddenerror.html");
