@@ -37,7 +37,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
+                        <a class="nav-link active" href="gestaoProdutosAdmin.php">
                             <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
                             <span class="nav-text">Produtos</span>
                         </a>
@@ -55,7 +55,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="Chatadmin.php">
+                        <a class="nav-link" href="Chatadmin.php">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
