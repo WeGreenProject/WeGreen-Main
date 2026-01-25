@@ -78,3 +78,10 @@
 [24-Jan-2026 16:13:29 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
 [24-Jan-2026 16:13:44 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
 [24-Jan-2026 16:13:44 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[25-Jan-2026 18:24:07 Europe/Berlin] removerProdutosEmMassa - IDs: Array
+(
+    [0] => 30
+)
+
+[25-Jan-2026 18:24:07 Europe/Berlin] Produto 30 removido
+[25-Jan-2026 18:24:07 Europe/Berlin] Resultado final: 1 produto(s) removido(s)

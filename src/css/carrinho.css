@@ -461,6 +461,24 @@ body {
   box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
 }
 
+/* Botão desabilitado */
+.btn-primary.disabled-btn,
+.btn-primary:disabled {
+  background: #cccccc !important;
+  color: #888888 !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn-primary.disabled-btn:hover,
+.btn-primary:disabled:hover {
+  background: #cccccc !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 /* Form Elements */
 .form-label {
   font-weight: 600;
@@ -1020,8 +1038,22 @@ body {
 
 .pickup-point-item.selected {
   border-color: #3cb371;
-  background: rgba(60, 179, 113, 0.1);
-  box-shadow: 0 4px 12px rgba(60, 179, 113, 0.2);
+  background: rgba(60, 179, 113, 0.15);
+  box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
+  position: relative;
+}
+
+.pickup-point-item.selected::before {
+  content: "✓ Selecionado";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #3cb371;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .pickup-point-icon {

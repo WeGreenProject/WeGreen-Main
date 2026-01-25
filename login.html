@@ -42,7 +42,13 @@
             <div class="input-icon">
               <i class="fas fa-envelope"></i>
             </div>
-            <input type="email" id="emailLogin" placeholder="Email" required />
+            <input
+              type="email"
+              id="emailLogin"
+              placeholder="Email"
+              autocomplete="username"
+              required
+            />
             <label>Email</label>
           </div>
           <div class="input-group">
@@ -53,6 +59,7 @@
               type="password"
               id="passwordLogin"
               placeholder="Palavra-chave"
+              autocomplete="current-password"
               required
             />
             <label>Password</label>
@@ -75,8 +82,8 @@
             type="button"
             id="btnRegister"
             class="btn-primary"
-            onclick="login1()">
-            
+            onclick="login1()"
+          >
             <span>Entrar na sua conta</span>
             <i class="fas fa-arrow-right"></i>
           </button>

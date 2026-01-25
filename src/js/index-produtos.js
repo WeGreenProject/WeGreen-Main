@@ -83,13 +83,13 @@ function renderizarProdutos(produtos, containerId) {
     const card = `
             <div class="col-md-3 col-sm-6">
                 <a href="produto.php?id=${produto.id}" class="text-decoration-none">
-                    <div class="produto-card-homepage" style="background: white; border-radius: 16px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100%;">
-                        <div style="position: relative; padding-top: 120%; overflow: hidden;">
+                    <div class="produto-card-homepage" style="background: white; border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.08); height: 100%;">
+                        <div style="position: relative; padding-top: 85%; overflow: hidden;">
                             <img src="${produto.foto}" alt="${produto.nome}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <div style="padding: 20px;">
-                            <h5 style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin-bottom: 8px; min-height: 40px;">${produto.nome}</h5>
-                            <p style="color: #64748b; font-size: 14px; margin-bottom: 12px;">
+                        <div style="padding: 14px;">
+                            <h5 style="color: #1a1a1a; font-size: 14px; font-weight: 600; margin-bottom: 6px; min-height: 36px; line-height: 1.3;">${produto.nome}</h5>
+                            <p style="color: #64748b; font-size: 12px; margin-bottom: 10px;">
                                 ${
                                   produto.tipo_vendedor === "designer"
                                     ? '<i class="fas fa-palette"></i> Designer'
@@ -101,7 +101,7 @@ function renderizarProdutos(produtos, containerId) {
                                 }
                             </p>
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: #3cb371; font-size: 20px; font-weight: 700;">€${parseFloat(produto.preco).toFixed(2)}</span>
+                                <span style="color: #3cb371; font-size: 18px; font-weight: 700;">€${parseFloat(produto.preco).toFixed(2)}</span>
                             </div>
                         </div>
                     </div>

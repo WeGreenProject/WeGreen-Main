@@ -15,9 +15,11 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   <title>Meu Perfil - WeGreen</title>
   <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
   <link rel="stylesheet" href="src/css/DashboardCliente.css">
+  <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="src/js/lib/jquery.js"></script>
   <script src="src/js/lib/sweatalert.js"></script>
+  <script src="src/js/notifications.js"></script>
   <style>
   .profile-header-card {
     background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
@@ -337,6 +339,48 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     background: #475569;
     transform: translateY(-2px);
   }
+
+  .page-content {
+    overflow-x: hidden;
+  }
+
+  .profile-header-card {
+    padding: 25px 35px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .profile-avatar-large {
+    width: 90px !important;
+    height: 90px !important;
+  }
+
+  .profile-header-left h1 {
+    font-size: 26px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .profile-section {
+    padding: 30px !important;
+  }
+
+  .section-header {
+    margin-bottom: 24px !important;
+    padding-bottom: 16px !important;
+  }
+
+  .info-item {
+    margin-bottom: 18px !important;
+  }
+
+  .info-item input,
+  .info-item select {
+    padding: 12px 16px !important;
+  }
+
+  .btn-save {
+    padding: 14px 28px !important;
+    margin-top: 18px !important;
+  }
   </style>
 </head>
 
@@ -469,7 +513,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
               <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;">
                 <div class="info-item">
                   <label>Distrito</label>
-                  <select id="distrito" class="form-control" required>
+                  <select id="distrito" class="form-control">
                     <option value="">Selecione o distrito</option>
                     <option value="Aveiro">Aveiro</option>
                     <option value="Beja">Beja</option>
@@ -495,7 +539,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                 </div>
                 <div class="info-item">
                   <label>Localidade</label>
-                  <input type="text" id="localidade" placeholder="Cidade ou Vila" required>
+                  <input type="text" id="localidade" placeholder="Cidade ou Vila">
                 </div>
               </div>
 
@@ -523,42 +567,65 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   });
 
   // Carregar dados do perfil ao iniciar
-  carregarPerfilCliente();
+  $(document).ready(function() {
+    carregarPerfilCliente();
+  });
 
   function carregarPerfilCliente() {
-    $.post('src/controller/controllerPerfil.php', {
-      op: 12
-    }, function(resp) {
-      console.log('Resposta do servidor:', resp);
-      const dados = JSON.parse(resp);
-      console.log('Dados parseados:', dados);
+    $.ajax({
+      url: 'src/controller/controllerPerfil.php',
+      type: 'POST',
+      data: { op: 12 },
+      success: function(response) {
+        console.log('Resposta bruta:', response);
 
-      if (dados.error) {
-        return Swal.fire('Erro', dados.error, 'error');
+        try {
+          // Se a resposta já é um objeto, usa direto, senão faz parse
+          const dados = typeof response === 'string' ? JSON.parse(response) : response;
+          console.log('Dados parseados:', dados);
+
+          if (dados.error) {
+            console.error('Erro:', dados.error);
+            Swal.fire('Erro', dados.error, 'error');
+            return;
+          }
+
+          // Preencher os campos com os dados do usuário
+          if (dados.nome_completo || dados.nome) {
+            $('#nome').val(dados.nome_completo || dados.nome);
+          }
+          if (dados.email) {
+            $('#email').val(dados.email);
+          }
+          if (dados.telefone) {
+            $('#telefone').val(dados.telefone);
+          }
+          if (dados.nif) {
+            $('#nif').val(dados.nif);
+          }
+          if (dados.morada) {
+            $('#morada').val(dados.morada);
+          }
+          if (dados.distrito) {
+            $('#distrito').val(dados.distrito);
+          }
+          if (dados.localidade) {
+            $('#localidade').val(dados.localidade);
+          }
+
+          console.log('Perfil carregado com sucesso');
+        } catch (e) {
+          console.error('Erro ao processar resposta:', e);
+          console.error('Resposta recebida:', response);
+          Swal.fire('Erro', 'Não foi possível carregar os dados do perfil', 'error');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Erro AJAX:', error);
+        console.error('Status:', status);
+        console.error('Response:', xhr.responseText);
+        Swal.fire('Erro', 'Erro ao comunicar com o servidor', 'error');
       }
-
-      // Preencher os campos
-      $('#nome').val(dados.nome_completo || dados.nome || '');
-      $('#email').val(dados.email || '');
-      $('#telefone').val(dados.telefone || '');
-      $('#nif').val(dados.nif || '');
-      $('#morada').val(dados.morada || '');
-      $('#distrito').val(dados.distrito || '');
-      $('#localidade').val(dados.localidade || '');
-
-      console.log('Campos preenchidos:', {
-        nome: $('#nome').val(),
-        email: $('#email').val(),
-        telefone: $('#telefone').val(),
-        nif: $('#nif').val(),
-        morada: $('#morada').val(),
-        distrito: $('#distrito').val(),
-        localidade: $('#localidade').val()
-      });
-    }).fail(function(jqXHR, textStatus) {
-      console.error('Erro ao carregar perfil:', textStatus);
-      console.error('Detalhes:', jqXHR.responseText);
-      Swal.fire('Erro', 'Não foi possível carregar os dados do perfil', 'error');
     });
   }
 
@@ -588,14 +655,6 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
     if (!dados.morada || dados.morada.trim().length < 10) {
       return Swal.fire('Atenção', 'Morada completa é obrigatória (mínimo 10 caracteres)', 'warning');
-    }
-
-    if (!dados.distrito) {
-      return Swal.fire('Atenção', 'Distrito é obrigatório', 'warning');
-    }
-
-    if (!dados.localidade || dados.localidade.trim().length < 2) {
-      return Swal.fire('Atenção', 'Localidade é obrigatória', 'warning');
     }
 
     Swal.fire({
@@ -637,7 +696,12 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   });
 
   function logout() {
-    window.location.href = 'src/controller/controllerPerfil.php?op=2';
+    $.ajax({
+      url: 'src/controller/controllerPerfil.php?op=2',
+      method: 'GET'
+    }).always(function() {
+      window.location.href = 'index.html';
+    });
   }
   </script>
 </body>

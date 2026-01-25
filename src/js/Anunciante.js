@@ -2968,6 +2968,26 @@ function logout() {
     showCancelButton: true,
     confirmButtonText: "Sim, sair",
     cancelButtonText: "Cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: "src/controller/controllerPerfil.php?op=2",
+        method: "GET",
+      }).always(function () {
+        window.location.href = "index.html";
+      });
+    }
+  });
+}
+
+function logoutIncomplete() {
+  Swal.fire({
+    title: "Terminar Sessão?",
+    text: "Tem a certeza que pretende sair?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Sim, sair",
+    cancelButtonText: "Cancelar",
     confirmButtonColor: "#3cb371",
   }).then((result) => {
     if (result.isConfirmed) {
