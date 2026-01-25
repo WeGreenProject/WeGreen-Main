@@ -37,48 +37,42 @@ if($_SESSION['tipo'] == 1){
             </a>
             <nav>
                 <ul class="nav-menu">
-    <li class="nav-item">
-                            <a class="nav-link active" href="DashboardAdmin.php">
-                                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                                <span class="nav-text">Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="gestaoProdutosAdmin.php">
-                                <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                                <span class="nav-text">Produtos</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="gestaoCliente.php">
-                                <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                                <span class="nav-text">Gestao de Utilizadores</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="gestaoLucros.php">
-                                <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                                <span class="nav-text">Gestão de Lucros</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="Chatadmin.php">
-                                <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                                <span class="nav-text">Chats</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="fornecedores.php">
-                                <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                                <span class="nav-text">Gestão de Fornecedores</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="logAdmin.php">
-                                <span class="nav-icon"><i class="fas fa-history"></i></span>
-                                <span class="nav-text">Logs do Sistema</span>
-                            </a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="DashboardAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
+                            <span class="nav-text">Produtos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestaoCliente.php">
+                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
+                            <span class="nav-text">Gestao de Utilizadores</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="gestaoLucros.php">
+                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
+                            <span class="nav-text">Gestão de Lucros</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Chatadmin.php">
+                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
+                            <span class="nav-text">Chats</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logAdmin.php">
+                            <span class="nav-icon"><i class="fas fa-history"></i></span>
+                            <span class="nav-text">Logs do Sistema</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </aside>

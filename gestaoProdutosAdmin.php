@@ -61,12 +61,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="fornecedores.php">
-                            <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                            <span class="nav-text">Gestão de Fornecedores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="logAdmin.php">
                             <span class="nav-icon"><i class="fas fa-history"></i></span>
                             <span class="nav-text">Logs do Sistema</span>
@@ -112,7 +106,7 @@
                 </button>
             </div>
 
-            <div id="Inativos" class="tab-content">
+            <div id="Inativos" class="tab-content active">
                 <div class="table-container">
                     <h3><i class="fas fa-clock" style="color: #f59e0b;"></i> Produtos Aguardando Verificação</h3>
                     <table id="inativosTable">
@@ -241,7 +235,7 @@
                     </table>
                 </div>
             </div>
-            <div id="minhas-vendas" class="tab-content active">
+            <div id="minhas-vendas" class="tab-content">
                 <div class="table-container">
                     <h3><i class="fas fa-box-open" style="color: #A6D90C;"></i> Histórico de Meus Produtos</h3>
                     <table id="minhasVendasTable">
@@ -290,17 +284,17 @@
                             </div>
                             <div class="info-item">
                                 <label>Categoria</label>
-                                <select name="" id="categoriaprodutoEdit2">
+                                <select name="" id="categoriaprodutoEdit2" disabled>
 
                                 </select>
                             </div>
                             <div class="info-item">
                                 <label>Marca</label>
-                                <input type="text" class="form-control" id="marcaprodutoEdit2">
+                                <input type="text" class="form-control" id="marcaprodutoEdit2" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Tamanho</label>
-                                <input type="text" class="form-control" id="tamanhoprodutoEdit2">
+                                <input type="text" class="form-control" id="tamanhoprodutoEdit2" disabled>
                             </div>
                             <div class="info-item">
                                 <label>Preço</label>

@@ -74,6 +74,145 @@ class Lucros{
         return ($msg);
 
     }
+function getGastos(){
+    global $conn;
+    $msg = "";
+
+    $sql = "SELECT * FROM gastos ORDER BY data_registo DESC;";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $msg .= "<tr>";
+            $msg .= "<td>".$row['id']."</td>";
+            $msg .= "<td>".$row['descricao']."</td>";        
+            $msg .= "<td>".$row['valor']."€</td>";          
+            $msg .= "<td>".$row['data_registo']."</td>";     
+            $msg .= "<td><button class='btn-action btn-edit' onclick='getDadosGastos(".$row['id'].")'><i class='fa fa-pencil'></i> Editar</button></td>";
+            $msg .= "<td><button class='btn-action btn-remove' onclick='removerGastos(".$row['id'].")'><i class='fa fa-trash'></i> Remover</button></td>";
+            $msg .= "</tr>";
+        }
+    } else {
+        $msg .= "<tr><td colspan='6' style='text-align:center;'>Sem Registos</td></tr>";
+    }
+    $conn->close();
+
+    return ($msg);
+}
+function removerGastos($ID_Gasto){
+        global $conn;
+        $msg = "";
+        $flag = true;
+
+        $sql = "DELETE FROM Gastos WHERE id = ".$ID_Gasto;
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Removido com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+    }
+    function removerRendimentos($ID_Rendimento){
+        global $conn;
+        $msg = "";
+        $flag = true;
+
+        $sql = "DELETE FROM Rendimento WHERE id = ".$ID_Rendimento;
+
+        if ($conn->query($sql) === TRUE) {
+            $msg = "Removido com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+          
+        $conn->close();
+
+        return($resp);
+    }
+    function registaGastos($descricao,$Valor, $Data){
+    global $conn;
+    $msg = "";
+    $flag = false;
+
+    $stmt = $conn->prepare("INSERT INTO Gastos (descricao,Valor, Data) VALUES (?, ?,?)");
+    $stmt->bind_param("sds", $descricao, $Valor, $Data);
+
+    if($stmt->execute()){
+        $msg = "Registado com sucesso!";
+        $flag = true;
+    } else {
+        $msg = "Erro ao registar: " . $stmt->error;
+        $flag = false;
+    }
+
+    $resp = json_encode([
+        "flag" => $flag,
+        "msg" => $msg
+    ]);
+
+    $stmt->close();
+    $conn->close();
+
+    return $resp;
+}
+function registaRendimentos($descricao, $valor, $data){
+    global $conn;
+
+    $stmt = $conn->prepare(
+        "INSERT INTO rendimento (descricao, valor, data) VALUES (?, ?, ?)"
+    );
+
+    $stmt->bind_param("sds", $descricao, $valor, $data);
+
+    $flag = $stmt->execute();
+    $msg = $flag ? "Registado com sucesso!" : $stmt->error;
+
+    return json_encode([
+        "flag" => $flag,
+        "msg" => $msg
+    ]);
+}
+function getRendimentos(){
+    global $conn;
+    $msg = "";
+
+    $sql = "SELECT * FROM rendimento ORDER BY data_registo DESC;";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $msg .= "<tr>";
+            $msg .= "<td>".$row['id']."</td>";
+            $msg .= "<td>".$row['descricao']."</td>";      
+            $msg .= "<td>".$row['valor']."€</td>";        
+            $msg .= "<td>".$row['data_registo']."</td>";    
+            $msg .= "<td><button class='btn-action btn-edit' onclick='getDadosRendimento(".$row['id'].")'><i class='fa fa-pencil'></i> Editar</button></td>";
+            $msg .= "<td><button class='btn-action btn-remove' onclick='removerRendimentos(".$row['id'].")'><i class='fa fa-trash'></i> Remover</button></td>";
+            $msg .= "</tr>";
+        }
+    } else {
+        $msg .= "<tr><td colspan='6' style='text-align:center;'>Sem Registos</td></tr>";
+    }
+    $conn->close();
+
+    return ($msg);
+}
     function GraficoReceita() {
     global $conn;
     $dados1 = [];
