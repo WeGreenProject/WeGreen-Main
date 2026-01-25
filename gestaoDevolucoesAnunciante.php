@@ -14,9 +14,12 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/gestaoProdutos.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/modalProduto.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="assets/css/devolucoes.css">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
+    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
@@ -25,6 +28,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <script src="src/js/lib/sweatalert.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="src/js/notifications.js"></script>
     <!-- Sistema de Devoluções -->
     <script src="assets/js/custom/devolucoes.js"></script>
     <script src="src/js/Anunciante.js"></script>
@@ -71,14 +75,15 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         <main class="main-content">
             <nav class="top-navbar">
                 <div class="navbar-left">
+                    <h1 class="page-title"><i class="fas fa-undo"></i> Gestão de Devoluções</h1>
                 </div>
                 <div class="navbar-right">
+                    <?php include 'src/views/notifications-widget.php'; ?>
                     <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;" <?php echo (isset($_SESSION['plano']) && $_SESSION['plano'] == 3) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>>
                         <i class="fas fa-crown"></i> Upgrade
                     </button>
-                    <?php include 'src/views/notifications-widget.php'; ?>
                     <div class="navbar-user" id="userMenuBtn">
-                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff" alt="Usuário" class="user-avatar">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=3cb371&color=fff" alt="Usuário" class="user-avatar">
                         <div class="user-info">
                             <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></span>
                             <span class="user-role">Anunciante</span>
@@ -87,7 +92,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                     </div>
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-header">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff" alt="Usuário" class="dropdown-avatar">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=3cb371&color=fff" alt="Usuário" class="dropdown-avatar">
                             <div>
                                 <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></div>
                                 <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'user@email.com'; ?></div>
@@ -98,10 +103,6 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             <i class="fas fa-user"></i>
                             <span>Meu Perfil</span>
                         </a>
-                        <button class="dropdown-item" onclick="showPasswordModal()">
-                            <i class="fas fa-key"></i>
-                            <span>Alterar Senha</span>
-                        </button>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item dropdown-item-danger" onclick="logout()">
                             <i class="fas fa-sign-out-alt"></i>
@@ -111,120 +112,101 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 </div>
             </nav>
 
-            <div id="devolucoes" class="page active">
-                <div class="page-header">
-                    <h2><i class="fas fa-undo"></i> Gestão de Devoluções</h2>
-                    <p>Gerir pedidos de devolução dos clientes</p>
-                </div>
+            <div class="content-area">
+                <div id="devolucoes" class="page active">
+                    <div class="page-actions">
+                        <div class="actions-left">
+                        </div>
+                        <div class="actions-right">
+                            <button id="exportDevolucoesBtn" class="btn-export-pdf">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>Exportar PDF</span>
+                            </button>
+                        </div>
+                    </div>
 
-                <!-- Statistics Cards -->
-                <div class="stats-grid stats-grid-compact">
-                    <div class="stat-card" id="statPendentes">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Pendentes</div>
-                            <div class="stat-value">0</div>
-                        </div>
+                    <div class="stats-grid-compact" id="devolucoesStats">
+                        <div class="stat-card-compact" id="statPendentes"></div>
+                        <div class="stat-card-compact" id="statAprovadas"></div>
+                        <div class="stat-card-compact" id="statRejeitadas"></div>
+                        <div class="stat-card-compact" id="statReembolsadas"></div>
                     </div>
-                    <div class="stat-card" id="statAprovadas">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Aprovadas</div>
-                            <div class="stat-value">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card" id="statRejeitadas">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
-                            <i class="fas fa-times"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Rejeitadas</div>
-                            <div class="stat-value">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card" id="statReembolsadas">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
-                            <i class="fas fa-euro-sign"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-label">Valor Reembolsado</div>
-                            <div class="stat-value">€0.00</div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Filters -->
-                <div class="filters">
-                    <select id="filterEstadoDevolucao" onchange="filtrarDevolucoes()">
-                        <option value="">Todos os Estados</option>
-                        <option value="solicitada">Pendentes</option>
-                        <option value="aprovada">Aprovadas</option>
-                        <option value="rejeitada">Rejeitadas</option>
-                        <option value="produto_recebido">Produto Recebido</option>
-                        <option value="reembolsada">Reembolsadas</option>
-                        <option value="cancelada">Canceladas</option>
-                    </select>
-                    <button class="btn btn-secondary" onclick="carregarDevolucoesAnunciante()">
-                        <i class="fas fa-sync"></i> Atualizar
-                    </button>
-                    <button id="exportDevolucoesBtn" class="btn btn-secondary" style="margin-left: auto;">
-                        <i class="fas fa-file-pdf"></i> Exportar PDF
-                    </button>
-                </div>
-
-                <!-- Table -->
-                <div class="table-container">
-                    <table class="display" id="tabelaDevolucoes">
-                        <thead>
-                            <tr>
-                                <th>Código Devolução</th>
-                                <th>Encomenda</th>
-                                <th>Produto</th>
-                                <th>Cliente</th>
-                                <th>Motivo</th>
-                                <th>Valor</th>
-                                <th>Data</th>
-                                <th>Estado</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Populated by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Modal Alterar Senha -->
-            <div id="passwordModal" class="modal">
-                <div class="modal-content" style="max-width: 500px;">
-                    <div class="modal-header">
-                        <h3>Alterar Senha</h3>
-                        <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
+                    <div class="filters-container">
+                        <div class="filters-grid">
+                            <div class="filter-item">
+                                <label>
+                                    <i class="fas fa-search"></i> Pesquisar
+                                </label>
+                                <input type="text" id="filterPesquisa" placeholder="Código, cliente ou produto..." class="filter-input" onkeyup="filtrarDevolucoes()">
+                            </div>
+                            <div class="filter-item">
+                                <label>
+                                    <i class="fas fa-toggle-on"></i> Estado
+                                </label>
+                                <select id="filterEstadoDevolucao" onchange="filtrarDevolucoes()" class="filter-select">
+                                    <option value="">Todos os Estados</option>
+                                    <option value="solicitada">Pendentes</option>
+                                    <option value="aprovada">Aprovadas</option>
+                                    <option value="rejeitada">Rejeitadas</option>
+                                    <option value="produto_recebido">Produto Recebido</option>
+                                    <option value="reembolsada">Reembolsadas</option>
+                                    <option value="cancelada">Canceladas</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>
+                                    <i class="fas fa-comment-alt"></i> Motivo
+                                </label>
+                                <select id="filterMotivo" onchange="filtrarDevolucoes()" class="filter-select">
+                                    <option value="">Todos os Motivos</option>
+                                    <option value="defeituoso">Defeituoso</option>
+                                    <option value="tamanho_errado">Tamanho Errado</option>
+                                    <option value="nao_como_descrito">Não Conforme</option>
+                                    <option value="arrependimento">Arrependimento</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label>
+                                    <i class="fas fa-calendar-alt"></i> Data Inicial
+                                </label>
+                                <input type="date" id="filterDataInicial" class="filter-input" onchange="filtrarDevolucoes()">
+                            </div>
+                            <div class="filter-item">
+                                <label>
+                                    <i class="fas fa-calendar-alt"></i> Data Final
+                                </label>
+                                <input type="date" id="filterDataFinal" class="filter-input" onchange="filtrarDevolucoes()">
+                            </div>
+                            <div class="filter-item-button">
+                                <button class="btn-clear-filters" onclick="limparFiltros()">
+                                    <i class="fas fa-sync"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
-                        <input type="text" name="username" autocomplete="username" value="<?php echo $_SESSION['email'] ?? ''; ?>" style="display: none;" readonly>
-                        <div class="form-group">
-                            <label>Senha Atual</label>
-                            <input type="password" id="currentPassword" autocomplete="current-password" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Nova Senha</label>
-                            <input type="password" id="newPassword" autocomplete="new-password" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Confirmar Nova Senha</label>
-                            <input type="password" id="confirmPassword" autocomplete="new-password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-                            <i class="fas fa-key"></i> Alterar Senha
-                        </button>
-                    </form>
-                </div>
+
+                    <div class="table-container">
+                        <table id="tabelaDevolucoes" class="display">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag"></i> Código Devolução</th>
+                                    <th><i class="fas fa-shopping-bag"></i> Encomenda</th>
+                                    <th><i class="fas fa-box"></i> Produto</th>
+                                    <th><i class="fas fa-user"></i> Cliente</th>
+                                    <th><i class="fas fa-comment-alt"></i> Motivo</th>
+                                    <th><i class="fas fa-euro-sign"></i> Valor</th>
+                                    <th><i class="fas fa-calendar-alt"></i> Data</th>
+                                    <th><i class="fas fa-info-circle"></i> Estado</th>
+                                    <th><i class="fas fa-cog"></i> Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
             </div>
 
         </main>
@@ -286,8 +268,79 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         }
 
         function filtrarDevolucoes() {
+            const pesquisa = $('#filterPesquisa').val().toLowerCase();
             const estado = $('#filterEstadoDevolucao').val();
-            carregarDevolucoesAnunciante(estado);
+            const motivo = $('#filterMotivo').val();
+            const dataInicial = $('#filterDataInicial').val();
+            const dataFinal = $('#filterDataFinal').val();
+
+            devolucoesTable.rows().every(function() {
+                const data = this.data();
+                let mostrar = true;
+
+                // Filtro de pesquisa
+                if (pesquisa) {
+                    const textoCompleto = (
+                        data[0] + ' ' + // Código
+                        data[1] + ' ' + // Encomenda
+                        data[2] + ' ' + // Produto
+                        data[3]         // Cliente
+                    ).toLowerCase();
+                    if (!textoCompleto.includes(pesquisa)) {
+                        mostrar = false;
+                    }
+                }
+
+                // Filtro de estado
+                if (estado && mostrar) {
+                    const estadoCell = $(data[7]).text().toLowerCase();
+                    if (!estadoCell.includes(estado)) {
+                        mostrar = false;
+                    }
+                }
+
+                // Filtro de motivo
+                if (motivo && mostrar) {
+                    const motivoCell = data[4].toLowerCase();
+                    if (!motivoCell.includes(motivo)) {
+                        mostrar = false;
+                    }
+                }
+
+                // Filtro de data inicial
+                if (dataInicial && mostrar) {
+                    const dataRow = data[6]; // coluna de data
+                    if (dataRow < dataInicial) {
+                        mostrar = false;
+                    }
+                }
+
+                // Filtro de data final
+                if (dataFinal && mostrar) {
+                    const dataRow = data[6]; // coluna de data
+                    if (dataRow > dataFinal) {
+                        mostrar = false;
+                    }
+                }
+
+                if (mostrar) {
+                    $(this.node()).show();
+                } else {
+                    $(this.node()).hide();
+                }
+            });
+        }
+
+        function limparFiltros() {
+            $('#filterPesquisa').val('');
+            $('#filterEstadoDevolucao').val('');
+            $('#filterMotivo').val('');
+            $('#filterDataInicial').val('');
+            $('#filterDataFinal').val('');
+            devolucoesTable.rows().every(function() {
+                $(this.node()).show();
+            });
+            carregarDevolucoesAnunciante();
         }
 
         function renderizarDevolucoesTabela(devolucoes) {

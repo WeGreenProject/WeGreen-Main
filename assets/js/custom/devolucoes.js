@@ -417,6 +417,9 @@ function carregarDevolucoesAnunciante(filtroEstado = null) {
       console.log("Data:", response.data);
 
       if (response.success) {
+        // Atualizar estatísticas
+        atualizarEstatisticasDevolucoesCompactas(response.data);
+
         // Verificar se a função renderizarDevolucoesTabela existe (definida na página do anunciante)
         if (typeof renderizarDevolucoesTabela === "function") {
           console.log("Chamando renderizarDevolucoesTabela...");
@@ -439,54 +442,165 @@ function carregarDevolucoesAnunciante(filtroEstado = null) {
   });
 }
 
+/**
+ * Atualiza cards de estatísticas no estilo compacto
+ */
+function atualizarEstatisticasDevolucoesCompactas(devolucoes) {
+  // Contar por estado
+  const stats = {
+    pendentes: 0,
+    aprovadas: 0,
+    rejeitadas: 0,
+    valorReembolsado: 0,
+  };
+
+  devolucoes.forEach((dev) => {
+    if (dev.estado === "solicitada") stats.pendentes++;
+    else if (dev.estado === "aprovada") stats.aprovadas++;
+    else if (dev.estado === "rejeitada") stats.rejeitadas++;
+
+    if (dev.estado === "reembolsada") {
+      stats.valorReembolsado += parseFloat(dev.valor || 0);
+    }
+  });
+
+  // Atualizar cards compactos
+  $("#statPendentes").html(`
+    <div class='stat-icon'><i class='fas fa-clock' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Pendentes</div><div class='stat-value'>${stats.pendentes}</div></div>
+  `);
+
+  $("#statAprovadas").html(`
+    <div class='stat-icon'><i class='fas fa-check' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Aprovadas</div><div class='stat-value'>${stats.aprovadas}</div></div>
+  `);
+
+  $("#statRejeitadas").html(`
+    <div class='stat-icon'><i class='fas fa-times' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Rejeitadas</div><div class='stat-value'>${stats.rejeitadas}</div></div>
+  `);
+
+  $("#statReembolsadas").html(`
+    <div class='stat-icon'><i class='fas fa-euro-sign' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Reembolsado</div><div class='stat-value'>€${stats.valorReembolsado.toFixed(2)}</div></div>
+  `);
+}
+
 function renderizarTabelaDevolucoes(devolucoes) {
   const tbody = $("#tabelaDevolucoes tbody");
   tbody.empty();
 
   if (devolucoes.length === 0) {
-    tbody.html(
-      '<tr><td colspan="7" class="text-center text-muted">Nenhuma devolução encontrada</td></tr>',
-    );
+    tbody.html(`
+      <tr>
+        <td colspan="9" style="text-align: center; padding: 40px; color: #718096;">
+          <i class="fas fa-undo" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
+          <p>Nenhuma devolução encontrada</p>
+          <small>As devoluções dos seus produtos aparecerão aqui</small>
+        </td>
+      </tr>
+    `);
     return;
   }
 
   devolucoes.forEach((dev) => {
-    const badgeEstado = getBadgeEstadoDevolucao(dev.estado);
-    const acoes = getAcoesDevolucao(dev);
+    const statusClass = getStatusClassDevolucao(dev.estado);
+    const statusBadge = `<span class="badge badge-${statusClass}">${getEstadoTexto(dev.estado)}</span>`;
 
-    tbody.append(`
-            <tr>
-                <td><span class="badge badge-light-primary">${dev.codigo_devolucao}</span></td>
-                <td><small>${dev.codigo_encomenda}</small></td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <img src="${dev.produto_imagem || "assets/media/products/default.jpg"}"
-                             class="w-40px h-40px rounded me-2">
-                        <span>${dev.produto_nome}</span>
-                    </div>
-                </td>
-                <td>${dev.cliente_nome}</td>
-                <td>${getMotivoTexto(dev.motivo)}</td>
-                <td>${badgeEstado}</td>
-                <td class="text-end">${acoes}</td>
-            </tr>
-        `);
+    // Calcular dias desde a solicitação
+    const dataSolicitacao = new Date(dev.data_solicitacao);
+    const hoje = new Date();
+    const diasDesdeSolicitacao = Math.floor(
+      (hoje - dataSolicitacao) / (1000 * 60 * 60 * 24),
+    );
+
+    // Badge "Novo" para últimas 24h
+    const badgeNovo =
+      diasDesdeSolicitacao === 0
+        ? '<span class="badge badge-new">Novo</span> '
+        : "";
+
+    // Classe de urgência (mais de 3 dias pendente)
+    const classeUrgente =
+      diasDesdeSolicitacao > 3 && dev.estado === "solicitada"
+        ? "row-urgent"
+        : "";
+
+    const row = `
+      <tr data-devolucao-id="${dev.id}" class="${classeUrgente}">
+        <td>
+          ${badgeNovo}<strong>${dev.codigo_devolucao}</strong>
+          ${
+            diasDesdeSolicitacao > 3 && dev.estado === "solicitada"
+              ? '<span class="badge badge-danger" style="margin-left: 5px; font-size: 10px;">Urgente</span>'
+              : ""
+          }
+        </td>
+        <td>${dev.codigo_encomenda || "N/A"}</td>
+        <td>
+          <div class="product-info">
+            <img src="${dev.produto_imagem || "src/img/no-image.png"}"
+                 alt="${dev.produto_nome}"
+                 class="product-thumb">
+            <div>
+              <div class="product-name">${dev.produto_nome}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="customer-info">
+            <div class="customer-name">${dev.cliente_nome}</div>
+            <div class="customer-email">${dev.cliente_email || ""}</div>
+          </div>
+        </td>
+        <td>${getMotivoTexto(dev.motivo)}</td>
+        <td><strong>€${parseFloat(dev.valor_reembolso || 0).toFixed(2)}</strong></td>
+        <td>${formatarData(dev.data_solicitacao)}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <div class="action-buttons">
+            ${getAcoesDevolucao(dev)}
+          </div>
+        </td>
+      </tr>
+    `;
+
+    tbody.append(row);
   });
 }
 
-/**
- * Retorna badge de acordo com o estado
- */
-function getBadgeEstadoDevolucao(estado) {
-  const badges = {
-    solicitada: '<span class="badge badge-warning">Pendente</span>',
-    aprovada: '<span class="badge badge-success">Aprovada</span>',
-    rejeitada: '<span class="badge badge-danger">Rejeitada</span>',
-    produto_recebido: '<span class="badge badge-info">Produto Recebido</span>',
-    reembolsada: '<span class="badge badge-primary">Reembolsada</span>',
-    cancelada: '<span class="badge badge-secondary">Cancelada</span>',
+function formatarData(dataString) {
+  if (!dataString) return "N/A";
+  const data = new Date(dataString);
+  return data.toLocaleDateString("pt-PT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+function getStatusClassDevolucao(estado) {
+  const classes = {
+    solicitada: "warning",
+    aprovada: "success",
+    rejeitada: "danger",
+    produto_recebido: "info",
+    reembolsada: "primary",
+    cancelada: "secondary",
   };
-  return badges[estado] || estado;
+  return classes[estado] || "secondary";
+}
+
+function getEstadoTexto(estado) {
+  const textos = {
+    solicitada: "Solicitada",
+    aprovada: "Aprovada",
+    rejeitada: "Rejeitada",
+    produto_recebido: "Produto Recebido",
+    reembolsada: "Reembolsada",
+    cancelada: "Cancelada",
+  };
+  return textos[estado] || estado;
 }
 
 /**
@@ -507,27 +621,29 @@ function getMotivoTexto(motivo) {
  * Retorna botões de ação de acordo com o estado
  */
 function getAcoesDevolucao(dev) {
-  let html = `<button class="btn btn-sm btn-light-primary" onclick="verDetalhesDevolucao(${dev.id})">
-                    <i class="bi bi-eye"></i> Ver
-                </button>`;
+  let html = `
+    <button class="btn-action" onclick="verDetalhesDevolucao(${dev.id})" title="Ver Detalhes">
+      <i class="fas fa-eye"></i>
+    </button>
+  `;
 
   if (dev.estado === "solicitada") {
     html += `
-            <button class="btn btn-sm btn-success ms-1" onclick="aprovarDevolucao(${dev.id})">
-                <i class="bi bi-check-circle"></i> Aprovar
-            </button>
-            <button class="btn btn-sm btn-danger ms-1" onclick="rejeitarDevolucao(${dev.id})">
-                <i class="bi bi-x-circle"></i> Rejeitar
-            </button>
-        `;
+      <button class="btn-action" onclick="aprovarDevolucao(${dev.id})" title="Aprovar">
+        <i class="fas fa-check"></i>
+      </button>
+      <button class="btn-action" onclick="rejeitarDevolucao(${dev.id})" title="Rejeitar">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
   }
 
   if (dev.estado === "produto_recebido") {
     html += `
-            <button class="btn btn-sm btn-primary ms-1" onclick="processarReembolsoDevolucao(${dev.id})">
-                <i class="bi bi-cash"></i> Reembolsar
-            </button>
-        `;
+      <button class="btn-action" onclick="processarReembolsoDevolucao(${dev.id})" title="Reembolsar">
+        <i class="fas fa-euro-sign"></i>
+      </button>
+    `;
   }
 
   return html;

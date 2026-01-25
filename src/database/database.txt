@@ -1,6 +1,25 @@
-create database wegreen;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+SET GLOBAL event_scheduler = ON;
+SET FOREIGN_KEY_CHECKS = 0;
 
-use wegreen;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `wegreen`
+--
+CREATE DATABASE IF NOT EXISTS `wegreen` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `wegreen`;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `carrinho_itens`
+--
 
 CREATE TABLE `carrinho_itens` (
   `id` int(11) NOT NULL,
@@ -28,7 +47,8 @@ INSERT INTO `carrinho_itens` (`id`, `utilizador_id`, `produto_id`, `quantidade`,
 (21, '2', 1, 7, '2026-01-01 00:10:47', '2026-01-20 20:45:35'),
 (27, '2', 6, 5, '2026-01-07 20:40:33', '2026-01-07 20:44:44'),
 (28, '2', 10, 6, '2026-01-07 20:40:38', '2026-01-07 20:44:44'),
-(31, '2', 26, 1, '2026-01-20 20:46:29', '2026-01-20 20:46:29');
+(31, '2', 26, 2, '2026-01-20 20:46:29', '2026-01-23 17:37:38'),
+(33, 'temp_6973ff71e892f', 25, 10, '2026-01-23 23:09:45', '2026-01-23 23:09:50');
 
 -- --------------------------------------------------------
 
@@ -69,6 +89,10 @@ CREATE TABLE `devolucoes` (
   `reembolso_stripe_id` varchar(100) DEFAULT NULL,
   `reembolso_status` varchar(50) DEFAULT NULL COMMENT 'pending, succeeded, failed, canceled',
   `fotos` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Array de URLs das fotos do produto/defeito' CHECK (json_valid(`fotos`)),
+  `codigo_rastreio` varchar(100) DEFAULT NULL,
+  `data_envio_cliente` datetime DEFAULT NULL,
+  `notas_recebimento` text DEFAULT NULL,
+  `data_recebimento` datetime DEFAULT NULL,
   `codigo_envio_devolucao` varchar(100) DEFAULT NULL,
   `transportadora_devolucao_id` int(11) DEFAULT NULL,
   `data_solicitacao` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -86,6 +110,18 @@ CREATE TABLE logs_acesso (
     email varchar(250),
     data_hora DATETIME DEFAULT CURRENT_TIMESTAMP
 );	
+
+--
+-- Extraindo dados da tabela `devolucoes`
+--
+
+INSERT INTO `devolucoes` (`id`, `encomenda_id`, `codigo_devolucao`, `cliente_id`, `anunciante_id`, `produto_id`, `valor_reembolso`, `motivo`, `motivo_detalhe`, `notas_cliente`, `notas_anunciante`, `estado`, `payment_intent_id`, `reembolso_stripe_id`, `reembolso_status`, `fotos`, `codigo_rastreio`, `data_envio_cliente`, `notas_recebimento`, `data_recebimento`, `codigo_envio_devolucao`, `transportadora_devolucao_id`, `data_solicitacao`, `data_aprovacao`, `data_rejeicao`, `data_produto_recebido`, `data_reembolso`, `updated_at`) VALUES
+(3, 8, 'DEV20260124F3899A', 2, 1, 1, 15.00, 'nao_como_descrito', 'A cor é diferente da foto.', 'Aguardo retorno sobre a devolução.', NULL, 'produto_recebido', NULL, NULL, NULL, '[]', NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-21 13:40:47', NULL, NULL, NULL, NULL, '2026-01-24 13:40:47'),
+(16, 1, 'DEV-20260125-0001', 10, 3, 1, 29.99, 'defeituoso', 'Produto chegou com defeito', 'Cliente reportou defeito', NULL, 'solicitada', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-25 15:55:39', NULL, NULL, NULL, NULL, '2026-01-25 16:05:44'),
+(20, 2, 'DEV-20260125-0002', 11, 3, 2, 45.50, 'tamanho_errado', 'Tamanho nÒo serve', 'Tamanho muito pequeno', NULL, 'aprovada', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-25 15:56:17', NULL, NULL, NULL, NULL, '2026-01-25 16:05:44'),
+(21, 3, 'DEV-20260125-0003', 10, 3, 3, 35.00, 'nao_como_descrito', 'Cor diferente', 'A cor nÒo Ú a mesma da foto', NULL, 'produto_recebido', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-25 15:56:17', NULL, NULL, NULL, NULL, '2026-01-25 16:05:44'),
+(22, 4, 'DEV-20260125-0004', 11, 3, 4, 28.75, 'arrependimento', 'NÒo quero mais', 'Mudei de ideia', NULL, 'rejeitada', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-25 15:56:17', NULL, NULL, NULL, NULL, '2026-01-25 16:05:44'),
+(23, 5, 'DEV-20260125-0005', 10, 3, 5, 52.00, 'outro', 'Outro motivo qualquer', 'Observaþ§es diversas', NULL, 'reembolsada', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-25 15:56:17', NULL, NULL, NULL, NULL, '2026-01-25 16:05:44');
 
 --
 -- Acionadores `devolucoes`
@@ -152,7 +188,31 @@ INSERT INTO `encomendas` (`id`, `codigo_encomenda`, `payment_id`, `payment_metho
 (8, 'WG12354', NULL, NULL, 'paid', 2, 1, 2, 1, 1, '2025-12-06', 'Rua das Amendoeiras 22, Coimbra', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Avan?ado', NULL, NULL, NULL),
 (9, 'WG12350', NULL, NULL, 'paid', 2, 4, 1, 2, 1, '2025-12-06', 'Av. dos Descobrimentos 50, Aveiro', 'domicilio', NULL, NULL, NULL, 'Entregue', 'B?sico', NULL, NULL, NULL),
 (10, 'WG12351', NULL, NULL, 'paid', 7, 4, 2, 3, 2, '2025-12-06', 'Rua dos Cedros 18, Leiria', 'domicilio', NULL, NULL, NULL, 'Cancelada', 'B?sico', NULL, NULL, NULL),
-(11, 'WG12355', NULL, NULL, 'paid', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL);
+(11, 'WG12355', NULL, NULL, 'paid', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL),
+(12, 'WG35643', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(13, 'WG92289', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(14, 'WG39257', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(15, 'WG84712', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(16, 'WG85659', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(17, 'WG19273', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(18, 'WG82204', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(19, 'WG17091', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, 'Joao, Rua, Número, Código Postal, Cidade', 'Joao', 'Processando', NULL, NULL, NULL, NULL),
+(20, 'WG92781', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(21, 'WG78669', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(22, 'WG45929', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(23, 'WG52743', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(24, 'WG30838', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(25, 'WG79581', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(26, 'WG54248', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(27, 'WG59915', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(28, 'WG48750', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(29, 'WG39061', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(30, 'WG39162', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(31, 'WG64608', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
+(32, 'WG65461', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
+(33, 'WG81782', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL),
+(34, 'WG75227', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL),
+(35, 'WG40268', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -172,7 +232,8 @@ CREATE TABLE `favoritos` (
 --
 
 INSERT INTO `favoritos` (`id`, `cliente_id`, `produto_id`, `data_adicao`) VALUES
-(1, 2, 1, '2026-01-19 17:27:28');
+(2, 2, 26, '2026-01-24 17:48:32'),
+(3, 2, 25, '2026-01-24 17:48:33');
 
 -- --------------------------------------------------------
 
@@ -195,9 +256,9 @@ CREATE TABLE `fornecedores` (
 --
 
 INSERT INTO `fornecedores` (`id`, `nome`, `descricao`, `tipo_produtos_id`, `email`, `telefone`, `morada`) VALUES
-(1, 'ModaCenter', 'Fornecedor de vestu?rio masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
-(2, 'FootWorld', 'Fornecedor de sapatilhas e cal?ado desportivo', 2, 'info@footworld.pt', '934567890', 'Av. Central 45, Porto'),
-(3, 'AccessoriArt', 'Fornecedor de bijuteria e acess?rios de moda', 3, 'suporte@accessoriart.com', '965432187', 'Rua do Com?rcio 22, Braga'),
+(1, 'ModaCenter', 'Fornecedor de vestuário masculino e feminino', 1, 'contacto@modacenter.com', '912345678', 'Rua das Flores 12, Lisboa'),
+(2, 'FootWorld', 'Fornecedor de sapatilhas e calçado desportivo', 2, 'info@footworld.pt', '934567890', 'Av. Central 45, Porto'),
+(3, 'AccessoriArt', 'Fornecedor de bijuteria e acessórios de moda', 3, 'suporte@accessoriart.com', '965432187', 'Rua do Com?rcio 22, Braga'),
 (4, 'BelleCosmetics', 'Fornecedor de produtos de beleza e skincare', 4, 'geral@bellecosmetics.pt', '938221765', 'Rua Rosa 9, Coimbra'),
 (5, 'MixSupplies', 'Fornecedor geral de artigos variados', 5, 'info@mixsupplies.com', '926553421', 'Av. Nova 88, Faro');
 
@@ -338,6 +399,38 @@ INSERT INTO `mensagensadmin` (`id`, `remetente_id`, `destinatario_id`, `mensagem
 -- --------------------------------------------------------
 
 --
+-- Estrutura da tabela `notificacoes_lidas`
+--
+
+CREATE TABLE `notificacoes_lidas` (
+  `id` int(11) NOT NULL,
+  `utilizador_id` int(11) NOT NULL,
+  `tipo_notificacao` enum('encomenda','devolucao','utilizador') NOT NULL,
+  `referencia_id` int(11) NOT NULL,
+  `data_leitura` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `notificacoes_lidas`
+--
+
+INSERT INTO `notificacoes_lidas` (`id`, `utilizador_id`, `tipo_notificacao`, `referencia_id`, `data_leitura`) VALUES
+(1, 2, 'encomenda', 12, '2026-01-24 16:03:40'),
+(2, 2, 'encomenda', 14, '2026-01-24 16:05:14'),
+(3, 2, 'encomenda', 13, '2026-01-24 16:09:52'),
+(4, 2, 'encomenda', 15, '2026-01-24 16:11:49'),
+(5, 2, 'encomenda', 19, '2026-01-24 16:11:52'),
+(6, 2, 'encomenda', 17, '2026-01-24 16:12:15'),
+(7, 2, 'encomenda', 16, '2026-01-24 16:52:21'),
+(8, 2, 'encomenda', 18, '2026-01-24 17:09:40'),
+(9, 2, 'encomenda', 20, '2026-01-24 19:00:52'),
+(21, 3, 'encomenda', 11, '2026-01-24 20:43:10'),
+(22, 3, 'encomenda', 7, '2026-01-24 20:47:31'),
+(23, 3, 'encomenda', 4, '2026-01-24 20:47:31');
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura da tabela `notificacoes_preferencias`
 --
 
@@ -417,7 +510,7 @@ CREATE TABLE `planos` (
 INSERT INTO `planos` (`id`, `nome`, `preco`, `limite_produtos`, `rastreio_tipo`, `relatorio_pdf`) VALUES
 (1, 'Plano Essencial Verde', 0.00, 5, 'Basico', 0),
 (2, 'Plano Crescimento Circular', 25.00, 10, 'Basico', 1),
-(3, 'Plano Profissional Eco+', 70.00, NULL, 'Avancado', 1);
+(3, 'Plano Profissional Eco+', 100.00, NULL, 'Avancado', 1);
 
 -- --------------------------------------------------------
 
@@ -439,7 +532,9 @@ CREATE TABLE `planos_ativos` (
 --
 
 INSERT INTO `planos_ativos` (`id`, `anunciante_id`, `plano_id`, `data_inicio`, `data_fim`, `ativo`) VALUES
-(1, 3, 2, '2025-12-06', NULL, 1);
+(1, 3, 2, '2025-12-06', NULL, 1),
+(2, 4, 2, '2026-01-23', '2026-02-22', 0),
+(3, 4, 3, '2026-01-23', '2026-02-22', 1);
 
 -- --------------------------------------------------------
 
@@ -471,27 +566,27 @@ CREATE TABLE `produtos` (
 
 INSERT INTO `produtos` (`Produto_id`, `nome`, `tipo_produto_id`, `preco`, `foto`, `genero`, `anunciante_id`, `designer_id`, `marca`, `tamanho`, `estado`, `descricao`, `data_criacao`, `ativo`, `stock`) VALUES
 (1, 'Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', 1, NULL, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.', '2025-12-06', 1, 0),
-(2, 'Vestido Versace Cole??o 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, NULL, 'Versace', 'S', 'Como Novo', 'Vestido Versace cole??o 2003, nunca usado.', '2025-12-06', 0, 10),
-(3, 'Cal?as de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', 1, NULL, 'NYWS', 'S', 'Excelente', 'Cal?as de ganga Low Rise, nunca usadas.', '2025-12-06', 1, 10),
-(4, 'Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', 3, NULL, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, eleg?ncia e sofistica??o.', '2025-12-06', 0, 10),
-(5, 'Blus?o de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', 1, NULL, 'Miss Sixty', 'M', 'Excelente', 'Blus?o de ganga, nunca usado.', '2025-12-06', 1, 10),
+(2, 'Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, NULL, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.', '2025-12-06', 0, 10),
+(3, 'Calças de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', 1, NULL, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.', '2025-12-06', 1, 10),
+(4, 'Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', 3, NULL, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.', '2025-12-06', 0, 10),
+(5, 'Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', 1, NULL, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.', '2025-12-06', 1, 10),
 (6, 'Sweatshirt Billabong', 1, 23.80, 'src/img/6fa73f19c9a53d2c3d32f4c7e8d84300.jpg', 'Homem', 2, NULL, 'Billabong', 'M', 'Excelente', 'Sweatshirt Azul e Amarela da  Billabong, nunca usado.', '2025-12-06', 1, 10),
-(7, 'Leggings Yoga', 1, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', 3, NULL, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confort?veis e novas.', '2025-12-06', 0, 10),
+(7, 'Leggings Yoga', 1, 10.90, 'src/img/206af231b9b61956182afd1d73a47082.jpg', 'Mulher', 3, NULL, 'Abercrombie & Fitch', 'XS', 'Excelente', 'Leggings Yoga, confortáveis e novas.', '2025-12-06', 0, 10),
 (8, 'Camisa GAP Azul', 1, 23.80, 'src/img/9b8d88a4f89987b10e27b2f05ece802f.jpg', 'Homem', 2, NULL, 'GAP', 'M', 'Excelente', 'Camisa Azul da  GAP, nunca usado.', '2025-12-06', 1, 10),
 (9, 'Casaco Desportivo Nike', 1, 22.00, 'src/img/c5584a14a4d828c79754a5b553a3abe3.jpg', 'Homem', 2, NULL, 'Nike', 'L', 'Como Novo', 'Casaco desportivo Nike, em excelente estado.', '2025-12-06', 1, 10),
 (10, 'Sweatshirt North Face', 1, 18.00, 'src/img/northface.webp', 'Crian?a', 2, NULL, 'North Face', '7 anos', 'Excelente', 'Sweatshirt da North Face nunca usada, com etiqueta.', '2025-12-06', 1, 10),
-(11, 'Botas Timbaland', 2, 26.00, 'src/img/image66.webp', 'Crian?a', 3, NULL, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para crian?a, nunca usadas.', '2025-12-06', 0, 10),
+(11, 'Botas Timbaland', 2, 26.00, 'src/img/image66.webp', 'Crian?a', 3, NULL, 'Timbaland', '10 anos', 'Excelente', 'Botas de couro Timbaland para criança, nunca usadas.', '2025-12-06', 0, 10),
 (12, 'Camisa Polo Tommy Hilfiger', 1, 79.90, 'src/img/camisapolotommy.jpg', 'Homem', 2, NULL, 'Tommy Hilfiger', 'M', 'Novo', 'Camisa Polo Tommy Hilfiger, nunca usada, com etiqueta.', '2025-12-06', 1, 10),
-(13, 'T?nis Adidas UltraBoost', 2, 249.99, 'src/img/Adidas Ultraboost Light - lateral 2.jpg', 'Homem', 2, NULL, 'Adidas', '42', 'Novo', 'T?nis Adidas UltraBoost, conforto incompar?vel para atividades f?sicas.', '2025-12-06', 1, 10),
+(13, 'Ténis Adidas UltraBoost', 2, 249.99, 'src/img/Adidas Ultraboost Light - lateral 2.jpg', 'Homem', 2, NULL, 'Adidas', '42', 'Novo', 'Tênis Adidas UltraBoost, conforto incomparável para atividades físicas.', '2025-12-06', 1, 10),
 (14, 'Bolsa de Couro Michael Kors', 3, 359.99, 'src/img/1298bdfb53f943dc29132b4684dbb507.jpg', 'Mulher', 3, NULL, 'Michael Kors', '?nico tamanho', 'Novo', 'Bolsa de couro Michael Kors de 1981.', '2025-12-06', 0, 10),
-(15, 'Creme Hidratante Nivea', 4, 29.90, 'src/img/b06b57ded4c5ded4bc7e600eada0649c.jpg', 'Mulher', 3, NULL, 'Nivea', '?nico tamanho', 'Novo', 'Creme hidratante Nivea Edi??o Limitada de 2006 lacrado.', '2025-12-06', 0, 0),
-(16, 'Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src/img/s-l1200.webp', 'Homem', 2, NULL, 'Bose', '?nico tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ru?do, perfeito para viagens e uso di?rio.', '2025-12-06', 1, 10),
-(17, 'Cal?as de ganga Levis', 1, 19.00, 'src/img/63ee2e61813747ba02e97868eb523680.jpg', 'Homem', 2, NULL, 'Levis', 'XL', 'Novo', 'Cal?as de gnaga Levis nunca usadas com etiqueta.', '2025-12-06', 1, 10),
+(15, 'Creme Hidratante Nivea', 4, 29.90, 'src/img/b06b57ded4c5ded4bc7e600eada0649c.jpg', 'Mulher', 3, NULL, 'Nivea', '?nico tamanho', 'Novo', 'Creme hidratante Nivea Edição Limitada de 2006 lacrado.', '2025-12-06', 0, 0),
+(16, 'Fone de Ouvido Bose QuietComfort 35', 5, 899.00, 'src/img/s-l1200.webp', 'Homem', 2, NULL, 'Bose', '?nico tamanho', 'Novo', 'Fone de ouvido Bose com cancelamento de ruído, perfeito para viagens e uso diário.', '2025-12-06', 1, 10),
+(17, 'Calças de ganga Levis', 1, 19.00, 'src/img/63ee2e61813747ba02e97868eb523680.jpg', 'Homem', 2, NULL, 'Levis', 'XL', 'Novo', 'Calças de gnaga Levis nunca usadas com etiqueta.', '2025-12-06', 1, 10),
 (18, 'Casaco Verde Pistachio', 1, 29.90, 'src/img/image.webp', 'Mulher', 3, NULL, 'Naz', 'S', 'Novo', 'Camisola de Inverno Naz na cor verde pistachio.', '2025-12-06', 0, 10),
-(19, 'T?nis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', 3, NULL, 'Nea Vegan Shoes', '38', 'Novo', 'T?nis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.', '2025-12-06', 0, 10),
-(20, 'Cal?a de ganga em algod?o', 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Crian?a', 3, NULL, 'Playup', '4-5 anos', 'Novo', 'Cal?a de ganga em algod?o para crian?a da Playup.', '2025-12-06', 0, 10),
-(22, 'Colar Animal Edition', 3, 15.00, 'src/img/animalcross.jpeg', 'Mulher', 4, 1, 'HeartKnows', 'Tamanho ?nico', 'Novo', 'Colar com missangas coloridas e daltamata cole??o Animal Cross.', '2025-12-06', 1, 10),
-(23, 'Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 5, 1, 'MatildeMayer', 'Tamanho ?nico', 'Novo', 'Mala branca de missangas feita ? m?o.', '2025-12-06', 1, 10),
+(19, 'Ténis Azuis Vegan', 2, 69.90, 'src/img/MG_7966.webp', 'Mulher', 3, NULL, 'Nea Vegan Shoes', '38', 'Novo', 'Tênis azuis vegan da Nea Vegan Shoes, perfeitos para caminhadas e corridas.', '2025-12-06', 0, 10),
+(20, 'Calça de ganga em algodão', 1, 64.00, 'src/img/1759334984_3ece5eec09df8225764acda4b0d3c1d6.jpg', 'Crian?a', 3, NULL, 'Playup', '4-5 anos', 'Novo', 'Cal?a de ganga em algodão para criança da Playup.', '2025-12-06', 0, 10),
+(22, 'Colar Animal Edition', 3, 15.00, 'src/img/animalcross.jpeg', 'Mulher', 4, 1, 'HeartKnows', 'Tamanho ?nico', 'Novo', 'Colar com missangas coloridas e daltamata coleção Animal Cross.', '2025-12-06', 1, 10),
+(23, 'Mala Missangas', 3, 35.00, 'src/img/download (10).jpeg', 'Mulher', 5, 1, 'MatildeMayer', 'Tamanho ?nico', 'Novo', 'Mala branca de missangas feita ? mão.', '2025-12-06', 1, 10),
 (24, 'Colar Cruz', 3, 12.00, 'src/img/cora-pursley-dupe.jpeg', 'Mulher', 8, 1, 'SolangeJewels', 'Tamanho ?nico', 'Novo', 'Colar com cruz.', '2025-12-06', 1, 10),
 (25, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10),
 (26, 'T-shirt Cult Classic', 1, 25.00, 'src/img/ccult.jpeg', 'Homem', 6, 1, 'Carlo Pereira', 'M', 'Novo', 'T-shirt Cult Classic Azul.', '2025-12-06', 1, 10);
@@ -594,8 +689,8 @@ CREATE TABLE `tipo_produtos` (
 
 INSERT INTO `tipo_produtos` (`id`, `descricao`) VALUES
 (1, 'Roupa'),
-(2, 'Cal?ado'),
-(3, 'Acess?rios'),
+(2, 'Calçado'),
+(3, 'Acessórios'),
 (4, 'Beleza'),
 (5, 'Outros'),
 (6, 'Artesanato');
@@ -670,14 +765,14 @@ CREATE TABLE `utilizadores` (
 --
 
 INSERT INTO `utilizadores` (`id`, `nome`, `apelido`, `email`, `email_verificado`, `token_verificacao`, `token_expira_em`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`) VALUES
-(1, 'Admin WeGreen', NULL, 'admin@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 3, 3, 200, NULL),
-(2, 'Joao', NULL, 'joao@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL),
+(1, 'Admin WeGreen', NULL, 'admin@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 1, 3, 200, NULL),
+(2, 'Joao', NULL, 'joao@wegreen.pt', 1, NULL, NULL, '000000000', '900000000', 'Rua, Número, Código Postal, Cidade', 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL),
 (3, 'Maria Santos', NULL, 'maria@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 2, 2, 75, NULL),
 (4, 'Maria Luiza', NULL, 'Luiza@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 3, 3, 54, NULL),
-(5, 'Matilde Mayer', NULL, 'Matilde@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 2, 3, 350, NULL),
+(5, 'Matilde Mayer', NULL, 'Matilde@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 1, 3, 350, NULL),
 (6, 'Carlos Pereira', NULL, 'Carlos@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 3, 98, NULL),
 (7, 'Mango', NULL, 'mango@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg', 'mango123', 2, 1, 1, 10, NULL),
-(8, 'Solange Jewels', NULL, 'Solange@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 2, 3, 350, NULL),
+(8, 'Solange Jewels', NULL, 'Solange@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 1, 3, 350, NULL),
 (11, 'joão', 'santos', 'jmssgames@gmail.com', 1, NULL, NULL, '012345678', NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', '3dfcab79ed21fd89c9eb25e9864a6155', 2, 1, 1, 0, '2026-01-13'),
 (14, 'Joao', 'Silva', 'joao@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'e10adc3949ba59abbe56e057f20f883e', 3, 1, 1, 0, '2026-01-16');
 
@@ -710,7 +805,68 @@ INSERT INTO `vendas` (`id`, `encomenda_id`, `stripe_session_id`, `anunciante_id`
 (4, 4, NULL, 4, 3, 3, 269.97, 16.20, '2025-12-06'),
 (5, 5, NULL, 4, 2, 1, 49.99, 3.00, '2025-12-06'),
 (6, NULL, NULL, 3, 1, 2, 100.00, 20.00, '2025-12-08'),
-(7, NULL, NULL, 3, 2, 1, 50.00, 10.00, '2025-12-07');
+(7, NULL, NULL, 3, 2, 1, 50.00, 10.00, '2025-12-07'),
+(8, 12, '', 4, 22, 1, 15.00, 0.90, '2026-01-24'),
+(9, 12, '', 2, 17, 2, 38.00, 2.28, '2026-01-24'),
+(10, 13, '', 5, 23, 1, 35.00, 2.10, '2026-01-24'),
+(11, 13, '', 5, 23, 1, 35.00, 2.10, '2026-01-24'),
+(12, 13, '', 2, 6, 2, 47.60, 2.86, '2026-01-24'),
+(13, 14, '', 2, 17, 1, 19.00, 1.14, '2026-01-24'),
+(14, 15, '', 4, 22, 1, 15.00, 0.90, '2026-01-24'),
+(15, 16, '', 5, 23, 2, 70.00, 4.20, '2026-01-24'),
+(16, 16, '', 2, 8, 1, 23.80, 1.43, '2026-01-24'),
+(17, 16, '', 4, 22, 2, 30.00, 1.80, '2026-01-24'),
+(18, 17, '', 1, 3, 2, 70.80, 4.25, '2026-01-24'),
+(19, 17, '', 2, 8, 2, 47.60, 2.86, '2026-01-24'),
+(20, 17, '', 2, 17, 2, 38.00, 2.28, '2026-01-24'),
+(21, 18, '', 2, 13, 1, 249.99, 15.00, '2026-01-24'),
+(22, 18, '', 2, 6, 2, 47.60, 2.86, '2026-01-24'),
+(23, 18, '', 1, 5, 2, 47.60, 2.86, '2026-01-24'),
+(24, 19, '', 2, 13, 1, 249.99, 15.00, '2026-01-24'),
+(25, 20, '', 4, 22, 1, 15.00, 0.90, '2026-01-24'),
+(26, 20, '', 1, 5, 1, 23.80, 1.43, '2026-01-24'),
+(27, 21, '', 6, 26, 1, 25.00, 1.50, '2026-01-24'),
+(28, 21, '', 4, 22, 1, 15.00, 0.90, '2026-01-24'),
+(29, 21, '', 2, 6, 2, 47.60, 2.86, '2026-01-24'),
+(30, 22, '', 5, 23, 2, 70.00, 4.20, '2026-01-24'),
+(31, 23, '', 2, 6, 2, 47.60, 2.86, '2026-01-24'),
+(32, 24, '', 2, 13, 1, 249.99, 15.00, '2026-01-24'),
+(33, 25, '', 2, 13, 1, 249.99, 15.00, '2026-01-24'),
+(34, 26, '', 8, 24, 2, 24.00, 1.44, '2026-01-24'),
+(35, 27, '', 6, 26, 2, 50.00, 3.00, '2026-01-24'),
+(36, 27, '', 5, 23, 2, 70.00, 4.20, '2026-01-24'),
+(37, 28, '', 5, 23, 1, 35.00, 2.10, '2026-01-24'),
+(38, 28, '', 8, 24, 1, 12.00, 0.72, '2026-01-24'),
+(39, 29, '', 1, 3, 2, 70.80, 4.25, '2026-01-24'),
+(40, 29, '', 1, 3, 2, 70.80, 4.25, '2026-01-24'),
+(41, 29, '', 8, 24, 2, 24.00, 1.44, '2026-01-24'),
+(42, 30, '', 6, 26, 2, 50.00, 3.00, '2026-01-24'),
+(43, 30, '', 2, 8, 2, 47.60, 2.86, '2026-01-24'),
+(44, 30, '', 2, 17, 2, 38.00, 2.28, '2026-01-24'),
+(45, 31, '', 1, 3, 1, 35.40, 2.12, '2026-01-24'),
+(46, 31, '', 2, 13, 2, 499.98, 30.00, '2026-01-24'),
+(47, 32, '', 1, 5, 1, 23.80, 1.43, '2026-01-24'),
+(48, 32, '', 8, 24, 1, 12.00, 0.72, '2026-01-24'),
+(49, 32, '', 5, 23, 2, 70.00, 4.20, '2026-01-24'),
+(50, 33, '', 2, 17, 2, 38.00, 2.28, '2026-01-24'),
+(51, 34, '', 1, 5, 2, 47.60, 2.86, '2026-01-24'),
+(52, 34, '', 1, 5, 1, 23.80, 1.43, '2026-01-24'),
+(53, 34, '', 2, 17, 2, 38.00, 2.28, '2026-01-24'),
+(54, 35, '', 4, 22, 1, 15.00, 0.90, '2026-01-24'),
+(55, 35, '', 5, 23, 1, 35.00, 2.10, '2026-01-24'),
+(56, 35, '', 4, 22, 2, 30.00, 1.80, '2026-01-24'),
+(57, 6, '', 8, 24, 2, 24.00, 1.44, '2025-12-06'),
+(58, 6, '', 4, 22, 1, 15.00, 0.90, '2025-12-06'),
+(59, 6, '', 5, 23, 1, 35.00, 2.10, '2025-12-06'),
+(60, 7, '', 2, 6, 1, 23.80, 1.43, '2025-12-06'),
+(61, 7, '', 1, 5, 1, 23.80, 1.43, '2025-12-06'),
+(62, 7, '', 2, 17, 2, 38.00, 2.28, '2025-12-06'),
+(63, 8, '', 1, 3, 1, 35.40, 2.12, '2025-12-06'),
+(64, 9, '', 1, 3, 1, 35.40, 2.12, '2025-12-06'),
+(65, 10, '', 4, 22, 1, 15.00, 0.90, '2025-12-06'),
+(66, 11, '', 2, 13, 2, 499.98, 30.00, '2025-12-06'),
+(67, 11, '', 6, 26, 2, 50.00, 3.00, '2025-12-06'),
+(68, 11, '', 2, 8, 2, 47.60, 2.86, '2025-12-06');
 
 -- --------------------------------------------------------
 
@@ -747,6 +903,9 @@ CREATE TABLE `view_devolucoes_completa` (
 ,`data_entrega_original` date
 ,`produto_nome` varchar(150)
 ,`produto_foto` varchar(255)
+,`produto_imagem` varchar(255)
+,`cliente_nome` varchar(100)
+,`cliente_email` varchar(100)
 );
 
 -- --------------------------------------------------------
@@ -765,7 +924,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `view_devolucoes_completa`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_devolucoes_completa`  AS SELECT `d`.`id` AS `id`, `d`.`encomenda_id` AS `encomenda_id`, `d`.`codigo_devolucao` AS `codigo_devolucao`, `d`.`cliente_id` AS `cliente_id`, `d`.`anunciante_id` AS `anunciante_id`, `d`.`produto_id` AS `produto_id`, `d`.`valor_reembolso` AS `valor_reembolso`, `d`.`motivo` AS `motivo`, `d`.`motivo_detalhe` AS `motivo_detalhe`, `d`.`notas_cliente` AS `notas_cliente`, `d`.`notas_anunciante` AS `notas_anunciante`, `d`.`estado` AS `estado`, `d`.`payment_intent_id` AS `payment_intent_id`, `d`.`reembolso_stripe_id` AS `reembolso_stripe_id`, `d`.`reembolso_status` AS `reembolso_status`, `d`.`fotos` AS `fotos`, `d`.`codigo_envio_devolucao` AS `codigo_envio_devolucao`, `d`.`transportadora_devolucao_id` AS `transportadora_devolucao_id`, `d`.`data_solicitacao` AS `data_solicitacao`, `d`.`data_aprovacao` AS `data_aprovacao`, `d`.`data_rejeicao` AS `data_rejeicao`, `d`.`data_produto_recebido` AS `data_produto_recebido`, `d`.`data_reembolso` AS `data_reembolso`, `d`.`updated_at` AS `updated_at`, `e`.`codigo_encomenda` AS `codigo_encomenda`, `e`.`data_envio` AS `data_entrega_original`, `p`.`nome` AS `produto_nome`, `p`.`foto` AS `produto_foto` FROM ((`devolucoes` `d` join `encomendas` `e` on(`d`.`encomenda_id` = `e`.`id`)) join `produtos` `p` on(`d`.`produto_id` = `p`.`Produto_id`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_devolucoes_completa`  AS SELECT `d`.`id` AS `id`, `d`.`encomenda_id` AS `encomenda_id`, `d`.`codigo_devolucao` AS `codigo_devolucao`, `d`.`cliente_id` AS `cliente_id`, `d`.`anunciante_id` AS `anunciante_id`, `d`.`produto_id` AS `produto_id`, `d`.`valor_reembolso` AS `valor_reembolso`, `d`.`motivo` AS `motivo`, `d`.`motivo_detalhe` AS `motivo_detalhe`, `d`.`notas_cliente` AS `notas_cliente`, `d`.`notas_anunciante` AS `notas_anunciante`, `d`.`estado` AS `estado`, `d`.`payment_intent_id` AS `payment_intent_id`, `d`.`reembolso_stripe_id` AS `reembolso_stripe_id`, `d`.`reembolso_status` AS `reembolso_status`, `d`.`fotos` AS `fotos`, `d`.`codigo_envio_devolucao` AS `codigo_envio_devolucao`, `d`.`transportadora_devolucao_id` AS `transportadora_devolucao_id`, `d`.`data_solicitacao` AS `data_solicitacao`, `d`.`data_aprovacao` AS `data_aprovacao`, `d`.`data_rejeicao` AS `data_rejeicao`, `d`.`data_produto_recebido` AS `data_produto_recebido`, `d`.`data_reembolso` AS `data_reembolso`, `d`.`updated_at` AS `updated_at`, `e`.`codigo_encomenda` AS `codigo_encomenda`, `e`.`data_envio` AS `data_entrega_original`, `p`.`nome` AS `produto_nome`, `p`.`foto` AS `produto_foto`, `p`.`foto` AS `produto_imagem`, `u`.`nome` AS `cliente_nome`, `u`.`email` AS `cliente_email` FROM (((`devolucoes` `d` join `encomendas` `e` on(`d`.`encomenda_id` = `e`.`id`)) join `produtos` `p` on(`d`.`produto_id` = `p`.`Produto_id`)) join `utilizadores` `u` on(`d`.`cliente_id` = `u`.`id`)) ;
 
 --
 -- Índices para tabelas despejadas
@@ -869,6 +1028,15 @@ ALTER TABLE `mensagensadmin`
   ADD PRIMARY KEY (`id`),
   ADD KEY `remetente_id` (`remetente_id`),
   ADD KEY `destinatario_id` (`destinatario_id`);
+
+--
+-- Índices para tabela `notificacoes_lidas`
+--
+ALTER TABLE `notificacoes_lidas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_notificacao` (`utilizador_id`,`tipo_notificacao`,`referencia_id`),
+  ADD KEY `idx_utilizador` (`utilizador_id`),
+  ADD KEY `idx_tipo_ref` (`tipo_notificacao`,`referencia_id`);
 
 --
 -- Índices para tabela `notificacoes_preferencias`
@@ -975,7 +1143,7 @@ ALTER TABLE `vendas`
 -- AUTO_INCREMENT de tabela `carrinho_itens`
 --
 ALTER TABLE `carrinho_itens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT de tabela `denuncias`
@@ -987,19 +1155,19 @@ ALTER TABLE `denuncias`
 -- AUTO_INCREMENT de tabela `devolucoes`
 --
 ALTER TABLE `devolucoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de tabela `encomendas`
 --
 ALTER TABLE `encomendas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de tabela `favoritos`
 --
 ALTER TABLE `favoritos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `fornecedores`
@@ -1038,6 +1206,12 @@ ALTER TABLE `mensagensadmin`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
+-- AUTO_INCREMENT de tabela `notificacoes_lidas`
+--
+ALTER TABLE `notificacoes_lidas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
 -- AUTO_INCREMENT de tabela `notificacoes_preferencias`
 --
 ALTER TABLE `notificacoes_preferencias`
@@ -1059,7 +1233,7 @@ ALTER TABLE `planos`
 -- AUTO_INCREMENT de tabela `planos_ativos`
 --
 ALTER TABLE `planos_ativos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de tabela `produtos`
@@ -1113,7 +1287,7 @@ ALTER TABLE `utilizadores`
 -- AUTO_INCREMENT de tabela `vendas`
 --
 ALTER TABLE `vendas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- Restrições para despejos de tabelas
@@ -1237,6 +1411,8 @@ ALTER TABLE `vendas`
   ADD CONSTRAINT `vendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`);
 COMMIT;
 
+SET FOREIGN_KEY_CHECKS = 1;
+SHOW EVENTS;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
