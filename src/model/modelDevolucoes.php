@@ -204,14 +204,14 @@ class ModelDevolucoes {
                     d.*,
                     e.codigo_encomenda,
                     e.data_envio,
-                    p.nome as produto_nome,
+                    COALESCE(p.nome, 'Produto Removido') as produto_nome,
                     p.foto as produto_imagem,
                     u.nome as cliente_nome,
                     u.email as cliente_email
                 FROM devolucoes d
-                INNER JOIN encomendas e ON d.encomenda_id = e.id
-                INNER JOIN produtos p ON d.produto_id = p.Produto_id
-                INNER JOIN Utilizadores u ON d.cliente_id = u.id
+                LEFT JOIN encomendas e ON d.encomenda_id = e.id
+                LEFT JOIN Produtos p ON d.produto_id = p.Produto_id
+                LEFT JOIN Utilizadores u ON d.cliente_id = u.id
                 WHERE d.anunciante_id = ?";
 
         if ($filtro_estado) {

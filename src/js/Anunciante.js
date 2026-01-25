@@ -185,12 +185,12 @@ function renderTopProductsChart() {
             backgroundColor: [
               "#3cb371", // Verde WeGreen principal
               "#2d2d2d", // Preto/cinza escuro
+              "#64748b", // Azul-cinza (terceira cor distintiva)
               "#2e8b57", // Verde escuro
               "#1a1a1a", // Preto
               "#5fd8a0", // Verde claro
               "#3a3a3a", // Cinza escuro
               "#45b8ac", // Verde-água
-              "#252525", // Preto médio
             ],
             borderColor: "#ffffff",
             borderWidth: 3,
@@ -330,14 +330,14 @@ function visualizarFoto(fotoUrl, nomeProduto) {
   Swal.fire({
     title: nomeProduto,
     html: `
-      <div style="max-height: 60vh; display: flex; align-items: center; justify-content: center;">
+      <div style="max-height: 55vh; display: flex; align-items: center; justify-content: center;">
         <img src="${fotoUrl}"
              alt="${nomeProduto}"
-             style="max-width: 100%; max-height: 60vh; object-fit: contain; border-radius: 8px;">
+             style="max-width: 100%; max-height: 55vh; object-fit: contain; border-radius: 8px;">
       </div>
     `,
-    width: "80%",
-    maxWidth: "800px",
+    width: "45%",
+    maxWidth: "450px",
     showCloseButton: true,
     showConfirmButton: false,
     background: "#ffffff",
@@ -2380,23 +2380,23 @@ function atualizarEstatisticasEncomendas(encomendas) {
   const devolvidas = encomendas.filter((e) => e.estado === "Devolvido").length;
 
   $("#totalPendentesCard").html(`
-    <div class='stat-icon'><i class='fas fa-clock' style='color: #3cb371;'></i></div>
-    <div class='stat-content'><div class='stat-label'>Pendentes</div><div class='stat-value' style='color: #f59e0b;'>${pendentes}</div></div>
+    <div class='stat-icon'><i class='fas fa-clock' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Pendentes</div><div class='stat-value'>${pendentes}</div></div>
   `);
 
   $("#totalProcessandoCard").html(`
-    <div class='stat-icon'><i class='fas fa-box-open' style='color: #3cb371;'></i></div>
-    <div class='stat-content'><div class='stat-label'>Processando</div><div class='stat-value' style='color: #3b82f6;'>${processando}</div></div>
+    <div class='stat-icon'><i class='fas fa-box-open' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Processando</div><div class='stat-value'>${processando}</div></div>
   `);
 
   $("#totalEnviadasCard").html(`
-    <div class='stat-icon'><i class='fas fa-shipping-fast' style='color: #3cb371;'></i></div>
-    <div class='stat-content'><div class='stat-label'>Enviadas</div><div class='stat-value' style='color: #8b5cf6;'>${enviadas}</div></div>
+    <div class='stat-icon'><i class='fas fa-shipping-fast' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Enviadas</div><div class='stat-value'>${enviadas}</div></div>
   `);
 
   $("#totalEntreguesCard").html(`
-    <div class='stat-icon'><i class='fas fa-check-circle' style='color: #3cb371;'></i></div>
-    <div class='stat-content'><div class='stat-label'>Entregues</div><div class='stat-value' style='color: #10b981;'>${entregues}</div></div>
+    <div class='stat-icon'><i class='fas fa-check-circle' style='color: #ffffff;'></i></div>
+    <div class='stat-content'><div class='stat-label'>Entregues</div><div class='stat-value'>${entregues}</div></div>
   `);
 }
 
@@ -2522,19 +2522,19 @@ function verDetalhesEncomenda(encomendaId) {
                         ${
                           diasDesdeEncomenda > 3 &&
                           encomenda.estado === "Pendente"
-                            ? '<div style="padding: 10px; background: #FEE2E2; border-left: 4px solid #EF4444; border-radius: 6px; margin-bottom: 12px;"><strong style="color: #991B1B;">⚠️ Atenção:</strong> Esta encomenda está pendente há ' +
+                            ? '<div style="padding: 12px 16px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;"><i class="fas fa-exclamation-triangle" style="color: #856404; font-size: 18px;"></i><span style="color: #856404; font-size: 14px; font-weight: 500;">Esta encomenda está pendente há ' +
                               diasDesdeEncomenda +
-                              " dias</div>"
+                              " dias</span></div>"
                             : ""
                         }
 
                         <!-- GRID PRINCIPAL: DADOS + PRODUTO -->
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
 
                         <!-- COLUNA ESQUERDA: GRID 2x2 COM TODOS OS DADOS -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #3cb371; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
                                 <i class="fas fa-user" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Cliente
@@ -2565,7 +2565,7 @@ function verDetalhesEncomenda(encomendaId) {
                             </p>
                         </div>
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #3cb371; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
                                 <i class="fas fa-box" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Encomenda
@@ -2601,9 +2601,9 @@ function verDetalhesEncomenda(encomendaId) {
                             </p>
                         </div>
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #3b82f6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-shipping-fast" style="margin-right: 8px; color: #3b82f6; font-size: 18px;"></i>
+                                <i class="fas fa-shipping-fast" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Envio
                             </h4>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Transportadora:</strong> ${
@@ -2616,9 +2616,9 @@ function verDetalhesEncomenda(encomendaId) {
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
                         </div>
 
-                        <div style="padding: 15px; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-radius: 8px; border-left: 4px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #f59e0b; font-size: 18px;"></i>
+                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Financeiros
                             </h4>
                             <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Pagamento:</strong> ${encomenda.payment_method.toUpperCase()}</p>
@@ -2640,14 +2640,14 @@ function verDetalhesEncomenda(encomendaId) {
                         ${
                           encomenda.produto_foto
                             ? `
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #3cb371; box-shadow: 0 4px 8px rgba(166,217,12,0.15); text-align: center;">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-image" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
+                        <div style="padding: 20px; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); text-align: center;">
+                            <h4 style="margin: 0 0 16px 0; color: #2d3748; font-size: 17px; font-weight: 700;">
+                                <i class="fas fa-image" style="margin-right: 8px; color: #3cb371; font-size: 20px;"></i>
                                 Produto
                             </h4>
                             <img src="${encomenda.produto_foto}"
                                  alt="${encomenda.produto_nome}"
-                                 onclick="Swal.fire({imageUrl: '${encomenda.produto_foto}', imageAlt: '${encomenda.produto_nome}', imageWidth: 'auto', imageHeight: '70vh', width: '50%', maxWidth: '500px', showCloseButton: true, showConfirmButton: false, background: '#1a202c', customClass: {popup: 'photo-preview-modal', image: 'photo-preview-image'}})"
+                                 onclick="visualizarFoto('${encomenda.produto_foto}', '${encomenda.produto_nome}')"
                                  style="max-width: 100%; max-height: 380px; width: auto; height: auto; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;"
                                  title="Clique para ampliar">
                         </div>
@@ -2683,7 +2683,9 @@ function verDetalhesEncomenda(encomendaId) {
                                       encomenda.morada,
                                     )}"
                                        target="_blank"
-                                       style="display: inline-block; padding: 10px 20px; background: linear-gradient(135deg, #3cb371 0%, #8BC708 100%); color: #000; text-decoration: none; font-weight: 700; font-size: 14px; border-radius: 6px; box-shadow: 0 2px 4px rgba(166,217,12,0.3);">
+                                       style="display: inline-block; padding: 10px 20px; background: #3cb371; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 8px rgba(60, 179, 113, 0.3); transition: all 0.3s ease;"
+                                       onmouseover="this.style.background='#2e8b57'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(60, 179, 113, 0.4)';"
+                                       onmouseout="this.style.background='#3cb371'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(60, 179, 113, 0.3)';">
                                         <i class="fas fa-external-link-alt" style="margin-right: 6px;"></i>
                                         Abrir no Google Maps
                                     </a>
@@ -2696,11 +2698,41 @@ function verDetalhesEncomenda(encomendaId) {
                     </div>
                 `,
         width: "95%",
+        maxWidth: "1100px",
+        padding: "0",
         customClass: {
-          popup: "swal-wide",
+          popup: "product-modal-view",
+          title: "modal-title-green",
+          htmlContainer: "modal-view-wrapper",
         },
+        showCloseButton: true,
         confirmButtonText: "Fechar",
         confirmButtonColor: "#3cb371",
+        didOpen: () => {
+          // Aplicar estilos do cabeçalho verde
+          const title = document.querySelector(
+            ".product-modal-view .swal2-title",
+          );
+          if (title) {
+            title.style.background =
+              "linear-gradient(135deg, #3cb371 0%, #2e8b57 100%)";
+            title.style.color = "#ffffff";
+            title.style.padding = "18px 32px";
+            title.style.margin = "0";
+            title.style.borderRadius = "16px 16px 0 0";
+            title.style.fontSize = "20px";
+            title.style.fontWeight = "600";
+          }
+
+          // Botão X branco
+          const closeBtn = document.querySelector(
+            ".product-modal-view .swal2-close",
+          );
+          if (closeBtn) {
+            closeBtn.style.color = "#ffffff";
+            closeBtn.style.fontSize = "28px";
+          }
+        },
       });
     },
   );

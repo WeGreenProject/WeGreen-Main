@@ -26,6 +26,22 @@ body {
   overflow-x: hidden;
 }
 
+/* ========== Título da Página ========== */
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title i {
+  color: #3cb371;
+  font-size: 26px;
+}
+
 /* ========== Botões de Ação da Página ========== */
 .page-actions {
   display: flex;
@@ -96,9 +112,14 @@ body {
 
 .filters-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 15px;
   align-items: end;
+}
+
+/* Grid específico para página de produtos (6 colunas) */
+#products .filters-grid {
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
 }
 
 .filter-item label {
@@ -569,7 +590,7 @@ body {
     0 2px 6px rgba(0, 0, 0, 0.04);
   border: none;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 480px;
+  min-height: 600px;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
@@ -603,8 +624,8 @@ body {
 }
 
 .chart-card canvas {
-  max-height: 320px;
-  min-height: 280px;
+  max-height: 440px;
+  min-height: 400px;
 }
 
 /* ========== Produtos Recentes - Layout de Cards Modernos ========== */
@@ -916,6 +937,24 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  color: #3cb371;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  color: #2e8b57;
+}
+
+.btn-action i {
+  color: #3cb371;
+  font-size: 14px;
+}
+
+.btn-action:hover i {
+  color: #2e8b57;
 }
 
 .btn-action-primary {
