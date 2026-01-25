@@ -8,48 +8,138 @@ class Vendedor {
         global $conn;
         $msg = "";
         $row = "";
-        
-        $sql = "SELECT 
+
+        $sql = "SELECT
                     ranking.nome AS rankname,
+                    ranking.pontos AS rank_pontos,
+                    ranking.id AS rank_id,
                     utilizadores.*,
-                    (SELECT COUNT(*) FROM Vendas WHERE anunciante_id = $utilizador_id) AS vendas
+                    (SELECT COUNT(*) FROM Vendas WHERE anunciante_id = $utilizador_id) AS vendas,
+                    (SELECT COUNT(*) FROM Produtos WHERE anunciante_id = $utilizador_id AND ativo = 1) AS total_produtos
                 FROM Utilizadores
                 INNER JOIN ranking ON Utilizadores.ranking_id = ranking.id
                 WHERE Utilizadores.id = $utilizador_id";
-        
+
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                $msg .= "<section class='container my-5'>";
-                $msg .= "<div class='card border-0 shadow-sm rounded-4 p-4'>";
-                $msg .= "<div class='d-flex align-items-center gap-4'>";
-                $msg .= "<img src='".$row["foto"]."' class='rounded-circle border border-3 border-success shadow' width='120' height='120' style='object-fit: cover;'>";
-                $msg .= "<div class='flex-grow-1'>";
-                $msg .= "<h3 class='fw-bold text-success mb-2'>".$row["nome"]."</h3>";
-                $msg .= "<div class='d-flex align-items-center gap-3 mb-3'>";
-                $msg .= "<span class='badge bg-success-subtle text-success border border-success fw-semibold px-3 py-2'>";
-                $msg .= "<i class='bi bi-patch-check-fill me-1'></i> ".$row["rankname"]."</span>";
-                $msg .= "<span class='text-muted'><i class='bi bi-geo-alt-fill text-success me-1'></i> Lisboa, Portugal</span>";
+                // Buscar o próximo rank
+                $sql_next_rank = "SELECT nome, pontos FROM ranking WHERE id > ".$row["rank_id"]." ORDER BY id ASC LIMIT 1";
+                $result_next_rank = $conn->query($sql_next_rank);
+
+                $next_rank_name = "";
+                $next_rank_pontos = 1000; // Default se não houver próximo rank
+                $pontos_faltam = 0;
+
+                if ($result_next_rank->num_rows > 0) {
+                    $next_rank = $result_next_rank->fetch_assoc();
+                    $next_rank_name = $next_rank["nome"];
+                    $next_rank_pontos = $next_rank["pontos"];
+                    $pontos_faltam = $next_rank_pontos - $row["pontos_conf"];
+                } else {
+                    // Se já está no rank máximo
+                    $next_rank_name = "Máximo";
+                    $pontos_faltam = 0;
+                }
+
+                // Calcular percentagem para o próximo rank
+                $pontos_percentage = 0;
+                if ($pontos_faltam > 0) {
+                    $pontos_do_rank_atual = $row["rank_pontos"];
+                    $pontos_progresso = $row["pontos_conf"] - $pontos_do_rank_atual;
+                    $pontos_necessarios_total = $next_rank_pontos - $pontos_do_rank_atual;
+                    $pontos_percentage = min(100, ($pontos_progresso / $pontos_necessarios_total) * 100);
+                } else {
+                    $pontos_percentage = 100;
+                }
+
+                // Container principal
+                $msg .= "<div class='container my-5'>";
+
+                // Card principal do perfil
+                $msg .= "<div class='row g-4'>";
+
+                // Coluna da esquerda - Informação do vendedor
+                $msg .= "<div class='col-lg-4'>";
+                $msg .= "<div style='background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); height: 100%;'>";
+
+                // Foto do perfil
+                $msg .= "<div class='text-center mb-4'>";
+                $msg .= "<div class='position-relative d-inline-block'>";
+                $msg .= "<img src='".$row["foto"]."' class='rounded-circle' width='120' height='120' style='object-fit: cover; border: 4px solid #3cb371; box-shadow: 0 8px 24px rgba(62,179,113,0.2);' onerror=\"this.src='assets/media/avatars/blank.png'\">";
+                $msg .= "<div style='position: absolute; bottom: 0; right: 0; width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);'>";
+                $msg .= "<i class='bi bi-patch-check-fill' style='font-size: 20px; color: #3cb371;'></i>";
                 $msg .= "</div>";
-                $msg .= "<div class='d-flex gap-4'>";
-                $msg .= "<div class='text-center'>";
-                $msg .= "<h5 class='fw-bold text-success mb-0'>".$row["pontos_conf"]."</h5>";
-                $msg .= "<small class='text-muted'>Pontos de Confiança</small>";
                 $msg .= "</div>";
-                $msg .= "<div class='vr'></div>";
-                $msg .= "<div class='text-center'>";
-                $msg .= "<h5 class='fw-bold text-success mb-0'>".$row["vendas"]."</h5>";
-                $msg .= "<small class='text-muted'>Vendas Realizadas</small>";
+                $msg .= "<h3 class='fw-bold mt-3 mb-1' style='color: #1a1a1a;'>".$row["nome"]."</h3>";
+                $msg .= "<p class='text-muted mb-3'><i class='bi bi-award-fill me-1' style='color: #3cb371;'></i>".$row["rankname"]."</p>";
+                $msg .= "</div>";
+
+                // Pontos de Confiança
+                $msg .= "<div class='mb-4 p-3' style='background: linear-gradient(135deg, #E8F5E9, #ffffff); border-radius: 12px; border: 1px solid #C8E6C9;'>";
+                $msg .= "<div class='d-flex align-items-center justify-content-between mb-2'>";
+                $msg .= "<span class='fw-semibold' style='color: #2e8b57; font-size: 13px;'><i class='bi bi-stars me-1'></i>Pontos de Confiança</span>";
+                $msg .= "<span class='fw-bold' style='color: #3cb371; font-size: 16px;'>".$row["pontos_conf"]." pontos</span>";
+                $msg .= "</div>";
+
+                // Informação do rank atual e próximo
+                $msg .= "<div class='mb-2'>";
+                $msg .= "<div class='d-flex align-items-center justify-content-between mb-1'>";
+                $msg .= "<span style='color: #6b7280; font-size: 12px;'>Rank Atual: <strong style='color: #2e8b57;'>".$row["rankname"]."</strong></span>";
+                if ($pontos_faltam > 0) {
+                    $msg .= "<span style='color: #6b7280; font-size: 12px;'>Faltam <strong style='color: #3cb371;'>".$pontos_faltam."</strong> para <strong>".$next_rank_name."</strong></span>";
+                } else {
+                    $msg .= "<span style='color: #6b7280; font-size: 12px;'><strong style='color: #3cb371;'>Rank Máximo!</strong></span>";
+                }
                 $msg .= "</div>";
                 $msg .= "</div>";
-                $msg .= "</div>"; 
+
+                $msg .= "<div class='w-100' style='height: 8px; background: #E8F5E9; border-radius: 50px; overflow: hidden;'>";
+                $msg .= "<div style='width: ".$pontos_percentage."%; height: 100%; background: linear-gradient(90deg, #3cb371, #2e8b57); transition: width 0.5s ease;'></div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
-                $msg .= "</section>";
+
+                // Estatísticas
+                $msg .= "<div class='row g-3 mb-3'>";
+                $msg .= "<div class='col-6'>";
+                $msg .= "<div class='text-center p-3' style='background: #f8f9fa; border-radius: 12px;'>";
+                $msg .= "<i class='bi bi-bag-check-fill mb-2' style='font-size: 24px; color: #3cb371;'></i>";
+                $msg .= "<h4 class='fw-bold mb-0' style='color: #1a1a1a;'>".$row["vendas"]."</h4>";
+                $msg .= "<small class='text-muted'>Vendas</small>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+                $msg .= "<div class='col-6'>";
+                $msg .= "<div class='text-center p-3' style='background: #f8f9fa; border-radius: 12px;'>";
+                $msg .= "<i class='bi bi-box-seam-fill mb-2' style='font-size: 24px; color: #3cb371;'></i>";
+                $msg .= "<h4 class='fw-bold mb-0' style='color: #1a1a1a;'>".$row["total_produtos"]."</h4>";
+                $msg .= "<small class='text-muted'>Produtos</small>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+
+                // Badge verificado
+                $msg .= "<div class='text-center pt-3 border-top'>";
+                $msg .= "<span class='badge' style='background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; padding: 8px 16px; border-radius: 50px; font-weight: 600;'>";
+                $msg .= "<i class='bi bi-shield-check me-1'></i>Vendedor Verificado</span>";
+                $msg .= "</div>";
+
+                $msg .= "</div>";
+                $msg .= "</div>";
+
+                // Coluna da direita - Produtos
+                $msg .= "<div class='col-lg-8'>";
+                $msg .= "<div style='background: white; border-radius: 20px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);'>";
+                $msg .= "<h4 class='fw-bold mb-4' style='color: #1a1a1a;'><i class='bi bi-grid-fill me-2' style='color: #3cb371;'></i>Produtos do Vendedor</h4>";
+                $msg .= "<div id='produtos-container'></div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+
+                $msg .= "</div>";
+                $msg .= "</div>";
             }
         }
-        
+
         return ($msg);
     }
 
@@ -57,36 +147,87 @@ class Vendedor {
         global $conn;
         $msg = "";
 
-        $sql = "SELECT Produtos.* FROM Produtos WHERE Produtos.anunciante_id = " . $utilizador_id . " AND Produtos.ativo = 1"; 
+        $sql = "SELECT Produtos.* FROM Produtos WHERE Produtos.anunciante_id = " . $utilizador_id . " AND Produtos.ativo = 1 ORDER BY Produtos.data_criacao DESC";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
-            $msg .= "<section class='container my-5'><div class='row g-4'>";
+            // Barra de filtros
+            $msg .= "<div class='d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3'>";
+            $msg .= "<div class='d-flex gap-2'>";
+            $msg .= "<select id='filtroEstado' class='form-select form-select-sm' style='width: auto; border-radius: 10px;'>";
+            $msg .= "<option value=''>Todos os Estados</option>";
+            $msg .= "<option value='Novo'>Novo</option>";
+            $msg .= "<option value='Usado'>Usado</option>";
+            $msg .= "<option value='Como Novo'>Como Novo</option>";
+            $msg .= "</select>";
+            $msg .= "<select id='filtroOrdenacao' class='form-select form-select-sm' style='width: auto; border-radius: 10px;'>";
+            $msg .= "<option value='recente'>Mais Recentes</option>";
+            $msg .= "<option value='preco_asc'>Preço: Menor para Maior</option>";
+            $msg .= "<option value='preco_desc'>Preço: Maior para Menor</option>";
+            $msg .= "</select>";
+            $msg .= "</div>";
+            $msg .= "</div>";
+
+            $msg .= "<div class='row g-3' id='produtos-grid'>";
 
             while ($row = $result->fetch_assoc()) {
-                $msg .= "<div class='col-md-3'>";
-                $msg .= "<div class='card border-0 shadow rounded-4'>";
-                $msg .= "<img src='".$row["foto"]."' class='card-img-top rounded-top-4' alt='".$row["nome"]."' style='height: 300px; object-fit: cover;'>";
-                $msg .= "<div class='card-body'>";
-                $msg .= "<h5 class='fw-bold'>".$row["nome"]."</h5>";
-                $msg .= "<p class='text-muted mb-1'>".$row["marca"]." · ".$row["tamanho"]." · ".$row["estado"]."</p>";
-                $msg .= "<p class='fw-bold text-success fs-5'>€".number_format($row["preco"], 2, ',', '.')."</p>";
-                $msg .= "<a href='ProdutoMulherMostrar.html?id=".$row['Produto_id']."' class='btn btn-outline-success rounded-pill w-100 fw-semibold'>Ver Produto</a>";
+                $msg .= "<div class='col-lg-6 col-md-6 produto-item' data-estado='".$row["estado"]."' data-preco='".$row["preco"]."' data-data='".$row["data_criacao"]."'>";
+                $msg .= "<div class='h-100' style='background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e9ecef; transition: all 0.3s ease; position: relative; cursor: pointer;' onmouseover='this.style.boxShadow=\"0 8px 24px rgba(62,179,113,0.15)\"; this.style.transform=\"translateY(-4px)\"' onmouseout='this.style.boxShadow=\"none\"; this.style.transform=\"translateY(0)\"' onclick=\"window.location.href='produto.php?id=".$row['Produto_id']."'\">";
+
+                $msg .= "<div class='row g-0'>";
+
+                // Imagem
+                $msg .= "<div class='col-4'>";
+                $msg .= "<div style='position: relative; overflow: hidden; background: #f5f5f5; height: 100%;'>";
+                $msg .= "<img src='".$row["foto"]."' alt='".$row["nome"]."' style='width: 100%; height: 160px; object-fit: cover;'>";
+                // Badge de estado
+                $msg .= "<div style='position: absolute; top: 8px; left: 8px; background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 600; z-index: 10;'>";
+                $msg .= $row["estado"]."</div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+
+                // Conteúdo
+                $msg .= "<div class='col-8'>";
+                $msg .= "<div class='p-3'>";
+                $msg .= "<h6 class='fw-bold mb-2' style='color: #1a1a1a; font-size: 14px;'>".$row["nome"]."</h6>";
+
+                // Info badges
+                $msg .= "<div class='d-flex flex-wrap gap-1 mb-2'>";
+                $msg .= "<span class='badge' style='background: #f8f9fa; color: #6b7280; font-size: 10px; padding: 4px 8px; border-radius: 8px;'>";
+                $msg .= "<i class='bi bi-tag-fill me-1'></i>".$row["marca"]."</span>";
+                $msg .= "<span class='badge' style='background: #f8f9fa; color: #6b7280; font-size: 10px; padding: 4px 8px; border-radius: 8px;'>";
+                $msg .= "<i class='bi bi-rulers me-1'></i>".$row["tamanho"]."</span>";
+                $msg .= "</div>";
+
+                // Preço
+                $msg .= "<div class='mt-auto'>";
+                $msg .= "<p class='fw-bold mb-2' style='color: #3cb371; font-size: 18px;'>".$row["preco"]."€</p>";
+
+                // Botão
+                $msg .= "<button class='btn btn-sm fw-semibold' style='background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px;'>";
+                $msg .= "<i class='bi bi-eye me-1'></i>Ver Detalhes</button>";
+                $msg .= "</div>";
+
+                $msg .= "</div>";
+                $msg .= "</div>";
+
                 $msg .= "</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";
             }
 
-            $msg .= "</div></section>";
+            $msg .= "</div>";
         } else {
-            $msg .= "<section class='container my-5'>";
-            $msg .= "<div class='alert alert-info text-center'>Este vendedor ainda não tem produtos à venda.</div>";
-            $msg .= "</section>";
+            $msg .= "<div class='text-center py-5' style='background: #f8f9fa; border-radius: 12px; border: 2px dashed #e9ecef;'>";
+            $msg .= "<i class='bi bi-box-seam' style='font-size: 48px; color: #cbd5e0; margin-bottom: 16px; display: block;'></i>";
+            $msg .= "<h6 class='fw-semibold mb-1' style='color: #6b7280;'>Nenhum produto disponível</h6>";
+            $msg .= "<p class='text-muted mb-0' style='font-size: 13px;'>Este vendedor ainda não tem produtos à venda.</p>";
+            $msg .= "</div>";
         }
-        
+
         return ($msg);
     }
 
-} 
+}
 
 ?>

@@ -22,7 +22,7 @@ class Perfil{
                     $msg .= "<li><a class='dropdown-item' href='DashboardAdmin.php'><i class='fas fa-chart-line me-2'></i>Dashboard</a></li>";
                     $msg .= "<li><a class='dropdown-item' href='perfilAdmin.php'><i class='fas fa-user-cog me-2'></i>Perfil</a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
+                    $msg .= "<li><a href='#' class='dropdown-item text-danger' onclick='event.preventDefault(); logout();'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
                 }
                 else if($tpUser == 2)
                 {
@@ -36,7 +36,7 @@ class Perfil{
                     $msg .= "<li><a class='dropdown-item' href='#' id='btnAlternarConta' onclick='verificarEAlternarConta()' style='display:none;'>";
                     $msg .= "<i class='fas fa-exchange-alt me-2'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'><i class='fas fa-sign-out-alt me-2'></i>Sair</li>";
+                    $msg .= "<li><a href='#' class='dropdown-item text-danger' onclick='event.preventDefault(); logout();'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
                 }
                 else if($tpUser == 3)
                 {
@@ -48,7 +48,7 @@ class Perfil{
                     $msg .= "<li><a class='dropdown-item' href='#' id='btnAlternarConta' onclick='verificarEAlternarConta()' style='display:none;'>";
                     $msg .= "<i class='fas fa-exchange-alt me-2'></i> <span id='textoAlternar'>Alternar Conta</span></a></li>";
                     $msg .= "<li><hr class='dropdown-divider'></li>";
-                    $msg .= "<li><a href='index.html' class='dropdown-item text-danger' onclick='logout()'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
+                    $msg .= "<li><a href='#' class='dropdown-item text-danger' onclick='event.preventDefault(); logout();'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
                 }
                 else
                 {
@@ -664,7 +664,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
     function getDadosPerfilCliente($ID_User) {
         global $conn;
 
-        $sql = "SELECT u.id, u.nome, u.apelido, u.email, u.nif, u.telefone, u.morada, u.distrito, u.localidade, u.foto, u.data_criacao
+        $sql = "SELECT u.id, u.nome, u.apelido, u.email, u.nif, u.telefone, u.morada, u.foto, u.data_criacao
                 FROM Utilizadores u
                 WHERE u.id = ?";
 
@@ -677,6 +677,10 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
             // Juntar nome e apelido
             $nomeCompleto = trim($row['nome'] . ' ' . ($row['apelido'] ?? ''));
             $row['nome_completo'] = $nomeCompleto;
+
+            // Adicionar campos vazios para distrito e localidade (não existem na BD)
+            $row['distrito'] = '';
+            $row['localidade'] = '';
 
             $stmt->close();
             return json_encode($row);
@@ -701,14 +705,6 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
         if (empty($morada) || strlen(trim($morada)) < 10) {
             return json_encode(['success' => false, 'message' => 'Morada completa é obrigatória (mínimo 10 caracteres)']);
-        }
-
-        if (empty($distrito)) {
-            return json_encode(['success' => false, 'message' => 'Distrito é obrigatório']);
-        }
-
-        if (empty($localidade) || strlen(trim($localidade)) < 2) {
-            return json_encode(['success' => false, 'message' => 'Localidade é obrigatória']);
         }
 
         if (!empty($nif) && !preg_match('/^[0-9]{9}$/', $nif)) {
@@ -737,10 +733,10 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
         $primeiroNome = $partesNome[0];
         $apelido = isset($partesNome[1]) ? $partesNome[1] : null;
 
-        // Atualizar dados
-        $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ?, distrito = ?, localidade = ? WHERE id = ?";
+        // Atualizar dados (sem distrito e localidade que não existem na BD)
+        $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $distrito, $localidade, $ID_User);
+        $stmt->bind_param("ssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $ID_User);
 
         if ($stmt->execute()) {
             // Atualizar sessão

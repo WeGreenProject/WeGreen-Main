@@ -117,33 +117,30 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
         </div>
       </nav>
       <div class="page-content">
-        <header class="dashboard-header">
-          <div class="header-title">
-            <h1>Minhas Encomendas</h1>
-            <p>Acompanhe o estado das suas compras</p>
-          </div>
-          <div class="header-actions">
-            <button class="btn-continue-shopping" onclick="window.location.href='index.html'">
+        <div class="content-area" style="padding-top: 20px;">
+          <!-- Botão Continuar a Comprar -->
+          <div style="margin-bottom: 20px; display: flex; justify-content: flex-end;">
+            <button class="btn-continue-shopping" onclick="window.location.href='marketplace.html'"
+              style="padding: 12px 24px; background: #3cb371; color: white; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 500; box-shadow: 0 2px 8px rgba(60,179,113,0.3); transition: all 0.3s ease;"
+              onmouseover="this.style.background='#2ea05f'"
+              onmouseout="this.style.background='#3cb371'">
               <i class="fas fa-shopping-cart"></i>
               <span>Continuar a Comprar</span>
             </button>
           </div>
-        </header>
-
-        <div class="content-area">
           <!-- Barra de Pesquisa e Filtros -->
           <div class="filters-container"
             style="background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
             <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
               <div>
-                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666;">
-                  <i class="fas fa-search"></i> Pesquisar Produto
+                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666; font-weight: 500;">
+                  <i class="fas fa-search" style="color: #3cb371; margin-right: 4px;"></i> Pesquisar Produto
                 </label>
                 <input type="text" id="searchProduct" placeholder="Nome do produto..."
                   style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
               </div>
               <div>
-                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666;">Status</label>
+                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666; font-weight: 500;"><i class="fas fa-toggle-on" style="color: #3cb371; margin-right: 4px;"></i> Status</label>
                 <select id="filterStatus" class="filter-select"
                   style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
                   <option value="">Todos</option>
@@ -156,7 +153,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                 </select>
               </div>
               <div>
-                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666;">Período</label>
+                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666; font-weight: 500;"><i class="fas fa-calendar-alt" style="color: #3cb371; margin-right: 4px;"></i> Período</label>
                 <select id="filterPeriod"
                   style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
                   <option value="">Todo o período</option>
@@ -167,7 +164,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                 </select>
               </div>
               <div>
-                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666;">Ordenar</label>
+                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #666; font-weight: 500;"><i class="fas fa-sort" style="color: #3cb371; margin-right: 4px;"></i> Ordenar</label>
                 <select id="sortBy" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px;">
                   <option value="date-desc">Mais recentes</option>
                   <option value="date-asc">Mais antigas</option>
@@ -175,8 +172,8 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                   <option value="value-asc">Menor valor</option>
                 </select>
               </div>
-              <button class="btn-secondary" onclick="limparFiltros()"
-                style="padding: 10px 20px; background: #f5f5f5; border: none; border-radius: 8px; cursor: pointer;">
+              <button class="btn-clear-filters" onclick="limparFiltros()"
+                style="padding: 10px 20px; background: #3cb371; border: none; border-radius: 8px; cursor: pointer; color: #ffffff; font-size: 16px; display: flex; align-items: center; justify-content: center; height: 42px; box-shadow: 0 2px 8px rgba(60, 179, 113, 0.3); transition: all 0.3s ease;" onmouseover="this.style.background='#2ea05f'" onmouseout="this.style.background='#3cb371'">
                 <i class="fas fa-redo"></i>
               </button>
             </div>
@@ -193,7 +190,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             <i class="fas fa-shopping-bag" style="font-size: 64px; color: #e0e0e0; margin-bottom: 20px;"></i>
             <h3 style="color: #999;">Nenhuma encomenda encontrada</h3>
             <p style="color: #999;">Ainda não realizou nenhuma compra ou não há encomendas com os filtros aplicados</p>
-            <button class="btn-primary" onclick="window.location.href='index.html'"
+            <button class="btn-primary" onclick="window.location.href='marketplace.html'"
               style="margin-top: 20px; padding: 12px 24px; background: #3cb371; color: white; border: none; border-radius: 8px; cursor: pointer;">
               <i class="fas fa-shopping-cart"></i> Começar a Comprar
             </button>
@@ -203,12 +200,12 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
       <!-- Modal Detalhes da Encomenda -->
       <div id="detalhesModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 800px;">
-          <div class="modal-header">
-            <h3>Detalhes da Encomenda</h3>
-            <span class="close" onclick="fecharModal()">&times;</span>
+        <div class="modal-content" style="max-width: 750px;">
+          <div class="modal-header" style="background: #3cb371; color: white; padding: 20px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; color: white; font-size: 20px;"><i class="fas fa-box" style="margin-right: 10px;"></i>Detalhes da Encomenda</h3>
+            <span class="close" onclick="fecharModal()" style="color: white; font-size: 28px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.2); width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">&times;</span>
           </div>
-          <div class="modal-body" id="detalhesContent">
+          <div class="modal-body" id="detalhesContent" style="padding: 0;">
             <!-- Conteúdo dinâmico -->
           </div>
         </div>
@@ -514,31 +511,162 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   }
 
   function avaliarProduto(codigo) {
-    Swal.fire({
-      title: 'Avaliar Produtos',
-      html: `
-                    <div style="text-align: left;">
-                        <p>Como foi a sua experiência?</p>
-                        <div style="font-size: 32px; text-align: center; margin: 20px 0;">
-                            <i class="far fa-star rating-star" data-rating="1"></i>
-                            <i class="far fa-star rating-star" data-rating="2"></i>
-                            <i class="far fa-star rating-star" data-rating="3"></i>
-                            <i class="far fa-star rating-star" data-rating="4"></i>
-                            <i class="far fa-star rating-star" data-rating="5"></i>
-                        </div>
-                        <textarea id="comentario" placeholder="Deixe um comentário..." style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; min-height: 100px;"></textarea>
-                    </div>
-                `,
-      showCancelButton: true,
-      confirmButtonText: 'Enviar Avaliação',
-      cancelButtonText: 'Cancelar',
-      didOpen: () => {
-        $('.rating-star').on('click', function() {
-          const rating = $(this).data('rating');
-          $('.rating-star').each(function(i) {
-            $(this).toggleClass('fas far', i < rating);
+    // Primeiro, obter os produtos da encomenda
+    $.ajax({
+      url: 'src/controller/controllerAvaliacoes.php',
+      method: 'POST',
+      data: {
+        op: 'obterProdutosParaAvaliar',
+        encomenda_codigo: codigo
+      },
+      dataType: 'json',
+      success: function(response) {
+        if (response.success && response.produtos.length > 0) {
+          mostrarModalAvaliacao(response.produtos, codigo);
+        } else {
+          Swal.fire('Informação', 'Não há produtos para avaliar nesta encomenda', 'info');
+        }
+      },
+      error: function() {
+        Swal.fire('Erro', 'Erro ao carregar produtos', 'error');
+      }
+    });
+  }
+
+  function mostrarModalAvaliacao(produtos, encomenda_codigo) {
+    let currentIndex = 0;
+    let selectedRating = 0;
+
+    function showProduct(index) {
+      const produto = produtos[index];
+      selectedRating = produto.avaliado ? produto.avaliacao_dada : 0;
+
+      const html = `
+        <div style="text-align: left;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="${produto.foto}" alt="${produto.nome}"
+                 style="max-width: 150px; max-height: 150px; border-radius: 8px;">
+            <h4 style="margin-top: 10px;">${produto.nome}</h4>
+          </div>
+          <p style="text-align: center; font-weight: 600; margin-bottom: 10px;">
+            ${produto.avaliado ? 'Já avaliou este produto' : 'Como foi a sua experiência?'}
+          </p>
+          <div style="font-size: 32px; text-align: center; margin: 20px 0;">
+            <i class="far fa-star rating-star" data-rating="1"></i>
+            <i class="far fa-star rating-star" data-rating="2"></i>
+            <i class="far fa-star rating-star" data-rating="3"></i>
+            <i class="far fa-star rating-star" data-rating="4"></i>
+            <i class="far fa-star rating-star" data-rating="5"></i>
+          </div>
+          <textarea id="comentario-avaliacao" placeholder="Deixe um comentário (opcional)..."
+                    style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; min-height: 80px;"
+                    ${produto.avaliado ? 'disabled' : ''}>${produto.avaliado ? produto.comentario_dado || '' : ''}</textarea>
+          <div style="margin-top: 15px; text-align: center; color: #888; font-size: 14px;">
+            Produto ${index + 1} de ${produtos.length}
+          </div>
+        </div>
+      `;
+
+      Swal.fire({
+        title: produto.avaliado ? 'Avaliação Registada' : 'Avaliar Produto',
+        html: html,
+        showCancelButton: true,
+        showDenyButton: index < produtos.length - 1,
+        confirmButtonText: produto.avaliado ? (index < produtos.length - 1 ? 'Próximo' : 'Fechar') : 'Enviar Avaliação',
+        denyButtonText: 'Próximo',
+        cancelButtonText: 'Cancelar',
+        allowOutsideClick: false,
+        preConfirm: () => {
+          if (produto.avaliado) return true;
+
+          if (selectedRating === 0) {
+            Swal.showValidationMessage('Por favor, selecione uma avaliação');
+            return false;
+          }
+          return {
+            produto_id: produto.Produto_id,
+            avaliacao: selectedRating,
+            comentario: document.getElementById('comentario-avaliacao').value
+          };
+        },
+        didOpen: () => {
+          // Marcar estrelas já avaliadas
+          if (produto.avaliado) {
+            $('.rating-star').each(function(i) {
+              if (i < produto.avaliacao_dada) {
+                $(this).removeClass('far').addClass('fas');
+              }
+            });
+          }
+
+          // Evento de clique nas estrelas
+          $('.rating-star').on('click', function() {
+            if (produto.avaliado) return; // Não permitir reavaliação
+
+            selectedRating = $(this).data('rating');
+            $('.rating-star').each(function(i) {
+              if (i < selectedRating) {
+                $(this).removeClass('far').addClass('fas');
+              } else {
+                $(this).removeClass('fas').addClass('far');
+              }
+            });
           });
-        });
+        }
+      }).then((result) => {
+        if (result.isConfirmed && !produto.avaliado) {
+          // Enviar avaliação
+          enviarAvaliacao(result.value, encomenda_codigo, index, produtos);
+        } else if (result.isDenied || (result.isConfirmed && produto.avaliado && index < produtos.length - 1)) {
+          // Próximo produto
+          showProduct(index + 1);
+        } else if (result.isConfirmed && index < produtos.length - 1) {
+          // Depois de enviar, ir para próximo
+          showProduct(index + 1);
+        } else if (result.isConfirmed || result.isDismissed) {
+          // Recarregar encomendas
+          carregarEncomendas();
+        }
+      });
+    }
+
+    showProduct(currentIndex);
+  }
+
+  function enviarAvaliacao(dados, encomenda_codigo, index, produtos) {
+    $.ajax({
+      url: 'src/controller/controllerAvaliacoes.php',
+      method: 'POST',
+      data: {
+        op: 'criarAvaliacao',
+        produto_id: dados.produto_id,
+        encomenda_codigo: encomenda_codigo,
+        avaliacao: dados.avaliacao,
+        comentario: dados.comentario
+      },
+      dataType: 'json',
+      success: function(response) {
+        if (response.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Avaliação Registada!',
+            text: response.message,
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            // Continuar para próximo produto se houver
+            if (index < produtos.length - 1) {
+              mostrarModalAvaliacao(produtos.slice(index + 1), encomenda_codigo);
+            } else {
+              carregarEncomendas();
+            }
+          });
+        } else {
+          Swal.fire('Erro', response.message, 'error');
+        }
+      },
+      error: function() {
+        Swal.fire('Erro', 'Erro ao enviar avaliação', 'error');
       }
     });
   }
@@ -568,7 +696,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   function mostrarDetalhes(encomenda) {
     // Determinar tipo de entrega
     const tipoEntrega = encomenda.tipo_entrega || 'domicilio';
-    const tituloMorada = tipoEntrega === 'ponto_recolha' ? '📍 Ponto de Recolha' : '🏠 Morada de Entrega';
+    const tituloMorada = tipoEntrega === 'ponto_recolha' ? 'Ponto de Recolha' : 'Morada de Entrega';
     const moradaCompleta = tipoEntrega === 'ponto_recolha' ?
       (encomenda.morada_ponto_recolha || encomenda.morada || 'Morada não disponível') :
       (encomenda.morada_completa || encomenda.morada || 'Morada não disponível');
@@ -576,64 +704,84 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     // Só mostrar mapa se houver morada válida
     const temMorada = moradaCompleta && moradaCompleta !== 'Morada não disponível' && moradaCompleta !== 'null';
 
-    let mapaHtml = '';
-    if (temMorada) {
-      // Gerar URL do mapa
-      const enderecoEncoded = encodeURIComponent(moradaCompleta);
-      const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}`;
+    // Calcular dias desde encomenda
+    const dataEncomenda = new Date(encomenda.data_envio);
+    const hoje = new Date();
+    const diasDesdeEncomenda = Math.floor((hoje - dataEncomenda) / (1000 * 60 * 60 * 24));
 
-      // HTML do mapa (iframe do Google Maps)
-      mapaHtml = `
-                    <div style="margin-top: 15px; border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb;">
-                        <iframe
-                            width="100%"
-                            height="300"
-                            frameborder="0"
-                            style="border:0"
-                            src="https://maps.google.com/maps?q=${enderecoEncoded}&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                            allowfullscreen>
-                        </iframe>
-                        <div style="padding: 10px; background-color: #f3f4f6; text-align: center;">
-                            <a href="${googleMapsUrl}"
-                               target="_blank"
-                               style="color: #22c55e; text-decoration: none; font-weight: 600; font-size: 12px;">
-                                📍 Abrir no Google Maps
-                            </a>
-                        </div>
-                    </div>
-                `;
-    }
+    const statusInfo = getStatusInfo(encomenda.estado.toLowerCase());
 
     const html = `
-                <div style="padding: 20px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                        <div>
-                            <h4 style="color: #3cb371; margin-bottom: 10px;">Informações da Encomenda</h4>
-                            <p><strong>Código:</strong> ${encomenda.codigo_encomenda}</p>
-                            <p><strong>Data:</strong> ${encomenda.data_envio}</p>
-                            <p><strong>Status:</strong> ${encomenda.estado}</p>
-                            <p><strong>Transportadora:</strong> ${encomenda.transportadora}</p>
-                        </div>
-                        <div>
-                            <h4 style="color: #3cb371; margin-bottom: 10px;">${tituloMorada}</h4>
-                            ${tipoEntrega === 'ponto_recolha' && encomenda.nome_ponto_recolha ? `
-                                <p style="font-weight: 600; margin-bottom: 5px;">${encomenda.nome_ponto_recolha}</p>
-                            ` : ''}
-                            <p style="white-space: pre-line;">${moradaCompleta}</p>
-                            ${mapaHtml}
-                        </div>
-                    </div>
-                    <div>
-                        <h4 style="color: #3cb371; margin-bottom: 10px;">Produtos</h4>
-                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
-                            ${encomenda.produtos_detalhes || 'Carregando produtos...'}
-                        </div>
-                    </div>
-                    <div style="margin-top: 20px; text-align: right;">
-                        <h3 style="color: #3cb371;">Total: €${parseFloat(encomenda.total).toFixed(2)}</h3>
-                    </div>
-                </div>
-            `;
+      <div style="padding: 25px;">
+
+        <!-- Grid: Informações à esquerda, Mapa à direita -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+          <!-- COLUNA ESQUERDA: Informações -->
+          <div>
+            <!-- Encomenda -->
+            <div style="background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); padding: 18px; border-radius: 10px; border-left: 4px solid #3cb371; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+              <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                <i class="fas fa-box" style="margin-right: 8px; color: #3cb371;"></i>
+                Encomenda
+              </h4>
+              <p style="margin: 6px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Código:</strong> ${encomenda.codigo_encomenda}</p>
+              <p style="margin: 6px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${encomenda.data_envio}</p>
+              <p style="margin: 6px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #3cb371; font-weight: bold; font-size: 15px;">€${parseFloat(encomenda.total).toFixed(2)}</span></p>
+              <p style="margin: 6px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Status:</strong> <span class="badge ${statusInfo.class}" style="font-size: 12px; padding: 4px 10px; border-radius: 6px;">${statusInfo.text}</span></p>
+            </div>
+
+            <!-- Envio -->
+            <div style="background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); padding: 18px; border-radius: 10px; border-left: 4px solid #3cb371; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+              <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                <i class="fas fa-shipping-fast" style="margin-right: 8px; color: #3cb371;"></i>
+                Envio
+              </h4>
+              <p style="margin: 6px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Transportadora:</strong> ${encomenda.transportadora || 'N/A'}</p>
+              <p style="margin: 6px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Rastreio:</strong> ${encomenda.plano_rastreio || 'N/A'}</p>
+              <p style="margin: 6px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
+            </div>
+
+            <!-- Morada -->
+            <div style="background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); padding: 18px; border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+              <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                <i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #3cb371;"></i>
+                ${tituloMorada}
+              </h4>
+              ${tipoEntrega === 'ponto_recolha' && encomenda.nome_ponto_recolha ?
+                `<p style="font-weight: 600; margin: 0 0 6px 0; font-size: 14px; color: #2d3748;">${encomenda.nome_ponto_recolha}</p>` : ''}
+              <p style="margin: 0; font-size: 13px; color: #4a5568; line-height: 1.6;">${moradaCompleta}</p>
+              ${temMorada ? `<button onclick="navigator.clipboard.writeText('${moradaCompleta.replace(/'/g, "\\'")}').then(() => Swal.fire({icon: 'success', title: 'Copiado!', text: 'Morada copiada', timer: 1500, showConfirmButton: false}))" style="margin-top: 10px; padding: 7px 14px; background: #3cb371; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;" onmouseover="this.style.background='#2e8b57'" onmouseout="this.style.background='#3cb371'"><i class="fas fa-copy" style="margin-right: 5px;"></i>Copiar Morada</button>` : ''}
+            </div>
+          </div>
+
+          <!-- COLUNA DIREITA: Mapa -->
+          ${temMorada ? `
+            <div style="background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); height: fit-content;">
+              <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                <i class="fas fa-map" style="margin-right: 8px; color: #3cb371;"></i>
+                Localização de Entrega
+              </h4>
+              <div style="border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb;">
+                <iframe width="100%" height="400" frameborder="0" style="border:0"
+                  src="https://maps.google.com/maps?q=${encodeURIComponent(moradaCompleta)}&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen>
+                </iframe>
+              </div>
+              <div style="text-align: center; margin-top: 12px;">
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(moradaCompleta)}" target="_blank"
+                  style="display: inline-block; padding: 10px 18px; background: #3cb371; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 13px; border-radius: 8px; box-shadow: 0 2px 8px rgba(60, 179, 113, 0.3); transition: all 0.3s ease;"
+                  onmouseover="this.style.background='#2e8b57'; this.style.transform='translateY(-2px)'"
+                  onmouseout="this.style.background='#3cb371'; this.style.transform='translateY(0)'">
+                  <i class="fas fa-external-link-alt" style="margin-right: 6px;"></i>
+                  Abrir no Google Maps
+                </a>
+              </div>
+            </div>
+          ` : '<div></div>'}
+
+        </div>
+      </div>
+    `;
 
     $('#detalhesContent').html(html);
     $('#detalhesModal').fadeIn();
@@ -642,6 +790,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   function fecharModal() {
     $('#detalhesModal').fadeOut();
   }
+
 
   function descarregarFatura(codigo) {
     // Buscar detalhes da encomenda
@@ -865,7 +1014,12 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.href = 'src/controller/controllerPerfil.php?op=2';
+        $.ajax({
+          url: 'src/controller/controllerPerfil.php?op=2',
+          method: 'GET'
+        }).always(function() {
+          window.location.href = 'index.html';
+        });
       }
     });
   }

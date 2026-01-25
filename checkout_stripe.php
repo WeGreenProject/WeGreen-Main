@@ -51,8 +51,49 @@ foreach ($produtos as $produto) {
     ];
 }
 
-// NOTA: Custo de envio é cobrado via shipping_options do Stripe (linhas abaixo)
-// NÃO adicionar aqui para evitar cobrança duplicada
+// Adicionar custo de envio baseado na transportadora selecionada
+$shippingCost = 0;
+$shippingName = '';
+
+switch ($transportadoraId) {
+    case '1': // CTT Standard
+        $shippingCost = 250; // €2.50
+        $shippingName = 'Envio CTT Standard';
+        break;
+    case '2': // CTT Pickup
+        $shippingCost = 250; // €2.50
+        $shippingName = 'Envio CTT Pickup - ' . ($pickupPointData['pickup_point_name'] ?? 'Ponto de Recolha');
+        break;
+    case '3': // DPD Standard
+        $shippingCost = 250; // €2.50
+        $shippingName = 'Envio DPD Standard';
+        break;
+    case '4': // DPD Pickup
+        $shippingCost = 250; // €2.50
+        $shippingName = 'Envio DPD Pickup - ' . ($pickupPointData['pickup_point_name'] ?? 'Ponto de Recolha');
+        break;
+    case '5': // Entrega em Casa
+        $shippingCost = 500; // €5.00
+        $shippingName = 'Entrega em Casa';
+        break;
+    default:
+        $shippingCost = 250; // €2.50 (padrão)
+        $shippingName = 'Envio Standard';
+}
+
+// Adicionar o envio como um item separado
+if ($shippingCost > 0) {
+    $line_items[] = [
+        'price_data' => [
+            'currency' => 'eur',
+            'product_data' => [
+                'name' => $shippingName,
+            ],
+            'unit_amount' => $shippingCost,
+        ],
+        'quantity' => 1,
+    ];
+}
 
 $discounts = [];
 if (isset($_SESSION['cupao_desconto']) && $_SESSION['cupao_desconto'] > 0) {
@@ -72,6 +113,7 @@ $sessionData = [
     'mode' => 'payment',
     'success_url' => 'http://localhost/wegreen-main/sucess_carrinho.php?session_id={CHECKOUT_SESSION_ID}',
     'cancel_url' => 'http://localhost/wegreen-main/carrinho.html',
+    'customer_creation' => 'always',
     'metadata' => [
         'utilizador' => $utilizador_id,
         'tipo' => 'carrinho',
@@ -87,59 +129,7 @@ $sessionData = [
         'pickup_point_id' => $pickupPointData['pickup_point_id'],
         'pickup_point_name' => $pickupPointData['pickup_point_name'],
         'pickup_point_address' => $pickupPointData['pickup_point_address']
-    ],
-
-
-    'shipping_address_collection' => [
-        'allowed_countries' => ['PT'],
-    ],
-
-    'customer_creation' => 'always',
-
-    'shipping_options' => [
-        [
-            'shipping_rate_data' => [
-                'type' => 'fixed_amount',
-                'fixed_amount' => [
-                    'amount' => 250,
-                    'currency' => 'eur',
-                ],
-                'display_name' => 'DPD',
-                'delivery_estimate' => [
-                    'minimum' => ['unit' => 'business_day', 'value' => 1],
-                    'maximum' => ['unit' => 'business_day', 'value' => 2],
-                ],
-            ],
-        ],
-        [
-            'shipping_rate_data' => [
-                'type' => 'fixed_amount',
-                'fixed_amount' => [
-                    'amount' => 250,
-                    'currency' => 'eur',
-                ],
-                'display_name' => 'CTT',
-                'delivery_estimate' => [
-                    'minimum' => ['unit' => 'business_day', 'value' => 2],
-                    'maximum' => ['unit' => 'business_day', 'value' => 4],
-                ],
-            ],
-        ],
-        [
-            'shipping_rate_data' => [
-                'type' => 'fixed_amount',
-                'fixed_amount' => [
-                    'amount' => 500,
-                    'currency' => 'eur',
-                ],
-                'display_name' => 'Entrega em Casa',
-                'delivery_estimate' => [
-                    'minimum' => ['unit' => 'business_day', 'value' => 1],
-                    'maximum' => ['unit' => 'business_day', 'value' => 3],
-                ],
-            ],
-        ],
-    ],
+    ]
 ];
 
 

@@ -52,7 +52,12 @@ function logout() {
     cancelButtonText: "Cancelar",
   }).then((result) => {
     if (result.isConfirmed) {
-      window.location.href = "src/controller/controllerPerfil.php?op=2";
+      $.ajax({
+        url: "src/controller/controllerPerfil.php?op=2",
+        method: "GET",
+      }).always(function () {
+        window.location.href = "index.html";
+      });
     }
   });
 }

@@ -87,7 +87,7 @@
         </div>
     </header>
 
-  <main class="container my-5" style="margin-top: 100px !important;">
+  <main class="container my-5" style="margin-top: 70px !important;">
 
     <div id="ProdutoInfo" class="row g-5 mb-5">
       <!-- Conteúdo do produto será carregado aqui via AJAX -->

@@ -472,11 +472,33 @@ body {
   color: #666;
 }
 
-/* ========== Produtos Grid ========== */
+/* ========== Produtos Grid - Carrossel ========== */
 .produtos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  display: flex;
   gap: 20px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding-bottom: 15px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.produtos-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.produtos-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.produtos-grid::-webkit-scrollbar-thumb {
+  background: #3cb371;
+  border-radius: 4px;
+}
+
+.produtos-grid::-webkit-scrollbar-thumb:hover {
+  background: #2ea05f;
 }
 
 .produto-item {
@@ -486,6 +508,8 @@ body {
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
+  flex: 0 0 220px;
+  min-width: 220px;
 }
 
 .produto-item:hover {

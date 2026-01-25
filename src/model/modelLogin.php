@@ -5,18 +5,29 @@ require_once 'connection.php';
 class Login {
 
     function login1($email, $pw) {
+        try {
+            global $conn;
+            $msg = "";
+            $flag = true;
 
-        global $conn;
-        $msg = "";
-        $flag = true;
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
 
-        session_start();
+            $stmt = $conn->prepare(
+                "SELECT * FROM Utilizadores WHERE email = ? AND password = ?"
+            );
 
-        $stmt = $conn->prepare(
-            "SELECT * FROM Utilizadores WHERE email = ? AND password = ?"
-        );
-        $stmt->bind_param("ss", $email, $pw);
-        $stmt->execute();
+            if (!$stmt) {
+                error_log("Erro prepare: " . $conn->error);
+                return json_encode([
+                    "flag" => false,
+                    "msg" => "Erro ao processar login"
+                ]);
+            }
+
+            $stmt->bind_param("ss", $email, $pw);
+            $stmt->execute();
 
         $result = $stmt->get_result();
 
@@ -62,21 +73,23 @@ class Login {
             );
 
             if (!$stmtLog) {
-                die("Erro prepare log: " . $conn->error);
+                error_log("Erro prepare log: " . $conn->error);
+                // Continua mesmo com erro no log
+            } else {
+                $stmtLog->bind_param(
+                    "iss",
+                    $_SESSION['utilizador'],
+                    $acao,
+                    $_SESSION['email']
+                );
+
+                if (!$stmtLog->execute()) {
+                    error_log("Erro insert log: " . $stmtLog->error);
+                    // Continua mesmo com erro no log
+                }
+
+                $stmtLog->close();
             }
-
-            $stmtLog->bind_param(
-                "iss",
-                $_SESSION['utilizador'],
-                $acao,
-                $_SESSION['email']
-            );
-
-            if (!$stmtLog->execute()) {
-                die("Erro insert log: " . $stmtLog->error);
-            }
-
-            $stmtLog->close();
 
         } else {
             $flag = false;
@@ -91,6 +104,14 @@ class Login {
             "flag" => $flag,
             "perfil_duplo" => $_SESSION['perfil_duplo'] ?? false
         ]);
+
+        } catch (Exception $e) {
+            error_log("Erro login1: " . $e->getMessage());
+            return json_encode([
+                "flag" => false,
+                "msg" => "Erro ao processar login"
+            ]);
+        }
     }
 }
 ?>

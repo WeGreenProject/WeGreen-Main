@@ -8,14 +8,13 @@ function login1() {
     url: "src/controller/controllerLogin.php",
     method: "POST",
     data: dados,
-    dataType: "html",
+    dataType: "json",
     cache: false,
     contentType: false,
     processData: false,
   })
 
-    .done(function (msg) {
-      let obj = JSON.parse(msg);
+    .done(function (obj) {
       if (obj.flag) {
         alerta2(obj.msg);
 
@@ -62,8 +61,16 @@ function login1() {
       }
     })
 
-    .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      console.error("Erro completo:", jqXHR.responseText);
+      console.error("Status:", textStatus);
+      console.error("Error:", errorThrown);
+      Swal.fire({
+        icon: "error",
+        title: "Erro ao fazer login",
+        text: "Ocorreu um erro ao processar o login. Por favor, tente novamente.",
+        confirmButtonColor: "#3cb371",
+      });
     });
 }
 function alerta2(msg) {

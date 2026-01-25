@@ -114,9 +114,6 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                             <h2 class="section-title">
                                 <i class="fas fa-history"></i> Produtos Adquiridos Recentemente
                             </h2>
-                            <a href="minhasEncomendas.php" class="btn-ver-todas">
-                                Ver Todas as Compras <i class="fas fa-arrow-right"></i>
-                            </a>
                         </div>
                         <div id="recomendacoesContainer">
                             <!-- Produtos carregados via AJAX -->
@@ -258,7 +255,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
 function renderRecomendacoes(produtos) {
             let html = '<div class="produtos-grid">';
 
-            produtos.slice(0, 6).forEach(function(produto) {
+            produtos.forEach(function(produto) {
                 const imagem = produto.foto || produto.Imagem1 || 'assets/media/products/default.jpg';
                 const preco = parseFloat(produto.preco || produto.Preco || 0).toFixed(2);
                 const nome = produto.nome || produto.Nome || 'Produto';
@@ -433,7 +430,12 @@ function renderRecomendacoes(produtos) {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'src/controller/controllerPerfil.php?op=2';
+                    $.ajax({
+                        url: 'src/controller/controllerPerfil.php?op=2',
+                        method: 'GET'
+                    }).always(function() {
+                        window.location.href = 'index.html';
+                    });
                 }
             });
         }

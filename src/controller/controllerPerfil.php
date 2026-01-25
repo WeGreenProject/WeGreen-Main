@@ -14,13 +14,13 @@ if ($op == 1) {
         echo $resp;
     } else
     {
-        echo "<li><a class='dropdown-item' href='login.html'>Entrar na sua conta</a></li>";
+        echo "<li><a class='dropdown-item' href='login.html'><i class='fas fa-sign-in-alt me-2'></i>Entrar na sua conta</a></li>";
     }
 }
 if ($op == 2) {
     $resp = $func->logout();
-    // Redirecionar para login após logout
-    header('Location: ../../login.html');
+    // Redirecionar para index após logout
+    header('Location: ../../index.html');
     exit();
 }
 if ($_POST['op'] == 3) {

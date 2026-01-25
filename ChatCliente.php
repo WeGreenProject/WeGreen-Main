@@ -161,7 +161,12 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <script src="src/js/ChatCliente.js"></script>
     <script>
         function logout() {
-            window.location.href = 'src/controller/controllerPerfil.php?op=2';
+            $.ajax({
+                url: 'src/controller/controllerPerfil.php?op=2',
+                method: 'GET'
+            }).always(function() {
+                window.location.href = 'index.html';
+            });
         }
     </script>
 </body>

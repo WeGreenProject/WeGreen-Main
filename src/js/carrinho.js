@@ -827,10 +827,32 @@ function selectTransportadora(id, price) {
 
   // Se for pickup point (IDs 2 ou 4), mostrar mapa
   if (id === 2 || id === 4) {
+    // Limpar seleção anterior de pickup point
+    localStorage.removeItem("pickup_point_id");
+    localStorage.removeItem("pickup_point_name");
+    localStorage.removeItem("pickup_point_address");
+
+    // Desabilitar botão de continuar até selecionar ponto
+    $("button[onclick*='nextStep']")
+      .prop("disabled", true)
+      .addClass("disabled-btn");
+
     const transportadoraType = id === 2 ? "ctt_pickup" : "dpd_pickup";
     showPickupMap(transportadoraType);
+
+    // Scroll suave para o mapa após renderizar
+    setTimeout(() => {
+      const mapContainer = document.getElementById("pickupMapContainer");
+      if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 300);
   } else {
     hidePickupMap();
+    // Reabilitar botão de continuar
+    $("button[onclick*='nextStep']")
+      .prop("disabled", false)
+      .removeClass("disabled-btn");
   }
 }
 
@@ -1048,7 +1070,12 @@ function logout() {
     if (result.isConfirmed) {
       sessionStorage.clear();
       localStorage.clear();
-      window.location.href = "src/controller/controllerPerfil.php?op=2";
+      $.ajax({
+        url: "src/controller/controllerPerfil.php?op=2",
+        method: "GET",
+      }).always(function () {
+        window.location.href = "index.html";
+      });
     }
   });
 }
@@ -2130,30 +2157,45 @@ function initPickupMap(transportadoraId) {
   const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
   const selectedCity = shippingInfo.state; // state contém a cidade selecionada
 
+  console.log("🔍 Cidade selecionada:", selectedCity);
+  console.log("📍 Total de pontos antes do filtro:", points.length);
+
   if (selectedCity) {
     // Filtrar pontos pela cidade usando a função getCityFromPickupPoint
     const filteredPoints = points.filter((p) => {
       const pointCity = getCityFromPickupPoint(p);
+      console.log(`   Ponto: ${p.name} → Cidade extraída: ${pointCity}`);
       return pointCity === selectedCity;
     });
 
+    console.log(
+      `✅ Pontos filtrados para ${selectedCity}:`,
+      filteredPoints.length,
+    );
+
     if (filteredPoints.length > 0) {
       points = filteredPoints;
-      console.log(
-        `Filtrados ${filteredPoints.length} pontos para ${selectedCity}`,
-      );
     } else {
-      // Se não encontrar pontos para a cidade, mostrar aviso
-      Swal.fire({
-        icon: "info",
-        title: "Pontos de Recolha",
-        html: `Não há pontos de recolha em <strong>${selectedCity}</strong>.<br><small>A mostrar pontos de todas as localidades disponíveis.</small>`,
-        timer: 3000,
-        showConfirmButton: false,
-      });
-      console.log(
-        `Nenhum ponto encontrado para ${selectedCity}. Mostrando todos.`,
+      console.warn(
+        `⚠️ Nenhum ponto encontrado para ${selectedCity}. Usando pontos da região mais próxima.`,
       );
+      // Tentar encontrar pontos no distrito/região
+      const regionPoints = points.filter((p) => {
+        const pointCity = getCityFromPickupPoint(p);
+        // Procurar pontos num raio de cidades próximas (mesmo distrito)
+        return (
+          pointCity &&
+          pointCity
+            .toLowerCase()
+            .includes(selectedCity.toLowerCase().substring(0, 3))
+        );
+      });
+      if (regionPoints.length > 0) {
+        points = regionPoints;
+        console.log(
+          `📍 Encontrados ${regionPoints.length} pontos na região de ${selectedCity}`,
+        );
+      }
     }
   }
 
@@ -2170,17 +2212,13 @@ function initPickupMap(transportadoraId) {
     return;
   }
 
-  // Calcular centro do mapa
-  const centerLat = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
-  const centerLng = points.reduce((sum, p) => sum + p.lng, 0) / points.length;
-
   // Remover mapa anterior se existir
   if (pickupMap) {
     pickupMap.remove();
   }
 
-  // Inicializar Leaflet map
-  pickupMap = L.map("pickupMap").setView([centerLat, centerLng], 12);
+  // Inicializar Leaflet map (zoom inicial será ajustado depois)
+  pickupMap = L.map("pickupMap").setView([38.7223, -9.1393], 7);
 
   // Adicionar tile layer do OpenStreetMap
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -2226,12 +2264,27 @@ function initPickupMap(transportadoraId) {
     marker.bindPopup(popupContent, {
       maxWidth: 300,
       className: "custom-leaflet-popup",
+      autoPan: true,
+      autoPanPadding: [50, 50],
+      keepInView: true,
+      closeButton: true,
     });
     pickupMarkers.push(marker);
   });
 
   // Renderizar lista de pontos
   renderPickupPointsList(points);
+
+  // Ajustar zoom do mapa para os pontos filtrados
+  if (points.length > 0) {
+    const initialBounds = L.latLngBounds(points.map((p) => [p.lat, p.lng]));
+    setTimeout(() => {
+      pickupMap.fitBounds(initialBounds, {
+        padding: [80, 80],
+        maxZoom: points.length === 1 ? 14 : 12,
+      });
+    }, 500);
+  }
 
   // Tentar obter localização do usuário
   if (navigator.geolocation) {
@@ -2259,22 +2312,50 @@ function initPickupMap(transportadoraId) {
         const pointsWithDistance = calculateDistances(points, userLocation);
         renderPickupPointsList(pointsWithDistance);
 
-        // Ajustar bounds do mapa
+        // Ajustar bounds do mapa incluindo localização do usuário
         const allLats = [...points.map((p) => p.lat), userLocation.lat];
         const allLngs = [...points.map((p) => p.lng), userLocation.lng];
-        const bounds = L.latLngBounds(
+        const boundsWithUser = L.latLngBounds(
           [Math.min(...allLats), Math.min(...allLngs)],
           [Math.max(...allLats), Math.max(...allLngs)],
         );
-        pickupMap.fitBounds(bounds, { padding: [50, 50] });
+        setTimeout(() => {
+          pickupMap.fitBounds(boundsWithUser, {
+            padding: [80, 80],
+            maxZoom: points.length === 1 ? 14 : 12,
+          });
+        }, 500);
+
+        // Abrir popup do ponto mais próximo
+        if (pointsWithDistance.length > 0 && pickupMarkers.length > 0) {
+          const closestPoint = pointsWithDistance[0];
+          const closestMarker = pickupMarkers.find((m) => {
+            const pos = m.getLatLng();
+            return (
+              Math.abs(pos.lat - closestPoint.lat) < 0.0001 &&
+              Math.abs(pos.lng - closestPoint.lng) < 0.0001
+            );
+          });
+          if (closestMarker) {
+            setTimeout(() => closestMarker.openPopup(), 500);
+          }
+        }
       },
       (error) => {
         console.log("Geolocalização não disponível:", error);
         renderPickupPointsList(points);
+        // Abrir popup do primeiro ponto se houver
+        if (points.length > 0 && pickupMarkers.length > 0) {
+          setTimeout(() => pickupMarkers[0].openPopup(), 500);
+        }
       },
     );
   } else {
     renderPickupPointsList(points);
+    // Abrir popup do primeiro ponto se houver
+    if (points.length > 0 && pickupMarkers.length > 0) {
+      setTimeout(() => pickupMarkers[0].openPopup(), 500);
+    }
   }
 }
 
@@ -2310,9 +2391,7 @@ function renderPickupPointsList(points) {
   const html = points
     .map(
       (point) => `
-    <div class="pickup-point-item" onclick="focusPickupPoint(${point.lat}, ${
-      point.lng
-    })">
+    <div class="pickup-point-item" onclick="selectPickupPoint(${point.id}, '${point.name}', '${point.address}')">
       <div class="pickup-point-icon">
         <i class="bi bi-geo-alt-fill"></i>
       </div>
@@ -2370,13 +2449,10 @@ function selectPickupPoint(id, name, address) {
 
   updateOrderSummary(); // Atualizar resumo com pickup point
 
-  Swal.fire({
-    icon: "success",
-    title: "Ponto de Recolha Selecionado",
-    html: `<strong>${name}</strong><br><small>${address}</small>`,
-    timer: 2000,
-    showConfirmButton: false,
-  });
+  // Reabilitar botão de continuar
+  $("button[onclick*='nextStep']")
+    .prop("disabled", false)
+    .removeClass("disabled-btn");
 
   // Destacar ponto selecionado
   $(".pickup-point-item").removeClass("selected");
@@ -2385,4 +2461,12 @@ function selectPickupPoint(id, name, address) {
       $(this).addClass("selected");
     }
   });
+
+  // Scroll suave de volta para o botão de continuar
+  setTimeout(() => {
+    const continueBtn = $("button[onclick*='nextStep']")[0];
+    if (continueBtn) {
+      continueBtn.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, 500);
 }
