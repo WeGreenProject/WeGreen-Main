@@ -135,20 +135,20 @@ class EmailService {
 
         // Determinar subject baseado no template
         $subjects = [
-            'confirmacao_encomenda' => '✅ Confirmação de Encomenda - WeGreen',
-            'nova_encomenda_anunciante' => '🛒 Nova Encomenda Recebida - WeGreen',
-            'encomenda_enviada' => '📦 Encomenda Enviada - WeGreen',
-            'encomenda_entregue' => '✓ Encomenda Entregue - WeGreen',
-            'boas_vindas' => '🎉 Bem-vindo ao WeGreen',
-            'reset_password' => '🔑 Recuperação de Password - WeGreen',
-            'verificacao_email' => '✉️ Verificação de Email - WeGreen',
-            'conta_criada_admin' => '✅ A sua conta WeGreen foi criada',
+            'confirmacao_encomenda' => 'Confirmação de Encomenda - WeGreen',
+            'nova_encomenda_anunciante' => 'Nova Encomenda Recebida - WeGreen',
+            'encomenda_enviada' => 'Encomenda Enviada - WeGreen',
+            'encomenda_entregue' => 'Encomenda Entregue - WeGreen',
+            'boas_vindas' => 'Bem-vindo ao WeGreen',
+            'reset_password' => 'Recuperação de Password - WeGreen',
+            'verificacao_email' => 'Verificação de Email - WeGreen',
+            'conta_criada_admin' => 'A sua conta WeGreen foi criada',
             // Novos templates de devoluções
-            'devolucao_solicitada' => '📦 Pedido de Devolução Registado - WeGreen',
-            'devolucao_aprovada' => '✅ Devolução Aprovada - WeGreen',
-            'devolucao_rejeitada' => '❌ Devolução Não Aprovada - WeGreen',
-            'reembolso_processado' => '💰 Reembolso Processado - WeGreen',
-            'nova_devolucao_anunciante' => '⚠️ Nova Devolução Solicitada - WeGreen'
+            'devolucao_solicitada' => 'Pedido de Devolução Registado - WeGreen',
+            'devolucao_aprovada' => 'Devolução Aprovada - WeGreen',
+            'devolucao_rejeitada' => 'Devolução Não Aprovada - WeGreen',
+            'reembolso_processado' => 'Reembolso Processado - WeGreen',
+            'nova_devolucao_anunciante' => 'Nova Devolução Solicitada - WeGreen'
         ];
 
         $subject = $subjects[$template] ?? 'Notificação WeGreen';
@@ -183,7 +183,7 @@ class EmailService {
     }
 
     public function sendBoasVindas($email, $nome, $data_criacao = null) {
-        $subject = '🎉 Bem-vindo ao WeGreen';
+        $subject = 'Bem-vindo ao WeGreen';
 
         // Dados para o template
         $data = [
@@ -213,7 +213,7 @@ class EmailService {
     }
 
     public function sendVerificacaoEmail($email, $nome, $link_verificacao) {
-        $subject = '✉️ Verificação de Email - WeGreen';
+        $subject = 'Verificação de Email - WeGreen';
 
         // Dados para o template
         $data = [
@@ -241,7 +241,7 @@ class EmailService {
     }
 
     public function sendResetPassword($email, $nome, $reset_link) {
-        $subject = '🔑 Recuperação de Password - WeGreen';
+        $subject = ' Recuperação de Password - WeGreen';
 
         // Dados para o template
         $data = [
@@ -332,23 +332,27 @@ class EmailService {
 
         // Determinar subject baseado no template
         $subjects = [
-            'confirmacao_encomenda' => '✅ Confirmação de Encomenda - WeGreen',
-            'nova_encomenda_anunciante' => '🛒 Nova Encomenda Recebida - WeGreen',
-            'status_processando' => '⚙️ Encomenda em Processamento - WeGreen',
-            'status_enviado' => '📦 Encomenda Enviada - WeGreen',
-            'status_entregue' => '✅ Encomenda Entregue - WeGreen',
-            'cancelamento' => '❌ Encomenda Cancelada - WeGreen',
-            'encomendas_pendentes_urgentes' => '⚠️ Encomendas Pendentes Urgentes - WeGreen',
-            'boas_vindas' => '🎉 Bem-vindo ao WeGreen',
-            'reset_password' => '🔑 Recuperação de Password - WeGreen',
-            'verificacao_email' => '✉️ Verificação de Email - WeGreen',
-            'conta_criada_admin' => '✅ A sua conta WeGreen foi criada',
+            'confirmacao_encomenda' => 'Confirmação de Encomenda - WeGreen',
+            'nova_encomenda_anunciante' => 'Nova Encomenda Recebida - WeGreen',
+            'status_processando' => 'Encomenda em Processamento - WeGreen',
+            'status_enviado' => 'Encomenda Enviada - WeGreen',
+            'status_entregue' => 'Encomenda Entregue - WeGreen',
+            'cancelamento' => 'Encomenda Cancelada - WeGreen',
+            'encomendas_pendentes_urgentes' => 'Encomendas Pendentes Urgentes - WeGreen',
+            'boas_vindas' => 'Bem-vindo ao WeGreen',
+            'reset_password' => 'Recuperação de Password - WeGreen',
+            'verificacao_email' => 'Verificação de Email - WeGreen',
+            'conta_criada_admin' => 'A sua conta WeGreen foi criada',
             // Templates de devoluções
-            'devolucao_solicitada' => '📦 Pedido de Devolução Registado - WeGreen',
-            'devolucao_aprovada' => '✅ Devolução Aprovada - WeGreen',
-            'devolucao_rejeitada' => '❌ Devolução Não Aprovada - WeGreen',
-            'reembolso_processado' => '💰 Reembolso Processado - WeGreen',
-            'nova_devolucao_anunciante' => '⚠️ Nova Devolução Solicitada - WeGreen'
+            'devolucao_solicitada' => 'Pedido de Devolução Registado - WeGreen',
+            'devolucao_aprovada' => 'Devolução Aprovada - WeGreen',
+            'devolucao_rejeitada' => 'Devolução Não Aprovada - WeGreen',
+            'devolucao_enviada' => 'Cliente Enviou Produto - WeGreen',
+            'devolucao_recebida' => 'Produto Recebido - Reembolso em Processamento - WeGreen',
+            'reembolso_processado' => 'Reembolso Processado - WeGreen',
+            'nova_devolucao_anunciante' => 'Nova Devolução Solicitada - WeGreen',
+            // Template confirmação receção encomenda
+            'confirmacao_recepcao' => 'Obrigado por Confirmar a Entrega - WeGreen'
         ];
 
         $subject = $subjects[$template] ?? 'Notificação WeGreen';
@@ -390,7 +394,7 @@ class EmailService {
         if ($codigo_rastreio && $novo_status === 'Enviado') {
             $rastreio_html = "
                 <div style='background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin-top: 20px;'>
-                    <h3 style='color: #1f2937; margin-bottom: 10px;'>📦 Código de Rastreio</h3>
+                    <h3 style='color: #1f2937; margin-bottom: 10px;'>Código de Rastreio</h3>
                     <p style='font-size: 18px; font-weight: bold; color: #A6D90C; font-family: monospace;'>{$codigo_rastreio}</p>
                     <p style='color: #6b7280; font-size: 14px; margin-top: 10px;'>Use este código para acompanhar sua encomenda no site da transportadora.</p>
                 </div>
@@ -400,12 +404,12 @@ class EmailService {
         $htmlBody = "
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;'>
                 <div style='background: linear-gradient(135deg, #A6D90C 0%, #8ab80a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>
-                    <h1 style='color: white; margin: 0; font-size: 32px;'>🌿 WeGreen</h1>
+                    <h1 style='color: white; margin: 0; font-size: 32px;'>WeGreen</h1>
                     <p style='color: white; margin: 10px 0 0 0; font-size: 14px;'>Moda Sustentável</p>
                 </div>
 
                 <div style='background-color: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none;'>
-                    <h2 style='color: #1f2937; margin-bottom: 20px;'>Olá, {$cliente_nome}! 👋</h2>
+                    <h2 style='color: #1f2937; margin-bottom: 20px;'>Olá, {$cliente_nome}!</h2>
                     <p style='color: #4b5563; font-size: 16px; line-height: 1.6;'>A sua encomenda foi atualizada:</p>
 
                     <div style='background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #A6D90C;'>
@@ -448,16 +452,16 @@ class EmailService {
         if ($aprovado) {
             $instrucoes_html = "
                 <div style='background-color: #d1fae5; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #10b981;'>
-                    <h3 style='color: #065f46; margin: 0 0 15px 0; font-size: 16px;'>📋 Próximos Passos</h3>
+                    <h3 style='color: #065f46; margin: 0 0 15px 0; font-size: 16px;'> Próximos Passos</h3>
                     <div style='color: #065f46;'>
                         <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
-                            <span style='position: absolute; left: 0;'>1️⃣</span> Embale o produto com segurança
+                            <span style='position: absolute; left: 0;'>1️</span> Embale o produto com segurança
                         </p>
                         <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
-                            <span style='position: absolute; left: 0;'>2️⃣</span> Aguarde instruções de envio na sua conta
+                            <span style='position: absolute; left: 0;'>2️</span> Aguarde instruções de envio na sua conta
                         </p>
                         <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
-                            <span style='position: absolute; left: 0;'>3️⃣</span> O reembolso será processado após recebermos o produto
+                            <span style='position: absolute; left: 0;'>3️</span> O reembolso será processado após recebermos o produto
                         </p>
                     </div>
                 </div>
@@ -468,7 +472,7 @@ class EmailService {
         if ($notas_anunciante) {
             $notas_html = "
                 <div style='background-color: #fff7ed; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #f59e0b;'>
-                    <h3 style='color: #92400e; margin: 0 0 10px 0; font-size: 16px;'>💬 Observações do Vendedor</h3>
+                    <h3 style='color: #92400e; margin: 0 0 10px 0; font-size: 16px;'>Observações do Vendedor</h3>
                     <p style='color: #78350f; margin: 0; line-height: 1.6;'>{$notas_anunciante}</p>
                 </div>
             ";
@@ -477,12 +481,12 @@ class EmailService {
         $htmlBody = "
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;'>
                 <div style='background: linear-gradient(135deg, #A6D90C 0%, #8ab80a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>
-                    <h1 style='color: white; margin: 0; font-size: 32px;'>🌿 WeGreen</h1>
+                    <h1 style='color: white; margin: 0; font-size: 32px;' WeGreen</h1>
                     <p style='color: white; margin: 10px 0 0 0; font-size: 14px;'>Moda Sustentável</p>
                 </div>
 
                 <div style='background-color: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none;'>
-                    <h2 style='color: #1f2937; margin-bottom: 20px;'>Olá, {$cliente_nome}! 👋</h2>
+                    <h2 style='color: #1f2937; margin-bottom: 20px;'>Olá, {$cliente_nome}!</h2>
                     <p style='color: #4b5563; font-size: 16px; line-height: 1.6;'>A sua devolução foi processada:</p>
 
                     <div style='background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid {$cor_status};'>

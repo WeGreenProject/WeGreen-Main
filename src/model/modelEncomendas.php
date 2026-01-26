@@ -14,6 +14,9 @@ class Encomendas {
                     e.estado,
                     e.morada,
                     e.plano_rastreio,
+                    e.codigo_confirmacao_recepcao,
+                    e.data_confirmacao_recepcao,
+                    e.prazo_estimado_entrega,
                     (SELECT GROUP_CONCAT(DISTINCT p.nome SEPARATOR ', ')
                      FROM vendas v
                      INNER JOIN produtos p ON v.produto_id = p.Produto_id

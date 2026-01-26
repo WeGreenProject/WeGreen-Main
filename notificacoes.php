@@ -511,23 +511,55 @@ if ($tipo_utilizador == 1) {
   }
 
   function marcarComoLida(tipo, id) {
-    $.post('src/controller/controllerNotifications.php', {
-      op: 3,
-      tipo: tipo,
-      id: id
-    }).done(function(response) {
-      if (response.success) {
-        carregarTodasNotificacoes();
+    console.log('[NotificacoesPage] Marcando como lida:', tipo, id);
+    $.ajax({
+      url: 'src/controller/controllerNotifications.php',
+      method: 'POST',
+      data: {
+        op: 3,
+        tipo: tipo,
+        id: id
+      },
+      dataType: 'json',
+      success: function(response) {
+        console.log('[NotificacoesPage] Resposta marcar:', response);
+        if (response && response.success) {
+          // Recarregar lista de notificações
+          carregarTodasNotificacoes();
+        } else {
+          console.error('[NotificacoesPage] Erro ao marcar:', response ? response.message : 'resposta inválida');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('[NotificacoesPage] Erro AJAX ao marcar:', error);
+        console.error('[NotificacoesPage] Resposta:', xhr.responseText);
       }
     });
   }
 
   function marcarTodasComoLidas() {
-    $.post('src/controller/controllerNotifications.php', {
-      op: 4
-    }).done(function(response) {
-      if (response.success) {
-        carregarTodasNotificacoes();
+    console.log('[NotificacoesPage] Marcando todas como lidas...');
+    $.ajax({
+      url: 'src/controller/controllerNotifications.php',
+      method: 'POST',
+      data: { op: 4 },
+      dataType: 'json',
+      success: function(response) {
+        console.log('[NotificacoesPage] Resposta marcar todas:', response);
+        if (response && response.success) {
+          // Recarregar lista de notificações
+          carregarTodasNotificacoes();
+          // Mostrar feedback
+          alert('Todas as notificações foram marcadas como lidas!');
+        } else {
+          console.error('[NotificacoesPage] Erro ao marcar todas:', response ? response.message : 'resposta inválida');
+          alert('Erro ao marcar notificações: ' + (response ? response.message : 'Resposta inválida'));
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('[NotificacoesPage] Erro AJAX ao marcar todas:', error);
+        console.error('[NotificacoesPage] Resposta:', xhr.responseText);
+        alert('Erro ao marcar notificações. Tente novamente.');
       }
     });
   }

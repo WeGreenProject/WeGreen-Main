@@ -100,6 +100,14 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             <i class="fas fa-user"></i>
                             <span>Meu Perfil</span>
                         </a>
+                        <a class="dropdown-item" href="alterarSenha.php">
+                            <i class="fas fa-key"></i>
+                            <span>Alterar Senha</span>
+                        </a>
+                        <button class="dropdown-item" id="btnAlternarConta" onclick="verificarEAlternarConta()" style="display:none;">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span id="textoAlternar">Alternar Conta</span>
+                        </button>
                         <div class="dropdown-divider"></div>
                         <button class="dropdown-item dropdown-item-danger" onclick="logout()">
                             <i class="fas fa-sign-out-alt"></i>

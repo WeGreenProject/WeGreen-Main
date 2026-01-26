@@ -203,14 +203,9 @@ class ModelDevolucoes {
         $sql = "SELECT
                     d.*,
                     e.codigo_encomenda,
-                    e.data_envio,
-                    COALESCE(p.nome, 'Produto Removido') as produto_nome,
-                    p.foto as produto_imagem,
-                    u.nome as cliente_nome,
-                    u.email as cliente_email
+                    e.data_envio
                 FROM devolucoes d
                 LEFT JOIN encomendas e ON d.encomenda_id = e.id
-                LEFT JOIN Produtos p ON d.produto_id = p.Produto_id
                 LEFT JOIN Utilizadores u ON d.cliente_id = u.id
                 WHERE d.anunciante_id = ?";
 
@@ -235,6 +230,50 @@ class ModelDevolucoes {
 
         $devolucoes = [];
         while ($row = $result->fetch_assoc()) {
+            // Buscar informações do cliente
+            $sql_cliente = "SELECT nome, email FROM Utilizadores WHERE id = ?";
+            $stmt_cliente = $this->conn->prepare($sql_cliente);
+            $stmt_cliente->bind_param('i', $row['cliente_id']);
+            $stmt_cliente->execute();
+            $result_cliente = $stmt_cliente->get_result();
+            $cliente = $result_cliente->fetch_assoc();
+            $stmt_cliente->close();
+
+            $row['cliente_nome'] = $cliente ? $cliente['nome'] : 'Cliente não encontrado';
+            $row['cliente_email'] = $cliente ? $cliente['email'] : '';
+
+            // Buscar produtos da devolução
+            // Se a devolução tem produto_id específico, usar esse
+            // Senão, buscar todos os produtos da encomenda
+            if (!empty($row['produto_id'])) {
+                $sql_produto = "SELECT nome, foto FROM Produtos WHERE Produto_id = ?";
+                $stmt_produto = $this->conn->prepare($sql_produto);
+                $stmt_produto->bind_param('i', $row['produto_id']);
+                $stmt_produto->execute();
+                $result_produto = $stmt_produto->get_result();
+                $produto = $result_produto->fetch_assoc();
+                $stmt_produto->close();
+
+                $row['produto_nome'] = $produto ? $produto['nome'] : 'Produto Removido';
+                $row['produto_imagem'] = $produto ? $produto['foto'] : null;
+            } else {
+                // Buscar produtos da encomenda
+                $sql_produtos = "SELECT p.nome, p.foto
+                                FROM Vendas v
+                                INNER JOIN Produtos p ON v.produto_id = p.Produto_id
+                                WHERE v.encomenda_id = ?
+                                LIMIT 1";
+                $stmt_produtos = $this->conn->prepare($sql_produtos);
+                $stmt_produtos->bind_param('i', $row['encomenda_id']);
+                $stmt_produtos->execute();
+                $result_produtos = $stmt_produtos->get_result();
+                $primeiro_produto = $result_produtos->fetch_assoc();
+                $stmt_produtos->close();
+
+                $row['produto_nome'] = $primeiro_produto ? $primeiro_produto['nome'] : 'Produto Removido';
+                $row['produto_imagem'] = $primeiro_produto ? $primeiro_produto['foto'] : null;
+            }
+
             if (!empty($row['fotos'])) {
                 $row['fotos'] = json_decode($row['fotos'], true);
             } else {

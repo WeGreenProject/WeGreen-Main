@@ -55,6 +55,66 @@ function selecionarVendedor(vendedorId, vendedorNome) {
   );
 }
 
+function iniciarConversaComVendedor(vendedorId) {
+  console.log("iniciarConversaComVendedor() chamada", vendedorId);
+
+  // Buscar informações do vendedor
+  let dados = new FormData();
+  dados.append("op", 5); // Nova operação para buscar dados do vendedor
+  dados.append("vendedorId", vendedorId);
+
+  console.log("Enviando request para op=5, vendedorId:", vendedorId);
+
+  $.ajax({
+    url: "src/controller/controllerChatCliente.php",
+    method: "POST",
+    data: dados,
+    dataType: "json",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+    .done(function (resp) {
+      console.log("Resposta recebida de op=5:", resp);
+
+      if (resp.flag) {
+        // Vendedor encontrado - abrir chat
+        console.log("Vendedor encontrado:", resp.nome);
+        selecionarVendedor(vendedorId, resp.nome);
+
+        // Mostrar mensagem de boas-vindas
+        Swal.fire({
+          icon: "success",
+          title: "Chat Iniciado",
+          text: `Conversa com ${resp.nome} iniciada. Pode começar a escrever!`,
+          timer: 2000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
+        });
+
+        // Focar no input
+        setTimeout(() => {
+          $("#messageInput").focus();
+        }, 500);
+      } else {
+        console.error("Erro no flag:", resp);
+        alerta(
+          "Erro",
+          resp.msg || "Não foi possível iniciar a conversa",
+          "error",
+        );
+      }
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      console.error("Erro AJAX ao iniciar conversa:");
+      console.error("Status:", textStatus);
+      console.error("Error:", errorThrown);
+      console.error("Response:", jqXHR.responseText);
+      alerta("Erro", "Erro ao conectar com o vendedor", "error");
+    });
+}
+
 function getConversas(vendedorId) {
   console.log("getConversas() chamada", vendedorId);
   let dados = new FormData();
@@ -217,8 +277,30 @@ function alerta(titulo, msg, icon) {
 
 // Event Listeners
 $(document).ready(function () {
+  console.log("ChatCliente.js carregado");
+
   // Carregar lista de vendedores
   getSideBar();
+
+  // Verificar se veio de um produto (auto-iniciar conversa)
+  const urlParams = new URLSearchParams(window.location.search);
+  const vendedorId = urlParams.get("vendedor");
+  const produtoId = urlParams.get("produto");
+
+  console.log("URL params:", { vendedorId, produtoId });
+  console.log("URL completa:", window.location.href);
+
+  if (vendedorId) {
+    console.log("Auto-iniciando conversa com vendedor:", vendedorId);
+    // Aguardar sidebar carregar antes de iniciar
+    setTimeout(() => {
+      iniciarConversaComVendedor(vendedorId);
+      // Limpar URL para evitar re-inicialização
+      window.history.replaceState({}, document.title, "ChatCliente.php");
+    }, 800);
+  } else {
+    console.log("Nenhum vendedor especificado na URL");
+  }
 
   // Enter para enviar mensagem
   $("#messageInput").on("keypress", function (e) {

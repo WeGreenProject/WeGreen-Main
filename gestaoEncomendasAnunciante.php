@@ -90,12 +90,12 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
               <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></span>
               <span class="user-role">Anunciante</span>
             </div>
-            <i class="fas fa-chevron-down" style="font-size: 12px; color: #4a5568;"></i>
+            <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
           </div>
           <div class="user-dropdown" id="userDropdown">
             <div class="dropdown-header">
               <img
-                src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=A6D90C&color=fff"
+                src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'User'); ?>&background=3cb371&color=fff"
                 alt="Usuário" class="dropdown-avatar">
               <div>
                 <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Usuário'; ?></div>
@@ -107,6 +107,14 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
               <i class="fas fa-user"></i>
               <span>Meu Perfil</span>
             </a>
+            <a class="dropdown-item" href="alterarSenha.php">
+              <i class="fas fa-key"></i>
+              <span>Alterar Senha</span>
+            </a>
+            <button class="dropdown-item" id="btnAlternarConta" onclick="verificarEAlternarConta()" style="display:none;">
+              <i class="fas fa-exchange-alt"></i>
+              <span id="textoAlternar">Alternar Conta</span>
+            </button>
             <div class="dropdown-divider"></div>
             <button class="dropdown-item dropdown-item-danger" onclick="logout()">
               <i class="fas fa-sign-out-alt"></i>
@@ -163,6 +171,11 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                   <i class="fas fa-calendar-alt"></i> Data Final
                 </label>
                 <input type="date" id="filterDateTo" class="filter-input">
+              </div>
+              <div class="filter-item-button">
+                <button class="btn-clear-filters" onclick="limparFiltrosEncomendas()">
+                  <i class="fas fa-redo"></i>
+                </button>
               </div>
             </div>
           </div>

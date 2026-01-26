@@ -27,7 +27,7 @@ if (isset($_GET['op']) && $_GET['op'] == 1) {
 
         switch($tipo_utilizador) {
             case 1: // Admin
-                $count = $modelNotifications->contarNotificacoesAdmin();
+                $count = $modelNotifications->contarNotificacoesAdmin($utilizador_id);
                 error_log("[Notifications] Admin count: $count");
                 break;
             case 2: // Cliente
@@ -52,11 +52,12 @@ if (isset($_GET['op']) && $_GET['op'] == 1) {
 // op=2: Listar notificações detalhadas (todos os tipos)
 if (isset($_GET['op']) && $_GET['op'] == 2) {
     try {
+        error_log("[Notifications] Listando para tipo_utilizador: $tipo_utilizador, user_id: $utilizador_id");
         $notificacoes = [];
 
         switch($tipo_utilizador) {
             case 1: // Admin
-                $notificacoes = $modelNotifications->listarNotificacoesAdmin();
+                $notificacoes = $modelNotifications->listarNotificacoesAdmin($utilizador_id);
                 error_log("[Notifications] Admin notificações: " . count($notificacoes));
                 break;
             case 2: // Cliente
@@ -64,8 +65,10 @@ if (isset($_GET['op']) && $_GET['op'] == 2) {
                 error_log("[Notifications] Cliente notificações: " . count($notificacoes));
                 break;
             case 3: // Anunciante
+                error_log("[Notifications] Chamando listarNotificacoesAnunciante para ID: $utilizador_id");
                 $notificacoes = $modelNotifications->listarNotificacoesAnunciante($utilizador_id);
-                error_log("[Notifications] Anunciante notificações: " . count($notificacoes));
+                error_log("[Notifications] Anunciante notificações retornadas: " . count($notificacoes));
+                error_log("[Notifications] Dados: " . json_encode($notificacoes));
                 break;
         }
 
@@ -74,6 +77,7 @@ if (isset($_GET['op']) && $_GET['op'] == 2) {
 
     } catch (Exception $e) {
         error_log("[Notifications] Erro ao listar: " . $e->getMessage());
+        error_log("[Notifications] Stack trace: " . $e->getTraceAsString());
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;
@@ -102,10 +106,14 @@ if (isset($_POST['op']) && $_POST['op'] == 3) {
 // op=4: Marcar todas como lidas
 if (isset($_POST['op']) && $_POST['op'] == 4) {
     try {
+        error_log("[Notifications] Marcando todas como lidas - user_id: $utilizador_id, tipo: $tipo_utilizador");
         $resultado = $modelNotifications->marcarTodasComoLidas($utilizador_id, $tipo_utilizador);
-        echo json_encode(['success' => $resultado]);
+        error_log("[Notifications] Resultado marcar todas: " . ($resultado ? 'true' : 'false'));
+        echo json_encode(['success' => $resultado, 'message' => $resultado ? 'Marcadas com sucesso' : 'Erro ao marcar']);
 
     } catch (Exception $e) {
+        error_log("[Notifications] Erro ao marcar todas: " . $e->getMessage());
+        error_log("[Notifications] Stack trace: " . $e->getTraceAsString());
         echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;
@@ -118,7 +126,7 @@ if (isset($_GET['op']) && $_GET['op'] == 5) {
 
         switch($tipo_utilizador) {
             case 1: // Admin
-                $notificacoes = $modelNotifications->listarTodasNotificacoesAdmin();
+                $notificacoes = $modelNotifications->listarTodasNotificacoesAdmin($utilizador_id);
                 break;
             case 2: // Cliente
                 $notificacoes = $modelNotifications->listarTodasNotificacoesCliente($utilizador_id);

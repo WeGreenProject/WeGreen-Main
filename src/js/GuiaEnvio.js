@@ -12,176 +12,230 @@ function imprimirGuiaEnvio(encomendaId) {
         return;
       }
 
+      // Usar produtos que já vêm na encomenda
+      const produtos = encomenda.produtos || [];
+
       // Criar PDF com jsPDF
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Header com logo e título
-      doc.setFillColor(166, 217, 12); // #A6D90C
-      doc.rect(0, 0, 210, 35, "F");
+      // Header com gradiente verde
+      doc.setFillColor(60, 179, 113); // #3cb371
+      doc.rect(0, 0, 210, 40, "F");
 
-      doc.setFontSize(28);
+      // Logo WeGreen
+      doc.setFontSize(32);
       doc.setTextColor(255, 255, 255);
       doc.setFont("helvetica", "bold");
-      doc.text("WeGreen", 15, 20);
+      doc.text("WeGreen", 15, 22);
 
-      doc.setFontSize(14);
+      doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
-      doc.text("GUIA DE ENVIO", 15, 28);
+      doc.text("Moda Sustentavel", 15, 30);
+
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("GUIA DE ENVIO", 15, 37);
 
       // Código de encomenda em destaque
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text(`Encomenda: ${encomenda.codigo}`, 150, 15, { align: "right" });
+      doc.setFillColor(46, 139, 87); // #2e8b57 - verde escuro
+      doc.roundedRect(140, 8, 60, 26, 3, 3, "F");
 
-      // Data
-      doc.setFont("helvetica", "normal");
+      doc.setTextColor(255, 255, 255);
       doc.setFontSize(10);
-      const dataAtual = new Date().toLocaleDateString("pt-PT");
-      doc.text(`Data de Impressão: ${dataAtual}`, 150, 22, { align: "right" });
+      doc.setFont("helvetica", "normal");
+      doc.text("ENCOMENDA", 170, 15, { align: "center" });
 
-      // Código de rastreio (se disponível)
-      if (encomenda.codigo_rastreio) {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.text(`Rastreio: ${encomenda.codigo_rastreio}`, 150, 29, {
-          align: "right",
-        });
-      }
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`#${encomenda.codigo}`, 170, 23, { align: "center" });
+
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      const dataAtual = new Date().toLocaleDateString("pt-PT");
+      doc.text(dataAtual, 170, 30, { align: "center" });
 
       // Linha separadora
-      let yPos = 45;
+      let yPos = 50;
+      doc.setDrawColor(60, 179, 113);
       doc.setLineWidth(0.5);
       doc.line(15, yPos, 195, yPos);
 
-      // Informações do Remetente (WeGreen)
+      // Informações do Remetente
       yPos += 10;
-      doc.setFontSize(12);
+      doc.setFontSize(13);
       doc.setFont("helvetica", "bold");
+      doc.setTextColor(60, 179, 113);
       doc.text("REMETENTE", 15, yPos);
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
+      doc.setTextColor(0, 0, 0);
       yPos += 7;
-      doc.text("WeGreen - Marketplace Sustentável", 15, yPos);
+      doc.text("WeGreen - Marketplace Sustentavel", 15, yPos);
       yPos += 5;
       doc.text("Rua Exemplo, 123", 15, yPos);
       yPos += 5;
       doc.text("1000-000 Lisboa, Portugal", 15, yPos);
       yPos += 5;
-      doc.text("Telefone: +351 123 456 789", 15, yPos);
+      doc.text("Tel: +351 123 456 789 | Email: suporte@wegreen.pt", 15, yPos);
 
       // Box do destinatário
-      yPos += 15;
-      doc.setDrawColor(166, 217, 12);
-      doc.setLineWidth(1);
-      doc.rect(15, yPos, 180, 45);
+      yPos += 12;
+      doc.setDrawColor(60, 179, 113);
+      doc.setLineWidth(1.5);
+      doc.setFillColor(240, 253, 244); // Verde muito claro
+      doc.roundedRect(15, yPos, 180, 48, 3, 3, "FD");
 
       yPos += 8;
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(60, 179, 113);
+      doc.text("DESTINATARIO", 20, yPos);
+
       doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("DESTINATÁRIO", 20, yPos);
-
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
+      doc.setTextColor(0, 0, 0);
       yPos += 8;
       doc.text(encomenda.cliente_nome.toUpperCase(), 20, yPos);
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
-      yPos += 7;
+      yPos += 6;
       doc.text(`Email: ${encomenda.cliente_email}`, 20, yPos);
 
-      yPos += 7;
-      // Dividir morada em linhas se for muito grande
-      const moradaLines = doc.splitTextToSize(encomenda.morada, 160);
+      yPos += 6;
+      doc.text(`Tel: ${encomenda.telefone || "Nao fornecido"}`, 20, yPos);
+
+      yPos += 6;
+      const moradaLines = doc.splitTextToSize(
+        `Morada: ${encomenda.morada}`,
+        160,
+      );
       doc.text(moradaLines, 20, yPos);
 
-      // Detalhes do produto
-      yPos += moradaLines.length * 5 + 20;
-      doc.setFontSize(12);
+      // Produtos
+      yPos += moradaLines.length * 5 + 15;
+      doc.setFontSize(13);
       doc.setFont("helvetica", "bold");
-      doc.text("DETALHES DO PRODUTO", 15, yPos);
+      doc.setTextColor(60, 179, 113);
+      doc.text("PRODUTOS DA ENCOMENDA", 15, yPos);
 
-      yPos += 10;
-      doc.autoTable({
-        startY: yPos,
-        head: [["Produto", "Quantidade", "Valor"]],
-        body: [
-          [
-            encomenda.produto_nome,
-            encomenda.quantidade.toString(),
-            `€${encomenda.valor.toFixed(2)}`,
-          ],
-        ],
-        theme: "striped",
-        headStyles: {
-          fillColor: [166, 217, 12],
-          textColor: [255, 255, 255],
-          fontStyle: "bold",
-        },
-        margin: { left: 15, right: 15 },
+      yPos += 8;
+
+      // Lista simples de produtos
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(0, 0, 0);
+
+      produtos.forEach((p, index) => {
+        const linha = `${index + 1}. ${p.nome} (Qtd: ${p.quantidade})`;
+        yPos += 6;
+        doc.text(linha, 20, yPos);
       });
 
-      yPos = doc.lastAutoTable.finalY + 15;
+      yPos += 10;
+
+      // Total
+      doc.setFillColor(240, 253, 244);
+      doc.roundedRect(120, yPos, 75, 12, 2, 2, "F");
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(60, 179, 113);
+      doc.text("TOTAL:", 125, yPos + 8);
+      doc.setFontSize(13);
+      doc.text(`€${parseFloat(encomenda.valor).toFixed(2)}`, 190, yPos + 8, {
+        align: "right",
+      });
 
       // Informações de transporte
-      doc.setFontSize(12);
+      yPos += 22;
+      doc.setFontSize(13);
       doc.setFont("helvetica", "bold");
-      doc.text("INFORMAÇÕES DE TRANSPORTE", 15, yPos);
+      doc.setTextColor(60, 179, 113);
+      doc.text("INFORMACOES DE TRANSPORTE", 15, yPos);
 
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
+      doc.setTextColor(0, 0, 0);
       yPos += 7;
       doc.text(
-        `Transportadora: ${encomenda.transportadora || "Não definida"}`,
+        `Transportadora: ${encomenda.transportadora || "A definir"}`,
         15,
-        yPos
+        yPos,
       );
       yPos += 6;
       doc.text(`Data da Encomenda: ${encomenda.data}`, 15, yPos);
+      yPos += 6;
+      doc.text(`Estado: ${encomenda.estado || "Pendente"}`, 15, yPos);
 
       if (encomenda.codigo_rastreio) {
         yPos += 6;
         doc.setFont("helvetica", "bold");
-        doc.text(`Código de Rastreio: ${encomenda.codigo_rastreio}`, 15, yPos);
+        doc.setTextColor(60, 179, 113);
+        doc.text(`Codigo de Rastreio: ${encomenda.codigo_rastreio}`, 15, yPos);
 
-        // QR Code para rastreio (usando um serviço online)
+        // QR Code para rastreio
         const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
-          encomenda.codigo_rastreio
+          encomenda.codigo_rastreio,
         )}`;
-        doc.addImage(qrCodeUrl, "PNG", 150, yPos - 15, 30, 30);
+        doc.addImage(qrCodeUrl, "PNG", 155, yPos - 18, 35, 35);
       }
 
       // Rodapé
-      yPos = 270;
+      yPos = 275;
+      doc.setDrawColor(60, 179, 113);
+      doc.setLineWidth(0.3);
+      doc.line(15, yPos, 195, yPos);
+
+      yPos += 5;
       doc.setFontSize(8);
       doc.setFont("helvetica", "italic");
-      doc.setTextColor(128, 128, 128);
+      doc.setTextColor(100, 100, 100);
       doc.text(
-        "Este documento foi gerado automaticamente pelo sistema WeGreen.",
+        "WeGreen - Comprometidos com a sustentabilidade e moda responsavel",
         105,
         yPos,
-        { align: "center" }
+        { align: "center" },
       );
       yPos += 4;
       doc.text(
-        "Para qualquer dúvida, contacte-nos através de suporte@wegreen.pt",
+        "Este documento foi gerado automaticamente. Duvidas: suporte@wegreen.pt",
         105,
         yPos,
-        { align: "center" }
+        { align: "center" },
       );
 
       // Gerar PDF
       doc.save(`Guia_Envio_${encomenda.codigo}.pdf`);
 
+      // Modal de confirmação
       Swal.fire({
         icon: "success",
-        title: "Guia Gerada!",
-        text: "A guia de envio foi gerada com sucesso",
-        confirmButtonColor: "#A6D90C",
+        title: "Guia Gerada com Sucesso!",
+        html: `
+          <p style="color: #64748b; font-size: 15px; margin: 15px 0;">
+            O arquivo <strong style="color: #3cb371;">Guia_Envio_${encomenda.codigo}.pdf</strong>
+            foi gerado com sucesso.
+          </p>
+        `,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3cb371",
+        showClass: {
+          popup: "swal2-show",
+          backdrop: "swal2-backdrop-show",
+          icon: "swal2-icon-show",
+        },
+        customClass: {
+          confirmButton: "swal2-confirm-modern",
+          popup: "swal2-border-radius",
+        },
+        didOpen: () => {
+          const popup = Swal.getPopup();
+          popup.style.borderRadius = "12px";
+          popup.style.padding = "25px";
+        },
       });
-    }
+    },
   );
 }

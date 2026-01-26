@@ -85,3 +85,59 @@
 
 [25-Jan-2026 18:24:07 Europe/Berlin] Produto 30 removido
 [25-Jan-2026 18:24:07 Europe/Berlin] Resultado final: 1 produto(s) removido(s)
+[25-Jan-2026 23:50:47 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[25-Jan-2026 23:50:47 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[25-Jan-2026 23:50:48 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[25-Jan-2026 23:50:48 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[25-Jan-2026 23:51:06 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[25-Jan-2026 23:51:06 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[25-Jan-2026 23:55:25 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[25-Jan-2026 23:55:25 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[25-Jan-2026 23:59:36 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[25-Jan-2026 23:59:36 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[26-Jan-2026 14:55:08 Europe/Berlin] PHP Warning:  Undefined array key "ids" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 202
+[26-Jan-2026 14:55:08 Europe/Berlin] PHP Warning:  Undefined array key "ativo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 203
+[26-Jan-2026 16:39:55 Europe/Berlin] PHP Warning:  Undefined array key "novo_estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 299
+[26-Jan-2026 16:39:55 Europe/Berlin] Erro ao enviar email de mudança de status: Unknown column 'p.Foto_Produto' in 'field list'
+[26-Jan-2026 16:39:55 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method DashboardAnunciante::obterDetalhesEncomenda() in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php:312
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
+[26-Jan-2026 16:39:56 Europe/Berlin] PHP Warning:  Undefined array key "novo_estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 299
+[26-Jan-2026 16:39:56 Europe/Berlin] Erro ao enviar email de mudança de status: Unknown column 'p.Foto_Produto' in 'field list'
+[26-Jan-2026 16:39:56 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method DashboardAnunciante::obterDetalhesEncomenda() in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php:312
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
+[26-Jan-2026 16:39:57 Europe/Berlin] PHP Warning:  Undefined array key "novo_estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 299
+[26-Jan-2026 16:39:57 Europe/Berlin] Erro ao enviar email de mudança de status: Unknown column 'p.Foto_Produto' in 'field list'
+[26-Jan-2026 16:39:57 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method DashboardAnunciante::obterDetalhesEncomenda() in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php:312
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
+[26-Jan-2026 16:39:57 Europe/Berlin] PHP Warning:  Undefined array key "novo_estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 299
+[26-Jan-2026 16:39:57 Europe/Berlin] Erro ao enviar email de mudança de status: Unknown column 'p.Foto_Produto' in 'field list'
+[26-Jan-2026 16:39:57 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method DashboardAnunciante::obterDetalhesEncomenda() in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php:312
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
+[26-Jan-2026 16:39:57 Europe/Berlin] PHP Warning:  Undefined array key "novo_estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 299
+[26-Jan-2026 16:39:57 Europe/Berlin] Erro ao enviar email de mudança de status: Unknown column 'p.Foto_Produto' in 'field list'
+[26-Jan-2026 16:39:57 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method DashboardAnunciante::obterDetalhesEncomenda() in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php:312
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
+[26-Jan-2026 16:40:00 Europe/Berlin] PHP Warning:  Undefined array key "novo_estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 299
+[26-Jan-2026 16:40:00 Europe/Berlin] Erro ao enviar email de mudança de status: Unknown column 'p.Foto_Produto' in 'field list'
+[26-Jan-2026 16:40:00 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method DashboardAnunciante::obterDetalhesEncomenda() in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php:312
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
+[26-Jan-2026 16:40:00 Europe/Berlin] PHP Warning:  Undefined array key "novo_estado" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 299
+[26-Jan-2026 16:40:00 Europe/Berlin] Erro ao enviar email de mudança de status: Unknown column 'p.Foto_Produto' in 'field list'
+[26-Jan-2026 16:40:00 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method DashboardAnunciante::obterDetalhesEncomenda() in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php:312
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
+>>>>>>> Stashed changes
+>>>>>>> origin/JS/26/01/2026

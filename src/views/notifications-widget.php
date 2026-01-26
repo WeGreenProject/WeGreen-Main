@@ -25,9 +25,15 @@ if(!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
             <p>Sem notificações no momento</p>
         </div>
     </div>
+    <?php
+    // Não mostrar "Ver Todas" se já estiver na página de notificações
+    $current_page = basename($_SERVER['PHP_SELF']);
+    if ($current_page !== 'notificacoes.php'):
+    ?>
     <div class="notifications-footer">
         <a href="notificacoes.php" class="btn-ver-todas-notificacoes">
             <i class="fas fa-list"></i> Ver Todas as Notificações
         </a>
     </div>
+    <?php endif; ?>
 </div>

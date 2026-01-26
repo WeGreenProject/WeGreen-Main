@@ -102,6 +102,7 @@ class Login {
         return json_encode([
             "msg" => $msg,
             "flag" => $flag,
+            "tipo_utilizador" => $row['tipo_utilizador_id'] ?? null,
             "perfil_duplo" => $_SESSION['perfil_duplo'] ?? false
         ]);
 

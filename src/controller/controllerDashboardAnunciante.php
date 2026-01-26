@@ -343,6 +343,19 @@ if ($_POST['op'] == 36) {
     echo $resp; // Já vem como JSON do model
 }
 
+// op 37 - Ativar Plano Pago
+if ($_POST['op'] == 37) {
+    $plano_id = $_POST['plano_id'];
+    $resp = $func->ativarPlanoPago($_SESSION['utilizador'], $plano_id);
+    echo $resp;
+}
+
+// op 38 - Obter Informacoes de Expiracao do Plano
+if ($_POST['op'] == 38) {
+    $resp = $func->getInfoExpiracaoPlano($_SESSION['utilizador']);
+    echo $resp;
+}
+
 // Fechar conexão global no final
 global $conn;
 if (isset($conn)) {

@@ -1,44 +1,42 @@
 <?php
-include_once '../model/modelChatAnunciante.php';
-session_start();
+include_once __DIR__ . '/../model/modelChatAnunciante.php';
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $func = new ChatAnunciante();
 
+// op=1: Listar clientes/admins com quem o anunciante tem conversas
 if ($_POST['op'] == 1) {
-    $resp = $func->InfoAnunciante();
+    $resp = $func->getSideBar($_SESSION['utilizador']);
     echo $resp;
 }
+
+// op=2: Buscar mensagens com cliente específico
 if ($_POST['op'] == 2) {
-    $resp = $func->ProdutoChatInfo($_POST["id"]);
-    echo $resp;
-}
-if ($_POST['op'] == 10) {
-    if(isset($_SESSION['utilizador']))
-    {
-        $resp = $func->PerfilDoUtilizador($_SESSION['utilizador']);
+    if (isset($_POST['IdCliente']) && !empty($_POST['IdCliente'])) {
+        $resp = $func->getConversas($_SESSION['utilizador'], $_POST['IdCliente']);
         echo $resp;
-    }
-    else
-    {
-        echo "                        
-        <a class='nav-link dropdown-toggle d-flex align-items-center' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'>
-        <img src='src/img/pexels-beccacorreiaph-31095884.jpg' class='rounded-circle profile-img-small me-1' alt='Perfil do Utilizador'>
-        </a>
-        <ul class='dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3' id='PerfilTipo'>
-        </ul>
-        ";
+    } else {
+        echo '
+        <div class="empty-chat">
+            <i class="fas fa-comments" style="font-size: 64px; color: #e0e0e0; margin-bottom: 16px;"></i>
+            <h3>Nenhuma conversa selecionada</h3>
+            <p>Escolha um cliente à esquerda para começar</p>
+        </div>
+        ';
     }
 }
+
+// op=3: Enviar mensagem
 if ($_POST['op'] == 3) {
-    $resp = $func->PerfilDoAnunciante($_POST["nome"]);
+    $resp = $func->enviarMensagem($_SESSION['utilizador'], $_POST['IdCliente'], $_POST['mensagem']);
     echo $resp;
 }
+
+// op=4: Pesquisar clientes
 if ($_POST['op'] == 4) {
-    $resp = $func->ConsumidorRes($_POST["nome"],$_SESSION['utilizador'],$_POST["mensagem"],$_POST["id"]);
-    echo $resp;
-}
-if ($_POST['op'] == 5) {
-    $resp = $func->ChatMensagens($_POST["nome"],$_SESSION['utilizador'],$_POST["id"]);
+    $resp = $func->pesquisarChat($_POST['pesquisa'], $_SESSION['utilizador']);
     echo $resp;
 }
 ?>

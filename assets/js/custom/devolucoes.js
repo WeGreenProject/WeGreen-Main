@@ -698,13 +698,13 @@ function mostrarModalDetalhesDevolucao(dev) {
   };
 
   const estadoTexto = {
-    solicitada: "Solicitada",
-    aprovada: "Aprovada",
-    rejeitada: "Rejeitada",
-    produto_enviado: "Produto Enviado",
-    produto_recebido: "Produto Recebido",
-    reembolsada: "Reembolsada",
-    cancelada: "Cancelada",
+    solicitada: "⏳ Solicitada",
+    aprovada: "✔️ Aprovada",
+    rejeitada: "❌ Rejeitada",
+    produto_enviado: "🚚 Produto Enviado",
+    produto_recebido: "📦 Produto Recebido",
+    reembolsada: "💰 Reembolsada",
+    cancelada: "🚫 Cancelada",
   };
 
   const estadoBadge = {
@@ -719,160 +719,201 @@ function mostrarModalDetalhesDevolucao(dev) {
 
   let fotosHtml = "";
   if (dev.fotos && dev.fotos.length > 0) {
-    fotosHtml = '<div class="row mt-3">';
-    dev.fotos.forEach((foto) => {
-      fotosHtml += `
-        <div class="col-md-3 mb-2">
-          <img src="${foto}" class="img-fluid rounded" alt="Foto da devolução"
-               style="cursor: pointer;" onclick="window.open('${foto}', '_blank')">
-        </div>
-      `;
-    });
-    fotosHtml += "</div>";
+    fotosHtml = `
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 12px;">
+        ${dev.fotos
+          .map(
+            (foto) => `
+          <div style="border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;" onclick="window.open('${foto}', '_blank')">
+            <img src="${foto}" style="width: 100%; height: 150px; object-fit: cover;" alt="Foto da devolução">
+          </div>
+        `,
+          )
+          .join("")}
+      </div>
+    `;
   }
 
   const html = `
-    <div class="devolucao-detalhes">
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <h6 class="text-muted mb-2">Código da Devolução</h6>
-          <p class="fw-bold">${dev.codigo_devolucao || "N/A"}</p>
-        </div>
-        <div class="col-md-6">
-          <h6 class="text-muted mb-2">Estado</h6>
-          <p><span class="badge ${estadoBadge[dev.estado] || "badge-secondary"}">${estadoTexto[dev.estado] || dev.estado}</span></p>
-        </div>
-      </div>
+    <div style="text-align: left; max-width: 100%; margin: 0;">
+      <!-- GRID PRINCIPAL: DADOS + MAPA -->
+      <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; margin-bottom: 5px;">
 
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <h6 class="text-muted mb-2">Código da Encomenda</h6>
-          <p class="fw-bold">${dev.codigo_encomenda || "N/A"}</p>
-        </div>
-        <div class="col-md-6">
-          <h6 class="text-muted mb-2">Data da Solicitação</h6>
-          <p>${dev.data_solicitacao ? new Date(dev.data_solicitacao).toLocaleString("pt-PT") : "N/A"}</p>
-        </div>
-      </div>
+        <!-- COLUNA ESQUERDA: INFORMAÇÕES -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
 
-      <div class="card mb-4">
-        <div class="card-body">
-          <h6 class="card-title mb-3">Informações do Produto</h6>
-          <div class="row">
-            <div class="col-md-3">
-              ${dev.produto_imagem || dev.produto_foto ? `<img src="${dev.produto_imagem || dev.produto_foto}" class="img-fluid rounded" alt="${dev.produto_nome}">` : ""}
-            </div>
-            <div class="col-md-9">
-              <p class="mb-2"><strong>Produto:</strong> ${dev.produto_nome || "N/A"}</p>
-              <p class="mb-2"><strong>Valor do Reembolso:</strong> €${parseFloat(dev.valor_reembolso || 0).toFixed(2)}</p>
+          <!-- Cliente (Topo - Largura Total) -->
+          <div style="padding: 20px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+            <h4 style="margin: 0 0 14px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
+              <i class="fas fa-user" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
+              Cliente
+            </h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Nome:</strong> ${dev.cliente_nome || "N/A"}</p>
+              <p style="margin: 6px 0; font-size: 15px; color: #4a5568;">
+                <strong style="color: #2d3748;">Email:</strong>
+                <a href="mailto:${dev.cliente_email}" style="color: #3b82f6; text-decoration: none;">
+                  ${dev.cliente_email || "N/A"}
+                </a>
+              </p>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div class="card mb-4">
-        <div class="card-body">
-          <h6 class="card-title mb-3">Informações do Cliente</h6>
-          <p class="mb-2"><strong>Nome:</strong> ${dev.cliente_nome || "N/A"}</p>
-          <p class="mb-2"><strong>Email:</strong> ${dev.cliente_email || "N/A"}</p>
-        </div>
-      </div>
+          <!-- Grid 3 Colunas: Devolução | Produto | Financeiro -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
 
-      <div class="card mb-4">
-        <div class="card-body">
-          <h6 class="card-title mb-3">Motivo da Devolução</h6>
-          <p class="mb-2"><strong>Motivo:</strong> ${motivoTexto[dev.motivo] || dev.motivo}</p>
-          ${dev.motivo_detalhe ? `<p class="mb-2"><strong>Detalhes:</strong> ${dev.motivo_detalhe}</p>` : ""}
-          ${dev.notas_cliente ? `<p class="mb-2"><strong>Notas do Cliente:</strong> ${dev.notas_cliente}</p>` : ""}
-        </div>
-      </div>
+            <!-- Devolução -->
+            <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+              <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                <i class="fas fa-undo-alt" style="margin-right: 8px; color: #3cb371; font-size: 16px;"></i>
+                Devolução
+              </h4>
+              <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Código:</strong> ${dev.codigo_devolucao || "N/A"}</p>
+              <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Encomenda:</strong> ${dev.codigo_encomenda || "N/A"}</p>
+              <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${dev.data_solicitacao ? new Date(dev.data_solicitacao).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" }) : "N/A"}</p>
+              <p style="margin: 6px 0; font-size: 14px; color: #4a5568;">
+                <strong style="color: #2d3748;">Estado:</strong>
+                <span class="badge ${estadoBadge[dev.estado] || "badge-secondary"}" style="font-size: 13px; padding: 5px 10px; border-radius: 6px; display: inline-block; margin-top: 4px;">
+                  ${estadoTexto[dev.estado] || dev.estado}
+                </span>
+              </p>
+            </div>
 
-      ${
-        dev.notas_anunciante
-          ? `
-        <div class="card mb-4">
-          <div class="card-body">
-            <h6 class="card-title mb-3">Notas do Anunciante</h6>
-            <p>${dev.notas_anunciante}</p>
+            <!-- Produto -->
+            <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+              <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                <i class="fas fa-box-open" style="margin-right: 8px; color: #3cb371; font-size: 16px;"></i>
+                Produto
+              </h4>
+              <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Nome:</strong> ${dev.produto_nome || "N/A"}</p>
+              <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Motivo:</strong> ${motivoTexto[dev.motivo] || dev.motivo}</p>
+              ${dev.motivo_detalhe ? `<p style="margin: 6px 0; font-size: 13px; color: #718096; font-style: italic;">"${dev.motivo_detalhe}"</p>` : ""}
+            </div>
+
+            <!-- Financeiro -->
+            <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+              <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #3cb371; font-size: 16px;"></i>
+                Reembolso
+              </h4>
+              <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #ef4444; font-weight: 700; font-size: 16px;">€${parseFloat(dev.valor_reembolso || 0).toFixed(2)}</span></p>
+              ${dev.reembolso_status ? `<p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Status:</strong> ${dev.reembolso_status}</p>` : ""}
+              ${dev.data_reembolso ? `<p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${new Date(dev.data_reembolso).toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" })}</p>` : ""}
+              ${dev.reembolso_stripe_id ? `<p style="margin: 6px 0; font-size: 12px; color: #718096;"><small>ID: ${dev.reembolso_stripe_id.substring(0, 20)}...</small></p>` : ""}
+            </div>
+
           </div>
-        </div>
-      `
-          : ""
-      }
+          <!-- FIM GRID 3 COLUNAS -->
 
-      ${
-        fotosHtml
-          ? `
-        <div class="card mb-4">
-          <div class="card-body">
-            <h6 class="card-title mb-3">Fotos Anexadas</h6>
+          <!-- Notas e Observações -->
+          ${
+            dev.notas_cliente || dev.notas_anunciante || dev.notas_recebimento
+              ? `
+          <div style="padding: 18px; background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #f59e0b; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+              <i class="fas fa-sticky-note" style="margin-right: 8px; color: #f59e0b; font-size: 16px;"></i>
+              Notas e Observações
+            </h4>
+            ${dev.notas_cliente ? `<p style="margin: 8px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Cliente:</strong> ${dev.notas_cliente}</p>` : ""}
+            ${dev.notas_anunciante ? `<p style="margin: 8px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Anunciante:</strong> ${dev.notas_anunciante}</p>` : ""}
+            ${dev.notas_recebimento ? `<p style="margin: 8px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Recebimento:</strong> ${dev.notas_recebimento}</p>` : ""}
+          </div>
+          `
+              : ""
+          }
+
+          <!-- Histórico de Datas -->
+          ${
+            dev.data_aprovacao || dev.data_rejeicao || dev.data_produto_recebido
+              ? `
+          <div style="padding: 18px; background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3b82f6; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+              <i class="fas fa-history" style="margin-right: 8px; color: #3b82f6; font-size: 16px;"></i>
+              Histórico
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+              ${dev.data_aprovacao ? `<p style="margin: 4px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Aprovação:</strong> ${new Date(dev.data_aprovacao).toLocaleString("pt-PT")}</p>` : ""}
+              ${dev.data_rejeicao ? `<p style="margin: 4px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Rejeição:</strong> ${new Date(dev.data_rejeicao).toLocaleString("pt-PT")}</p>` : ""}
+              ${dev.data_envio_cliente ? `<p style="margin: 4px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Envio Cliente:</strong> ${new Date(dev.data_envio_cliente).toLocaleString("pt-PT")}</p>` : ""}
+              ${dev.data_produto_recebido ? `<p style="margin: 4px 0; font-size: 13px; color: #4a5568;"><strong style="color: #2d3748;">Recebimento:</strong> ${new Date(dev.data_produto_recebido).toLocaleString("pt-PT")}</p>` : ""}
+            </div>
+          </div>
+          `
+              : ""
+          }
+
+        </div>
+        <!-- FIM COLUNA ESQUERDA -->
+
+        <!-- COLUNA DIREITA: PRODUTO E FOTOS -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+
+          <!-- Imagem do Produto -->
+          ${
+            dev.produto_imagem || dev.produto_foto
+              ? `
+          <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 10px; border: 2px solid #3cb371; box-shadow: 0 4px 8px rgba(60,179,113,0.15);">
+            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
+              <i class="fas fa-image" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
+              Informações do Produto
+            </h4>
+            <div style="border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <img src="${dev.produto_imagem || dev.produto_foto}" style="width: 100%; height: auto; display: block;" alt="${dev.produto_nome}">
+            </div>
+          </div>
+          `
+              : ""
+          }
+
+          <!-- Fotos Anexadas -->
+          ${
+            fotosHtml
+              ? `
+          <div style="padding: 15px; background: linear-gradient(135deg, #fef3c7 0%, #ffffff 100%); border-radius: 10px; border: 2px solid #f59e0b; box-shadow: 0 4px 8px rgba(245,158,11,0.15);">
+            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
+              <i class="fas fa-camera" style="margin-right: 8px; color: #f59e0b; font-size: 18px;"></i>
+              Fotos Anexadas
+            </h4>
             ${fotosHtml}
           </div>
-        </div>
-      `
-          : ""
-      }
+          `
+              : ""
+          }
 
-      <div class="row mb-2">
-        ${
-          dev.data_aprovacao
-            ? `
-          <div class="col-md-6">
-            <p class="mb-2"><strong>Data de Aprovação:</strong> ${new Date(dev.data_aprovacao).toLocaleString("pt-PT")}</p>
-          </div>
-        `
-            : ""
-        }
-        ${
-          dev.data_rejeicao
-            ? `
-          <div class="col-md-6">
-            <p class="mb-2"><strong>Data de Rejeição:</strong> ${new Date(dev.data_rejeicao).toLocaleString("pt-PT")}</p>
-          </div>
-        `
-            : ""
-        }
-        ${
-          dev.data_produto_recebido
-            ? `
-          <div class="col-md-6">
-            <p class="mb-2"><strong>Data de Recebimento:</strong> ${new Date(dev.data_produto_recebido).toLocaleString("pt-PT")}</p>
-          </div>
-        `
-            : ""
-        }
-        ${
-          dev.data_reembolso
-            ? `
-          <div class="col-md-6">
-            <p class="mb-2"><strong>Data do Reembolso:</strong> ${new Date(dev.data_reembolso).toLocaleString("pt-PT")}</p>
-          </div>
-        `
-            : ""
-        }
+        </div>
+        <!-- FIM COLUNA DIREITA -->
+
       </div>
-
-      ${
-        dev.reembolso_status
-          ? `
-        <div class="alert alert-info mt-3">
-          <strong>Status do Reembolso:</strong> ${dev.reembolso_status}
-          ${dev.reembolso_stripe_id ? `<br><small>ID Stripe: ${dev.reembolso_stripe_id}</small>` : ""}
-        </div>
-      `
-          : ""
-      }
+      <!-- FIM GRID -->
     </div>
   `;
 
   Swal.fire({
-    title: "Detalhes da Devolução",
+    title: `Devolução ${dev.codigo_devolucao || ""}`,
     html: html,
-    width: "800px",
-    showCloseButton: true,
-    showConfirmButton: false,
+    padding: "0",
+    heightAuto: false,
     customClass: {
-      container: "devolucao-modal",
+      popup: "product-modal-view",
+      title: "modal-title-green",
+      htmlContainer: "modal-view-wrapper",
+    },
+    showCloseButton: true,
+    confirmButtonText: "Fechar",
+    confirmButtonColor: "#3cb371",
+    didOpen: () => {
+      // Aplicar estilos do cabeçalho verde
+      const title = document.querySelector(".product-modal-view .swal2-title");
+      if (title) {
+        title.style.background =
+          "linear-gradient(135deg, #3cb371 0%, #2e8b57 100%)";
+        title.style.color = "#ffffff";
+        title.style.padding = "18px 32px";
+        title.style.margin = "0";
+        title.style.borderRadius = "16px 16px 0 0";
+        title.style.fontSize = "20px";
+        title.style.fontWeight = "600";
+      }
     },
   });
 }
@@ -888,18 +929,71 @@ function aprovarDevolucao(devolucao_id) {
   Swal.fire({
     title: "Aprovar Devolução?",
     html: `
-            <p>Tem certeza que deseja aprovar esta devolução?</p>
-            <textarea id="notasAprovacao" class="form-control mt-3" rows="3"
-                      placeholder="Notas adicionais (opcional)..."></textarea>
-        `,
-    icon: "question",
+      <div style="text-align: left; padding: 20px;">
+        <div style="padding: 16px; background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%); border-radius: 10px; border-left: 4px solid #10b981; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(16,185,129,0.15);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <i class="fas fa-check-circle" style="color: #10b981; font-size: 24px;"></i>
+            <div>
+              <p style="margin: 0; color: #065f46; font-size: 15px; font-weight: 600;">Confirmar Aprovação</p>
+              <p style="margin: 4px 0 0 0; color: #047857; font-size: 13px;">Ao aprovar, o cliente poderá enviar o produto de volta.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <label style="display: block; margin-bottom: 8px; color: #2d3748; font-weight: 600; font-size: 14px;">
+            <i class="fas fa-sticky-note" style="margin-right: 6px; color: #3cb371;"></i>
+            Notas Adicionais (opcional)
+          </label>
+          <textarea id="notasAprovacao"
+                    style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; transition: border-color 0.3s ease;"
+                    rows="4"
+                    placeholder="Adicione observações sobre a aprovação..."
+                    onfocus="this.style.borderColor='#3cb371'"
+                    onblur="this.style.borderColor='#d1d5db'"></textarea>
+          <p style="margin: 6px 0 0 0; color: #6b7280; font-size: 12px;">
+            <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
+            Estas notas serão visíveis ao cliente.
+          </p>
+        </div>
+      </div>
+    `,
+    icon: false,
     showCancelButton: true,
-    confirmButtonText: "Sim, Aprovar",
-    cancelButtonText: "Cancelar",
-    confirmButtonColor: "#22c55e",
+    confirmButtonText:
+      '<i class="fas fa-check" style="margin-right: 6px;"></i>Sim, Aprovar',
+    cancelButtonText:
+      '<i class="fas fa-times" style="margin-right: 6px;"></i>Cancelar',
+    confirmButtonColor: "#10b981",
     cancelButtonColor: "#6b7280",
+    customClass: {
+      title: "modal-title-green",
+      confirmButton: "swal2-confirm-custom",
+      cancelButton: "swal2-cancel-custom",
+    },
+    buttonsStyling: true,
     preConfirm: () => {
       return $("#notasAprovacao").val();
+    },
+    didOpen: () => {
+      const popup = document.querySelector(".swal2-popup");
+      if (popup) {
+        popup.style.width = "600px";
+        popup.style.maxWidth = "600px";
+        popup.style.borderRadius = "16px";
+        popup.style.padding = "0";
+      }
+      const title = document.querySelector(".swal2-title");
+      if (title) {
+        title.style.background =
+          "linear-gradient(135deg, #10b981 0%, #059669 100%)";
+        title.style.color = "#ffffff";
+        title.style.padding = "18px 32px";
+        title.style.margin = "0";
+        title.style.borderRadius = "16px 16px 0 0";
+        title.style.fontSize = "20px";
+        title.style.fontWeight = "600";
+      }
     },
   }).then((result) => {
     console.log("Resultado do Swal:", result);
@@ -939,24 +1033,81 @@ function aprovarDevolucao(devolucao_id) {
 function rejeitarDevolucao(devolucao_id) {
   Swal.fire({
     title: "Rejeitar Devolução?",
+    width: "600px",
     html: `
-            <p class="text-danger">Esta ação não pode ser desfeita!</p>
-            <textarea id="motivoRejeicao" class="form-control mt-3" rows="3"
-                      placeholder="Motivo da rejeição (obrigatório)..." required></textarea>
-        `,
-    icon: "warning",
+      <div style="text-align: left; padding: 20px 20px 10px 20px;">
+        <div style="padding: 16px; background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%); border-radius: 10px; border-left: 4px solid #ef4444; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(239,68,68,0.15);">
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <i class="fas fa-exclamation-triangle" style="color: #dc2626; font-size: 24px;"></i>
+            <div>
+              <p style="margin: 0; color: #991b1b; font-size: 15px; font-weight: 600;">Atenção: Ação Irreversível</p>
+              <p style="margin: 4px 0 0 0; color: #b91c1c; font-size: 13px;">Esta devolução será rejeitada e o cliente será notificado.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <label style="display: block; margin-bottom: 8px; color: #2d3748; font-weight: 600; font-size: 14px;">
+            <i class="fas fa-comment-alt" style="margin-right: 6px; color: #ef4444;"></i>
+            Motivo da Rejeição <span style="color: #ef4444;">*</span>
+          </label>
+          <textarea id="motivoRejeicao"
+                    style="width: 100%; padding: 12px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical; transition: border-color 0.3s ease;"
+                    rows="4"
+                    placeholder="Explique o motivo da rejeição desta devolução..."
+                    required
+                    onfocus="this.style.borderColor='#ef4444'"
+                    onblur="this.style.borderColor='#d1d5db'"></textarea>
+          <p style="margin: 6px 0 0 0; color: #6b7280; font-size: 12px;">
+            <i class="fas fa-info-circle" style="margin-right: 4px;"></i>
+            O motivo será enviado por email ao cliente.
+          </p>
+        </div>
+      </div>
+    `,
+    icon: false,
     showCancelButton: true,
-    confirmButtonText: "Sim, Rejeitar",
-    cancelButtonText: "Cancelar",
+    confirmButtonText:
+      '<i class="fas fa-ban" style="margin-right: 6px;"></i>Sim, Rejeitar',
+    cancelButtonText:
+      '<i class="fas fa-times" style="margin-right: 6px;"></i>Cancelar',
     confirmButtonColor: "#ef4444",
     cancelButtonColor: "#6b7280",
+    customClass: {
+      title: "modal-title-red",
+      confirmButton: "swal2-confirm-custom",
+      cancelButton: "swal2-cancel-custom",
+    },
+    buttonsStyling: true,
     preConfirm: () => {
       const motivo = $("#motivoRejeicao").val();
       if (!motivo || motivo.trim() === "") {
-        Swal.showValidationMessage("Por favor, informe o motivo da rejeição");
+        Swal.showValidationMessage(
+          '<i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i>Por favor, informe o motivo da rejeição',
+        );
         return false;
       }
       return motivo;
+    },
+    didOpen: () => {
+      const popup = document.querySelector(".swal2-popup");
+      if (popup) {
+        popup.style.width = "600px";
+        popup.style.maxWidth = "600px";
+        popup.style.borderRadius = "16px";
+        popup.style.padding = "0";
+      }
+      const title = document.querySelector(".swal2-title");
+      if (title) {
+        title.style.background =
+          "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)";
+        title.style.color = "#ffffff";
+        title.style.padding = "18px 32px";
+        title.style.margin = "0";
+        title.style.borderRadius = "16px 16px 0 0";
+        title.style.fontSize = "20px";
+        title.style.fontWeight = "600";
+      }
     },
   }).then((result) => {
     if (result.isConfirmed) {

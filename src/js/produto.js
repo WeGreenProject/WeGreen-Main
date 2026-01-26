@@ -37,11 +37,41 @@ function getProdutoMostrar() {
 }
 
 function ErrorSession() {
-  alerta("Inicie Sessão", "É necessário iniciar sessão para avançar!", "error");
+  Swal.fire({
+    icon: "warning",
+    title: '<span style="color: #2e8b57;">Inicie Sessão</span>',
+    html: '<p style="color: #64748b; font-size: 15px;">É necessário iniciar sessão para conversar com o vendedor!</p>',
+    showCancelButton: true,
+    confirmButtonText: '<i class="fas fa-sign-in-alt"></i> Ir para Login',
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#3cb371",
+    cancelButtonColor: "#6c757d",
+    customClass: {
+      popup: "swal-custom-popup",
+      confirmButton: "swal-confirm-green",
+      cancelButton: "swal-cancel",
+    },
+    buttonsStyling: true,
+    reverseButtons: true,
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = "login.html";
+    }
+  });
 }
 
 function ErrorSession2() {
-  alerta("Mesma Pessoa", "Não pode conversar consigo mesmo!", "error");
+  Swal.fire({
+    icon: "info",
+    title: '<span style="color: #2e8b57;">Ação Inválida</span>',
+    html: '<p style="color: #64748b; font-size: 15px;">Não pode iniciar uma conversa consigo mesmo!</p>',
+    confirmButtonText: "Entendi",
+    confirmButtonColor: "#3cb371",
+    customClass: {
+      popup: "swal-custom-popup",
+      confirmButton: "swal-confirm-green",
+    },
+  });
 }
 
 function comprarAgora(produtoId) {

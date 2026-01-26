@@ -2245,7 +2245,8 @@ function renderEncomendas(encomendas) {
 
 function criarLinhaEncomenda(encomenda) {
   const statusClass = getStatusClass(encomenda.estado);
-  const statusBadge = `<span class="badge badge-${statusClass}">${encomenda.estado}</span>`;
+  const estadoTexto = encomenda.estado || "Pendente";
+  const statusBadge = `<span class="badge badge-${statusClass}">${estadoTexto}</span>`;
 
   // Calcular dias desde a encomenda
   const dataEncomenda = new Date(encomenda.data_completa);
@@ -2267,7 +2268,8 @@ function criarLinhaEncomenda(encomenda) {
       : "";
 
   // Tooltip morada
-  const moradaTooltip = encomenda.morada || "Morada não disponível";
+  const moradaTooltip =
+    encomenda.morada_completa || encomenda.morada || "Morada não disponível";
 
   // Ícone do método de pagamento
   let paymentIcon = '<i class="fas fa-credit-card"></i>';
@@ -2286,6 +2288,93 @@ function criarLinhaEncomenda(encomenda) {
   )}\nComissão (6%): €${comissao.toFixed(
     2,
   )}\nLucro Líquido: €${lucroLiquido.toFixed(2)}`;
+
+  // Renderizar produtos (múltiplos produtos ou produto único)
+  let produtosHtml = "";
+  let produtosExpandidosHtml = "";
+  let temMultiplosProdutos = false;
+
+  if (encomenda.produtos && Array.isArray(encomenda.produtos)) {
+    if (encomenda.produtos.length === 1) {
+      // Apenas 1 produto - mostrar normalmente
+      const prod = encomenda.produtos[0];
+      produtosHtml = `
+        <div class="product-info">
+          <img src="${prod.foto || "src/img/no-image.png"}" alt="${
+            prod.nome
+          }" class="product-thumb">
+          <div>
+            <div class="product-name">${prod.nome}</div>
+            <div class="product-qty">Qtd: ${prod.quantidade}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Múltiplos produtos - mostrar resumo com botão de expandir
+      temMultiplosProdutos = true;
+      const primeiraFoto =
+        encomenda.produtos[0]?.foto || "src/img/no-image.png";
+      const totalProdutos = encomenda.produtos.length;
+
+      produtosHtml = `
+        <div class="product-info" style="cursor: pointer;" onclick="toggleProdutosEncomenda(${encomenda.id})">
+          <img src="${primeiraFoto}" alt="Produtos" class="product-thumb">
+          <div>
+            <div class="product-name">
+              ${totalProdutos} produtos
+              <i class="fas fa-chevron-down" id="arrow-${encomenda.id}" style="margin-left: 8px; font-size: 12px; color: #3cb371; transition: transform 0.3s;"></i>
+            </div>
+            <div class="product-qty">Qtd total: ${encomenda.quantidade}</div>
+          </div>
+        </div>
+      `;
+
+      // HTML dos produtos expandidos (hidden por padrão)
+      produtosExpandidosHtml = `
+        <tr id="produtos-expand-${encomenda.id}" class="produtos-expand-row" style="display: none;">
+          <td colspan="8" style="padding: 0; background: #f9fafb; border-top: 2px solid #3cb371;">
+            <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
+              <h4 style="margin: 0 0 15px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
+                <i class="fas fa-box" style="margin-right: 8px; color: #3cb371;"></i>
+                Produtos da Encomenda
+              </h4>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
+                ${encomenda.produtos
+                  .map(
+                    (prod) => `
+                  <div style="display: flex; gap: 12px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <img src="${prod.foto || "src/img/no-image.png"}" alt="${prod.nome}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 2px solid #e2e8f0;">
+                    <div style="flex: 1;">
+                      <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 5px; font-size: 14px;">${prod.nome}</div>
+                      <div style="color: #718096; font-size: 13px;">
+                        <i class="fas fa-cubes" style="color: #3cb371; margin-right: 5px;"></i>
+                        Quantidade: <strong>${prod.quantidade}</strong>
+                      </div>
+                    </div>
+                  </div>
+                `,
+                  )
+                  .join("")}
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+  } else {
+    // Fallback para formato antigo (retrocompatibilidade)
+    produtosHtml = `
+      <div class="product-info">
+        <img src="${
+          encomenda.produto_foto || "src/img/no-image.png"
+        }" alt="${encomenda.produto_nome}" class="product-thumb">
+        <div>
+          <div class="product-name">${encomenda.produto_nome}</div>
+          <div class="product-qty">Qtd: ${encomenda.quantidade}</div>
+        </div>
+      </div>
+    `;
+  }
 
   const row = `
             <tr data-encomenda-id="${encomenda.id}" class="${classeUrgente}">
@@ -2308,23 +2397,7 @@ function criarLinhaEncomenda(encomenda) {
                         }</div>
                     </div>
                 </td>
-                <td>
-                    <div class="product-info">
-                        <img src="${
-                          encomenda.produto_foto || "src/img/no-image.png"
-                        }" alt="${
-                          encomenda.produto_nome
-                        }" class="product-thumb">
-                        <div>
-                            <div class="product-name">${
-                              encomenda.produto_nome
-                            }</div>
-                            <div class="product-qty">Qtd: ${
-                              encomenda.quantidade
-                            }</div>
-                        </div>
-                    </div>
-                </td>
+                <td>${produtosHtml}</td>
                 <td>
                     <div class="transportadora-info">
                         <i class="fas fa-truck" style="color: #3cb371; margin-right: 5px;"></i>
@@ -2366,6 +2439,11 @@ function criarLinhaEncomenda(encomenda) {
                 </td>
             </tr>
         `;
+
+  // Se tem múltiplos produtos, adicionar linha de expansão
+  if (temMultiplosProdutos) {
+    return row + produtosExpandidosHtml;
+  }
 
   return row;
 }
@@ -2431,6 +2509,19 @@ function getStatusClass(estado) {
     Cancelada: "danger",
   };
   return statusMap[estado] || "secondary";
+}
+
+function getStatusIcon(estado) {
+  const iconMap = {
+    Pendente: "fa-clock",
+    Processando: "fa-cog",
+    Enviado: "fa-shipping-fast",
+    Entregue: "fa-check-circle",
+    Devolvido: "fa-undo",
+    Cancelado: "fa-times-circle",
+    Cancelada: "fa-times-circle",
+  };
+  return iconMap[estado] || "fa-circle";
 }
 
 function aplicarFiltrosEncomendas() {
@@ -2528,63 +2619,85 @@ function verDetalhesEncomenda(encomendaId) {
                             : ""
                         }
 
-                        <!-- GRID PRINCIPAL: DADOS + PRODUTO -->
-                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <!-- GRID PRINCIPAL: DADOS + MAPA -->
+                        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; margin-bottom: 5px;">
 
-                        <!-- COLUNA ESQUERDA: GRID 2x2 COM TODOS OS DADOS -->
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <!-- COLUNA ESQUERDA: INFORMAÇÕES -->
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
 
-                        <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
+                        <!-- Cliente (Topo - Largura Total) -->
+                        <div style="padding: 20px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+                            <h4 style="margin: 0 0 14px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
                                 <i class="fas fa-user" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Cliente
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Nome:</strong> ${
-                              encomenda.cliente_nome
-                            }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;">
-                                <strong style="color: #2d3748;">Email:</strong>
-                                <a href="mailto:${
-                                  encomenda.cliente_email
-                                }" style="color: #3b82f6; text-decoration: none;">
-                                    ${encomenda.cliente_email}
-                                </a>
-                            </p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568; display: flex; align-items: center; gap: 8px;">
-                                <strong style="color: #2d3748;">Morada:</strong> ${
-                                  encomenda.morada
-                                }
-                                <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${encomenda.morada.replace(
-                                  /'/g,
-                                  "\\'",
-                                )}')
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                                <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Nome:</strong> ${
+                                  encomenda.cliente_nome
+                                }</p>
+                                <p style="margin: 6px 0; font-size: 15px; color: #4a5568;">
+                                    <strong style="color: #2d3748;">Email:</strong>
+                                    <a href="mailto:${
+                                      encomenda.cliente_email
+                                    }" style="color: #3b82f6; text-decoration: none;">
+                                        ${encomenda.cliente_email}
+                                    </a>
+                                </p>
+                            </div>
+                            <div style="margin-top: 12px; padding: 14px; background: linear-gradient(135deg, #e6f7ed 0%, #f0fdf4 100%); border-radius: 8px; border: 1px solid #3cb371;">
+                                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                                    <i class="fas fa-map-marker-alt" style="color: #3cb371; font-size: 16px; margin-top: 2px;"></i>
+                                    <div style="flex: 1;">
+                                        <strong style="color: #2d3748; display: block; margin-bottom: 6px;">Endereço de Entrega (${
+                                          encomenda.tipo_entrega ===
+                                          "ponto_recolha"
+                                            ? "Ponto de Recolha"
+                                            : "Domicílio"
+                                        }):</strong>
+                                        <span style="color: #4a5568; font-size: 14px; line-height: 1.6; display: block; word-wrap: break-word;">${
+                                          encomenda.morada_completa ||
+                                          encomenda.morada
+                                        }</span>
+                                    </div>
+                                    <i class="fas fa-copy" onclick="navigator.clipboard.writeText('${(
+                                      encomenda.morada_completa ||
+                                      encomenda.morada
+                                    ).replace(/'/g, "\\'")}')
 .then(() => Swal.fire({icon: 'success', title: 'Copiado!', text: 'Morada copiada para a área de transferência', timer: 1500, showConfirmButton: false}))
 .catch(() => Swal.fire({icon: 'error', title: 'Erro', text: 'Não foi possível copiar', timer: 1500, showConfirmButton: false}))"
-                                   style="color: #3cb371; cursor: pointer; font-size: 14px;"
-                                   title="Copiar morada"></i>
-                            </p>
+                                       style="color: #3cb371; cursor: pointer; font-size: 14px; flex-shrink: 0;"
+                                       title="Copiar morada"></i>
+                                </div>
+                            </div>
                         </div>
 
+                        <!-- Grid 3 Colunas: Encomenda | Envio | Financeiros -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+
+                        <!-- Encomenda -->
                         <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-box" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
+                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                                <i class="fas fa-box" style="margin-right: 8px; color: #3cb371; font-size: 16px;"></i>
                                 Encomenda
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Produto:</strong> ${
-                              encomenda.produto_nome
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Produto:</strong> ${
+                              encomenda.produto_nome ||
+                              (encomenda.produtos
+                                ? encomenda.produtos.length + " produtos"
+                                : "N/A")
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Qtd:</strong> ${
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Qtd:</strong> ${
                               encomenda.quantidade
                             } un.</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #3cb371; font-weight: bold; font-size: 16px;">€${encomenda.valor.toFixed(
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Valor:</strong> <span style="color: #3cb371; font-weight: bold; font-size: 15px;">€${encomenda.valor.toFixed(
                               2,
                             )}</span></p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Data:</strong> ${
                               encomenda.data
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;">
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;">
                                 <strong style="color: #2d3748;">Status:</strong>
-                                <span class="badge badge-${statusClass}" style="font-size: 14px; padding: 6px 12px; border-radius: 6px;">
+                                <span class="badge badge-${statusClass}" style="font-size: 13px; padding: 5px 10px; border-radius: 6px; display: inline-block; margin-top: 4px;">
                                     ${
                                       encomenda.estado === "Pendente"
                                         ? "⏳"
@@ -2601,68 +2714,51 @@ function verDetalhesEncomenda(encomendaId) {
                             </p>
                         </div>
 
+                        <!-- Envio -->
                         <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-shipping-fast" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
+                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                                <i class="fas fa-shipping-fast" style="margin-right: 8px; color: #3cb371; font-size: 16px;"></i>
                                 Envio
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Transportadora:</strong> ${
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Transportadora:</strong> ${
                               encomenda.transportadora || "N/A"
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Rastreio:</strong> ${
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Rastreio:</strong> ${
                               encomenda.codigo_rastreio || "N/A"
                             }</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Prazo:</strong> ${prazoEntrega}</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Prazo:</strong> ${prazoEntrega}</p>
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
                         </div>
 
+                        <!-- Financeiros -->
                         <div style="padding: 18px; background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-radius: 10px; border-left: 4px solid #3cb371; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
+                            <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 15px; font-weight: 700;">
+                                <i class="fas fa-euro-sign" style="margin-right: 8px; color: #3cb371; font-size: 16px;"></i>
                                 Financeiros
                             </h4>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Pagamento:</strong> ${encomenda.payment_method.toUpperCase()}</p>
-                            <p style="margin: 6px 0; font-size: 15px; color: #4a5568;"><strong style="color: #2d3748;">Bruto:</strong> <span style="font-weight: 600;">€${encomenda.valor.toFixed(
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Pagamento:</strong> ${encomenda.payment_method.toUpperCase()}</p>
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Bruto:</strong> <span style="font-weight: 600;">€${encomenda.valor.toFixed(
                               2,
                             )}</span></p>
-                            <p style="margin: 6px 0; font-size: 15px;"><strong style="color: #2d3748;">Comissão:</strong> <span style="color: #ef4444; font-weight: 600; font-size: 15px;">-€${encomenda.comissao.toFixed(
+                            <p style="margin: 6px 0; font-size: 14px;"><strong style="color: #2d3748;">Comissão:</strong> <span style="color: #ef4444; font-weight: 600; font-size: 14px;">-€${encomenda.comissao.toFixed(
                               2,
                             )}</span></p>
-                            <p style="margin: 6px 0; font-size: 15px;"><strong style="color: #2d3748;">Líquido:</strong> <span style="color: #10b981; font-weight: 700; font-size: 17px;">€${encomenda.lucro_liquido.toFixed(
+                            <p style="margin: 6px 0; font-size: 14px;"><strong style="color: #2d3748;">Líquido:</strong> <span style="color: #10b981; font-weight: 700; font-size: 16px;">€${encomenda.lucro_liquido.toFixed(
                               2,
                             )}</span></p>
                         </div>
 
                         </div>
-                        <!-- FIM GRID DADOS -->
-
-                        <!-- COLUNA DIREITA: PRODUTO -->
-                        ${
-                          encomenda.produto_foto
-                            ? `
-                        <div style="padding: 20px; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); text-align: center;">
-                            <h4 style="margin: 0 0 16px 0; color: #2d3748; font-size: 17px; font-weight: 700;">
-                                <i class="fas fa-image" style="margin-right: 8px; color: #3cb371; font-size: 20px;"></i>
-                                Produto
-                            </h4>
-                            <img src="${encomenda.produto_foto}"
-                                 alt="${encomenda.produto_nome}"
-                                 onclick="visualizarFoto('${encomenda.produto_foto}', '${encomenda.produto_nome}')"
-                                 style="max-width: 100%; max-height: 380px; width: auto; height: auto; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer;"
-                                 title="Clique para ampliar">
-                        </div>
-                        `
-                            : `<div></div>`
-                        }
+                        <!-- FIM GRID 3 COLUNAS -->
 
                         </div>
-                        <!-- FIM GRID -->
+                        <!-- FIM COLUNA ESQUERDA -->
 
-                        <!-- MAPA ABAIXO -->
+                        <!-- COLUNA DIREITA: MAPA -->
                         ${
                           encomenda.morada
                             ? `
-                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 8px; border: 2px solid #3cb371; box-shadow: 0 4px 8px rgba(166,217,12,0.15); margin-top: 12px;">
+                        <div style="padding: 15px; background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); border-radius: 10px; border: 2px solid #3cb371; box-shadow: 0 4px 8px rgba(166,217,12,0.15);">
                             <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
                                 <i class="fas fa-map-marker-alt" style="margin-right: 8px; color: #3cb371; font-size: 18px;"></i>
                                 Localização de Entrega
@@ -2674,32 +2770,35 @@ function verDetalhesEncomenda(encomendaId) {
                                     frameborder="0"
                                     style="border:0"
                                     src="https://maps.google.com/maps?q=${encodeURIComponent(
-                                      encomenda.morada,
+                                      encomenda.morada_completa ||
+                                        encomenda.morada,
                                     )}&t=&z=15&ie=UTF8&iwloc=&output=embed"
                                     allowfullscreen>
                                 </iframe>
-                                <div style="padding: 12px; background-color: #f9fafb; text-align: center;">
-                                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                      encomenda.morada,
-                                    )}"
-                                       target="_blank"
-                                       style="display: inline-block; padding: 10px 20px; background: #3cb371; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; border-radius: 8px; box-shadow: 0 2px 8px rgba(60, 179, 113, 0.3); transition: all 0.3s ease;"
-                                       onmouseover="this.style.background='#2e8b57'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(60, 179, 113, 0.4)';"
-                                       onmouseout="this.style.background='#3cb371'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(60, 179, 113, 0.3)';">
-                                        <i class="fas fa-external-link-alt" style="margin-right: 6px;"></i>
-                                        Abrir no Google Maps
-                                    </a>
-                                </div>
+                            </div>
+                            <div style="margin-top: 10px; text-align: center;">
+                                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                  encomenda.morada_completa || encomenda.morada,
+                                )}"
+                                   target="_blank"
+                                   style="display: inline-block; padding: 8px 16px; background: #3cb371; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 13px; border-radius: 6px; box-shadow: 0 2px 6px rgba(60, 179, 113, 0.3); transition: all 0.3s ease;"
+                                   onmouseover="this.style.background='#2e8b57'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 10px rgba(60, 179, 113, 0.4)';"
+                                   onmouseout="this.style.background='#3cb371'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 6px rgba(60, 179, 113, 0.3)';">
+                                    <i class="fas fa-external-link-alt" style="margin-right: 6px;"></i>
+                                    Ver mapa maior
+                                </a>
                             </div>
                         </div>
                         `
-                            : ""
+                            : `<div></div>`
                         }
+
+                        </div>
+                        <!-- FIM GRID -->
                     </div>
                 `,
-        width: "95%",
-        maxWidth: "1100px",
         padding: "0",
+        heightAuto: false,
         customClass: {
           popup: "product-modal-view",
           title: "modal-title-green",
@@ -2742,50 +2841,106 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
   Swal.fire({
     title: "Alterar Status da Encomenda",
     html: `
-            <select id="novoStatus" class="swal2-input" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px;" onchange="toggleCodigoRastreio()">
-                <option value="Pendente" ${
-                  statusAtual === "Pendente" ? "selected" : ""
-                }>Pendente</option>
-                <option value="Processando" ${
-                  statusAtual === "Processando" ? "selected" : ""
-                }>Processando</option>
-                <option value="Enviado" ${
-                  statusAtual === "Enviado" ? "selected" : ""
-                }>Enviado</option>
-                <option value="Entregue" ${
-                  statusAtual === "Entregue" ? "selected" : ""
-                }>Entregue</option>
-                <option value="Cancelado" ${
-                  statusAtual === "Cancelado" ? "selected" : ""
-                }>Cancelado</option>
-            </select>
-            <div id="codigoRastreioContainer" style="display: ${
-              statusAtual === "Enviado" ? "block" : "none"
-            }; margin-bottom: 15px;">
-                <input type="text" id="codigoRastreio" class="swal2-input" placeholder="Código de Rastreio *" style="width: 100%; padding: 10px; font-size: 14px; margin-top: 0;">
-                <small style="color: #999; font-size: 12px; display: block; margin-top: 5px;">* Obrigatório ao marcar como "Enviado"</small>
+            <div style="text-align: left; padding: 10px;">
+                <!-- Informação do status atual -->
+                <div style="background: linear-gradient(135deg, #f7fafc 0%, #ffffff 100%); border-left: 4px solid #3cb371; padding: 14px 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                        <i class="fas fa-info-circle" style="font-size: 18px; color: #3cb371;"></i>
+                        <div>
+                            <p style="margin: 0; font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Status Atual</p>
+                            <p style="margin: 0; font-size: 16px; color: #1e293b; font-weight: 700;">${statusAtual}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seletor de novo status -->
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 8px; color: #2d3748; font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-exchange-alt" style="margin-right: 6px; color: #3cb371;"></i>
+                        Novo Status
+                    </label>
+                    <select id="novoStatus" style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; background: white; color: #1e293b; font-weight: 500; transition: all 0.3s;" onchange="toggleCodigoRastreio()" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'">
+                        <option value="Pendente" ${statusAtual === "Pendente" ? "selected" : ""}>⏳ Pendente</option>
+                        <option value="Processando" ${statusAtual === "Processando" ? "selected" : ""}>📦 Processando</option>
+                        <option value="Enviado" ${statusAtual === "Enviado" ? "selected" : ""}>🚚 Enviado</option>
+                        <option value="Entregue" ${statusAtual === "Entregue" ? "selected" : ""}>✔️ Entregue</option>
+                        <option value="Cancelado" ${statusAtual === "Cancelado" ? "selected" : ""}>❌ Cancelado</option>
+                    </select>
+                </div>
+
+                <!-- Código de rastreio (condicional) -->
+                <div id="codigoRastreioContainer" style="display: ${statusAtual === "Enviado" ? "block" : "none"}; margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 8px; color: #2d3748; font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-barcode" style="margin-right: 6px; color: #3cb371;"></i>
+                        Código de Rastreio
+                        <span style="color: #ef4444; margin-left: 4px;">*</span>
+                    </label>
+                    <input type="text" id="codigoRastreio" placeholder="Ex: BR123456789PT" style="width: 100%; padding: 12px 16px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; transition: all 0.3s;" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'">
+                    <small style="color: #64748b; font-size: 12px; display: block; margin-top: 6px;">
+                        <i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i>
+                        Obrigatório ao marcar como "Enviado"
+                    </small>
+                </div>
+
+                <!-- Observações -->
+                <div style="margin-bottom: 10px;">
+                    <label style="display: block; margin-bottom: 8px; color: #2d3748; font-weight: 600; font-size: 14px;">
+                        <i class="fas fa-comment-alt" style="margin-right: 6px; color: #3cb371;"></i>
+                        Observações
+                        <span style="color: #64748b; font-weight: 400; font-size: 12px;">(opcional)</span>
+                    </label>
+                    <textarea id="observacao" placeholder="Adicione informações adicionais sobre a alteração..." style="width: 100%; min-height: 100px; padding: 12px 16px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; resize: vertical; font-family: inherit; transition: all 0.3s;" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                </div>
             </div>
-            <textarea id="observacao" class="swal2-textarea" placeholder="Observações (opcional)" style="width: 100%; min-height: 100px; padding: 10px; font-size: 14px;"></textarea>
+
             <script>
                 function toggleCodigoRastreio() {
                     const status = document.getElementById('novoStatus').value;
                     const container = document.getElementById('codigoRastreioContainer');
-                    container.style.display = status === 'Enviado' ? 'block' : 'none';
+                    if (status === 'Enviado') {
+                        container.style.display = 'block';
+                        container.style.animation = 'slideDown 0.3s ease-out';
+                    } else {
+                        container.style.display = 'none';
+                    }
                 }
             </script>
         `,
     showCancelButton: true,
-    confirmButtonText: "Atualizar",
-    cancelButtonText: "Cancelar",
+    confirmButtonText:
+      '<i class="fas fa-check" style="margin-right: 6px;"></i> Atualizar Status',
+    cancelButtonText:
+      '<i class="fas fa-times" style="margin-right: 6px;"></i> Cancelar',
     confirmButtonColor: "#3cb371",
-    width: 600,
+    cancelButtonColor: "#64748b",
+    width: 650,
+    customClass: {
+      popup: "status-modal-custom",
+      title: "modal-title-green",
+      confirmButton: "btn-confirm-green",
+      cancelButton: "btn-cancel-gray",
+    },
+    didOpen: () => {
+      // Aplicar estilos ao título
+      const title = document.querySelector(".status-modal-custom .swal2-title");
+      if (title) {
+        title.style.background =
+          "linear-gradient(135deg, #3cb371 0%, #2e8b57 100%)";
+        title.style.color = "white";
+        title.style.padding = "20px 28px";
+        title.style.margin = "0";
+        title.style.borderRadius = "12px 12px 0 0";
+        title.style.fontSize = "20px";
+        title.style.fontWeight = "700";
+      }
+    },
     preConfirm: () => {
       const status = document.getElementById("novoStatus").value;
       const codigoRastreio = document.getElementById("codigoRastreio").value;
 
       if (status === "Enviado" && !codigoRastreio.trim()) {
         Swal.showValidationMessage(
-          'Código de rastreio é obrigatório ao marcar como "Enviado"',
+          '<i class="fas fa-exclamation-triangle"></i> Código de rastreio é obrigatório ao marcar como "Enviado"',
         );
         return false;
       }
@@ -2848,31 +3003,32 @@ function verHistoricoEncomenda(encomendaId) {
 
       const timelineHTML = historico
         .map((item, index) => {
-          const statusClass = getStatusClass(item.estado);
+          const estadoTexto = item.estado || "Pendente";
+          const statusClass = getStatusClass(estadoTexto);
           const isLast = index === historico.length - 1;
+          const iconClass = getStatusIcon(estadoTexto);
 
           return `
-          <div style="position: relative; padding-left: 40px; padding-bottom: ${
-            isLast ? "0" : "25px"
+          <div style="position: relative; padding-left: 60px; padding-bottom: ${
+            isLast ? "0" : "30px"
           }; text-align: left;">
             ${
               !isLast
-                ? '<div style="position: absolute; left: 14px; top: 30px; bottom: 0; width: 2px; background: #e2e8f0;"></div>'
+                ? '<div style="position: absolute; left: 22px; top: 50px; bottom: 0; width: 3px; background: linear-gradient(180deg, #e2e8f0 0%, #f1f5f9 100%);"></div>'
                 : ""
             }
-            <div style="position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--badge-${statusClass}-bg, #f3f4f6); border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
-              <i class="fas fa-circle" style="font-size: 8px; color: var(--badge-${statusClass}-color, #6b7280);"></i>
+            <div style="position: absolute; left: 0; top: 0; width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--badge-${statusClass}-bg, #f3f4f6), var(--badge-${statusClass}-light, #fafafa)); border: 2px solid var(--badge-${statusClass}-color, #6b7280); box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center;">
+              <i class="fas ${iconClass}" style="font-size: 18px; color: var(--badge-${statusClass}-color, #6b7280);"></i>
             </div>
-            <div style="background: #f7fafc; padding: 12px; border-radius: 8px; border-left: 3px solid var(--badge-${statusClass}-color, #6b7280);">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <span class="badge badge-${statusClass}" style="font-size: 12px;">${
-                  item.estado
-                }</span>
-                <span style="font-size: 12px; color: #718096;">${
-                  item.data
-                }</span>
+            <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); padding: 18px 20px; border-radius: 12px; border-left: 4px solid var(--badge-${statusClass}-color, #6b7280); box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s ease;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span class="badge badge-${statusClass}" style="font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 8px;">${estadoTexto}</span>
+                <span style="font-size: 13px; color: #64748b; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+                  <i class="fas fa-clock" style="font-size: 11px;"></i>
+                  ${item.data}
+                </span>
               </div>
-              <p style="margin: 0; color: #2d3748; font-size: 14px;">${
+              <p style="margin: 0; color: #1e293b; font-size: 15px; line-height: 1.6;">${
                 item.descricao
               }</p>
             </div>
@@ -2882,29 +3038,71 @@ function verHistoricoEncomenda(encomendaId) {
         .join("");
 
       Swal.fire({
-        title: "Histórico da Encomenda",
+        title: "",
         html: `
           <style>
             :root {
               --badge-warning-bg: #fef3c7;
-              --badge-warning-color: #92400e;
+              --badge-warning-color: #d97706;
+              --badge-warning-light: #fffbeb;
               --badge-info-bg: #dbeafe;
-              --badge-info-color: #1e40af;
+              --badge-info-color: #2563eb;
+              --badge-info-light: #eff6ff;
               --badge-primary-bg: #e0e7ff;
-              --badge-primary-color: #3730a3;
+              --badge-primary-color: #4f46e5;
+              --badge-primary-light: #eef2ff;
               --badge-success-bg: #d1fae5;
-              --badge-success-color: #065f46;
+              --badge-success-color: #059669;
+              --badge-success-light: #ecfdf5;
               --badge-danger-bg: #fee2e2;
-              --badge-danger-color: #991b1b;
+              --badge-danger-color: #dc2626;
+              --badge-danger-light: #fef2f2;
+            }
+            .swal2-html-container {
+              padding: 0 !important;
+              margin: 0 !important;
+              overflow-x: hidden !important;
+            }
+            .swal2-popup {
+              overflow-x: hidden !important;
             }
           </style>
-          <div style="max-height: 500px; overflow-y: auto; padding: 10px;">
+          <div style="background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%); padding: 25px 20px; margin: -20px -20px 20px -20px; border-radius: 12px 12px 0 0;">
+            <div style="display: flex; align-items: center; gap: 12px; justify-content: center;">
+              <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                <i class="fas fa-history" style="font-size: 24px; color: white;"></i>
+              </div>
+              <div style="text-align: left;">
+                <h3 style="margin: 0; color: white; font-size: 20px; font-weight: 700;">Histórico da Encomenda</h3>
+                <p style="margin: 4px 0 0 0; color: rgba(255,255,255,0.9); font-size: 13px;">Timeline completa de estados</p>
+              </div>
+            </div>
+          </div>
+          <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden; padding: 20px 16px; background: #fafbfc; width: 100%; box-sizing: border-box;">
             ${timelineHTML}
           </div>
         `,
-        width: 700,
-        confirmButtonText: "Fechar",
+        width: 500,
+        showConfirmButton: true,
+        confirmButtonText: '<i class="fas fa-times"></i> Fechar',
         confirmButtonColor: "#3cb371",
+        customClass: {
+          confirmButton: "swal2-confirm-modern",
+        },
+        didOpen: () => {
+          const popup = Swal.getPopup();
+          popup.style.borderRadius = "16px";
+          popup.style.padding = "0";
+          popup.style.overflow = "hidden";
+          popup.style.overflowX = "hidden";
+          popup.style.width = "500px";
+          popup.style.maxWidth = "500px";
+
+          const htmlContainer = popup.querySelector(".swal2-html-container");
+          if (htmlContainer) {
+            htmlContainer.style.overflowX = "hidden";
+          }
+        },
       });
     },
   ).fail(function () {
@@ -2962,10 +3160,105 @@ function initProfilePage() {
 // Função de Logout
 function logout() {
   Swal.fire({
+    html: `
+      <div style="padding: 20px 0;">
+        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+          <i class="fas fa-sign-out-alt" style="font-size: 32px; color: #dc2626;"></i>
+        </div>
+        <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 24px; font-weight: 700;">Terminar Sessao?</h2>
+        <p style="margin: 0; color: #64748b; font-size: 15px; line-height: 1.6;">Tem a certeza que pretende sair da sua conta?</p>
+      </div>
+    `,
+    showCancelButton: true,
+<<<<<<< Updated upstream
+=======
+    confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Sim, sair',
+    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+    confirmButtonColor: "#dc2626",
+    cancelButtonColor: "#64748b",
+    customClass: {
+      confirmButton: "swal2-confirm-modern",
+      cancelButton: "swal2-cancel-modern",
+      popup: "swal2-logout-popup",
+    },
+    buttonsStyling: false,
+    reverseButtons: true,
+    didOpen: () => {
+      const popup = Swal.getPopup();
+      popup.style.borderRadius = "16px";
+      popup.style.padding = "25px";
+
+      const confirmBtn = popup.querySelector(".swal2-confirm");
+      const cancelBtn = popup.querySelector(".swal2-cancel");
+
+      if (confirmBtn) {
+        confirmBtn.style.padding = "12px 28px";
+        confirmBtn.style.borderRadius = "10px";
+        confirmBtn.style.fontSize = "15px";
+        confirmBtn.style.fontWeight = "600";
+        confirmBtn.style.border = "none";
+        confirmBtn.style.cursor = "pointer";
+        confirmBtn.style.transition = "all 0.3s ease";
+        confirmBtn.style.backgroundColor = "#dc2626";
+        confirmBtn.style.color = "#ffffff";
+        confirmBtn.style.marginLeft = "10px";
+      }
+
+      if (cancelBtn) {
+        cancelBtn.style.padding = "12px 28px";
+        cancelBtn.style.borderRadius = "10px";
+        cancelBtn.style.fontSize = "15px";
+        cancelBtn.style.fontWeight = "600";
+        cancelBtn.style.border = "2px solid #e2e8f0";
+        cancelBtn.style.cursor = "pointer";
+        cancelBtn.style.transition = "all 0.3s ease";
+        cancelBtn.style.backgroundColor = "#ffffff";
+        cancelBtn.style.color = "#64748b";
+      }
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire({
+        html: `
+          <div style="padding: 20px;">
+            <div class="swal2-loading-spinner" style="margin: 0 auto 20px;">
+              <div style="width: 50px; height: 50px; border: 4px solid #f3f4f6; border-top: 4px solid #3cb371; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+            </div>
+            <p style="margin: 0; color: #64748b; font-size: 15px;">A terminar sessao...</p>
+          </div>
+          <style>
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          </style>
+        `,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          const popup = Swal.getPopup();
+          popup.style.borderRadius = "16px";
+        },
+      });
+
+      $.ajax({
+        url: "src/controller/controllerPerfil.php?op=2",
+        method: "GET",
+      }).always(function () {
+        window.location.href = "index.html";
+      });
+    }
+  });
+}
+
+function logoutIncomplete() {
+  Swal.fire({
     title: "Terminar Sessão?",
     text: "Tem a certeza que pretende sair?",
     icon: "question",
     showCancelButton: true,
+>>>>>>> Stashed changes
     confirmButtonText: "Sim, sair",
     cancelButtonText: "Cancelar",
   }).then((result) => {
@@ -2996,6 +3289,20 @@ function logoutIncomplete() {
   });
 }
 
+// Toggle produtos expandidos na encomenda
+function toggleProdutosEncomenda(encomendaId) {
+  const expandRow = document.getElementById(`produtos-expand-${encomendaId}`);
+  const arrow = document.getElementById(`arrow-${encomendaId}`);
+
+  if (expandRow.style.display === "none") {
+    expandRow.style.display = "table-row";
+    arrow.style.transform = "rotate(180deg)";
+  } else {
+    expandRow.style.display = "none";
+    arrow.style.transform = "rotate(0deg)";
+  }
+}
+
 // Limpar filtros de produtos
 function limparFiltrosProdutos() {
   $("#searchProduct").val("");
@@ -3006,5 +3313,16 @@ function limparFiltrosProdutos() {
 
   if ($("#productsTable").DataTable()) {
     $("#productsTable").DataTable().search("").columns().search("").draw();
+  }
+}
+
+// Limpar filtros de encomendas
+function limparFiltrosEncomendas() {
+  $("#filterEncomendaStatus").val("");
+  $("#filterDateFrom").val("");
+  $("#filterDateTo").val("");
+
+  if ($("#encomendasTable").DataTable()) {
+    $("#encomendasTable").DataTable().search("").columns().search("").draw();
   }
 }

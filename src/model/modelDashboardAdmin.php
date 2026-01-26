@@ -16,17 +16,21 @@ class DashboardAdmin{
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
 
-                $msg  = " <div class='stat-icon'><i class='fas fa-crown'></i></div>";
-                $msg .= "<div class='stat-label'>Planos Ativos</div>";
+                $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
+                $msg .= "<div class='stat-content'>";
+                $msg .= "<div class='stat-label'>PLANOS ATIVOS</div>";
                 $msg .= "<div class='stat-value'>".$row["TotalAtivos"]."</div>";
+                $msg .= "</div>";
 
             }
         }
         else
         {
-                $msg  = " <div class='stat-icon'><i class='fas fa-crown'></i></div>";
-                $msg .= "<div class='stat-label'>Planos Ativos</div>";
-                $msg .= "<div class='stat-value'>Não Encontrado</div>";
+                $msg  = "<div class='stat-icon'><i class='fas fa-crown'></i></div>";
+                $msg .= "<div class='stat-content'>";
+                $msg .= "<div class='stat-label'>PLANOS ATIVOS</div>";
+                $msg .= "<div class='stat-value'>0</div>";
+                $msg .= "</div>";
         }
         $conn->close();
 
@@ -84,17 +88,20 @@ class DashboardAdmin{
               while ($row = $result->fetch_assoc()) {
 
                 $msg  = "<div class='stat-icon'><i class='fas fa-users'></i></div>";
-                $msg .= "<div class='stat-label'>Utilizadores Ativos</div>";
+                $msg .= "<div class='stat-content'>";
+                $msg .= "<div class='stat-label'>UTILIZADORES ATIVOS</div>";
                 $msg .= "<div class='stat-value'>".$row["TotalUtilizadores"]."</div>";
                 $msg .= "<div class='stat-change'><i class='fas fa-arrow-up'></i> ".$novos." Novos utilizadores</div>";
+                $msg .= "</div>";
             }
         }
         else
         {
-                $msg  = "<div class='stat-icon'>👥</div>";
-                $msg .= "<div class='stat-label'>Utilizadores</div>";
-                $msg .= "<div class='stat-value'>Nao Encontrado!</div>";
-                $msg .= "<div class='stat-change'>+ X Novos utilizadores</div>";
+                $msg  = "<div class='stat-icon'><i class='fas fa-users'></i></div>";
+                $msg .= "<div class='stat-content'>";
+                $msg .= "<div class='stat-label'>UTILIZADORES ATIVOS</div>";
+                $msg .= "<div class='stat-value'>0</div>";
+                $msg .= "</div>";
         }
         $conn->close();
 
@@ -153,7 +160,7 @@ class DashboardAdmin{
 
     }
     function logout(){
-        global $conn;   
+        global $conn;
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -227,17 +234,21 @@ class DashboardAdmin{
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $msg  = "<div class='stat-icon'><i class='fas fa-euro-sign'></i></div>";
-                    $msg .= "<div class='stat-label'>Rendimentos Totais</div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>RENDIMENTOS TOTAIS</div>";
                     $msg .= "<div class='stat-value'>".$row["TotalRendimentos"]."€</div>";
-                    $msg .= "<div class='stat-change'><i class='fas fa-arrow-up'></i> ".$novos."€ Ganhos rencentes</div>";
+                    $msg .= "<div class='stat-change'><i class='fas fa-arrow-up'></i> ".$novos."€ Gastos rencentes</div>";
+                    $msg .= "</div>";
 
                 }
             }
             else
             {
-                    $msg  = "<div class='stat-icon>📈</div>";
-                    $msg .= "<div class='stat-label'>Rendimentos</div>";
-                    $msg .= "<div class='stat-value'>Rendimentos não Encontrado!</div>";
+                    $msg  = "<div class='stat-icon'><i class='fas fa-euro-sign'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>RENDIMENTOS TOTAIS</div>";
+                    $msg .= "<div class='stat-value'>0€</div>";
+                    $msg .= "</div>";
             }
             $conn->close();
 
@@ -302,17 +313,21 @@ class DashboardAdmin{
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
                 $msg  = "<div class='stat-icon'><i class='fas fa-credit-card'></i></div>";
-                $msg .= "<div class='stat-label'>Gastos Totais</div>";
+                $msg .= "<div class='stat-content'>";
+                $msg .= "<div class='stat-label'>GASTOS TOTAIS</div>";
                 $msg .= "<div class='stat-value'>".$row["TotalGastos"]."€</div>";
                 $msg .= "<div class='stat-change'><i class='fas fa-arrow-down'></i> ".$novos."€ Gastos rencentes</div>";
+                $msg .= "</div>";
 
             }
         }
         else
         {
-                $msg  = "<div class='stat-icon>💸</div>";
-                $msg .= "<div class='stat-label'>Gastos</div>";
-                $msg .= "<div class='stat-value'>Gastos não Encontrado!</div>";
+                $msg  = "<div class='stat-icon'><i class='fas fa-credit-card'></i></div>";
+                $msg .= "<div class='stat-content'>";
+                $msg .= "<div class='stat-label'>GASTOS TOTAIS</div>";
+                $msg .= "<div class='stat-value'>0€</div>";
+                $msg .= "</div>";
         }
         $conn->close();
 

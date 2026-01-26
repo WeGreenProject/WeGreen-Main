@@ -1,13 +1,10 @@
-/* ========== Estilos para Modal de Produto ========== */
-
-/* Container do Modal */
 .product-modal-view {
   border-radius: 16px !important;
   padding: 0 !important;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
-  max-width: 900px !important;
-  width: 92% !important;
-  max-height: 75vh !important;
+  max-width: 1200px !important;
+  width: 98% !important;
+  max-height: 100vh !important;
   display: flex !important;
   flex-direction: column !important;
 }
@@ -31,7 +28,6 @@
   min-height: 0 !important;
 }
 
-/* Form Rows */
 #productFormSwal .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -48,7 +44,6 @@
   flex-direction: column;
 }
 
-/* Labels */
 #productFormSwal label {
   font-size: 13px;
   font-weight: 600;
@@ -58,7 +53,6 @@
   align-items: center;
 }
 
-/* Inputs e Selects */
 #productFormSwal input[type="text"],
 #productFormSwal input[type="number"],
 #productFormSwal select,
@@ -431,7 +425,6 @@
   }
 }
 
-/* ========== Modal de Galeria de Fotos ========== */
 .photo-gallery-modal {
   border-radius: 16px !important;
   overflow: hidden !important;
@@ -462,7 +455,6 @@
   color: #ffffff !important;
 }
 
-/* ========== Modal de Visualização de Produto ========== */
 .modal-view-container {
   display: flex;
   gap: 20px;

@@ -8,7 +8,7 @@ class Produto{
         global $conn;
         $msg = "";
 
-        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,ranking.nome As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos,utilizadores,ranking WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id AND utilizadores.ranking_id = ranking.id";
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*, Produtos.ativo AS status, utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,ranking.nome As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos,utilizadores,ranking WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id AND utilizadores.ranking_id = ranking.id";
 
         $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = $ID_Produto";
 
@@ -27,7 +27,7 @@ class Produto{
             while ($rowProduto = $result->fetch_assoc()) {
                 // Galeria de imagens - Coluna Esquerda
                 $msg .= "<div class='col-lg-6'>";
-                $msg .= "<div class='position-relative' style='border-radius: 20px; overflow: hidden; background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06);'>";
+                $msg .= "<div class='position-relative' style='overflow: hidden;'>";
 
                 // Botão de favorito modernizado
                 if(isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2) {
@@ -111,7 +111,7 @@ class Produto{
                         $msg .= "<button class='btn py-3 px-4 fw-semibold' onclick='ErrorSession2()' style='background: white; color: #3cb371; border: 2px solid #3cb371; border-radius: 10px; transition: all 0.3s ease;' onmouseover='this.style.background=\"#3cb371\"; this.style.color=\"white\"' onmouseout='this.style.background=\"white\"; this.style.color=\"#3cb371\"'>";
                         $msg .= "<i class='bi bi-chat-dots-fill'></i></button>";
                     } else {
-                        $msg .= "<a href='ChatAnunciante.php?id=".$rowProduto['Produto_id']."&nome=".$rowProduto['IdUtilizador']."'>";
+                        $msg .= "<a href='ChatCliente.php?vendedor=".$rowProduto['IdUtilizador']."&produto=".$rowProduto['Produto_id']."'>";
                         $msg .= "<button class='btn py-3 px-4 fw-semibold' style='background: white; color: #3cb371; border: 2px solid #3cb371; border-radius: 10px; transition: all 0.3s ease;' onmouseover='this.style.background=\"#3cb371\"; this.style.color=\"white\"' onmouseout='this.style.background=\"white\"; this.style.color=\"#3cb371\"'>";
                         $msg .= "<i class='bi bi-chat-dots-fill'></i></button></a>";
                     }
