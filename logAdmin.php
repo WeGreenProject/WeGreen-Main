@@ -61,12 +61,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="fornecedores.php">
-                            <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                            <span class="nav-text">Gestão de Fornecedores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link active" href="logAdmin.php">
                             <span class="nav-icon"><i class="fas fa-history"></i></span>
                             <span class="nav-text">Logs do Sistema</span>
