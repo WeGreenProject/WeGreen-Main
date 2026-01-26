@@ -39,4 +39,10 @@ if ($_POST['op'] == 4) {
     $resp = $func->pesquisarChat($_POST['pesquisa'], $_SESSION['utilizador']);
     echo $resp;
 }
+
+// op=5: Buscar dados do vendedor para iniciar conversa
+if ($_POST['op'] == 5) {
+    $resp = $func->getDadosVendedor($_POST['vendedorId']);
+    echo $resp;
+}
 ?>

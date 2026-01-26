@@ -928,22 +928,23 @@ function getEncomendas($ID_User) {
                     e.data_envio,
                     e.estado,
                     e.morada,
+                    e.morada_completa,
+                    e.nome_destinatario,
+                    e.tipo_entrega,
                     e.codigo_rastreio,
                     u.nome AS cliente_nome,
                     u.email AS cliente_email,
-                    GROUP_CONCAT(DISTINCT p.nome SEPARATOR ', ') AS produto_nome,
-                    MIN(p.foto) AS produto_foto,
-                    SUM(v.quantidade) AS quantidade_total,
+                    t.nome AS transportadora_nome,
                     SUM(v.valor) AS valor_total,
-                    SUM(v.lucro) AS lucro_total,
-                    t.nome AS transportadora_nome
+                    SUM(v.lucro) AS lucro_total
                 FROM Encomendas e
                 INNER JOIN Utilizadores u ON e.cliente_id = u.id
-                LEFT JOIN Produtos p ON e.produto_id = p.Produto_id
                 LEFT JOIN Vendas v ON e.id = v.encomenda_id
                 LEFT JOIN Transportadora t ON e.transportadora_id = t.id
                 WHERE e.anunciante_id = $ID_User
-                GROUP BY e.codigo_encomenda
+                GROUP BY e.id, e.codigo_encomenda, e.payment_id, e.payment_method, e.payment_status,
+                         e.data_envio, e.estado, e.morada, e.morada_completa, e.nome_destinatario,
+                         e.tipo_entrega, e.codigo_rastreio, u.nome, u.email, t.nome
                 ORDER BY e.data_envio DESC";
 
         $result = $conn->query($sql);
@@ -953,6 +954,28 @@ function getEncomendas($ID_User) {
             $valor_bruto = (float)$row['valor_total'];
             $comissao = $valor_bruto * 0.06;
             $lucro_liquido = $valor_bruto - $comissao;
+
+            // Buscar produtos da encomenda
+            $sql_produtos = "SELECT p.nome, p.foto, v.quantidade
+                            FROM Vendas v
+                            INNER JOIN Produtos p ON v.produto_id = p.Produto_id
+                            WHERE v.encomenda_id = ?";
+            $stmt_produtos = $conn->prepare($sql_produtos);
+            $stmt_produtos->bind_param("i", $row['id']);
+            $stmt_produtos->execute();
+            $result_produtos = $stmt_produtos->get_result();
+
+            $produtos = [];
+            $quantidade_total = 0;
+            while ($produto = $result_produtos->fetch_assoc()) {
+                $produtos[] = [
+                    'nome' => $produto['nome'],
+                    'foto' => $produto['foto'],
+                    'quantidade' => (int)$produto['quantidade']
+                ];
+                $quantidade_total += (int)$produto['quantidade'];
+            }
+            $stmt_produtos->close();
 
             $encomendas[] = [
                 'id' => (int)$row['id'],
@@ -964,12 +987,14 @@ function getEncomendas($ID_User) {
                 'data_completa' => $row['data_envio'],
                 'estado' => $row['estado'],
                 'morada' => $row['morada'],
+                'morada_completa' => $row['morada_completa'] ?: $row['morada'],
+                'nome_destinatario' => $row['nome_destinatario'] ?: $row['cliente_nome'],
+                'tipo_entrega' => $row['tipo_entrega'] ?: 'domicilio',
                 'codigo_rastreio' => $row['codigo_rastreio'],
                 'cliente_nome' => $row['cliente_nome'],
                 'cliente_email' => $row['cliente_email'],
-                'produto_nome' => $row['produto_nome'],
-                'produto_foto' => $row['produto_foto'],
-                'quantidade' => (int)$row['quantidade_total'],
+                'produtos' => $produtos,  // Array de produtos
+                'quantidade' => $quantidade_total,
                 'valor' => $valor_bruto,
                 'comissao' => $comissao,
                 'lucro_liquido' => $lucro_liquido,
@@ -1173,6 +1198,133 @@ function getEncomendas($ID_User) {
         $stmt->close();
 
         return json_encode($historico);
+    }
+
+    function ativarPlanoPago($ID_User, $plano_id) {
+        global $conn;
+
+        // Verificar se o plano existe e e pago
+        $sql = "SELECT nome, preco FROM Planos WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $plano_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            $stmt->close();
+            return json_encode(['success' => false, 'message' => 'Plano nao encontrado']);
+        }
+
+        $plano = $result->fetch_assoc();
+        $stmt->close();
+
+        // Calcular data de expiracao (30 dias a partir de agora)
+        $data_expiracao = date('Y-m-d H:i:s', strtotime('+30 days'));
+
+        // Atualizar usuario com novo plano e data de expiracao
+        $sql = "UPDATE Utilizadores SET plano_id = ?, data_expiracao_plano = ?, ultimo_email_expiracao = NULL WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("isi", $plano_id, $data_expiracao, $ID_User);
+
+        if ($stmt->execute()) {
+            // Atualizar sessao
+            $_SESSION['plano'] = $plano['nome'];
+
+            // Enviar email de confirmacao
+            $this->enviarEmailAtivacaoPlano($ID_User, $plano['nome'], $data_expiracao);
+
+            $stmt->close();
+            return json_encode([
+                'success' => true,
+                'message' => 'Plano ativado com sucesso!',
+                'plano' => $plano['nome'],
+                'data_expiracao' => $data_expiracao
+            ]);
+        }
+
+        $stmt->close();
+        return json_encode(['success' => false, 'message' => 'Erro ao ativar plano']);
+    }
+
+    function getInfoExpiracaoPlano($ID_User) {
+        global $conn;
+
+        $sql = "SELECT u.data_expiracao_plano, p.nome AS plano_nome, p.preco
+                FROM Utilizadores u
+                LEFT JOIN Planos p ON u.plano_id = p.id
+                WHERE u.id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $data_expiracao = $row['data_expiracao_plano'];
+            $plano_nome = $row['plano_nome'];
+            $preco = $row['preco'];
+
+            $dias_restantes = null;
+            $status_plano = 'gratuito';
+
+            if ($data_expiracao && $preco > 0) {
+                $agora = new DateTime();
+                $expira = new DateTime($data_expiracao);
+                $diff = $agora->diff($expira);
+
+                if ($expira < $agora) {
+                    $dias_restantes = 0;
+                    $status_plano = 'expirado';
+                } else {
+                    $dias_restantes = $diff->days;
+                    $status_plano = 'ativo';
+                }
+            }
+
+            $stmt->close();
+            return json_encode([
+                'success' => true,
+                'plano_nome' => $plano_nome,
+                'data_expiracao' => $data_expiracao,
+                'dias_restantes' => $dias_restantes,
+                'status_plano' => $status_plano
+            ]);
+        }
+
+        $stmt->close();
+        return json_encode(['success' => false, 'message' => 'Usuario nao encontrado']);
+    }
+
+    private function enviarEmailAtivacaoPlano($ID_User, $plano_nome, $data_expiracao) {
+        global $conn;
+
+        // Buscar dados do usuario
+        $sql = "SELECT nome, email FROM Utilizadores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            $emailService = new EmailService();
+
+            $data_formatada = date('d/m/Y', strtotime($data_expiracao));
+
+            $assunto = "Plano $plano_nome Ativado com Sucesso - WeGreen";
+            $corpo = "
+                <h2 style='color: #3cb371;'>Plano Ativado!</h2>
+                <p>Ola {$user['nome']},</p>
+                <p>O seu plano <strong>$plano_nome</strong> foi ativado com sucesso!</p>
+                <p><strong>Data de expiracao:</strong> $data_formatada</p>
+                <p>Aproveite todas as funcionalidades do seu plano.</p>
+                <p>Equipa WeGreen</p>
+            ";
+
+            $emailService->enviarEmail($user['email'], $assunto, $corpo);
+        }
+
+        $stmt->close();
     }
 
 }

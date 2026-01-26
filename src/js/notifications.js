@@ -22,10 +22,22 @@ function atualizarNotificacoes() {
         const count = parseInt(response.count);
 
         console.log("[Notificações] Contagem:", count);
+        console.log(
+          "[Notificações] Badge encontrado:",
+          badge.length,
+          "elemento(s)",
+        );
+
         if (count > 0) {
-          badge.text(count > 99 ? "99+" : count).show();
+          badge
+            .text(count > 99 ? "99+" : count)
+            .show()
+            .css("display", "inline-block");
+          console.log("[Notificações] Badge mostrado com contagem:", count);
         } else {
-          badge.hide();
+          // Forçar hide com CSS inline para garantir
+          badge.text("").hide().css({ display: "none", visibility: "hidden" });
+          console.log("[Notificações] Badge escondido (count = 0)");
         }
       } else {
         console.warn("[Notificações] Resposta sem sucesso:", response.message);
@@ -49,10 +61,15 @@ function carregarNotificacoes() {
     method: "GET",
     dataType: "json",
     success: function (response) {
+      console.log("[Notificações] Resposta bruta:", JSON.stringify(response));
       console.log("[Notificações] Lista recebida:", response);
       if (response.success) {
         notificationsCache = response.data;
-        console.log("[Notificações] Total de itens:", response.data.length);
+        console.log(
+          "[Notificações] Total de itens:",
+          response.data ? response.data.length : 0,
+        );
+        console.log("[Notificações] Dados:", response.data);
         renderizarNotificacoes(response.data);
       } else {
         console.warn("[Notificações] Erro ao listar:", response.message);
@@ -73,8 +90,14 @@ function carregarNotificacoes() {
  */
 function renderizarNotificacoes(notificacoes) {
   const container = $("#notificationsList");
+  console.log(
+    "[Notificações] Renderizando",
+    notificacoes ? notificacoes.length : 0,
+    "notificações",
+  );
 
   if (!notificacoes || notificacoes.length === 0) {
+    console.log("[Notificações] Mostrando mensagem 'sem notificações'");
     container.html(`
             <div class="notifications-empty">
                 <i class="fas fa-bell-slash"></i>
@@ -200,13 +223,49 @@ function abrirNotificacao(tipo, notifId, link) {
  * Marcar todas como lidas
  */
 function marcarTodasComoLidas() {
-  $.post("src/controller/controllerNotifications.php", {
-    op: 4,
-  }).done(function (response) {
-    if (response.success) {
-      atualizarNotificacoes();
-      carregarNotificacoes();
-    }
+  console.log("[Notificações] Marcando todas como lidas...");
+  console.log(
+    "[Notificações] Notificações em cache:",
+    notificationsCache.length,
+  );
+
+  $.ajax({
+    url: "src/controller/controllerNotifications.php",
+    method: "POST",
+    data: { op: 4 },
+    dataType: "json",
+    success: function (response) {
+      console.log(
+        "[Notificações] Resposta marcar todas (raw):",
+        JSON.stringify(response),
+      );
+      console.log("[Notificações] Resposta marcar todas:", response);
+      if (response && response.success) {
+        console.log("[Notificações] Todas marcadas com sucesso!");
+        // Limpar cache local
+        notificationsCache = [];
+        // Atualizar interface
+        atualizarNotificacoes();
+        carregarNotificacoes();
+        // Fechar dropdown após marcar
+        setTimeout(fecharNotificationsDropdown, 500);
+      } else {
+        console.error(
+          "[Notificações] Erro ao marcar todas:",
+          response ? response.message : "resposta vazia",
+        );
+        alert(
+          "Erro ao marcar notificações como lidas: " +
+            (response ? response.message : "Resposta inválida"),
+        );
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error("[Notificações] Erro AJAX ao marcar todas:", error);
+      console.error("[Notificações] Status:", status);
+      console.error("[Notificações] Resposta:", xhr.responseText);
+      alert("Erro ao marcar notificações: " + error);
+    },
   });
 }
 

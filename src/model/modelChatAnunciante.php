@@ -2,199 +2,318 @@
 
 require_once 'connection.php';
 
-class ChatAnunciante{
+class ChatAnunciante {
 
-    function ProdutoChatInfo($ID_Produto){
+    // Listar clientes e admins com quem o anunciante tem conversas
+    function getSideBar($anuncianteId) {
         global $conn;
         $msg = "";
-        $row = "";
 
-        $sql = "SELECT * from Produtos where Produto_id =".$ID_Produto;
+        // Buscar clientes e admins com quem o anunciante já conversou
+        $sql = "SELECT DISTINCT
+            u.id AS IdCliente,
+            u.nome,
+            u.foto,
+            m.mensagem AS UltimaMensagem,
+            m.created_at
+        FROM Utilizadores u
+        INNER JOIN MensagensAdmin m ON (
+            (m.remetente_id = u.id AND m.destinatario_id = ?)
+            OR
+            (m.remetente_id = ? AND m.destinatario_id = u.id)
+        )
+        INNER JOIN Tipo_Utilizadores tu ON u.tipo_utilizador_id = tu.id
+        WHERE tu.descricao IN ('Cliente', 'Administrador')
+        AND m.created_at = (
+            SELECT MAX(m2.created_at)
+            FROM MensagensAdmin m2
+            WHERE (
+                (m2.remetente_id = u.id AND m2.destinatario_id = ?)
+                OR
+                (m2.remetente_id = ? AND m2.destinatario_id = u.id)
+            )
+        )
+        ORDER BY m.created_at DESC";
 
-        $result = $conn->query($sql);
-
-        if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-
-            $msg .= "<div class='product-sidebar'>";
-
-            $msg .= "<img src='".$row["foto"]."' alt='Produto' class='product-image'>";
-
-            $msg .= "<h4 class='product-title'>".$row["nome"]."</h4>";
-            $msg .= "<p class='text-muted mb-2'>Por <strong>Maria Santos</strong></p>";
-            $msg .= "<p class='product-price'>".$row["preco"]."€</p>";
-
-            $msg .= "<p class='text-muted small mb-3'>";
-            $msg .= "".$row["descricao"]."";
-            $msg .= "</p>";
-
-            $msg .= "<button class='btn btn-dark w-100 rounded-pill mb-2'>";
-            $msg .= "<i class='bi bi-eye me-2'></i>Ver Produto Completo";
-            $msg .= "</button>";
-
-            $msg .= "</div>";
-            }
-        }
-        $conn->close();
-
-        return ($msg);
-
-    }
-        function PerfilDoAnunciante($ID_Anunciante){
-        global $conn;
-        $msg = "";
-        $row = "";
-
-        $sql = "SELECT * from utilizadores where id =".$ID_Anunciante;
-
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iiii", $anuncianteId, $anuncianteId, $anuncianteId, $anuncianteId);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                $msg  = "<img src='".$row["foto"]."' ";
-                $msg .= "alt='Vendedor' class='seller-avatar'>";
+            while ($row = $result->fetch_assoc()) {
+                $iniciais = $this->getIniciais($row['nome']);
+                $ultimaMensagem = strlen($row['UltimaMensagem']) > 40
+                    ? substr($row['UltimaMensagem'], 0, 40) . '...'
+                    : $row['UltimaMensagem'];
 
-                $msg .= "<div class='seller-info flex-grow-1'>";
-                $msg .= "<h5>".$row["nome"]."</h5>";
+                $hora = date("H:i", strtotime($row['created_at']));
+
+                $msg .= "<div class='conversation-item' data-cliente-id='".$row['IdCliente']."' onclick='selecionarCliente(".$row['IdCliente'].", \"".$row['nome']."\")'>";
+
+                if (!empty($row['foto']) && file_exists($row['foto'])) {
+                    $msg .= "<img src='".$row['foto']."' class='conversation-avatar' alt='Cliente'>";
+                } else {
+                    $msg .= "<div class='conversation-avatar'>".$iniciais."</div>";
+                }
+
+                $msg .= "<div class='conversation-details'>";
+                $msg .= "<div class='conversation-name'>".$row['nome']."</div>";
+                $msg .= "<div class='conversation-last-message'>".$ultimaMensagem."</div>";
                 $msg .= "</div>";
-
-                $msg .= "<button class='btn btn-link text-dark' title='Mais opções'>";
-                $msg .= "<i class='bi bi-three-dots-vertical fs-5'></i>";
-                $msg .= "</button>";
+                $msg .= "<div class='conversation-meta'>";
+                $msg .= "<span class='conversation-time'>".$hora."</span>";
+                $msg .= "</div>";
+                $msg .= "</div>";
             }
+        } else {
+            $msg .= "<div style='padding: 40px 20px; text-align: center; color: #94a3b8;'>";
+            $msg .= "<i class='fas fa-inbox' style='font-size: 48px; margin-bottom: 16px; display: block;'></i>";
+            $msg .= "<p style='font-size: 14px;'>Nenhuma conversa ainda</p>";
+            $msg .= "<p style='font-size: 12px; margin-top: 8px;'>Aguarde mensagens de clientes ou administradores</p>";
+            $msg .= "</div>";
         }
-        $conn->close();
 
-        return ($msg);
-
+        $stmt->close();
+        return $msg;
     }
-     function PerfilDoUtilizador($ID_User){
+
+    // Buscar mensagens com cliente específico
+    function getConversas($anuncianteId, $clienteId) {
         global $conn;
         $msg = "";
-        $row = "";
 
-        $sql = "SELECT * FROM Utilizadores WHERE id = '" . $ID_User . "'";
-        $result = $conn->query($sql);
+        // Buscar fotos dos participantes
+        $fotoAnunciante = $this->getFotoUsuario($anuncianteId);
+        $fotoCliente = $this->getFotoUsuario($clienteId);
+        $nomeAnunciante = $this->getNomeUsuario($anuncianteId);
+        $nomeCliente = $this->getNomeUsuario($clienteId);
 
-        if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                $msg  = "<a class='nav-link dropdown-toggle d-flex align-items-center' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'>";
-                $msg .= "<img src='".$row["foto"]."' class='rounded-circle profile-img-small me-1' alt='Perfil do Utilizador'>";
-                $msg .= "</a>";
-                $msg .= "<ul class='dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3' id='PerfilTipo'>";
-                $msg .= "</ul>";
+        $inicialAnunciante = $this->getIniciais($nomeAnunciante);
+        $inicialCliente = $this->getIniciais($nomeCliente);
 
-            }
+        // Buscar todas as mensagens entre anunciante e cliente
+        $sql = "SELECT
+            m.mensagem,
+            m.remetente_id,
+            m.created_at
+        FROM MensagensAdmin m
+        WHERE (
+            (m.remetente_id = ? AND m.destinatario_id = ?)
+            OR
+            (m.remetente_id = ? AND m.destinatario_id = ?)
+        )
+        ORDER BY m.created_at ASC";
 
-        }
-        else
-        {
-                $msg  = "<a class='nav-link dropdown-toggle d-flex align-items-center' href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false'>";
-                $msg .= "<img src='src/img/pexels-beccacorreiaph-31095884.jpg' class='rounded-circle profile-img-small me-1' alt='Perfil do Utilizador'>";
-                $msg .= "</a>";
-                $msg .= "<ul class='dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-3' id='PerfilTipo'>";
-                $msg .= "</ul>";
-        }
-        $conn->close();
-
-        return ($msg);
-
-    }
-function ConsumidorRes($ID_Anunciante, $ID_Consumidor, $mensagem,$ID_Produto){
-    global $conn;
-
-    $stmt = $conn->prepare("INSERT INTO Mensagens (remetente_id,destinatario_id,produto_id,mensagem) VALUES (?, ?, ?,?)");
-    $stmt->bind_param("iiis", $ID_Anunciante, $ID_Consumidor,$ID_Produto,$mensagem);
-
-    if($stmt->execute()){
-        $flag = true;
-        $msg = "Registado com sucesso!";
-    } else {
-        $flag = false;
-        $msg = "Erro ao registar: " . $stmt->error;
-    }
-
-    $resp = json_encode([
-        "flag" => $flag,
-        "msg" => $msg
-    ]);
-
-    $stmt->close();
-    $conn->close();
-
-    return $resp;
-}
-function ChatMensagens($ID_Anunciante,$ID_Consumidor,$ID_Produto){
-        global $conn;
-        $msg = "";
-        $row = "";
-    $sqlFoto2 = "SELECT foto As PerfilAnunciante FROM Utilizadores WHERE id = '" . $ID_Anunciante . "'";
-    $resultFoto2 = $conn->query($sqlFoto2);
-    $fotoPerfil2 = "";
-
-    if ($resultFoto2->num_rows > 0) {
-        $rowFoto2 = $resultFoto2->fetch_assoc();
-        $fotoPerfil2 = $rowFoto2["PerfilAnunciante"];
-    }
-
-
-    $sqlFoto = "SELECT foto FROM Utilizadores WHERE id = '" . $ID_Consumidor . "'";
-    $resultFoto = $conn->query($sqlFoto);
-    $fotoPerfil = "";
-
-    if ($resultFoto->num_rows > 0) {
-        $rowFoto = $resultFoto->fetch_assoc();
-        $fotoPerfil = $rowFoto["foto"];
-    }
-
-        $sql = "SELECT * FROM Mensagens
-WHERE
-    (
-        (remetente_id = '" . $ID_Anunciante . "' AND destinatario_id = '" . $ID_Consumidor . "')
-        OR
-        (remetente_id = '" . $ID_Consumidor . "' AND destinatario_id = '" . $ID_Anunciante . "')
-    )
-    AND Produto_id = $ID_Produto
-ORDER BY id ASC;";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iiii", $anuncianteId, $clienteId, $clienteId, $anuncianteId);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                $hora = date("H:i", strtotime($row["created_at"]));
-                if ($row["remetente_id"] == $ID_Consumidor) {
-                    $msg .= "<div class='message-wrapper sent'>";
+            while ($row = $result->fetch_assoc()) {
+                $hora = date("H:i", strtotime($row['created_at']));
+                $isMensagemEnviada = ($row['remetente_id'] == $anuncianteId);
+
+                if ($isMensagemEnviada) {
+                    // Mensagem enviada pelo anunciante
+                    $msg .= "<div class='message sent'>";
+                    if (!empty($fotoAnunciante)) {
+                        $msg .= "<div class='message-avatar'><img src='".$fotoAnunciante."' alt='Anunciante'></div>";
+                    } else {
+                        $msg .= "<div class='message-avatar'>".$inicialAnunciante."</div>";
+                    }
                     $msg .= "<div class='message-content'>";
-                    $msg .= "<div class='message-bubble'>";
-                    $msg .= "".$row["mensagem"]."";
+                    $msg .= "<div class='message-bubble'>".$row['mensagem']."</div>";
+                    $msg .= "<div class='message-time'>".$hora."</div>";
                     $msg .= "</div>";
-                    $msg .= "<span class='message-time'>".$hora."</span>";
                     $msg .= "</div>";
-                    $msg .= "<img src='$fotoPerfil' alt='Você' class='message-avatar' alt='Você' class='message-avatar'>";
-                    $msg .= "</div>";
-                }
-                else
-                {
-                    $msg .= "<div class='message-wrapper received'>";
-                    $msg .= "<img src='$fotoPerfil2' alt='Vendedor' class='message-avatar'>";
+                } else {
+                    // Mensagem recebida do cliente
+                    $msg .= "<div class='message'>";
+                    if (!empty($fotoCliente)) {
+                        $msg .= "<div class='message-avatar'><img src='".$fotoCliente."' alt='Cliente'></div>";
+                    } else {
+                        $msg .= "<div class='message-avatar'>".$inicialCliente."</div>";
+                    }
                     $msg .= "<div class='message-content'>";
-                    $msg .= "<div class='message-bubble'>";
-                    $msg .= "".$row["mensagem"]."";
-                    $msg .= "</div>";
-                    $msg .= " <span class='message-time'>".$hora."</span>";
+                    $msg .= "<div class='message-bubble'>".$row['mensagem']."</div>";
+                    $msg .= "<div class='message-time'>".$hora."</div>";
                     $msg .= "</div>";
                     $msg .= "</div>";
                 }
             }
-
+        } else {
+            $msg .= "<div class='empty-chat'>";
+            $msg .= "<i class='fas fa-comments' style='font-size: 64px; color: #e0e0e0; margin-bottom: 16px;'></i>";
+            $msg .= "<h3>Nenhuma mensagem ainda</h3>";
+            $msg .= "<p>Envie uma mensagem para começar a conversa</p>";
+            $msg .= "</div>";
         }
-        else
-        {
-                $msg  = "";
+
+        $stmt->close();
+        return $msg;
+    }
+
+    // Enviar mensagem
+    function enviarMensagem($anuncianteId, $clienteId, $mensagem) {
+        global $conn;
+
+        $mensagem = trim($mensagem);
+
+        if (empty($mensagem)) {
+            return json_encode([
+                "flag" => false,
+                "msg" => "Mensagem vazia"
+            ]);
         }
-        $conn->close();
 
-        return ($msg);
+        $sql = "INSERT INTO MensagensAdmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iis", $anuncianteId, $clienteId, $mensagem);
 
+        if ($stmt->execute()) {
+            $flag = true;
+            $msg = "Mensagem enviada com sucesso!";
+        } else {
+            $flag = false;
+            $msg = "Erro ao enviar mensagem: " . $stmt->error;
+        }
+
+        $stmt->close();
+
+        return json_encode([
+            "flag" => $flag,
+            "msg" => $msg
+        ]);
+    }
+
+    // Pesquisar clientes
+    function pesquisarChat($pesquisa, $anuncianteId) {
+        global $conn;
+        $msg = "";
+
+        $searchTerm = "%".$pesquisa."%";
+
+        $sql = "SELECT DISTINCT
+            u.id AS IdCliente,
+            u.nome,
+            u.foto,
+            m.mensagem AS UltimaMensagem,
+            m.created_at
+        FROM Utilizadores u
+        INNER JOIN MensagensAdmin m ON (
+            (m.remetente_id = u.id AND m.destinatario_id = ?)
+            OR
+            (m.remetente_id = ? AND m.destinatario_id = u.id)
+        )
+        INNER JOIN Tipo_Utilizadores tu ON u.tipo_utilizador_id = tu.id
+        WHERE tu.descricao IN ('Cliente', 'Administrador')
+        AND u.nome LIKE ?
+        AND m.created_at = (
+            SELECT MAX(m2.created_at)
+            FROM MensagensAdmin m2
+            WHERE (
+                (m2.remetente_id = u.id AND m2.destinatario_id = ?)
+                OR
+                (m2.remetente_id = ? AND m2.destinatario_id = u.id)
+            )
+        )
+        ORDER BY m.created_at DESC";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iisii", $anuncianteId, $anuncianteId, $searchTerm, $anuncianteId, $anuncianteId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $iniciais = $this->getIniciais($row['nome']);
+                $ultimaMensagem = strlen($row['UltimaMensagem']) > 40
+                    ? substr($row['UltimaMensagem'], 0, 40) . '...'
+                    : $row['UltimaMensagem'];
+
+                $hora = date("H:i", strtotime($row['created_at']));
+
+                $msg .= "<div class='conversation-item' data-cliente-id='".$row['IdCliente']."' onclick='selecionarCliente(".$row['IdCliente'].", \"".$row['nome']."\")'>";
+
+                if (!empty($row['foto']) && file_exists($row['foto'])) {
+                    $msg .= "<img src='".$row['foto']."' class='conversation-avatar' alt='Cliente'>";
+                } else {
+                    $msg .= "<div class='conversation-avatar'>".$iniciais."</div>";
+                }
+
+                $msg .= "<div class='conversation-details'>";
+                $msg .= "<div class='conversation-name'>".$row['nome']."</div>";
+                $msg .= "<div class='conversation-last-message'>".$ultimaMensagem."</div>";
+                $msg .= "</div>";
+                $msg .= "<div class='conversation-meta'>";
+                $msg .= "<span class='conversation-time'>".$hora."</span>";
+                $msg .= "</div>";
+                $msg .= "</div>";
+            }
+        } else {
+            $msg .= "<div style='padding: 40px 20px; text-align: center; color: #94a3b8;'>";
+            $msg .= "<i class='fas fa-search' style='font-size: 48px; margin-bottom: 16px; display: block;'></i>";
+            $msg .= "<p style='font-size: 14px;'>Nenhum resultado encontrado</p>";
+            $msg .= "</div>";
+        }
+
+        $stmt->close();
+        return $msg;
+    }
+
+    // Funções auxiliares
+    private function getFotoUsuario($userId) {
+        global $conn;
+        $sql = "SELECT foto FROM Utilizadores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            return $row['foto'];
+        }
+
+        $stmt->close();
+        return "";
+    }
+
+    private function getNomeUsuario($userId) {
+        global $conn;
+        $sql = "SELECT nome FROM Utilizadores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $stmt->close();
+            return $row['nome'];
+        }
+
+        $stmt->close();
+        return "Usuário";
+    }
+
+    private function getIniciais($nome) {
+        if (empty($nome)) return "U";
+
+        $palavras = explode(' ', trim($nome));
+        $iniciais = '';
+
+        foreach ($palavras as $palavra) {
+            if (!empty($palavra)) {
+                $iniciais .= strtoupper(substr($palavra, 0, 1));
+                if (strlen($iniciais) >= 2) break;
+            }
+        }
+
+        return !empty($iniciais) ? $iniciais : "U";
     }
 }
 ?>

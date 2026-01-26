@@ -108,18 +108,31 @@ body {
   border-radius: 12px;
   margin-bottom: 25px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 100%;
 }
 
 .filters-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 15px;
   align-items: end;
+  width: 100%;
 }
 
 /* Grid específico para página de produtos (6 colunas) */
 #products .filters-grid {
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+}
+
+/* Grid específico para encomendas (4 itens) */
+#sales .filters-grid {
+  grid-template-columns: 1fr 1fr 1fr auto;
+}
+
+/* Grid específico para devoluções (6 itens) */
+#devolucoes .filters-grid {
+  grid-template-columns: repeat(5, 1fr) auto;
 }
 
 .filter-item label {
@@ -590,7 +603,7 @@ body {
     0 2px 6px rgba(0, 0, 0, 0.04);
   border: none;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 600px;
+  min-height: 420px;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
@@ -624,8 +637,8 @@ body {
 }
 
 .chart-card canvas {
-  max-height: 440px;
-  min-height: 400px;
+  max-height: 360px;
+  min-height: 340px;
 }
 
 /* ========== Produtos Recentes - Layout de Cards Modernos ========== */
@@ -1235,4 +1248,67 @@ body {
     width: 100% !important;
     justify-content: center !important;
   }
+}
+
+/* ========== Estilos para Expansão de Produtos nas Encomendas ========== */
+.produtos-expand-row {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-info[onclick] {
+  transition: background-color 0.2s ease;
+}
+
+.product-info[onclick]:hover {
+  background-color: #f0fdf4;
+  border-radius: 6px;
+}
+
+/* Scrollbar personalizado para área de produtos expandidos */
+.produtos-expand-row div[style*="overflow-y"] {
+  scrollbar-width: thin;
+  scrollbar-color: #3cb371 #f1f5f9;
+}
+
+.produtos-expand-row div[style*="overflow-y"]::-webkit-scrollbar {
+  width: 8px;
+}
+
+.produtos-expand-row div[style*="overflow-y"]::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.produtos-expand-row div[style*="overflow-y"]::-webkit-scrollbar-thumb {
+  background: #3cb371;
+  border-radius: 4px;
+}
+
+.produtos-expand-row div[style*="overflow-y"]::-webkit-scrollbar-thumb:hover {
+  background: #2e8b57;
+}
+
+/* ========== Estilos para Modal de Histórico ========== */
+.swal2-confirm-modern {
+  padding: 12px 28px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  transition: all 0.3s ease !important;
+}
+
+.swal2-confirm-modern:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3) !important;
 }

@@ -33,7 +33,20 @@ function login1() {
             if (redirectUrl) {
               window.location.href = redirectUrl;
             } else {
-              window.location.href = "index.html";
+              // Redirecionar baseado no tipo de utilizador
+              if (obj.tipo_utilizador == 1) {
+                // Admin
+                window.location.href = "DashboardAdmin.php";
+              } else if (obj.tipo_utilizador == 3) {
+                // Anunciante
+                window.location.href = "DashboardAnunciante.php";
+              } else if (obj.tipo_utilizador == 2) {
+                // Cliente
+                window.location.href = "DashboardCliente.php";
+              } else {
+                // Default
+                window.location.href = "index.html";
+              }
             }
           }, 2000);
         }

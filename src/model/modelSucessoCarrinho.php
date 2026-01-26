@@ -91,8 +91,17 @@ class SucessoCarrinho {
             $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
-                // Gerar código único
+                // Gerar código único da encomenda
                 $codigo_encomenda = 'WG' . time() . rand(100, 999);
+
+                // Gerar código de confirmação de receção (6 caracteres alfanuméricos)
+                $codigo_confirmacao = 'CONF-' . strtoupper(substr(md5(uniqid($codigo_encomenda, true)), 0, 6));
+
+                // Calcular prazo estimado de entrega baseado na transportadora
+                // 2 = DPD (2 dias), outros = CTT/UPS (4 dias)
+                $dias_prazo = ($transportadora_id == 2) ? 2 : 4;
+                $prazo_estimado = date('Y-m-d', strtotime("+{$dias_prazo} days"));
+
                 $total = $session->amount_total / 100;
                 $produtos_nomes = array();
 
@@ -104,9 +113,25 @@ class SucessoCarrinho {
                     $anunciante_id = $row['anunciante_id'];
                     $produtos_nomes[] = $row['nome'];
 
-                    // Inserir encomenda com dados Stripe e informações de entrega
-                    $sql_encomenda = "INSERT INTO Encomendas (codigo_encomenda, payment_id, payment_method, payment_status, cliente_id, anunciante_id, transportadora_id, produto_id, data_envio, morada, tipo_entrega, ponto_recolha_id, nome_ponto_recolha, morada_ponto_recolha, morada_completa, nome_destinatario, estado, plano_rastreio)
-                                      VALUES ('$codigo_encomenda', '$payment_intent_id', '$payment_method', '$payment_status', $utilizador_id, $anunciante_id, $transportadora_id, $produto_id, NOW(), '$morada', '$tipo_entrega', " . ($ponto_recolha_id ? "'$ponto_recolha_id'" : "NULL") . ", " . ($nome_ponto_recolha ? "'$nome_ponto_recolha'" : "NULL") . ", " . ($morada_ponto_recolha ? "'" . $conn->real_escape_string($morada_ponto_recolha) . "'" : "NULL") . ", '" . $conn->real_escape_string($morada_completa) . "', '" . $conn->real_escape_string($nome_destinatario) . "', 'Pendente', 'Básico')";
+                    // Inserir encomenda com código de confirmação e prazo estimado
+                    $sql_encomenda = "INSERT INTO Encomendas (
+                        codigo_encomenda, payment_id, payment_method, payment_status,
+                        cliente_id, anunciante_id, transportadora_id, produto_id,
+                        data_envio, morada, tipo_entrega, ponto_recolha_id,
+                        nome_ponto_recolha, morada_ponto_recolha, morada_completa,
+                        nome_destinatario, estado, plano_rastreio,
+                        codigo_confirmacao_recepcao, prazo_estimado_entrega, lembrete_confirmacao_enviado
+                    ) VALUES (
+                        '$codigo_encomenda', '$payment_intent_id', '$payment_method', '$payment_status',
+                        $utilizador_id, $anunciante_id, $transportadora_id, $produto_id,
+                        NOW(), '$morada', '$tipo_entrega', " . ($ponto_recolha_id ? "'$ponto_recolha_id'" : "NULL") . ",
+                        " . ($nome_ponto_recolha ? "'$nome_ponto_recolha'" : "NULL") . ",
+                        " . ($morada_ponto_recolha ? "'" . $conn->real_escape_string($morada_ponto_recolha) . "'" : "NULL") . ",
+                        '" . $conn->real_escape_string($morada_completa) . "',
+                        '" . $conn->real_escape_string($nome_destinatario) . "',
+                        'Pendente', 'Básico',
+                        '$codigo_confirmacao', '$prazo_estimado', 0
+                    )";
                     $conn->query($sql_encomenda);
                     $encomenda_id = $conn->insert_id;
 
@@ -142,7 +167,9 @@ class SucessoCarrinho {
                     'nome_ponto_recolha' => $nome_ponto_recolha,
                     'morada_ponto_recolha' => $morada_ponto_recolha,
                     'morada_completa' => $morada_completa,
-                    'nome_destinatario' => $nome_destinatario
+                    'nome_destinatario' => $nome_destinatario,
+                    'codigo_confirmacao_recepcao' => $codigo_confirmacao,
+                    'prazo_estimado_entrega' => $prazo_estimado
                 ];
 
                 $this->enviarEmailsConfirmacao(

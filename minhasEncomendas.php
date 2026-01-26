@@ -312,6 +312,11 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                         <button class="btn-action btn-primary" onclick="verDetalhes('${enc.codigo_encomenda}')">
                             <i class="fas fa-eye"></i> Ver Detalhes
                         </button>
+                        ${enc.estado.toLowerCase() === 'enviado' && enc.codigo_confirmacao_recepcao ? `
+                            <button class="btn-action btn-success" onclick="confirmarEntrega('${enc.codigo_confirmacao_recepcao}')" style="font-weight: bold;">
+                                <i class="fas fa-check-circle"></i> Confirmar Receção
+                            </button>
+                        ` : ''}
                         ${enc.estado.toLowerCase() === 'entregue' && !enc.devolucao_ativa ? `
                             <button class="btn-action btn-warning" onclick="abrirModalDevolucao('${enc.id}', '${enc.codigo_encomenda}', ${JSON.stringify(enc.produtos).replace(/"/g, '&quot;')})">
                                 <i class="fas fa-undo"></i> Solicitar Devolução
@@ -496,6 +501,46 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     $('#filterPeriod').val('');
     $('#sortBy').val('date-desc');
     renderizarEncomendas(todasEncomendas);
+  }
+
+  function confirmarEntrega(codigo) {
+    Swal.fire({
+      title: 'Confirmar Receção',
+      html: `
+        <div style="text-align: left; padding: 10px 0;">
+          <p style="margin-bottom: 15px; color: #4b5563;">Confirme que recebeu a sua encomenda usando o código:</p>
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+            <p style="margin: 0 0 8px 0; color: #92400e; font-weight: bold; font-size: 13px;">Código de Confirmação:</p>
+            <p style="margin: 0; font-size: 20px; font-weight: bold; color: #92400e; letter-spacing: 2px; font-family: monospace;">
+              ${codigo}
+            </p>
+          </div>
+          <p style="color: #6b7280; font-size: 14px; margin-bottom: 10px;">
+            <strong>O que acontece ao confirmar?</strong>
+          </p>
+          <ul style="color: #6b7280; font-size: 13px; margin-left: 20px;">
+            <li>Encomenda marcada como "Entregue"</li>
+            <li>Pagamento liberado para o vendedor</li>
+            <li>Poderá avaliar o produto</li>
+          </ul>
+          <p style="color: #dc2626; font-size: 13px; margin-top: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Só confirme se recebeu o produto em boas condições!</strong>
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3cb371',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: '<i class="fas fa-check"></i> Sim, recebi!',
+      cancelButtonText: 'Cancelar',
+      width: 550
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Redirecionar para página de confirmação com código pré-preenchido
+        window.location.href = `confirmar_entrega.php?cod=${codigo}`;
+      }
+    });
   }
 
   function comprarNovamente(codigo) {

@@ -180,6 +180,50 @@
                                 </ol>
                             </div>
 
+                            <!-- Código de Confirmação de Receção -->
+                            <?php if (isset($codigo_confirmacao_recepcao)): ?>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                                <tr>
+                                    <td style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b; padding: 25px; border-radius: 8px;">
+                                        <h3 style="margin: 0 0 12px 0; color: #92400e; font-size: 18px; display: flex; align-items: center;">
+                                            🔐 Código de Confirmação de Receção
+                                        </h3>
+                                        <p style="margin: 0 0 15px 0; color: #78350f; font-size: 14px; line-height: 1.6;">
+                                            Quando receber a sua encomenda, por favor confirme a receção usando o código abaixo.
+                                            Isto ajuda-nos a garantir que tudo correu bem e melhora a confiança no marketplace.
+                                        </p>
+                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td align="center" style="padding: 15px 0;">
+                                                    <div style="background: #ffffff; display: inline-block; padding: 15px 30px; border-radius: 8px; border: 2px dashed #f59e0b;">
+                                                        <p style="margin: 0 0 5px 0; color: #92400e; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                                                            Seu Código
+                                                        </p>
+                                                        <p style="margin: 0; font-size: 28px; font-weight: bold; color: #92400e; letter-spacing: 3px; font-family: 'Courier New', monospace;">
+                                                            <?php echo htmlspecialchars($codigo_confirmacao_recepcao); ?>
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 15px;">
+                                            <tr>
+                                                <td align="center">
+                                                    <a href="http://localhost/WeGreen-Main/confirmar_entrega.php?cod=<?php echo urlencode($codigo_confirmacao_recepcao); ?>"
+                                                       style="display: inline-block; background-color: #f59e0b; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-size: 15px; font-weight: bold;">
+                                                        ✓ Confirmar Receção Agora
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <p style="margin: 15px 0 0 0; color: #92400e; font-size: 12px; text-align: center; line-height: 1.5;">
+                                            💡 Também pode confirmar em "Minhas Encomendas" após receber
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <?php endif; ?>
+
                             <!-- Botão -->
                             <table width="100%" cellpadding="0" cellspacing="0">
                                 <tr>

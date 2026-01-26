@@ -1,5 +1,5 @@
 <?php
-require_once 'connection.php';
+require_once __DIR__ . '/../../connection.php';
 
 class ModelNotifications {
     private $conn;
@@ -80,6 +80,10 @@ class ModelNotifications {
      * @return array
      */
     public function listarNotificacoesAnunciante($anunciante_id) {
+        error_log("[ModelNotifications] === INÍCIO listarNotificacoesAnunciante ===");
+        error_log("[ModelNotifications] Anunciante ID: $anunciante_id");
+        error_log("[ModelNotifications] Conexão ativa: " . ($this->conn ? 'SIM' : 'NÃO'));
+
         $notificacoes = [];
 
         // 1. Encomendas pendentes
@@ -88,11 +92,11 @@ class ModelNotifications {
                             e.codigo_encomenda,
                             e.estado,
                             e.data_envio,
-                            p.nome as produto_nome,
-                            u.nome as cliente_nome
+                            COALESCE(p.nome, 'Produto não encontrado') as produto_nome,
+                            COALESCE(u.nome, 'Cliente não encontrado') as cliente_nome
                           FROM Encomendas e
-                          INNER JOIN produtos p ON e.produto_id = p.Produto_id
-                          INNER JOIN Utilizadores u ON e.cliente_id = u.id
+                          LEFT JOIN produtos p ON e.produto_id = p.Produto_id
+                          LEFT JOIN Utilizadores u ON e.cliente_id = u.id
                           LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'encomenda' AND nl.referencia_id = e.id)
                           WHERE p.anunciante_id = ?
                           AND e.estado IN ('Pendente', 'Processando')
@@ -100,21 +104,33 @@ class ModelNotifications {
                           ORDER BY e.data_envio DESC
                           LIMIT 5";
 
+        error_log("[ModelNotifications] Query Encomendas preparada");
         $stmt = $this->conn->prepare($sql_encomendas);
+        if (!$stmt) {
+            error_log("[ModelNotifications] ERRO prepare listar encomendas: " . $this->conn->error);
+            error_log("[ModelNotifications] SQL: $sql_encomendas");
+            return $notificacoes;
+        }
         $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+        error_log("[ModelNotifications] Executando query encomendas...");
         $stmt->execute();
         $result = $stmt->get_result();
 
+        $encomendas_encontradas = 0;
         while ($row = $result->fetch_assoc()) {
+            $encomendas_encontradas++;
+            error_log("[ModelNotifications] Encomenda encontrada: ID=" . $row['id'] . ", Código=" . $row['codigo_encomenda']);
             $notificacoes[] = [
                 'tipo' => 'encomenda',
                 'id' => $row['id'],
                 'titulo' => 'Encomenda ' . $row['estado'],
                 'mensagem' => 'Encomenda #' . $row['codigo_encomenda'] . ' - ' . $row['produto_nome'],
                 'data' => $row['data_envio'],
-                'link' => 'gestaoEncomendasAnunciante.php'
+                'link' => 'gestaoEncomendasAnunciante.php',
+                'lida' => false
             ];
         }
+        error_log("[ModelNotifications] Encomendas listadas: $encomendas_encontradas");
 
         // 2. Devoluções (solicitadas e enviadas)
         $sql_devolucoes = "SELECT
@@ -123,11 +139,11 @@ class ModelNotifications {
                             d.estado,
                             d.data_solicitacao,
                             d.codigo_rastreio,
-                            p.nome as produto_nome,
-                            u.nome as cliente_nome
+                            COALESCE(p.nome, 'Produto não encontrado') as produto_nome,
+                            COALESCE(u.nome, 'Cliente não encontrado') as cliente_nome
                           FROM devolucoes d
-                          INNER JOIN produtos p ON d.produto_id = p.Produto_id
-                          INNER JOIN Utilizadores u ON d.cliente_id = u.id
+                          LEFT JOIN produtos p ON d.produto_id = p.Produto_id
+                          LEFT JOIN Utilizadores u ON d.cliente_id = u.id
                           LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
                           WHERE d.anunciante_id = ?
                           AND d.estado IN ('solicitada', 'enviada')
@@ -135,12 +151,23 @@ class ModelNotifications {
                           ORDER BY d.data_solicitacao DESC
                           LIMIT 10";
 
+        error_log("[ModelNotifications] Query Devoluções preparada");
         $stmt = $this->conn->prepare($sql_devolucoes);
+        if (!$stmt) {
+            error_log("[ModelNotifications] ERRO prepare listar devoluções: " . $this->conn->error);
+            error_log("[ModelNotifications] SQL: $sql_devolucoes");
+            error_log("[ModelNotifications] Retornando com " . count($notificacoes) . " notificações (só encomendas)");
+            return $notificacoes;
+        }
         $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+        error_log("[ModelNotifications] Executando query devoluções...");
         $stmt->execute();
         $result = $stmt->get_result();
 
+        $devolucoes_encontradas = 0;
         while ($row = $result->fetch_assoc()) {
+            $devolucoes_encontradas++;
+            error_log("[ModelNotifications] Devolução encontrada: ID=" . $row['id'] . ", Código=" . $row['codigo_devolucao'] . ", Estado=" . $row['estado']);
             $icone = '📦';
             $titulo = 'Devolução Solicitada';
             $mensagem = 'Devolução #' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
@@ -163,16 +190,25 @@ class ModelNotifications {
                 'titulo' => $titulo,
                 'mensagem' => $mensagem,
                 'data' => $row['data_solicitacao'],
-                'link' => 'gestaoDevolucoesAnunciante.php'
+                'link' => 'gestaoDevolucoesAnunciante.php',
+                'lida' => false
             ];
         }
+        error_log("[ModelNotifications] Devoluções listadas: $devolucoes_encontradas");
 
         // Ordenar por data
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
 
-        return array_slice($notificacoes, 0, 10);
+        $total_notificacoes = count($notificacoes);
+        error_log("[ModelNotifications] Total após merge e sort: $total_notificacoes");
+
+        $final = array_slice($notificacoes, 0, 10);
+        error_log("[ModelNotifications] Total após array_slice(0,10): " . count($final));
+        error_log("[ModelNotifications] === FIM listarNotificacoesAnunciante ===");
+
+        return $final;
     }
 
     /**
@@ -271,7 +307,8 @@ class ModelNotifications {
                 'titulo' => $titulo,
                 'mensagem' => '#' . $row['codigo_encomenda'] . ' - ' . $row['produto_nome'],
                 'data' => $row['data_envio'],
-                'link' => 'minhasEncomendas.php'
+                'link' => 'minhasEncomendas.php',
+                'lida' => false
             ];
         }
 
@@ -341,7 +378,8 @@ class ModelNotifications {
                 'titulo' => $titulo,
                 'mensagem' => $mensagem,
                 'data' => $row['data_solicitacao'],
-                'link' => 'minhasEncomendas.php?tab=devolucoes'
+                'link' => 'minhasEncomendas.php?tab=devolucoes',
+                'lida' => false
             ];
         }
 
@@ -358,12 +396,11 @@ class ModelNotifications {
      * - Novos utilizadores
      * - Produtos pendentes
      *
+     * @param int $utilizador_id
      * @return int
      */
-    public function contarNotificacoesAdmin() {
+    public function contarNotificacoesAdmin($utilizador_id) {
         $count = 0;
-        // Admin ID fixo = 1 (ajustar conforme necessário)
-        $admin_id = 1;
 
         // 1. Utilizadores não verificados - excluindo lidos
         $sql = "SELECT COUNT(*) as total
@@ -373,7 +410,21 @@ class ModelNotifications {
                 AND nl.id IS NULL";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('i', $admin_id);
+        $stmt->bind_param('i', $utilizador_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $count += (int)$row['total'];
+
+        // 2. Produtos inativos - excluindo lidos
+        $sql = "SELECT COUNT(*) as total
+                FROM produtos p
+                LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'produto' AND nl.referencia_id = p.Produto_id)
+                WHERE p.ativo = 0
+                AND nl.id IS NULL";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('i', $utilizador_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
@@ -385,24 +436,28 @@ class ModelNotifications {
     /**
      * Listar notificações para admin
      *
+     * @param int $utilizador_id
      * @return array
      */
-    public function listarNotificacoesAdmin() {
+    public function listarNotificacoesAdmin($utilizador_id) {
         $notificacoes = [];
 
-        // 1. Utilizadores não verificados
+        // 1. Utilizadores não verificados (excluindo lidos)
         $sql = "SELECT
-                    id,
-                    nome,
-                    email,
-                    tipo_utilizador_id,
-                    data_criacao
-                FROM Utilizadores
-                WHERE email_verificado = 0
-                ORDER BY data_criacao DESC
+                    u.id,
+                    u.nome,
+                    u.email,
+                    u.tipo_utilizador_id,
+                    u.data_criacao
+                FROM Utilizadores u
+                LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'utilizador' AND nl.referencia_id = u.id)
+                WHERE u.email_verificado = 0
+                AND nl.id IS NULL
+                ORDER BY u.data_criacao DESC
                 LIMIT 10";
 
         $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('i', $utilizador_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -416,11 +471,12 @@ class ModelNotifications {
                 'titulo' => 'Novo ' . $tipo_texto,
                 'mensagem' => $row['nome'] . ' - ' . $row['email'],
                 'data' => $row['data_criacao'],
-                'link' => 'gestaoCliente.php'
+                'link' => 'gestaoCliente.php',
+                'lida' => false
             ];
         }
 
-        // 2. Produtos inativos
+        // 2. Produtos inativos (excluindo lidos)
         $sql = "SELECT
                     p.Produto_id,
                     p.nome,
@@ -428,11 +484,14 @@ class ModelNotifications {
                     u.nome as anunciante_nome
                 FROM produtos p
                 INNER JOIN Utilizadores u ON p.anunciante_id = u.id
+                LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'produto' AND nl.referencia_id = p.Produto_id)
                 WHERE p.ativo = 0
+                AND nl.id IS NULL
                 ORDER BY p.data_criacao DESC
                 LIMIT 10";
 
         $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('i', $utilizador_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -444,7 +503,8 @@ class ModelNotifications {
                 'titulo' => 'Produto Inativo',
                 'mensagem' => $row['nome'] . ' - ' . $row['anunciante_nome'],
                 'data' => $row['data_criacao'],
-                'link' => 'gestaoProdutosAdmin.php'
+                'link' => 'gestaoProdutosAdmin.php',
+                'lida' => false
             ];
         }
 
@@ -489,24 +549,42 @@ class ModelNotifications {
      * @return bool
      */
     public function marcarTodasComoLidas($utilizador_id, $tipo_utilizador) {
+        error_log("[ModelNotifications] === INÍCIO marcarTodasComoLidas ===");
+        error_log("[ModelNotifications] User ID: $utilizador_id, Tipo: $tipo_utilizador");
+
         // Buscar todas as notificações atuais e marcar como lidas
         $notificacoes = [];
 
         switch($tipo_utilizador) {
             case 1:
-                $notificacoes = $this->listarNotificacoesAdmin();
+                error_log("[ModelNotifications] Buscando notificações Admin...");
+                $notificacoes = $this->listarNotificacoesAdmin($utilizador_id);
                 break;
             case 2:
+                error_log("[ModelNotifications] Buscando notificações Cliente...");
                 $notificacoes = $this->listarNotificacoesCliente($utilizador_id);
                 break;
             case 3:
+                error_log("[ModelNotifications] Buscando notificações Anunciante...");
                 $notificacoes = $this->listarNotificacoesAnunciante($utilizador_id);
                 break;
         }
 
+        error_log("[ModelNotifications] Total notificações encontradas: " . count($notificacoes));
+
+        $marcadas = 0;
         foreach ($notificacoes as $notif) {
-            $this->marcarComoLida($utilizador_id, $notif['tipo'], $notif['id']);
+            error_log("[ModelNotifications] Marcando: tipo=" . $notif['tipo'] . ", id=" . $notif['id']);
+            $resultado = $this->marcarComoLida($utilizador_id, $notif['tipo'], $notif['id']);
+            if ($resultado) {
+                $marcadas++;
+            } else {
+                error_log("[ModelNotifications] FALHA ao marcar: tipo=" . $notif['tipo'] . ", id=" . $notif['id']);
+            }
         }
+
+        error_log("[ModelNotifications] Total marcadas: $marcadas de " . count($notificacoes));
+        error_log("[ModelNotifications] === FIM marcarTodasComoLidas ===");
 
         return true;
     }
@@ -572,13 +650,14 @@ class ModelNotifications {
                     d.codigo_devolucao,
                     d.estado,
                     d.data_solicitacao,
+                    d.notas_anunciante,
                     p.nome as produto_nome,
                     CASE WHEN nl.id IS NOT NULL THEN 1 ELSE 0 END as lida
                 FROM devolucoes d
                 INNER JOIN produtos p ON d.produto_id = p.Produto_id
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
                 WHERE d.cliente_id = ?
-                AND d.estado IN ('aprovada', 'rejeitada', 'reembolsada')
+                AND d.estado IN ('aprovada', 'enviada', 'recebida', 'rejeitada', 'reembolsada')
                 AND DATE(d.data_solicitacao) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
                 ORDER BY d.data_solicitacao DESC
                 LIMIT 50";
@@ -589,8 +668,38 @@ class ModelNotifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $icone = $row['estado'] == 'aprovada' ? '✅' : '❌';
-            $titulo = $row['estado'] == 'aprovada' ? 'Devolução Aprovada' : 'Devolução Rejeitada';
+            $icone = '📦';
+            $titulo = 'Devolução ' . ucfirst($row['estado']);
+            $mensagem = '#' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
+
+            // Personalizar ícone e mensagem por estado
+            switch($row['estado']) {
+                case 'aprovada':
+                    $icone = '✅';
+                    $titulo = 'Devolução Aprovada';
+                    $mensagem .= ' - Por favor, envie o produto e confirme no sistema.';
+                    break;
+                case 'enviada':
+                    $icone = '🚚';
+                    $titulo = 'Devolução Enviada';
+                    $mensagem .= ' - Aguardando confirmação do vendedor.';
+                    break;
+                case 'recebida':
+                    $icone = '✅';
+                    $titulo = 'Produto Recebido';
+                    $mensagem .= ' - Reembolso será processado em 5-10 dias úteis.';
+                    break;
+                case 'rejeitada':
+                    $icone = '❌';
+                    $titulo = 'Devolução Rejeitada';
+                    $mensagem .= !empty($row['notas_anunciante']) ? ' - ' . $row['notas_anunciante'] : '';
+                    break;
+                case 'reembolsada':
+                    $icone = '💰';
+                    $titulo = 'Reembolso Processado';
+                    $mensagem .= ' - Reembolso concluído!';
+                    break;
+            }
 
             $notificacoes[] = [
                 'tipo' => 'devolucao',
@@ -679,11 +788,42 @@ class ModelNotifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
+            // Personalizar por estado
+            $icone = '↩️';
+            $titulo = 'Devolução ' . ucfirst($row['estado']);
+
+            switch($row['estado']) {
+                case 'solicitada':
+                    $icone = '📦';
+                    $titulo = 'Devolução Solicitada';
+                    break;
+                case 'aprovada':
+                    $icone = '✅';
+                    $titulo = 'Devolução Aprovada';
+                    break;
+                case 'enviada':
+                    $icone = '🚚';
+                    $titulo = 'Produto Enviado pelo Cliente';
+                    break;
+                case 'recebida':
+                    $icone = '✅';
+                    $titulo = 'Produto Recebido';
+                    break;
+                case 'rejeitada':
+                    $icone = '❌';
+                    $titulo = 'Devolução Rejeitada';
+                    break;
+                case 'reembolsada':
+                    $icone = '💰';
+                    $titulo = 'Reembolso Processado';
+                    break;
+            }
+
             $notificacoes[] = [
                 'tipo' => 'devolucao',
                 'id' => $row['id'],
-                'icone' => '↩️',
-                'titulo' => 'Devolução Solicitada',
+                'icone' => $icone,
+                'titulo' => $titulo,
                 'mensagem' => 'Devolução #' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'],
                 'data' => $row['data_solicitacao'],
                 'link' => 'gestaoDevolucoesAnunciante.php',
@@ -701,13 +841,13 @@ class ModelNotifications {
     /**
      * Listar TODAS as notificações do admin (incluindo lidas)
      *
+     * @param int $utilizador_id
      * @return array
      */
-    public function listarTodasNotificacoesAdmin() {
+    public function listarTodasNotificacoesAdmin($utilizador_id) {
         $notificacoes = [];
-        $admin_id = 1;
 
-        // Utilizadores não verificados (últimos 30 dias)
+        // Utilizadores não verificados (todos)
         $sql = "SELECT
                     u.id,
                     u.nome,
@@ -717,12 +857,11 @@ class ModelNotifications {
                 FROM Utilizadores u
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'utilizador' AND nl.referencia_id = u.id)
                 WHERE u.email_verificado = 0
-                AND DATE(u.data_criacao) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
                 ORDER BY u.data_criacao DESC
                 LIMIT 50";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('i', $admin_id);
+        $stmt->bind_param('i', $utilizador_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -735,6 +874,38 @@ class ModelNotifications {
                 'mensagem' => $row['nome'] . ' (' . $row['email'] . ') - Aguarda verificação',
                 'data' => $row['data_criacao'],
                 'link' => 'gestaoCliente.php',
+                'lida' => (bool)$row['lida']
+            ];
+        }
+
+        // Produtos inativos (últimos 30 dias)
+        $sql = "SELECT
+                    p.Produto_id,
+                    p.nome,
+                    p.data_criacao,
+                    u.nome as anunciante_nome,
+                    CASE WHEN nl.id IS NOT NULL THEN 1 ELSE 0 END as lida
+                FROM produtos p
+                INNER JOIN Utilizadores u ON p.anunciante_id = u.id
+                LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'produto' AND nl.referencia_id = p.Produto_id)
+                WHERE p.ativo = 0
+                ORDER BY p.data_criacao DESC
+                LIMIT 50";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('i', $utilizador_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $notificacoes[] = [
+                'tipo' => 'produto',
+                'id' => $row['Produto_id'],
+                'icone' => '📦',
+                'titulo' => 'Produto Inativo',
+                'mensagem' => $row['nome'] . ' - ' . $row['anunciante_nome'],
+                'data' => $row['data_criacao'],
+                'link' => 'gestaoProdutosAdmin.php',
                 'lida' => (bool)$row['lida']
             ];
         }

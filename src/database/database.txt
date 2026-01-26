@@ -15,6 +15,53 @@ SET FOREIGN_KEY_CHECKS = 0;
 CREATE DATABASE IF NOT EXISTS `wegreen` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `wegreen`;
 
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+SET GLOBAL event_scheduler = ON;
+SET FOREIGN_KEY_CHECKS = 0;
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `wegreen`
+--
+CREATE DATABASE IF NOT EXISTS `wegreen` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `wegreen`;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `avaliacoes_produtos`
+--
+
+CREATE TABLE `avaliacoes_produtos` (
+  `id` int(11) NOT NULL,
+  `produto_id` int(11) NOT NULL,
+  `utilizador_id` int(11) NOT NULL,
+  `encomenda_codigo` varchar(50) NOT NULL,
+  `avaliacao` int(11) NOT NULL CHECK (`avaliacao` >= 1 and `avaliacao` <= 5),
+  `comentario` text DEFAULT NULL,
+  `data_criacao` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Extraindo dados da tabela `avaliacoes_produtos`
+--
+
+INSERT INTO `avaliacoes_produtos` (`id`, `produto_id`, `utilizador_id`, `encomenda_codigo`, `avaliacao`, `comentario`, `data_criacao`) VALUES
+(1, 25, 1, 'WG12353', 5, 'Excelente qualidade! A t-shirt é muito confortável e o tecido é de primeira. Recomendo!', '2026-01-25 19:38:01'),
+(2, 25, 2, 'WG12353_0', 4, 'Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!', '2026-01-25 19:38:41'),
+(3, 25, 3, 'WG12353_1', 5, 'Perfeita! Chegou rápido e a qualidade é excelente. Já comprei mais!', '2026-01-25 19:38:41'),
+(4, 25, 4, 'WG12353_2', 3, 'Razoável. O tamanho M ficou um pouco justo.', '2026-01-25 19:38:41'),
+(5, 26, 1, 'WG12353_P26_0', 5, 'Excelente qualidade! A t-shirt é muito confortável e o tecido é de primeira. Recomendo!', '2026-01-25 19:42:55'),
+(6, 26, 2, 'WG12353_P26_1', 4, 'Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!', '2026-01-25 19:42:55'),
+(7, 26, 3, 'WG12353_P26_2', 5, 'Perfeita! Chegou rápido e a qualidade é excelente. Já comprei mais!', '2026-01-25 19:42:55'),
+(8, 26, 4, 'WG12353_P26_3', 3, 'Razoável. O tamanho M ficou um pouco justo.', '2026-01-25 19:42:55');
+
 -- --------------------------------------------------------
 
 --
@@ -39,7 +86,7 @@ INSERT INTO `carrinho_itens` (`id`, `utilizador_id`, `produto_id`, `quantidade`,
 (5, '1', 5, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
 (6, '1', 6, 1, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
 (7, '1', 7, 2, '2025-12-06 19:18:54', '2025-12-06 19:18:54'),
-(8, '2', 3, 1, '2025-12-16 20:55:36', '2025-12-16 20:55:36'),
+(8, '2', 3, 2, '2025-12-16 20:55:36', '2026-01-25 17:36:18'),
 (9, '3', 1, 2, '2025-12-29 23:13:04', '2026-01-01 23:45:06'),
 (18, '3', 9, 1, '2025-12-30 17:58:24', '2025-12-30 23:52:44'),
 (19, '3', 3, 1, '2025-12-30 23:41:40', '2025-12-30 23:52:44'),
@@ -47,8 +94,9 @@ INSERT INTO `carrinho_itens` (`id`, `utilizador_id`, `produto_id`, `quantidade`,
 (21, '2', 1, 7, '2026-01-01 00:10:47', '2026-01-20 20:45:35'),
 (27, '2', 6, 5, '2026-01-07 20:40:33', '2026-01-07 20:44:44'),
 (28, '2', 10, 6, '2026-01-07 20:40:38', '2026-01-07 20:44:44'),
-(31, '2', 26, 2, '2026-01-20 20:46:29', '2026-01-23 17:37:38'),
-(33, 'temp_6973ff71e892f', 25, 10, '2026-01-23 23:09:45', '2026-01-23 23:09:50');
+(31, '2', 26, 4, '2026-01-20 20:46:29', '2026-01-25 19:34:32'),
+(33, 'temp_6973ff71e892f', 25, 10, '2026-01-23 23:09:45', '2026-01-23 23:09:50'),
+(34, 'temp_697658d3d3dd9', 26, 2, '2026-01-25 17:54:34', '2026-01-25 18:07:15');
 
 -- --------------------------------------------------------
 
@@ -170,49 +218,54 @@ CREATE TABLE `encomendas` (
   `plano_rastreio` varchar(250) DEFAULT NULL,
   `codigo_rastreio` varchar(100) DEFAULT NULL COMMENT 'C?digo de rastreamento da transportadora',
   `nome_ponto_recolha` varchar(255) DEFAULT NULL COMMENT 'Nome do ponto de recolha',
-  `morada_ponto_recolha` text DEFAULT NULL COMMENT 'Morada completa do ponto de recolha'
+  `morada_ponto_recolha` text DEFAULT NULL COMMENT 'Morada completa do ponto de recolha',
+  `codigo_confirmacao_recepcao` varchar(20) DEFAULT NULL,
+  `data_confirmacao_recepcao` datetime DEFAULT NULL,
+  `ip_confirmacao` varchar(50) DEFAULT NULL,
+  `prazo_estimado_entrega` date DEFAULT NULL,
+  `lembrete_confirmacao_enviado` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Extraindo dados da tabela `encomendas`
 --
 
-INSERT INTO `encomendas` (`id`, `codigo_encomenda`, `payment_id`, `payment_method`, `payment_status`, `cliente_id`, `anunciante_id`, `transportadora_id`, `produto_id`, `TipoProdutoNome`, `data_envio`, `morada`, `tipo_entrega`, `ponto_recolha_id`, `morada_completa`, `nome_destinatario`, `estado`, `plano_rastreio`, `codigo_rastreio`, `nome_ponto_recolha`, `morada_ponto_recolha`) VALUES
-(1, 'WG12345', NULL, NULL, 'paid', 2, 3, 1, 1, 1, '2025-12-06', 'Rua das Flores 15, Lisboa', 'domicilio', NULL, 'Rua das Flores 15, 1200-001 Lisboa', NULL, 'Pendente', 'B?sico', NULL, NULL, NULL),
-(2, 'WG12346', NULL, NULL, 'paid', 2, 3, 1, 2, 1, '2025-12-06', 'Av. do Mar 20, Porto', 'domicilio', NULL, NULL, NULL, 'Cancelado', 'B?sico', NULL, NULL, NULL),
-(3, 'WG12347', NULL, NULL, 'paid', 7, 3, 2, 3, 2, '2025-12-06', 'Rua Central 12, Coimbra', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL),
-(4, 'WG12352', NULL, NULL, 'paid', 2, 3, 1, 4, 3, '2025-12-06', 'Rua Nova 8, Braga', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL),
-(5, 'WG12353', NULL, NULL, 'paid', 7, 3, 1, 5, 1, '2025-12-06', 'Av. das Oliveiras 30, Set?bal', 'domicilio', NULL, NULL, NULL, 'Entregue', 'B?sico', NULL, NULL, NULL),
-(6, 'WG12348', NULL, NULL, 'paid', 2, 1, 1, 6, 5, '2025-12-06', 'Rua Verde 5, Faro', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Avan?ado', NULL, NULL, NULL),
-(7, 'WG12349', NULL, NULL, 'paid', 7, 1, 2, 7, 4, '2025-12-06', 'Rua do Sol 40, Lisboa', 'domicilio', NULL, NULL, NULL, 'Pendente', 'Avan?ado', NULL, NULL, NULL),
-(8, 'WG12354', NULL, NULL, 'paid', 2, 1, 2, 1, 1, '2025-12-06', 'Rua das Amendoeiras 22, Coimbra', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Avan?ado', NULL, NULL, NULL),
-(9, 'WG12350', NULL, NULL, 'paid', 2, 4, 1, 2, 1, '2025-12-06', 'Av. dos Descobrimentos 50, Aveiro', 'domicilio', NULL, NULL, NULL, 'Entregue', 'B?sico', NULL, NULL, NULL),
-(10, 'WG12351', NULL, NULL, 'paid', 7, 4, 2, 3, 2, '2025-12-06', 'Rua dos Cedros 18, Leiria', 'domicilio', NULL, NULL, NULL, 'Cancelada', 'B?sico', NULL, NULL, NULL),
-(11, 'WG12355', NULL, NULL, 'paid', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL),
-(12, 'WG35643', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(13, 'WG92289', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(14, 'WG39257', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(15, 'WG84712', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(16, 'WG85659', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(17, 'WG19273', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(18, 'WG82204', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(19, 'WG17091', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, 'Joao, Rua, Número, Código Postal, Cidade', 'Joao', 'Processando', NULL, NULL, NULL, NULL),
-(20, 'WG92781', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(21, 'WG78669', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(22, 'WG45929', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(23, 'WG52743', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(24, 'WG30838', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(25, 'WG79581', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(26, 'WG54248', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(27, 'WG59915', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(28, 'WG48750', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(29, 'WG39061', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(30, 'WG39162', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(31, 'WG64608', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL),
-(32, 'WG65461', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL),
-(33, 'WG81782', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL),
-(34, 'WG75227', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL),
-(35, 'WG40268', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL);
+INSERT INTO `encomendas` (`id`, `codigo_encomenda`, `payment_id`, `payment_method`, `payment_status`, `cliente_id`, `anunciante_id`, `transportadora_id`, `produto_id`, `TipoProdutoNome`, `data_envio`, `morada`, `tipo_entrega`, `ponto_recolha_id`, `morada_completa`, `nome_destinatario`, `estado`, `plano_rastreio`, `codigo_rastreio`, `nome_ponto_recolha`, `morada_ponto_recolha`, `codigo_confirmacao_recepcao`, `data_confirmacao_recepcao`, `ip_confirmacao`, `prazo_estimado_entrega`, `lembrete_confirmacao_enviado`) VALUES
+(1, 'WG12345', NULL, NULL, 'paid', 2, 3, 1, 1, 1, '2025-12-06', 'Rua das Flores 15, Lisboa', 'domicilio', NULL, 'Rua das Flores 15, 1200-001 Lisboa', NULL, NULL, 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(2, 'WG12346', NULL, NULL, 'paid', 2, 3, 1, 2, 1, '2025-12-06', 'Av. do Mar 20, Porto', 'domicilio', NULL, NULL, NULL, NULL, 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(3, 'WG12347', NULL, NULL, 'paid', 7, 3, 2, 3, 2, '2025-12-06', 'Rua Central 12, Coimbra', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(4, 'WG12352', NULL, NULL, 'paid', 2, 3, 1, 4, 3, '2025-12-06', 'Rua Nova 8, Braga', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(5, 'WG12353', NULL, NULL, 'paid', 7, 3, 1, 5, 1, '2025-12-06', 'Av. das Oliveiras 30, Set?bal', 'domicilio', NULL, NULL, NULL, 'Entregue', 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(6, 'WG12348', NULL, NULL, 'paid', 2, 1, 1, 6, 5, '2025-12-06', 'Rua Verde 5, Faro', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Avan?ado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(7, 'WG12349', NULL, NULL, 'paid', 7, 1, 2, 7, 4, '2025-12-06', 'Rua do Sol 40, Lisboa', 'domicilio', NULL, NULL, NULL, 'Pendente', 'Avan?ado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(8, 'WG12354', NULL, NULL, 'paid', 2, 1, 2, 1, 1, '2025-12-06', 'Rua das Amendoeiras 22, Coimbra', 'domicilio', NULL, NULL, NULL, 'Entregue', 'Avan?ado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(9, 'WG12350', NULL, NULL, 'paid', 2, 4, 1, 2, 1, '2025-12-06', 'Av. dos Descobrimentos 50, Aveiro', 'domicilio', NULL, NULL, NULL, 'Entregue', 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(10, 'WG12351', NULL, NULL, 'paid', 7, 4, 2, 3, 2, '2025-12-06', 'Rua dos Cedros 18, Leiria', 'domicilio', NULL, NULL, NULL, 'Cancelada', 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(11, 'WG12355', NULL, NULL, 'paid', 7, 4, 1, 4, 3, '2025-12-06', 'Rua da Alegria 7, Viseu', 'domicilio', NULL, NULL, NULL, 'Pendente', 'B?sico', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(12, 'WG35643', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(13, 'WG92289', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(14, 'WG39257', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(15, 'WG84712', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(16, 'WG85659', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(17, 'WG19273', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(18, 'WG82204', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(19, 'WG17091', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, 'Joao, Rua, Número, Código Postal, Cidade', 'Joao', 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(20, 'WG92781', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(21, 'WG78669', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(22, 'WG45929', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(23, 'WG52743', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(24, 'WG30838', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(25, 'WG79581', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(26, 'WG54248', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(27, 'WG59915', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(28, 'WG48750', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(29, 'WG39061', NULL, NULL, 'paid', 2, 1, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(30, 'WG39162', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(31, 'WG64608', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Processando', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(32, 'WG65461', NULL, NULL, 'paid', 2, NULL, 2, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Enviado', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(33, 'WG81782', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(34, 'WG75227', NULL, NULL, 'paid', 2, NULL, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0),
+(35, 'WG40268', NULL, NULL, 'paid', 2, 1, 1, 1, NULL, '2026-01-24', 'Rua, Número, Código Postal, Cidade', 'domicilio', NULL, NULL, NULL, 'Entregue', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -233,7 +286,8 @@ CREATE TABLE `favoritos` (
 
 INSERT INTO `favoritos` (`id`, `cliente_id`, `produto_id`, `data_adicao`) VALUES
 (2, 2, 26, '2026-01-24 17:48:32'),
-(3, 2, 25, '2026-01-24 17:48:33');
+(3, 2, 25, '2026-01-24 17:48:33'),
+(4, 2, 24, '2026-01-25 17:43:59');
 
 -- --------------------------------------------------------
 
@@ -330,7 +384,52 @@ INSERT INTO `historico_produtos` (`id`, `encomenda_id`, `estado_encomenda`, `des
 (10, 11, 'Pendente', 'Aguardando confirma??o de pagamento.', '2025-12-06'),
 (11, 1, 'Processando', 'Status alterado para: Processando', '2026-01-11'),
 (12, 2, 'Cancelado', 'Status alterado para: Cancelado', '2026-01-11'),
-(13, 1, 'Pendente', 'Status alterado para: Pendente', '2026-01-11');
+(13, 1, 'Pendente', 'Status alterado para: Pendente', '2026-01-11'),
+(14, 1, NULL, 'Status alterado para: ', '2026-01-26'),
+(15, 1, NULL, 'Status alterado para: ', '2026-01-26'),
+(16, 2, NULL, 'Status alterado para: ', '2026-01-26'),
+(17, 2, NULL, 'Status alterado para: ', '2026-01-26'),
+(18, 2, NULL, 'Status alterado para: ', '2026-01-26'),
+(19, 1, NULL, 'Status alterado para: ', '2026-01-26'),
+(20, 1, NULL, 'Status alterado para: ', '2026-01-26');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura da tabela `logs_acesso`
+--
+
+CREATE TABLE `logs_acesso` (
+  `id` int(11) NOT NULL,
+  `utilizador_id` int(11) NOT NULL,
+  `acao` enum('login','logout') NOT NULL,
+  `email` varchar(250) DEFAULT NULL,
+  `data_hora` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Extraindo dados da tabela `logs_acesso`
+--
+
+INSERT INTO `logs_acesso` (`id`, `utilizador_id`, `acao`, `email`, `data_hora`) VALUES
+(1, 2, 'login', 'joao@wegreen.pt', '2026-01-25 17:07:04'),
+(2, 3, 'login', 'maria@wegreen.pt', '2026-01-25 17:14:18'),
+(3, 1, 'login', 'admin@wegreen.pt', '2026-01-25 17:28:08'),
+(4, 1, 'logout', 'admin@wegreen.pt', '2026-01-25 17:35:17'),
+(5, 2, 'login', 'joao@wegreen.pt', '2026-01-25 17:35:27'),
+(6, 2, 'login', 'joao@wegreen.pt', '2026-01-25 18:20:49'),
+(7, 3, 'login', 'maria@wegreen.pt', '2026-01-25 20:35:15'),
+(8, 3, 'login', 'maria@wegreen.pt', '2026-01-25 22:31:28'),
+(9, 3, 'login', 'maria@wegreen.pt', '2026-01-25 22:46:23'),
+(10, 3, 'login', 'maria@wegreen.pt', '2026-01-25 22:47:31'),
+(11, 3, 'login', 'maria@wegreen.pt', '2026-01-26 13:53:53'),
+(12, 3, 'login', 'maria@wegreen.pt', '2026-01-26 15:59:55'),
+(13, 2, 'login', 'joao@wegreen.pt', '2026-01-26 16:02:20'),
+(14, 3, 'login', 'maria@wegreen.pt', '2026-01-26 16:03:15'),
+(15, 3, 'login', 'maria@wegreen.pt', '2026-01-26 20:07:24'),
+(16, 2, 'login', 'joao@wegreen.pt', '2026-01-26 20:20:38'),
+(17, 2, 'login', 'joao@wegreen.pt', '2026-01-26 20:32:13'),
+(18, 1, 'login', 'admin@wegreen.pt', '2026-01-26 20:39:34');
 
 -- --------------------------------------------------------
 
@@ -405,7 +504,7 @@ INSERT INTO `mensagensadmin` (`id`, `remetente_id`, `destinatario_id`, `mensagem
 CREATE TABLE `notificacoes_lidas` (
   `id` int(11) NOT NULL,
   `utilizador_id` int(11) NOT NULL,
-  `tipo_notificacao` enum('encomenda','devolucao','utilizador') NOT NULL,
+  `tipo_notificacao` enum('encomenda','devolucao','utilizador','produto') NOT NULL,
   `referencia_id` int(11) NOT NULL,
   `data_leitura` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -426,7 +525,21 @@ INSERT INTO `notificacoes_lidas` (`id`, `utilizador_id`, `tipo_notificacao`, `re
 (9, 2, 'encomenda', 20, '2026-01-24 19:00:52'),
 (21, 3, 'encomenda', 11, '2026-01-24 20:43:10'),
 (22, 3, 'encomenda', 7, '2026-01-24 20:47:31'),
-(23, 3, 'encomenda', 4, '2026-01-24 20:47:31');
+(23, 3, 'encomenda', 4, '2026-01-24 20:47:31'),
+(24, 3, 'devolucao', 20, '2026-01-25 20:36:07'),
+(25, 3, 'devolucao', 21, '2026-01-25 20:36:08'),
+(26, 3, 'devolucao', 22, '2026-01-25 20:39:33'),
+(27, 3, 'devolucao', 23, '2026-01-25 20:48:27'),
+(28, 3, 'devolucao', 16, '2026-01-25 20:49:43'),
+(29, 2, 'encomenda', 21, '2026-01-26 20:35:27'),
+(79, 1, 'produto', 20, '2026-01-26 21:23:12'),
+(80, 1, 'produto', 19, '2026-01-26 21:23:37'),
+(81, 1, 'produto', 18, '2026-01-26 21:24:02'),
+(82, 1, 'produto', 14, '2026-01-26 21:24:07'),
+(83, 1, 'produto', 15, '2026-01-26 21:24:10'),
+(84, 1, 'produto', 11, '2026-01-26 21:27:38'),
+(85, 1, 'produto', 7, '2026-01-26 21:27:38'),
+(86, 1, 'produto', 4, '2026-01-26 21:27:38');
 
 -- --------------------------------------------------------
 
@@ -566,7 +679,7 @@ CREATE TABLE `produtos` (
 
 INSERT INTO `produtos` (`Produto_id`, `nome`, `tipo_produto_id`, `preco`, `foto`, `genero`, `anunciante_id`, `designer_id`, `marca`, `tamanho`, `estado`, `descricao`, `data_criacao`, `ativo`, `stock`) VALUES
 (1, 'Blusa Colorida Custo Barcelona', 1, 15.00, 'src/img/4aa0032639cfb631fe2d24df2baeb114.jpg', 'Mulher', 1, NULL, 'Custo Barcelona', 'S', 'Excelente', 'Blusa colorida da Custo Barcelona nunca usada, com etiqueta.', '2025-12-06', 1, 0),
-(2, 'Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, NULL, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.', '2025-12-06', 0, 10),
+(2, 'Vestido Versace Coleção 2003', 1, 289.90, 'src/img/ddbe3c8f8aef92c51a1745dcb4923752.jpg', 'Mulher', 3, NULL, 'Versace', 'S', 'Como Novo', 'Vestido Versace coleção 2003, nunca usado.', '2025-12-06', 1, 10),
 (3, 'Calças de ganga Low Rise', 1, 35.40, 'src/img/835c014897bbbab6c135f8dfd9f59bdf.jpg', 'Mulher', 1, NULL, 'NYWS', 'S', 'Excelente', 'Calças de ganga Low Rise, nunca usadas.', '2025-12-06', 1, 10),
 (4, 'Botas pele', 2, 79.00, 'src/img/b7358d779d9fc865d22f428ec1641391.jpg', 'Mulher', 3, NULL, 'Ana Salazar', '38', 'Como Novo', 'Botas de pele Michael Kors, elegância e sofisticação.', '2025-12-06', 0, 10),
 (5, 'Blusão de ganga', 1, 23.80, 'src/img/58c4e54e715841986e82c05fb3506a0d.jpg', 'Mulher', 1, NULL, 'Miss Sixty', 'M', 'Excelente', 'Blusão de ganga, nunca usado.', '2025-12-06', 1, 10),
@@ -757,24 +870,26 @@ CREATE TABLE `utilizadores` (
   `plano_id` int(11) DEFAULT NULL,
   `ranking_id` int(11) DEFAULT NULL,
   `pontos_conf` int(11) DEFAULT 0,
-  `data_criacao` date DEFAULT NULL
+  `data_criacao` date DEFAULT NULL,
+  `data_expiracao_plano` datetime DEFAULT NULL COMMENT 'Data de expiracao do plano pago (NULL para plano gratuito)',
+  `ultimo_email_expiracao` varchar(20) DEFAULT NULL COMMENT 'Tipo do ultimo email enviado: aviso_3dias, aviso_1dia, expirado'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Extraindo dados da tabela `utilizadores`
 --
 
-INSERT INTO `utilizadores` (`id`, `nome`, `apelido`, `email`, `email_verificado`, `token_verificacao`, `token_expira_em`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`) VALUES
-(1, 'Admin WeGreen', NULL, 'admin@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 1, 3, 200, NULL),
-(2, 'Joao', NULL, 'joao@wegreen.pt', 1, NULL, NULL, '000000000', '900000000', 'Rua, Número, Código Postal, Cidade', 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL),
-(3, 'Maria Santos', NULL, 'maria@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 2, 2, 75, NULL),
-(4, 'Maria Luiza', NULL, 'Luiza@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 3, 3, 54, NULL),
-(5, 'Matilde Mayer', NULL, 'Matilde@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 1, 3, 350, NULL),
-(6, 'Carlos Pereira', NULL, 'Carlos@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 3, 98, NULL),
-(7, 'Mango', NULL, 'mango@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg', 'mango123', 2, 1, 1, 10, NULL),
-(8, 'Solange Jewels', NULL, 'Solange@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 1, 3, 350, NULL),
-(11, 'joão', 'santos', 'jmssgames@gmail.com', 1, NULL, NULL, '012345678', NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', '3dfcab79ed21fd89c9eb25e9864a6155', 2, 1, 1, 0, '2026-01-13'),
-(14, 'Joao', 'Silva', 'joao@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'e10adc3949ba59abbe56e057f20f883e', 3, 1, 1, 0, '2026-01-16');
+INSERT INTO `utilizadores` (`id`, `nome`, `apelido`, `email`, `email_verificado`, `token_verificacao`, `token_expira_em`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`, `data_expiracao_plano`, `ultimo_email_expiracao`) VALUES
+(1, 'Admin WeGreen', NULL, 'admin@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 1, 3, 200, NULL, NULL, NULL),
+(2, 'Joao', NULL, 'joao@wegreen.pt', 1, NULL, NULL, '000000000', '900000000', 'Rua, Número, Código Postal, Cidade', 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL, NULL, NULL),
+(3, 'Maria Santos', NULL, 'maria@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 2, 2, 75, NULL, '2026-01-29 20:40:11', NULL),
+(4, 'Maria Luiza', NULL, 'Luiza@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 3, 3, 54, NULL, NULL, NULL),
+(5, 'Matilde Mayer', NULL, 'Matilde@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 1, 3, 350, NULL, NULL, NULL),
+(6, 'Carlos Pereira', NULL, 'Carlos@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 3, 98, NULL, NULL, NULL),
+(7, 'Mango', NULL, 'mango@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg', 'mango123', 2, 1, 1, 10, NULL, NULL, NULL),
+(8, 'Solange Jewels', NULL, 'Solange@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 2, 3, 350, NULL, '2026-02-25 20:37:26', NULL),
+(11, 'joão', 'santos', 'jmssgames@gmail.com', 1, NULL, NULL, '012345678', NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', '3dfcab79ed21fd89c9eb25e9864a6155', 2, 1, 1, 0, '2026-01-13', NULL, NULL),
+(14, 'Joao', 'Silva', 'joao@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'e10adc3949ba59abbe56e057f20f883e', 3, 2, 1, 0, '2026-01-16', '2026-02-25 20:38:25', NULL);
 
 -- --------------------------------------------------------
 
@@ -886,21 +1001,26 @@ CREATE TABLE `view_devolucoes_completa` (
 ,`motivo_detalhe` text
 ,`notas_cliente` text
 ,`notas_anunciante` text
+,`notas_recebimento` text
 ,`estado` enum('solicitada','aprovada','rejeitada','produto_recebido','reembolsada','cancelada')
 ,`payment_intent_id` varchar(100)
 ,`reembolso_stripe_id` varchar(100)
 ,`reembolso_status` varchar(50)
 ,`fotos` longtext
 ,`codigo_envio_devolucao` varchar(100)
+,`codigo_rastreio` varchar(100)
 ,`transportadora_devolucao_id` int(11)
 ,`data_solicitacao` timestamp
 ,`data_aprovacao` timestamp
 ,`data_rejeicao` timestamp
+,`data_envio_cliente` datetime
 ,`data_produto_recebido` timestamp
+,`data_recebimento` datetime
 ,`data_reembolso` timestamp
 ,`updated_at` timestamp
 ,`codigo_encomenda` varchar(50)
-,`data_entrega_original` date
+,`data_envio` date
+,`codigo_rastreio_original` varchar(100)
 ,`produto_nome` varchar(150)
 ,`produto_foto` varchar(255)
 ,`produto_imagem` varchar(255)
@@ -924,11 +1044,21 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `view_devolucoes_completa`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_devolucoes_completa`  AS SELECT `d`.`id` AS `id`, `d`.`encomenda_id` AS `encomenda_id`, `d`.`codigo_devolucao` AS `codigo_devolucao`, `d`.`cliente_id` AS `cliente_id`, `d`.`anunciante_id` AS `anunciante_id`, `d`.`produto_id` AS `produto_id`, `d`.`valor_reembolso` AS `valor_reembolso`, `d`.`motivo` AS `motivo`, `d`.`motivo_detalhe` AS `motivo_detalhe`, `d`.`notas_cliente` AS `notas_cliente`, `d`.`notas_anunciante` AS `notas_anunciante`, `d`.`estado` AS `estado`, `d`.`payment_intent_id` AS `payment_intent_id`, `d`.`reembolso_stripe_id` AS `reembolso_stripe_id`, `d`.`reembolso_status` AS `reembolso_status`, `d`.`fotos` AS `fotos`, `d`.`codigo_envio_devolucao` AS `codigo_envio_devolucao`, `d`.`transportadora_devolucao_id` AS `transportadora_devolucao_id`, `d`.`data_solicitacao` AS `data_solicitacao`, `d`.`data_aprovacao` AS `data_aprovacao`, `d`.`data_rejeicao` AS `data_rejeicao`, `d`.`data_produto_recebido` AS `data_produto_recebido`, `d`.`data_reembolso` AS `data_reembolso`, `d`.`updated_at` AS `updated_at`, `e`.`codigo_encomenda` AS `codigo_encomenda`, `e`.`data_envio` AS `data_entrega_original`, `p`.`nome` AS `produto_nome`, `p`.`foto` AS `produto_foto`, `p`.`foto` AS `produto_imagem`, `u`.`nome` AS `cliente_nome`, `u`.`email` AS `cliente_email` FROM (((`devolucoes` `d` join `encomendas` `e` on(`d`.`encomenda_id` = `e`.`id`)) join `produtos` `p` on(`d`.`produto_id` = `p`.`Produto_id`)) join `utilizadores` `u` on(`d`.`cliente_id` = `u`.`id`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_devolucoes_completa`  AS SELECT `d`.`id` AS `id`, `d`.`encomenda_id` AS `encomenda_id`, `d`.`codigo_devolucao` AS `codigo_devolucao`, `d`.`cliente_id` AS `cliente_id`, `d`.`anunciante_id` AS `anunciante_id`, `d`.`produto_id` AS `produto_id`, `d`.`valor_reembolso` AS `valor_reembolso`, `d`.`motivo` AS `motivo`, `d`.`motivo_detalhe` AS `motivo_detalhe`, `d`.`notas_cliente` AS `notas_cliente`, `d`.`notas_anunciante` AS `notas_anunciante`, `d`.`notas_recebimento` AS `notas_recebimento`, `d`.`estado` AS `estado`, `d`.`payment_intent_id` AS `payment_intent_id`, `d`.`reembolso_stripe_id` AS `reembolso_stripe_id`, `d`.`reembolso_status` AS `reembolso_status`, `d`.`fotos` AS `fotos`, `d`.`codigo_envio_devolucao` AS `codigo_envio_devolucao`, `d`.`codigo_rastreio` AS `codigo_rastreio`, `d`.`transportadora_devolucao_id` AS `transportadora_devolucao_id`, `d`.`data_solicitacao` AS `data_solicitacao`, `d`.`data_aprovacao` AS `data_aprovacao`, `d`.`data_rejeicao` AS `data_rejeicao`, `d`.`data_envio_cliente` AS `data_envio_cliente`, `d`.`data_produto_recebido` AS `data_produto_recebido`, `d`.`data_recebimento` AS `data_recebimento`, `d`.`data_reembolso` AS `data_reembolso`, `d`.`updated_at` AS `updated_at`, `e`.`codigo_encomenda` AS `codigo_encomenda`, `e`.`data_envio` AS `data_envio`, `e`.`codigo_rastreio` AS `codigo_rastreio_original`, `p`.`nome` AS `produto_nome`, `p`.`foto` AS `produto_foto`, `p`.`foto` AS `produto_imagem`, `u`.`nome` AS `cliente_nome`, `u`.`email` AS `cliente_email` FROM (((`devolucoes` `d` left join `encomendas` `e` on(`d`.`encomenda_id` = `e`.`id`)) left join `produtos` `p` on(`d`.`produto_id` = `p`.`Produto_id`)) left join `utilizadores` `u` on(`d`.`cliente_id` = `u`.`id`)) ;
 
 --
 -- Índices para tabelas despejadas
 --
+
+--
+-- Índices para tabela `avaliacoes_produtos`
+--
+ALTER TABLE `avaliacoes_produtos`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_avaliacao` (`utilizador_id`,`produto_id`,`encomenda_codigo`),
+  ADD KEY `idx_produto_id` (`produto_id`),
+  ADD KEY `idx_utilizador_id` (`utilizador_id`),
+  ADD KEY `idx_data_criacao` (`data_criacao`);
 
 --
 -- Índices para tabela `carrinho_itens`
@@ -965,6 +1095,7 @@ ALTER TABLE `devolucoes`
 ALTER TABLE `encomendas`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `codigo_encomenda` (`codigo_encomenda`),
+  ADD UNIQUE KEY `codigo_confirmacao_recepcao` (`codigo_confirmacao_recepcao`),
   ADD KEY `cliente_id` (`cliente_id`),
   ADD KEY `anunciante_id` (`anunciante_id`),
   ADD KEY `produto_id` (`produto_id`),
@@ -1011,6 +1142,14 @@ ALTER TABLE `historico_devolucoes`
 ALTER TABLE `historico_produtos`
   ADD PRIMARY KEY (`id`),
   ADD KEY `encomenda_id` (`encomenda_id`);
+
+--
+-- Índices para tabela `logs_acesso`
+--
+ALTER TABLE `logs_acesso`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `utilizador_id` (`utilizador_id`),
+  ADD KEY `data_hora` (`data_hora`);
 
 --
 -- Índices para tabela `mensagens`
@@ -1140,10 +1279,16 @@ ALTER TABLE `vendas`
 --
 
 --
+-- AUTO_INCREMENT de tabela `avaliacoes_produtos`
+--
+ALTER TABLE `avaliacoes_produtos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT de tabela `carrinho_itens`
 --
 ALTER TABLE `carrinho_itens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT de tabela `denuncias`
@@ -1167,7 +1312,7 @@ ALTER TABLE `encomendas`
 -- AUTO_INCREMENT de tabela `favoritos`
 --
 ALTER TABLE `favoritos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de tabela `fornecedores`
@@ -1191,7 +1336,13 @@ ALTER TABLE `historico_devolucoes`
 -- AUTO_INCREMENT de tabela `historico_produtos`
 --
 ALTER TABLE `historico_produtos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT de tabela `logs_acesso`
+--
+ALTER TABLE `logs_acesso`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT de tabela `mensagens`
@@ -1209,7 +1360,7 @@ ALTER TABLE `mensagensadmin`
 -- AUTO_INCREMENT de tabela `notificacoes_lidas`
 --
 ALTER TABLE `notificacoes_lidas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT de tabela `notificacoes_preferencias`
@@ -1239,7 +1390,7 @@ ALTER TABLE `planos_ativos`
 -- AUTO_INCREMENT de tabela `produtos`
 --
 ALTER TABLE `produtos`
-  MODIFY `Produto_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `Produto_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT de tabela `produto_fotos`
@@ -1292,6 +1443,13 @@ ALTER TABLE `vendas`
 --
 -- Restrições para despejos de tabelas
 --
+
+--
+-- Limitadores para a tabela `avaliacoes_produtos`
+--
+ALTER TABLE `avaliacoes_produtos`
+  ADD CONSTRAINT `avaliacoes_produtos_ibfk_1` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `avaliacoes_produtos_ibfk_2` FOREIGN KEY (`utilizador_id`) REFERENCES `utilizadores` (`id`) ON DELETE CASCADE;
 
 --
 -- Limitadores para a tabela `carrinho_itens`
@@ -1411,8 +1569,6 @@ ALTER TABLE `vendas`
   ADD CONSTRAINT `vendas_ibfk_3` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`Produto_id`);
 COMMIT;
 
-SET FOREIGN_KEY_CHECKS = 1;
-SHOW EVENTS;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -192,6 +192,34 @@ body {
   gap: 15px;
 }
 
+/* Botão de Notificações */
+.navbar-icon-btn {
+  position: relative;
+  background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(60, 179, 113, 0.35);
+}
+
+.navbar-icon-btn:hover {
+  background: linear-gradient(135deg, #2e8b57 0%, #228b4a 100%);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(60, 179, 113, 0.5);
+}
+
+.navbar-icon-btn i {
+  font-size: 20px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
 .btn-upgrade-navbar {
   background: linear-gradient(90deg, #3cb371 0%, #2e8b57 100%);
   color: #ffffff;

@@ -76,3 +76,130 @@
   width: 20px !important;
   height: 20px !important;
 }
+
+/* ========== Estilos dos Botões de Ação (Igual às Encomendas) ========== */
+.table-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-icon {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  color: #3cb371;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-icon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  color: #2e8b57;
+}
+
+.btn-icon i {
+  color: #3cb371;
+  font-size: 14px;
+}
+
+.btn-icon:hover i {
+  color: #2e8b57;
+}
+
+/* Remover estilos específicos de cores - todos os botões usam o mesmo estilo */
+.btn-success,
+.btn-danger,
+.btn-info,
+.btn-warning {
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  color: #3cb371;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-success:hover,
+.btn-danger:hover,
+.btn-info:hover,
+.btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  color: #2e8b57;
+}
+
+/* ========== Status Badges (Cores das Devoluções) ========== */
+.status-solicitada {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-aprovada {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-rejeitada {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-produto_recebido {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-reembolsada {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelada {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Badge "Novo" */
+.badge-new {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Product info */
+.product-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-thumb {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}

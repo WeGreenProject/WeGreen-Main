@@ -8,7 +8,7 @@ class Produto{
         global $conn;
         $msg = "";
 
-        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,ranking.nome As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos,utilizadores,ranking WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id AND utilizadores.ranking_id = ranking.id";
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*, Produtos.ativo AS status, utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,ranking.nome As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos,utilizadores,ranking WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id AND utilizadores.ranking_id = ranking.id";
 
         $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = $ID_Produto";
 
@@ -25,8 +25,14 @@ class Produto{
 
         if ($result->num_rows > 0) {
             while ($rowProduto = $result->fetch_assoc()) {
+<<<<<<< Updated upstream
                 $msg .= "<div class='col-md-6'>";
                 $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100' style='position: relative;'>";
+=======
+                // Galeria de imagens - Coluna Esquerda
+                $msg .= "<div class='col-lg-6'>";
+                $msg .= "<div class='position-relative' style='overflow: hidden;'>";
+>>>>>>> Stashed changes
 
                 // Adicionar botão de favorito na galeria
                 if(isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2) {
@@ -78,7 +84,13 @@ class Produto{
                     if($_SESSION['utilizador'] == $rowProduto['IdUtilizador']) {
                         $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold' onclick='ErrorSession2()'>Chat com o vendedor</button>";
                     } else {
+<<<<<<< Updated upstream
                         $msg .= "<a href='ChatAnunciante.php?id=".$rowProduto['Produto_id']."&nome=".$rowProduto['IdUtilizador']."'><button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button></a>";
+=======
+                        $msg .= "<a href='ChatCliente.php?vendedor=".$rowProduto['IdUtilizador']."&produto=".$rowProduto['Produto_id']."'>";
+                        $msg .= "<button class='btn py-3 px-4 fw-semibold' style='background: white; color: #3cb371; border: 2px solid #3cb371; border-radius: 10px; transition: all 0.3s ease;' onmouseover='this.style.background=\"#3cb371\"; this.style.color=\"white\"' onmouseout='this.style.background=\"white\"; this.style.color=\"#3cb371\"'>";
+                        $msg .= "<i class='bi bi-chat-dots-fill'></i></button></a>";
+>>>>>>> Stashed changes
                     }
                 } else {
                     $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold' onclick='ErrorSession()'>Chat com o vendedor</button>";

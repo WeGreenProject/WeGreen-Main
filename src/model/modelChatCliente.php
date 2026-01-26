@@ -315,5 +315,31 @@ class ChatCliente {
 
         return !empty($iniciais) ? $iniciais : "U";
     }
+
+    // Buscar dados do vendedor para iniciar conversa automaticamente
+    function getDadosVendedor($vendedorId) {
+        global $conn;
+
+        $sql = "SELECT id, nome, foto FROM Utilizadores WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $vendedorId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            return json_encode([
+                'flag' => true,
+                'nome' => $row['nome'],
+                'foto' => $row['foto'],
+                'id' => $row['id']
+            ]);
+        } else {
+            return json_encode([
+                'flag' => false,
+                'msg' => 'Vendedor não encontrado'
+            ]);
+        }
+    }
 }
 ?>

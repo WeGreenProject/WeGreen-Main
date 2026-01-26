@@ -205,7 +205,7 @@ function getProdutoCriançaMostrar($ID_Produto){
                 if($_SESSION['utilizador'] == $rowProduto['IdUtilizador']) {
                     $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold' onclick='ErrorSession2()'>Chat com o vendedor</button>";
                 } else {
-                    $msg .= "<a href='ChatAnunciante.php?id=".$rowProduto['Produto_id']."&nome=".$rowProduto['IdUtilizador']."'><button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button></a>";
+                    $msg .= "<a href='ChatCliente.php?vendedor=".$rowProduto['IdUtilizador']."&produto=".$rowProduto['Produto_id']."'><button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold'>Chat com o vendedor</button></a>";
                 }
             } else {
                 $msg .= "<button class='btn btn-outline-success rounded-pill px-4 py-2 fw-semibold' onclick='ErrorSession()'>Chat com o vendedor</button>";
