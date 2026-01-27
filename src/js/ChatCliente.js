@@ -5,7 +5,7 @@ let imagemAnexada = null;
 
 function getSideBar() {
   let dados = new FormData();
-  dados.append("op", 1); // Listar vendedores/anunciantes/admins com quem o cliente tem conversas
+  dados.append("op", 1);
 
   console.log("getSideBar() chamada");
 

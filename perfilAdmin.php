@@ -27,41 +27,43 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 <body>
     <div class="container">
         <aside class="sidebar">
-            <div class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                <div class="logo-text">
-                    <h1>WeGreen</h1>
-                    <p>Moda Sustentável</p>
+            <a href="index.html" style="text-decoration: none;">
+                <div class="logo">
+                    <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+                    <div class="logo-text">
+                        <h1>WeGreen</h1>
+                        <p>Moda Sustentável</p>
+                    </div>
                 </div>
-            </div>
+            </a>
             <nav>
                 <ul class="nav-menu">
                     <li class="nav-item">
-                        <a class="nav-link active" href="DashboardAdmin.php">
+                        <a class="nav-link active" href="DashboardAdmin.php" style="text-decoration: none;">
                             <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                             <span class="nav-text">Dashboard</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
+                        <a class="nav-link" href="gestaoProdutosAdmin.php" style="text-decoration: none;">
                             <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
                             <span class="nav-text">Produtos</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php">
+                        <a class="nav-link" href="gestaoCliente.php" style="text-decoration: none;">
                             <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
                             <span class="nav-text">Gestão de Utilizadores</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="gestaoLucros.php">
+                        <a class="nav-link" href="gestaoLucros.php" style="text-decoration: none;">
                             <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
                             <span class="nav-text">Gestão de Lucros</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php">
+                        <a class="nav-link" href="Chatadmin.php" style="text-decoration: none;">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
                         </a>
@@ -111,17 +113,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 <div class="profile-container" id="profileCard">
                 </div>
 
-                <div class="profile-tabs">
-                    <button class="profile-tab active" onclick="switchProfileTab('personal', this)">
-                        <i class="fas fa-user"></i> Informações Pessoais
-                    </button>
-                    <button class="profile-tab" onclick="switchProfileTab('plan', this)">
-                        <i class="fas fa-crown"></i> Plano & Ranking
-                    </button>
-                    <button class="profile-tab" onclick="switchProfileTab('security', this)">
-                        <i class="fas fa-shield-alt"></i> Segurança
-                    </button>
-                </div>
+
 
                 <div class="profile-tab-content">
                     <div id="tab-personal" class="tab-pane active">
