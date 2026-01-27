@@ -141,3 +141,19 @@ Stack trace:
   thrown in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php on line 312
 >>>>>>> Stashed changes
 >>>>>>> origin/JS/26/01/2026
+[27-Jan-2026 10:07:05 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "PHPMailer\PHPMailer\PHPMailer" not found in C:\xampp\htdocs\WeGreen-Main\src\services\EmailService.php:28
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\services\EmailService.php(21): EmailService->setupMailer()
+#1 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(1078): EmailService->__construct()
+#2 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(1061): DashboardAnunciante->enviarEmailMudancaStatus(Array, 'Processando', '')
+#3 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(303): DashboardAnunciante->atualizarStatusEncomenda('1', 'Processando', '', '')
+#4 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\services\EmailService.php on line 28
+[27-Jan-2026 10:07:34 Europe/Berlin] PHP Fatal error:  Uncaught Error: Class "PHPMailer\PHPMailer\PHPMailer" not found in C:\xampp\htdocs\WeGreen-Main\src\services\EmailService.php:28
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\services\EmailService.php(21): EmailService->setupMailer()
+#1 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(1078): EmailService->__construct()
+#2 C:\xampp\htdocs\WeGreen-Main\src\model\modelDashboardAnunciante.php(1061): DashboardAnunciante->enviarEmailMudancaStatus(Array, 'Entregue', '')
+#3 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(303): DashboardAnunciante->atualizarStatusEncomenda('1', 'Entregue', '4343', '')
+#4 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\services\EmailService.php on line 28

@@ -3170,8 +3170,6 @@ function logout() {
       </div>
     `,
     showCancelButton: true,
-<<<<<<< Updated upstream
-=======
     confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Sim, sair',
     cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
     confirmButtonColor: "#dc2626",
@@ -3258,7 +3256,6 @@ function logoutIncomplete() {
     text: "Tem a certeza que pretende sair?",
     icon: "question",
     showCancelButton: true,
->>>>>>> Stashed changes
     confirmButtonText: "Sim, sair",
     cancelButtonText: "Cancelar",
   }).then((result) => {
