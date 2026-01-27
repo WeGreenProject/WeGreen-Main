@@ -87,13 +87,13 @@
                     
                 </div>
 
-<div class="logs-container">
-    <div class="logs-header">
-        <h3>
-            <i class="fas fa-list"></i>
-            Histórico de Atividades
-        </h3>
-    </div>
+            <div class="logs-container">
+                <div class="logs-header">
+                    <h3>
+                        <i class="fas fa-list"></i>
+                        Histórico de Atividades
+                    </h3>
+                </div>
 
     <div id="logsContent">
         <div class="chart-card">

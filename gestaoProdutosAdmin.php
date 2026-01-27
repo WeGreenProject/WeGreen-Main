@@ -280,29 +280,29 @@
                             </div>
                             <div class="info-item">
                                 <label>Nome do Produto</label>
-                                <input type="text" class="form-control" id="nomeprodutoEdit2" disabled>
+                                <input type="text" class="form-control" id="nomeprodutoEdit2" >
                             </div>
                             <div class="info-item">
                                 <label>Categoria</label>
-                                <select name="" id="categoriaprodutoEdit2" disabled>
+                                <select name="" id="categoriaprodutoEdit2" >
 
                                 </select>
                             </div>
                             <div class="info-item">
                                 <label>Marca</label>
-                                <input type="text" class="form-control" id="marcaprodutoEdit2" disabled>
+                                <input type="text" class="form-control" id="marcaprodutoEdit2" >
                             </div>
                             <div class="info-item">
                                 <label>Tamanho</label>
-                                <input type="text" class="form-control" id="tamanhoprodutoEdit2" disabled>
+                                <input type="text" class="form-control" id="tamanhoprodutoEdit2" >
                             </div>
                             <div class="info-item">
                                 <label>Preço</label>
-                                <input type="text" class="form-control" id="precoprodutoEdit2" disabled>
+                                <input type="text" class="form-control" id="precoprodutoEdit2" >
                             </div>
                             <div class="info-item">
                                 <label>Gênero</label>
-                                <input type="text" class="form-control" id="generoprodutoEdit2" disabled>
+                                <input type="text" class="form-control" id="generoprodutoEdit2">
                             </div>
                             <div class="info-item">
                                 <label>Vendedor</label>

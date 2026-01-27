@@ -180,13 +180,23 @@ function registaRendimentos($descricao, $valor, $data){
 
     $stmt->bind_param("sds", $descricao, $valor, $data);
 
-    $flag = $stmt->execute();
-    $msg = $flag ? "Registado com sucesso!" : $stmt->error;
+    if($stmt->execute()){
+        $msg = "Registado com sucesso!";
+        $flag = true;
+    } else {
+        $msg = "Erro ao registar: " . $stmt->error;
+        $flag = false;
+    }
 
-    return json_encode([
+    $resp = json_encode([
         "flag" => $flag,
         "msg" => $msg
     ]);
+
+    $stmt->close();
+    $conn->close();
+
+    return $resp;
 }
 function getRendimentos(){
     global $conn;
