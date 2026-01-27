@@ -7,17 +7,26 @@ class SucessoCarrinho {
     function processarPagamentoStripe($session_id, $utilizador_id) {
         global $conn;
 
-        require_once '../vendor/autoload.php';
+        // Log para debug
+        error_log("=== PROCESSANDO PAGAMENTO STRIPE ===");
+        error_log("Session ID: " . $session_id);
+        error_log("Utilizador ID: " . $utilizador_id);
+
+        require_once __DIR__ . '/../vendor/autoload.php';
         \Stripe\Stripe::setApiKey('sk_test_51SAniYBgsjq4eGslagm3l86yXwCOicwq02ABZ54SCT7e8p9HiOTdciQcB3hQXxN4i6hVwlxohVvbtzQXEoPhg7yd009a6ubA3l');
 
         try {
             // Recuperar sessão do Stripe
             $session = \Stripe\Checkout\Session::retrieve($session_id);
+            error_log("Stripe Session Status: " . $session->payment_status);
 
             // Verificar pagamento
             if ($session->payment_status !== 'paid') {
+                error_log("ERRO: Pagamento não confirmado. Status: " . $session->payment_status);
                 return false;
             }
+
+            error_log("Pagamento confirmado! Processando encomenda...");
 
             // Extrair dados do pagamento Stripe
             $payment_intent_id = $session->payment_intent ?? '';
@@ -33,11 +42,38 @@ class SucessoCarrinho {
                 }
             }
 
-            $transportadora_id = $session->metadata->transportadora_id ?? 1;
+            // Extrair e validar transportadora_id
+            $transportadora_id_raw = $session->metadata->transportadora_id ?? null;
 
-            // Determinar tipo de entrega baseado na transportadora
-            // 2 = CTT Pickup, 4 = DPD Pickup
-            $tipo_entrega = (in_array($transportadora_id, [2, 4])) ? 'ponto_recolha' : 'domicilio';
+            // Mapear opções de envio (1-5) para transportadoras reais (1=CTT, 2=DPD)
+            // 1 = CTT Standard → 1 (CTT)
+            // 2 = CTT Pickup → 1 (CTT)
+            // 3 = DPD Standard → 2 (DPD)
+            // 4 = DPD Pickup → 2 (DPD)
+            // 5 = Entrega em Casa → 1 (CTT)
+
+            $mapeamento_transportadoras = [
+                '1' => 1, // CTT Standard
+                '2' => 1, // CTT Pickup
+                '3' => 2, // DPD Standard
+                '4' => 2, // DPD Pickup
+                '5' => 1, // Entrega em Casa (CTT)
+            ];
+
+            if (empty($transportadora_id_raw)) {
+                $transportadora_id = 1; // CTT por padrão
+                $tipo_entrega = 'domicilio';
+                error_log("⚠️ Transportadora vazia. Usando CTT (1) domicílio como padrão.");
+            } else {
+                $opcao_envio = strval($transportadora_id_raw);
+                $transportadora_id = $mapeamento_transportadoras[$opcao_envio] ?? 1;
+
+                // Determinar tipo de entrega baseado na opção
+                // 2 = CTT Pickup, 4 = DPD Pickup
+                $tipo_entrega = (in_array($opcao_envio, ['2', '4'])) ? 'ponto_recolha' : 'domicilio';
+
+                error_log("✓ Opção de envio: $opcao_envio → Transportadora: $transportadora_id, Tipo: $tipo_entrega");
+            }
 
             // Extrair dados do ponto de recolha (se aplicável)
             $ponto_recolha_id = $session->metadata->pickup_point_id ?? null;
@@ -89,76 +125,115 @@ class SucessoCarrinho {
                     WHERE ci.utilizador_id = $utilizador_id AND p.ativo = 1";
 
             $result = $conn->query($sql);
+            error_log("Produtos no carrinho: " . $result->num_rows);
 
             if ($result->num_rows > 0) {
-                // Gerar código único da encomenda
-                $codigo_encomenda = 'WG' . time() . rand(100, 999);
+                // Gerar código ÚNICO da encomenda (1 código para todos os produtos)
+                do {
+                    $codigo_encomenda = 'WG' . time() . rand(10000, 99999) . substr(uniqid(), -4);
+                    $check_sql = "SELECT id FROM Encomendas WHERE codigo_encomenda = '" . $conn->real_escape_string($codigo_encomenda) . "' LIMIT 1";
+                    $check_result = $conn->query($check_sql);
+                } while ($check_result && $check_result->num_rows > 0);
 
-                // Gerar código de confirmação de receção (6 caracteres alfanuméricos)
+                error_log("✓ Código único da encomenda: $codigo_encomenda");
+
+                // Gerar código de confirmação de receção
                 $codigo_confirmacao = 'CONF-' . strtoupper(substr(md5(uniqid($codigo_encomenda, true)), 0, 6));
 
-                // Calcular prazo estimado de entrega baseado na transportadora
-                // 2 = DPD (2 dias), outros = CTT/UPS (4 dias)
+                // Calcular prazo estimado de entrega
                 $dias_prazo = ($transportadora_id == 2) ? 2 : 4;
                 $prazo_estimado = date('Y-m-d', strtotime("+{$dias_prazo} days"));
 
                 $total = $session->amount_total / 100;
                 $produtos_nomes = array();
+                $produtos_detalhes = array();
+                $produtos_array = [];
+                $primeiro_produto_id = null;
+                $primeiro_anunciante_id = null;
 
-                // Processar cada produto
+                // Coletar todos os produtos primeiro
                 while ($row = $result->fetch_assoc()) {
-                    $produto_id = $row['produto_id'];
-                    $quantidade = $row['quantidade'];
-                    $preco = $row['preco'];
-                    $anunciante_id = $row['anunciante_id'];
+                    if ($primeiro_produto_id === null) {
+                        $primeiro_produto_id = $row['produto_id'];
+                        $primeiro_anunciante_id = $row['anunciante_id'];
+                    }
+                    $produtos_array[] = $row;
                     $produtos_nomes[] = $row['nome'];
+                    $produtos_detalhes[] = array(
+                        'nome' => $row['nome'],
+                        'imagem' => $row['imagem_principal'],
+                        'quantidade' => $row['quantidade'],
+                        'preco' => $row['preco']
+                    );
+                }
 
-                    // Inserir encomenda com código de confirmação e prazo estimado
-                    $sql_encomenda = "INSERT INTO Encomendas (
-                        codigo_encomenda, payment_id, payment_method, payment_status,
-                        cliente_id, anunciante_id, transportadora_id, produto_id,
-                        data_envio, morada, tipo_entrega, ponto_recolha_id,
-                        nome_ponto_recolha, morada_ponto_recolha, morada_completa,
-                        nome_destinatario, estado, plano_rastreio,
-                        codigo_confirmacao_recepcao, prazo_estimado_entrega, lembrete_confirmacao_enviado
-                    ) VALUES (
-                        '$codigo_encomenda', '$payment_intent_id', '$payment_method', '$payment_status',
-                        $utilizador_id, $anunciante_id, $transportadora_id, $produto_id,
-                        NOW(), '$morada', '$tipo_entrega', " . ($ponto_recolha_id ? "'$ponto_recolha_id'" : "NULL") . ",
-                        " . ($nome_ponto_recolha ? "'$nome_ponto_recolha'" : "NULL") . ",
-                        " . ($morada_ponto_recolha ? "'" . $conn->real_escape_string($morada_ponto_recolha) . "'" : "NULL") . ",
-                        '" . $conn->real_escape_string($morada_completa) . "',
-                        '" . $conn->real_escape_string($nome_destinatario) . "',
-                        'Pendente', 'Básico',
-                        '$codigo_confirmacao', '$prazo_estimado', 0
-                    )";
-                    $conn->query($sql_encomenda);
-                    $encomenda_id = $conn->insert_id;
+                // Criar UMA ÚNICA ENCOMENDA (sem anunciante_id - relação via tabela Vendas)
+                $sql_encomenda = "INSERT INTO Encomendas (
+                    codigo_encomenda, payment_id, payment_method, payment_status,
+                    cliente_id, transportadora_id, produto_id,
+                    data_envio, morada, tipo_entrega, ponto_recolha_id,
+                    nome_ponto_recolha, morada_ponto_recolha, morada_completa,
+                    nome_destinatario, estado, plano_rastreio,
+                    codigo_confirmacao_recepcao, prazo_estimado_entrega, lembrete_confirmacao_enviado
+                ) VALUES (
+                    '$codigo_encomenda', '$payment_intent_id', '$payment_method', '$payment_status',
+                    $utilizador_id, $transportadora_id, $primeiro_produto_id,
+                    NOW(), '" . $conn->real_escape_string($morada) . "', '$tipo_entrega', " . ($ponto_recolha_id ? "'" . $conn->real_escape_string($ponto_recolha_id) . "'" : "NULL") . ",
+                    " . ($nome_ponto_recolha ? "'" . $conn->real_escape_string($nome_ponto_recolha) . "'" : "NULL") . ",
+                    " . ($morada_ponto_recolha ? "'" . $conn->real_escape_string($morada_ponto_recolha) . "'" : "NULL") . ",
+                    '" . $conn->real_escape_string($morada_completa) . "',
+                    '" . $conn->real_escape_string($nome_destinatario) . "',
+                    'Pendente', 'Básico',
+                    '$codigo_confirmacao', '$prazo_estimado', 0
+                )";
 
-                    // Inserir venda com session_id
+                if (!$conn->query($sql_encomenda)) {
+                    error_log("❌ ERRO ao inserir encomenda: " . $conn->error);
+                    error_log("SQL: " . $sql_encomenda);
+                    throw new Exception("Erro ao criar encomenda: " . $conn->error);
+                }
+
+                $encomenda_id = $conn->insert_id;
+                error_log("✓ Encomenda única criada: ID=$encomenda_id, Código=$codigo_encomenda");
+
+                // Criar VENDAS para cada produto
+                foreach ($produtos_array as $produto) {
+                    $produto_id = $produto['produto_id'];
+                    $quantidade = $produto['quantidade'];
+                    $preco = $produto['preco'];
+                    $anunciante_id = $produto['anunciante_id'];
+
                     $valor_total = $preco * $quantidade;
                     $lucro = $valor_total * 0.06;
 
                     $sql_venda = "INSERT INTO Vendas (encomenda_id, stripe_session_id, anunciante_id, produto_id, quantidade, valor, lucro, data_venda)
                                   VALUES ($encomenda_id, '$session_id', $anunciante_id, $produto_id, $quantidade, $valor_total, $lucro, NOW())";
-                    $conn->query($sql_venda);
 
-                    // Inserir histórico
-                    $descricao = "Encomenda criada - Aguardando confirmação";
-                    $sql_historico = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao, data_atualizacao)
-                                      VALUES ($encomenda_id, 'Pendente', '$descricao', NOW())";
-                    $conn->query($sql_historico);
+                    if (!$conn->query($sql_venda)) {
+                        error_log("❌ ERRO ao inserir venda: " . $conn->error);
+                        throw new Exception("Erro ao criar venda: " . $conn->error);
+                    }
 
-                    // Registrar rendimento
-                    $descricao_rend = "Comissão venda - Encomenda $codigo_encomenda";
+                    error_log("✓ Venda criada: Produto ID=$produto_id, Qtd=$quantidade, Valor=€$valor_total");
+
+                    // Registrar rendimento por anunciante
+                    $descricao_rend = "Comissão venda - Encomenda $codigo_encomenda - Produto #$produto_id";
                     $sql_rendimento = "INSERT INTO Rendimento (valor, anunciante_id, descricao, data_registo)
                                        VALUES ($lucro, $anunciante_id, '$descricao_rend', NOW())";
                     $conn->query($sql_rendimento);
                 }
 
-                // Limpar carrinho
+                // Inserir histórico UMA VEZ para a encomenda
+                $descricao = "Encomenda criada - Aguardando confirmação";
+                $sql_historico = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao, data_atualizacao)
+                                  VALUES ($encomenda_id, 'Pendente', '$descricao', NOW())";
+                $conn->query($sql_historico);
+
+                // Limpar carrinho UMA VEZ
                 $sql_delete = "DELETE FROM Carrinho_Itens WHERE utilizador_id = $utilizador_id";
-                $conn->query($sql_delete);
+                if ($conn->query($sql_delete)) {
+                    error_log("✓ Carrinho limpo: removidos " . $conn->affected_rows . " itens");
+                }
 
                 // Enviar emails de notificação com dados completos de entrega
                 $dadosEntrega = [
@@ -175,7 +250,7 @@ class SucessoCarrinho {
                 $this->enviarEmailsConfirmacao(
                     $utilizador_id,
                     $codigo_encomenda,
-                    $anunciante_id,
+                    $primeiro_anunciante_id,
                     $payment_method,
                     $transportadora_id,
                     $morada,
@@ -185,18 +260,23 @@ class SucessoCarrinho {
                 );
 
                 // Retornar resultado
+                error_log("Encomenda processada com sucesso! Código: " . $codigo_encomenda);
                 return array(
                     'sucesso' => true,
                     'codigo_encomenda' => $codigo_encomenda,
                     'total' => $total,
-                    'produtos' => implode(', ', $produtos_nomes)
+                    'produtos' => implode(', ', $produtos_nomes),
+                    'produtos_detalhes' => $produtos_detalhes
                 );
+            } else {
+                error_log("ERRO: Carrinho vazio! Nenhum produto encontrado.");
             }
 
             return false;
 
         } catch (Exception $e) {
-            error_log("Erro ao processar pagamento: " . $e->getMessage());
+            error_log("ERRO CRÍTICO ao processar pagamento: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             return false;
         }
     }

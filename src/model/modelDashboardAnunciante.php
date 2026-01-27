@@ -326,6 +326,13 @@ class DashboardAnunciante {
         $produto = $result->fetch_assoc();
         $stmt->close();
 
+        // Converter fotos em array se existirem
+        if ($produto && !empty($produto['foto'])) {
+            $produto['fotos_array'] = explode(',', $produto['foto']);
+        } else {
+            $produto['fotos_array'] = [];
+        }
+
         return json_encode($produto);
     }
 
@@ -935,13 +942,13 @@ function getEncomendas($ID_User) {
                     u.nome AS cliente_nome,
                     u.email AS cliente_email,
                     t.nome AS transportadora_nome,
-                    SUM(v.valor) AS valor_total,
-                    SUM(v.lucro) AS lucro_total
+                    SUM(CASE WHEN v.anunciante_id = $ID_User THEN v.valor ELSE 0 END) AS valor_total,
+                    SUM(CASE WHEN v.anunciante_id = $ID_User THEN v.lucro ELSE 0 END) AS lucro_total
                 FROM Encomendas e
                 INNER JOIN Utilizadores u ON e.cliente_id = u.id
-                LEFT JOIN Vendas v ON e.id = v.encomenda_id
+                INNER JOIN Vendas v ON e.id = v.encomenda_id
                 LEFT JOIN Transportadora t ON e.transportadora_id = t.id
-                WHERE e.anunciante_id = $ID_User
+                WHERE v.anunciante_id = $ID_User
                 GROUP BY e.id, e.codigo_encomenda, e.payment_id, e.payment_method, e.payment_status,
                          e.data_envio, e.estado, e.morada, e.morada_completa, e.nome_destinatario,
                          e.tipo_entrega, e.codigo_rastreio, u.nome, u.email, t.nome
@@ -955,13 +962,13 @@ function getEncomendas($ID_User) {
             $comissao = $valor_bruto * 0.06;
             $lucro_liquido = $valor_bruto - $comissao;
 
-            // Buscar produtos da encomenda
+            // Buscar produtos da encomenda (apenas os produtos deste anunciante)
             $sql_produtos = "SELECT p.nome, p.foto, v.quantidade
                             FROM Vendas v
                             INNER JOIN Produtos p ON v.produto_id = p.Produto_id
-                            WHERE v.encomenda_id = ?";
+                            WHERE v.encomenda_id = ? AND v.anunciante_id = ?";
             $stmt_produtos = $conn->prepare($sql_produtos);
-            $stmt_produtos->bind_param("i", $row['id']);
+            $stmt_produtos->bind_param("ii", $row['id'], $ID_User);
             $stmt_produtos->execute();
             $result_produtos = $stmt_produtos->get_result();
 

@@ -1525,8 +1525,7 @@
     .swal2-popup.product-modal-view {
         border-radius: 12px !important;
         max-height: none !important;
-        width: 580px !important;
-        max-width: 580px !important;
+        max-width: none !important;
         overflow: visible !important;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         background: #ffffff !important;
@@ -2556,18 +2555,18 @@
     transform: translateY(-2px);
 }
 
-/* Indicador de Urgência */
-.row-urgent {
+/* Indicador de Urgência - REMOVIDO (não usado) */
+/* .row-urgent {
     background: #fff5f5 !important;
     border-left: 4px solid #e53e3e;
 }
 
 .row-urgent:hover {
     background: #fed7d7 !important;
-}
+} */
 
-/* Badge Novo */
-.badge-new {
+/* Badge Novo - REMOVIDO (não usado) */
+/* .badge-new {
     background: #3cb371;
     color: white;
     font-size: 10px;

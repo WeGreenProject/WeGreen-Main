@@ -23,251 +23,244 @@ if(!$resultado || !$resultado['sucesso']){
 
 $codigoEncomenda = $resultado['codigo_encomenda'];
 $totalCompra = $resultado['total'];
-$produtosNomes = $resultado['produtos'];
 
 // Limpar sessão
 unset($_SESSION['resultado_pagamento']);
+
+// Auto-redirecionar após 8 segundos
+$redirecionar_em = 8;
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagamento Confirmado - WeGreen</title>
-    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/sucess.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-     <style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compra Confirmada - WeGreen</title>
+  <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
     * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #ffffff;
-    color: #000000;
-    overflow-x: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.success-container {
-    max-width: 700px;
-    width: 100%;
-    background: #ffffff;
-    border: 2px solid #cb371;
-    border-radius: 20px;
-    padding: 50px 40px;
-    text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    animation: slideIn 0.6s ease-out;
-}
-
-.success-icon {
-    width: 120px;
-    height: 120px;
-    background: #cb371;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 30px;
-    font-size: 60px;
-    color: #3cb371;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-.success-title {
-    font-size: 36px;
-    color: #cb371;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.success-subtitle {
-    font-size: 18px;
-    color: #333333;
-    margin-bottom: 40px;
-    line-height: 1.6;
-}
-
-.order-details {
-    background: #f9f9f9;
-    border: 1px solid #3cb371;
-    border-radius: 16px;
-    padding: 30px;
-    margin-bottom: 30px;
-    text-align: left;
-}
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #3cb371;
-}
-
-.detail-label {
-    font-size: 14px;
-    color: #555555;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.detail-value {
-    font-size: 16px;
-    color: #000000;
-    font-weight: 600;
-}
-
-.confirmation-info {
-    background: #3cb371;
-    border: 1px solid #cb371;
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 30px;
-}
-
-.confirmation-info p {
-    font-size: 14px;
-    color: #ffffffff;
-    line-height: 1.6;
-    margin: 0;
-}
-
-.btn {
-    flex: 1;
-    min-width: 200px;
-    padding: 16px 32px;
-    border: none;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    text-decoration: none;
-}
-
-.btn-primary {
-    background: #3cb371;
-    color: #ffffff;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.btn-secondary {
-    background: #3cb371;
-    color: #ffffff;
-    border: 2px solid;
-}
-
-.btn-secondary:hover {
-    background: rgba(203, 179, 113, 0.15);
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.action-buttons .btn {
-    flex: none;
-    min-width: auto;
-    padding: 12px 22px;
-    border-radius: 8px; /* borda mais pequena */
-    font-size: 14px;
-}
-
-@media (max-width: 768px) {
-    .action-buttons {
-        flex-direction: column;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .action-buttons .btn {
-        width: 100%;
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #3cb371 0%, #2d8659 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow: hidden;
     }
-}
 
+    .success-container {
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+      max-width: 500px;
+      width: 100%;
+    }
 
-    </style>
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes checkDraw {
+      0% {
+        stroke-dashoffset: 100;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes scalePulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    .icon-wrapper {
+      margin-bottom: 30px;
+      animation: scalePulse 2s ease-in-out infinite;
+    }
+
+    .success-circle {
+      width: 150px;
+      height: 150px;
+      background: white;
+      border-radius: 50%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .checkmark {
+      width: 80px;
+      height: 80px;
+      stroke: #3cb371;
+      stroke-width: 4;
+      stroke-linecap: round;
+      fill: none;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: checkDraw 0.8s ease-out 0.3s forwards;
+    }
+
+    .success-message {
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .success-message h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .success-message p {
+      font-size: 18px;
+      opacity: 0.95;
+      font-weight: 400;
+    }
+
+    .order-code {
+      font-size: 16px;
+      margin-top: 10px;
+      opacity: 0.9;
+    }
+
+    .order-code strong {
+      font-family: monospace;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 5px 12px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-left: 5px;
+    }
+
+    .countdown-wrapper {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px 40px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .countdown-text {
+      color: white;
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    #countdown {
+      font-size: 56px;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      display: block;
+      margin-top: 5px;
+    }
+
+    .countdown-icon {
+      font-size: 24px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 768px) {
+      .success-circle {
+        width: 120px;
+        height: 120px;
+      }
+
+      .checkmark {
+        width: 60px;
+        height: 60px;
+      }
+
+      .success-message h1 {
+        font-size: 28px;
+      }
+
+      .success-message p {
+        font-size: 16px;
+      }
+
+      #countdown {
+        font-size: 42px;
+      }
+
+      .countdown-wrapper {
+        padding: 20px 30px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="success-container">
-        <div class="success-icon">✓</div>
-
-        <h1 class="success-title">Pagamento Confirmado!</h1>
-        <p class="success-subtitle">Obrigado pela sua compra. O seu pagamento foi processado com sucesso.</p>
-
-        <div class="order-details">
-            <div class="detail-row">
-                <span class="detail-label">Cliente</span>
-                <span class="detail-value"><?php echo $_SESSION['nome'] ?? 'Cliente WeGreen'; ?></span>
-            </div>
-
-            <div class="detail-row">
-                <span class="detail-label">Produtos</span>
-                <span class="detail-value"><?php echo $produtosNomes; ?></span>
-            </div>
-
-            <div class="detail-row">
-                <span class="detail-label">Data da Compra</span>
-                <span class="detail-value"><?php echo date('d \d\e F, Y'); ?></span>
-            </div>
-
-            <div class="detail-row">
-                <span class="detail-label">Número da Encomenda</span>
-                <span class="detail-value"><?php echo $codigoEncomenda; ?></span>
-            </div>
-
-            <div class="detail-row">
-                <span class="detail-label">Total Pago</span>
-                <span class="detail-value" style="color: #3cb371; font-size: 24px; font-weight: 700;">€<?php echo number_format($totalCompra, 2, ',', '.'); ?></span>
-            </div>
-        </div>
-
-        <div class="confirmation-info">
-            <p><i class="fas fa-envelope"></i> Enviámos um email de confirmação com todos os detalhes da sua compra</p>
-            <p><i class="fas fa-truck"></i> O seu pedido será processado em breve e receberá atualizações sobre o envio</p>
-        </div>
-
-        <div class="action-buttons">
-            <a href="minhasEncomendas.php" class="btn btn-primary">
-                <span class="btn-icon"><i class="fas fa-shopping-bag"></i></span>
-                <span>Ver Minhas Encomendas</span>
-            </a>
-
-            <a href="index.html" class="btn btn-secondary">
-                <span class="btn-icon"><i class="fas fa-home"></i></span>
-                <span>Voltar à Loja</span>
-            </a>
-        </div>
+  <div class="success-container">
+    <!-- Ícone de Sucesso -->
+    <div class="icon-wrapper">
+      <div class="success-circle">
+        <svg class="checkmark" viewBox="0 0 52 52">
+          <path fill="none" d="M14 27l7.5 7.5L38 18" />
+        </svg>
+      </div>
     </div>
 
-    <script>
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-        // Auto redirect após 5 segundos
-        setTimeout(function() {
-            window.location.href = 'minhasEncomendas.php';
-        }, 5000
-<script src="src/js/checkout.js"></script>
+    <!-- Mensagem de Sucesso -->
+    <div class="success-message">
+      <h1>Compra Realizada com Sucesso!</h1>
+      <p>Obrigado por escolher a WeGreen</p>
+      <p class="order-code">
+        Nº Encomenda: <strong><?php echo htmlspecialchars($codigoEncomenda); ?></strong>
+      </p>
+    </div>
+
+    <!-- Temporizador -->
+    <div class="countdown-wrapper">
+      <div class="countdown-text">
+        <i class="fas fa-clock countdown-icon"></i>
+        Redirecionamento automático em
+      </div>
+      <span id="countdown"><?php echo $redirecionar_em; ?></span>
+    </div>
+  </div>
+
+  <script>
+    let countdown = <?php echo $redirecionar_em; ?>;
+    const countdownElement = document.getElementById('countdown');
+
+    const timer = setInterval(function() {
+      countdown--;
+      countdownElement.textContent = countdown;
+
+      if (countdown <= 0) {
+        clearInterval(timer);
+        window.location.href = '/wegreen-main/minhasEncomendas.php';
+      }
+    }, 1000);
+  </script>
+</body>
+
+</html>

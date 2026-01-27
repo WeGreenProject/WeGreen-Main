@@ -108,11 +108,47 @@ function alerta2(msg) {
 }
 function alerta(titulo, msg, icon) {
   Swal.fire({
-    position: "center",
-    icon: icon,
-    title: titulo,
-    text: msg,
-    showConfirmButton: true,
+    html: `
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+          <i class="fas fa-times-circle" style="font-size: 40px; color: white;"></i>
+        </div>
+        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">${titulo}</h2>
+        <p style="color: #64748b; font-size: 15px; margin: 0;">${msg}</p>
+      </div>
+    `,
+    confirmButtonColor: "#dc3545",
+    confirmButtonText: '<i class="fas fa-check"></i> OK',
+    customClass: {
+      confirmButton: "swal2-confirm-modern",
+      popup: "swal2-border-radius",
+    },
+    buttonsStyling: false,
+    didOpen: () => {
+      const style = document.createElement("style");
+      style.textContent = `
+        .swal2-confirm-modern {
+          padding: 12px 30px !important;
+          border-radius: 8px !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          border: none !important;
+          margin: 5px !important;
+          background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+          color: white !important;
+        }
+        .swal2-confirm-modern:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+        }
+        .swal2-border-radius {
+          border-radius: 12px !important;
+        }
+      `;
+      document.head.appendChild(style);
+    },
   });
 }
 

@@ -55,10 +55,11 @@ body {
 }
 
 .logo-text p {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 11px;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
 }
 
 /* ========== Menu de Navegação ========== */
@@ -72,7 +73,7 @@ body {
 }
 
 .menu-section-title {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(0, 0, 0, 0.7);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -100,12 +101,17 @@ body {
 }
 
 .menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateX(5px);
+  color: #ffffff;
 }
 
 .menu-item.active {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
   font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: #ffffff;
 }
 
 /* ========== Perfil do Usuário ========== */

@@ -9,12 +9,12 @@ class ProdutosAdmin{
         $msg = "";
         $row = "";
         $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg  = "<div class='profile-avatar'>";
                     $msg .= "<img src='" .$row["foto"]. "' alt='User Photo' id='userPhoto'>";
                     $msg .= "</div>";
@@ -36,7 +36,7 @@ class ProdutosAdmin{
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -45,46 +45,40 @@ class ProdutosAdmin{
         $msg = "";
             if($estado == "Todos")
             {
-                $sql = "SELECT 
+                $sql = "SELECT
                 Encomendas.*,
                 Tipo_Produtos.descricao AS TipoProdutoNome,
                 Cliente.nome AS nomeCliente,
                 Anunciante.nome AS nomeAnunciante,
                 Produtos.preco AS Preco,
                 Produtos.foto AS Foto
-            FROM 
-                Encomendas, 
-                Tipo_Produtos, 
-                Utilizadores AS Cliente, 
-                Utilizadores AS Anunciante,
-                Produtos AS Produtos
-            WHERE 
-                Encomendas.TipoProdutoNome = Tipo_Produtos.id
-                AND Encomendas.produto_id = Produtos.id
-                AND Cliente.id = Encomendas.cliente_id
-                AND Anunciante.id = Encomendas.anunciante_id GROUP BY Encomendas.id";
+            FROM
+                Encomendas
+                INNER JOIN Vendas ON Encomendas.id = Vendas.encomenda_id
+                INNER JOIN Tipo_Produtos ON Encomendas.TipoProdutoNome = Tipo_Produtos.id
+                INNER JOIN Produtos ON Encomendas.produto_id = Produtos.Produto_id
+                INNER JOIN Utilizadores AS Cliente ON Cliente.id = Encomendas.cliente_id
+                INNER JOIN Utilizadores AS Anunciante ON Anunciante.id = Vendas.anunciante_id
+            GROUP BY Encomendas.id";
             }
             else if($estado == 'Pendente' || $estado == 'Entregue' ||  $estado == 'Cancelada')
             {
-                $sql = "SELECT 
+                $sql = "SELECT
                 Encomendas.*,
                 Tipo_Produtos.descricao AS TipoProdutoNome,
                 Cliente.nome AS nomeCliente,
                 Anunciante.nome AS nomeAnunciante,
                 Produtos.preco AS Preco,
                 Produtos.foto AS Foto
-            FROM 
-                Encomendas, 
-                Tipo_Produtos, 
-                Utilizadores AS Cliente, 
-                Utilizadores AS Anunciante,
-                Produtos AS Produtos
-            WHERE 
-                Encomendas.TipoProdutoNome = Tipo_Produtos.id
-                AND Encomendas.produto_id = Produtos.id
-                AND Cliente.id = Encomendas.cliente_id
-                AND Anunciante.id = Encomendas.anunciante_id
-                AND Encomendas.estado LIKE '$estado' GROUP BY Encomendas.id";
+            FROM
+                Encomendas
+                INNER JOIN Vendas ON Encomendas.id = Vendas.encomenda_id
+                INNER JOIN Tipo_Produtos ON Encomendas.TipoProdutoNome = Tipo_Produtos.id
+                INNER JOIN Produtos ON Encomendas.produto_id = Produtos.Produto_id
+                INNER JOIN Utilizadores AS Cliente ON Cliente.id = Encomendas.cliente_id
+                INNER JOIN Utilizadores AS Anunciante ON Anunciante.id = Vendas.anunciante_id
+            WHERE Encomendas.estado LIKE '$estado'
+            GROUP BY Encomendas.id";
             }
         $result = $conn->query($sql);
 
@@ -102,7 +96,7 @@ class ProdutosAdmin{
                 $msg .= "<td>".$row['morada']."</td>";
                 $msg .= "<td>".$row['estado']."</td>";
                 $msg .= "<td><button class='btn btn-success' onclick ='pagarDividasPagar(".$row['id'].")'><i class='fa fa-trash'>Aceitar</i></button></td>";
-                $msg .= "<td><button class='btn btn-danger' onclick ='recusarDividasPagar(".$row['id'].")'><i class='fa fa-trash'>Recusar</i></button></td>";         
+                $msg .= "<td><button class='btn btn-danger' onclick ='recusarDividasPagar(".$row['id'].")'><i class='fa fa-trash'>Recusar</i></button></td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -124,12 +118,12 @@ class ProdutosAdmin{
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As EncomendasCount from Encomendas  where Encomendas.estado like 'Pendente';";
-        
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg .= "<div class='approval-stat-icon'>⏳</div>";
                     $msg .= "<div class='approval-stat-info'>";
                     $msg  .= "<div class='approval-stat-value'>".$row["EncomendasCount"]."</div>";
@@ -149,7 +143,7 @@ class ProdutosAdmin{
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -158,12 +152,12 @@ class ProdutosAdmin{
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As EncomendasCount from Encomendas  where Encomendas.estado like 'Entregue';";
-        
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg .= "<div class='approval-stat-icon'>✅</div>";
                     $msg .= "<div class='approval-stat-info'>";
                     $msg  .= "<div class='approval-stat-value'>".$row["EncomendasCount"]."</div>";
@@ -183,7 +177,7 @@ class ProdutosAdmin{
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -192,12 +186,12 @@ class ProdutosAdmin{
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As EncomendasCount from Encomendas  where Encomendas.estado like 'Cancelada';";
-        
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg .= "<div class='approval-stat-icon'>❌</div>";
                     $msg .= "<div class='approval-stat-info'>";
                     $msg  .= "<div class='approval-stat-value'>".$row["EncomendasCount"]."</div>";
@@ -217,7 +211,7 @@ class ProdutosAdmin{
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -233,7 +227,7 @@ function getFiltro() {
     $row2 = $conn->query($sql2)->fetch_assoc();
     $row3 = $conn->query($sql3)->fetch_assoc();
     $row4 = $conn->query($sql4)->fetch_assoc();
-    
+
     $msg .= "<div class='add-order-section'>";
     $msg .= "<div class='simple-add-section'>";
     $msg .= "<button class='btn-add-order' onclick='adicionarEncomenda()'>";
@@ -269,7 +263,7 @@ function getFiltro() {
                 $msg .= "<td>".$row['data_criacao']."</td>";
                 $msg .= "<td>".$row['estado']."</td>";
                 $msg .= "<td><button class='btn btn-success' onclick ='pagarDividasPagar(".$row['id'].")'><i class='fa fa-trash'>Aceitar</i></button></td>";
-                $msg .= "<td><button class='btn btn-danger' onclick ='recusarDividasPagar(".$row['id'].")'><i class='fa fa-trash'>Recusar</i></button></td>";         
+                $msg .= "<td><button class='btn btn-danger' onclick ='recusarDividasPagar(".$row['id'].")'><i class='fa fa-trash'>Recusar</i></button></td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -291,12 +285,12 @@ function getFiltro() {
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As ProdutosCount from Produtos  where produtos.estado like 'Rejeitado';";
-        
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg .= "<button class='filter-btn active'>";
                     $msg .= "Todos <span class='filter-badge' onclick='getProdutosTodos()'>0</span>";
                     $msg  .= "</button>";
@@ -317,7 +311,7 @@ function getFiltro() {
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }

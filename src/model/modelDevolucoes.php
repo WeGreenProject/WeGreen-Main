@@ -12,9 +12,9 @@ class ModelDevolucoes {
         $this->conn = $conn;
     }
 
-    function solicitarDevolucao($encomenda_id, $cliente_id, $motivo, $motivo_detalhe = '', $notas_cliente = '', $fotos = []) {
+    function solicitarDevolucao($encomenda_id, $cliente_id, $motivo, $motivo_detalhe = '', $notas_cliente = '', $fotos = [], $produtos_selecionados = []) {
         try {
-            // 1. Verificar elegibilidade
+            // 1. Verificar elegibilidade básica da encomenda
             $elegibilidade = $this->verificarElegibilidade($encomenda_id, $cliente_id);
             if (!$elegibilidade['elegivel']) {
                 return [
@@ -25,52 +25,99 @@ class ModelDevolucoes {
 
             $encomenda = $elegibilidade['encomenda'];
 
-            // 2. Gerar código único de devolução
-            $codigo_devolucao = $this->gerarCodigoDevolucao();
+            // 2. Buscar detalhes dos produtos da encomenda para validar
+            $sql_produtos = "SELECT v.*, p.nome, p.foto
+                            FROM vendas v
+                            INNER JOIN produtos p ON v.Produto_id = p.Produto_id
+                            WHERE v.encomenda_id = ?";
+            $stmt_produtos = $this->conn->prepare($sql_produtos);
+            $stmt_produtos->bind_param('i', $encomenda_id);
+            $stmt_produtos->execute();
+            $result_produtos = $stmt_produtos->get_result();
 
-            // 3. Preparar dados
-            $fotos_json = json_encode($fotos);
-
-            // 4. Inserir devolução
-            $sql = "INSERT INTO devolucoes (
-                        codigo_devolucao, encomenda_id, cliente_id, anunciante_id, produto_id,
-                        valor_reembolso, motivo, motivo_detalhe, notas_cliente, fotos,
-                        payment_intent_id, estado, data_solicitacao
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'solicitada', NOW())";
-
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bind_param(
-                'siiiidssss',
-                $codigo_devolucao,
-                $encomenda_id,
-                $cliente_id,
-                $encomenda['anunciante_id'],
-                $encomenda['produto_id'],
-                $encomenda['valor'],
-                $motivo,
-                $motivo_detalhe,
-                $notas_cliente,
-                $fotos_json,
-                $encomenda['payment_id']
-            );
-
-            if (!$stmt->execute()) {
-                throw new Exception("Erro ao inserir devolução: " . $stmt->error);
+            $produtos_encomenda = [];
+            while ($row = $result_produtos->fetch_assoc()) {
+                $produtos_encomenda[$row['Produto_id']] = $row;
             }
 
-            $devolucao_id = $stmt->insert_id;
+            // 3. Validar produtos selecionados
+            foreach ($produtos_selecionados as $produto_sel) {
+                if (!isset($produtos_encomenda[$produto_sel['produto_id']])) {
+                    return [
+                        'success' => false,
+                        'message' => 'Produto inválido selecionado.'
+                    ];
+                }
 
-            // 5. Registrar no histórico
-            $this->registrarHistorico($devolucao_id, null, 'solicitada', 'cliente', 'Devolução solicitada pelo cliente');
+                $prod_enc = $produtos_encomenda[$produto_sel['produto_id']];
+                if ($produto_sel['quantidade'] > $prod_enc['quantidade']) {
+                    return [
+                        'success' => false,
+                        'message' => 'Quantidade de devolução excede quantidade comprada para: ' . $prod_enc['nome']
+                    ];
+                }
+            }
 
-            // 6. Enviar notificações
-            $this->enviarNotificacaoSolicitacao($devolucao_id);
+            // 4. Gerar código único de devolução (compartilhado por todos os produtos)
+            $codigo_devolucao = $this->gerarCodigoDevolucao();
+            $fotos_json = json_encode($fotos);
+
+            $devolucoes_criadas = [];
+
+            // 5. Criar uma devolução para cada produto selecionado
+            foreach ($produtos_selecionados as $produto_sel) {
+                $produto_id = $produto_sel['produto_id'];
+                $quantidade = $produto_sel['quantidade'];
+                $prod_enc = $produtos_encomenda[$produto_id];
+
+                // Calcular valor proporcional do reembolso
+                $valor_reembolso = ($prod_enc['valor'] / $prod_enc['quantidade']) * $quantidade;
+
+                // Inserir devolução
+                $sql = "INSERT INTO devolucoes (
+                            codigo_devolucao, encomenda_id, cliente_id, anunciante_id, produto_id,
+                            quantidade, valor_reembolso, motivo, motivo_detalhe, notas_cliente, fotos,
+                            payment_intent_id, estado, data_solicitacao
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'solicitada', NOW())";
+
+                $stmt = $this->conn->prepare($sql);
+                $stmt->bind_param(
+                    'siiiidssss',
+                    $codigo_devolucao,
+                    $encomenda_id,
+                    $cliente_id,
+                    $prod_enc['anunciante_id'],
+                    $produto_id,
+                    $quantidade,
+                    $valor_reembolso,
+                    $motivo,
+                    $motivo_detalhe,
+                    $notas_cliente,
+                    $fotos_json,
+                    $encomenda['payment_id']
+                );
+
+                if (!$stmt->execute()) {
+                    throw new Exception("Erro ao inserir devolução: " . $stmt->error);
+                }
+
+                $devolucao_id = $stmt->insert_id;
+                $devolucoes_criadas[] = $devolucao_id;
+
+                // 6. Registrar no histórico
+                $this->registrarHistorico($devolucao_id, null, 'solicitada', 'cliente', 'Devolução solicitada pelo cliente');
+            }
+
+            // 7. Enviar notificações (uma vez por código)
+            if (!empty($devolucoes_criadas)) {
+                $this->enviarNotificacaoSolicitacao($devolucoes_criadas[0]);
+            }
 
             return [
                 'success' => true,
                 'message' => 'Devolução solicitada com sucesso!',
                 'codigo_devolucao' => $codigo_devolucao,
-                'devolucao_id' => $devolucao_id
+                'devolucoes_criadas' => count($devolucoes_criadas)
             ];
 
         } catch (Exception $e) {
@@ -90,11 +137,12 @@ class ModelDevolucoes {
      * @return array
      */
     public function verificarElegibilidade($encomenda_id, $cliente_id) {
-        // Buscar dados da encomenda
-        $sql = "SELECT e.*, v.valor, e.payment_id
+        // Buscar dados da encomenda (anunciante_id vem da tabela Vendas)
+        $sql = "SELECT e.*, v.valor, v.anunciante_id, e.payment_id
                 FROM encomendas e
                 LEFT JOIN vendas v ON e.id = v.encomenda_id
-                WHERE e.id = ? AND e.cliente_id = ?";
+                WHERE e.id = ? AND e.cliente_id = ?
+                LIMIT 1";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('ii', $encomenda_id, $cliente_id);

@@ -266,8 +266,10 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   }
 
   function criarCardEncomenda(enc) {
-    const statusInfo = getStatusInfo(enc.estado.toLowerCase());
-    const timeline = criarTimeline(enc.estado.toLowerCase());
+    // Garantir que enc.estado existe e não é null
+    const estado = (enc.estado || 'Pendente').toLowerCase();
+    const statusInfo = getStatusInfo(estado);
+    const timeline = criarTimeline(estado);
 
     // Renderizar produtos - pode ser um array ou string
     let produtosHTML = '';
@@ -366,12 +368,12 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                         <button class="btn-action btn-primary" onclick="verDetalhes('${enc.codigo_encomenda}')">
                             <i class="fas fa-eye"></i> Ver Detalhes
                         </button>
-                        ${enc.estado.toLowerCase() === 'enviado' && enc.codigo_confirmacao_recepcao ? `
+                        ${estado === 'enviado' && enc.codigo_confirmacao_recepcao ? `
                             <button class="btn-action btn-success" onclick="confirmarEntrega('${enc.codigo_confirmacao_recepcao}')" style="font-weight: bold;">
                                 <i class="fas fa-check-circle"></i> Confirmar Receção
                             </button>
                         ` : ''}
-                        ${enc.estado.toLowerCase() === 'entregue' && !enc.devolucao_ativa ? `
+                        ${estado === 'entregue' && !enc.devolucao_ativa ? `
                             <button class="btn-action btn-warning" onclick="abrirModalDevolucao('${enc.id}', '${enc.codigo_encomenda}', ${JSON.stringify(enc.produtos).replace(/"/g, '&quot;')})">
                                 <i class="fas fa-undo"></i> Solicitar Devolução
                             </button>
@@ -400,7 +402,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                         <button class="btn-action btn-outline" onclick="descarregarFatura('${enc.codigo_encomenda}')">
                             <i class="fas fa-download"></i> Fatura
                         </button>
-                        ${(enc.estado.toLowerCase() === 'pendente' || enc.estado.toLowerCase() === 'processando') ? `
+                        ${(estado === 'pendente' || estado === 'processando') ? `
                             <button class="btn-action btn-danger" onclick="cancelarEncomenda('${enc.codigo_encomenda}')">
                                 <i class="fas fa-times"></i> Cancelar
                             </button>
@@ -511,13 +513,13 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     // Filtro de pesquisa
     const search = $('#searchProduct').val().toLowerCase();
     if (search) {
-      filtradas = filtradas.filter(e => e.produtos.toLowerCase().includes(search));
+      filtradas = filtradas.filter(e => (e.produtos || '').toLowerCase().includes(search));
     }
 
     // Filtro de status
     const status = $('#filterStatus').val().toLowerCase();
     if (status) {
-      filtradas = filtradas.filter(e => e.estado.toLowerCase() === status);
+      filtradas = filtradas.filter(e => (e.estado || 'pendente').toLowerCase() === status);
     }
 
     // Filtro de período
@@ -811,7 +813,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     const hoje = new Date();
     const diasDesdeEncomenda = Math.floor((hoje - dataEncomenda) / (1000 * 60 * 60 * 24));
 
-    const statusInfo = getStatusInfo(encomenda.estado.toLowerCase());
+    const statusInfo = getStatusInfo((encomenda.estado || 'Pendente').toLowerCase());
 
     const html = `
       <div style="padding: 25px;">
@@ -891,7 +893,10 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
   function mostrarTodosProdutos(produtos) {
     let produtosHTML = produtos.map((p, index) => `
-      <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: ${index % 2 === 0 ? '#f9fafb' : '#ffffff'}; border-radius: 8px; margin-bottom: 10px;">
+      <div onclick="window.location.href='produto.php?id=${p.Produto_id}'"
+           style="display: flex; align-items: center; gap: 15px; padding: 15px; background: ${index % 2 === 0 ? '#f9fafb' : '#ffffff'}; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: all 0.3s ease;"
+           onmouseover="this.style.background='#e8f5e9'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(60, 179, 113, 0.2)';"
+           onmouseout="this.style.background='${index % 2 === 0 ? '#f9fafb' : '#ffffff'}'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
         <img src="${p.foto || 'assets/media/products/default.jpg'}" alt="${p.nome}"
              style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 2px solid #e5e7eb;">
         <div style="flex: 1;">
@@ -905,23 +910,33 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
             </span>
           </div>
         </div>
+        <i class="fas fa-chevron-right" style="color: #3cb371; font-size: 14px;"></i>
       </div>
     `).join('');
 
     Swal.fire({
-      title: `<i class="fas fa-cubes" style="color: #3cb371; margin-right: 10px;"></i>Produtos da Encomenda`,
       html: `
-        <div style="text-align: left; max-height: 500px; overflow-y: auto; padding: 10px;">
-          <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
-            <span style="font-weight: 600; color: #2d3748;">
-              <i class="fas fa-shopping-bag" style="color: #3cb371; margin-right: 6px;"></i>
-              Total de ${produtos.length} produto${produtos.length > 1 ? 's' : ''} nesta encomenda
-            </span>
+        <div style="margin: -20px -20px 0 -20px; overflow-x: hidden;">
+          <div style="background: linear-gradient(135deg, #3cb371 0%, #2d8659 100%); padding: 25px 20px; border-radius: 8px 8px 0 0;">
+            <h2 style="margin: 0; color: white; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <i class="fas fa-cubes" style="font-size: 24px;"></i>
+              Produtos da Encomenda
+            </h2>
           </div>
-          ${produtosHTML}
+          <div style="text-align: center; max-height: 500px; overflow-y: auto; overflow-x: hidden; padding: 30px 25px;">
+            <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; border-left: 4px solid #3cb371; max-width: 400px; margin-left: auto; margin-right: auto;">
+              <span style="font-weight: 600; color: #2d3748;">
+                <i class="fas fa-shopping-bag" style="color: #3cb371; margin-right: 6px;"></i>
+                Total de ${produtos.length} produto${produtos.length > 1 ? 's' : ''} nesta encomenda
+              </span>
+            </div>
+            <div style="max-width: 550px; margin: 0 auto;">
+              ${produtosHTML}
+            </div>
+          </div>
         </div>
       `,
-      width: '600px',
+      width: '650px',
       confirmButtonText: 'Fechar',
       confirmButtonColor: '#3cb371',
       showClass: {
@@ -930,7 +945,24 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
       },
       customClass: {
         confirmButton: 'swal2-confirm-modern',
-        popup: 'swal2-border-radius'
+        popup: 'swal2-border-radius',
+        htmlContainer: 'swal2-html-container-no-padding'
+      },
+      didOpen: () => {
+        // Adicionar estilo customizado para remover padding do container HTML
+        const style = document.createElement('style');
+        style.textContent = `
+          .swal2-html-container-no-padding {
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow-x: hidden !important;
+          }
+          .swal2-border-radius {
+            border-radius: 12px !important;
+            overflow: hidden;
+          }
+        `;
+        document.head.appendChild(style);
       }
     });
   }
@@ -1133,14 +1165,67 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
   function cancelarEncomenda(codigo) {
     Swal.fire({
-      title: 'Cancelar Encomenda?',
-      text: 'Esta ação não pode ser revertida!',
-      icon: 'warning',
+      html: `
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(201, 42, 42, 0.3);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
+          </div>
+          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Cancelar Encomenda?</h2>
+          <p style="color: #64748b; font-size: 15px; margin: 0 0 20px 0;">Esta ação não pode ser revertida!</p>
+          <div style="background: #fff5f5; border-left: 4px solid #ff6b6b; padding: 12px; border-radius: 8px; margin-top: 15px;">
+            <p style="margin: 0; color: #c92a2a; font-size: 13px; font-weight: 500;">
+              <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+              Ao cancelar, a encomenda será permanentemente cancelada e não poderá ser processada.
+            </p>
+          </div>
+        </div>
+      `,
       showCancelButton: true,
       confirmButtonColor: '#dc3545',
       cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Sim, cancelar!',
-      cancelButtonText: 'Não'
+      confirmButtonText: '<i class="fas fa-times-circle"></i> Sim, cancelar!',
+      cancelButtonText: '<i class="fas fa-arrow-left"></i> Não',
+      customClass: {
+        confirmButton: 'swal2-confirm-modern',
+        cancelButton: 'swal2-cancel-modern',
+        popup: 'swal2-border-radius'
+      },
+      buttonsStyling: false,
+      didOpen: () => {
+        const style = document.createElement('style');
+        style.textContent = `
+          .swal2-confirm-modern, .swal2-cancel-modern {
+            padding: 12px 30px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+            margin: 5px !important;
+          }
+          .swal2-confirm-modern {
+            background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+            color: white !important;
+          }
+          .swal2-confirm-modern:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+          }
+          .swal2-cancel-modern {
+            background: #6c757d !important;
+            color: white !important;
+          }
+          .swal2-cancel-modern:hover {
+            background: #5a6268 !important;
+            transform: translateY(-2px) !important;
+          }
+          .swal2-border-radius {
+            border-radius: 12px !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
@@ -1153,10 +1238,58 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
           dataType: 'json',
           success: function(response) {
             if (response.success) {
-              Swal.fire('Cancelada!', 'Encomenda cancelada com sucesso', 'success');
+              Swal.fire({
+                icon: 'success',
+                title: 'Cancelada!',
+                text: 'Encomenda cancelada com sucesso',
+                confirmButtonColor: '#3cb371'
+              });
               carregarEncomendas();
             } else {
-              Swal.fire('Erro', response.message, 'error');
+              // Determinar motivo específico
+              let motivoHTML = '';
+              if (response.message.includes('não pode ser cancelada')) {
+                motivoHTML = `
+                  <div style="background: #fff5f5; border-left: 4px solid #ff6b6b; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: left;">
+                    <p style="margin: 0 0 10px 0; color: #c92a2a; font-weight: 600; font-size: 14px;">
+                      <i class="fas fa-ban" style="margin-right: 8px;"></i>Motivo:
+                    </p>
+                    <p style="margin: 0; color: #64748b; font-size: 13px;">
+                      Apenas encomendas com estado <strong>Pendente</strong> ou <strong>Em Processamento</strong> podem ser canceladas.
+                    </p>
+                    <p style="margin: 10px 0 0 0; color: #64748b; font-size: 13px;">
+                      Esta encomenda já está <strong>Enviada</strong> ou <strong>Entregue</strong> e não pode mais ser cancelada.
+                    </p>
+                  </div>
+                `;
+              } else if (response.message.includes('não encontrada')) {
+                motivoHTML = `
+                  <div style="background: #fff5f5; border-left: 4px solid #ff6b6b; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <p style="margin: 0; color: #c92a2a; font-size: 13px;">
+                      <i class="fas fa-search" style="margin-right: 5px;"></i>
+                      A encomenda não foi encontrada no sistema.
+                    </p>
+                  </div>
+                `;
+              }
+
+              Swal.fire({
+                html: `
+                  <div style="text-align: center;">
+                    <div style="width: 70px; height: 70px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                      <i class="fas fa-times" style="font-size: 35px; color: white;"></i>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #2d3748; font-size: 20px; font-weight: 700;">Erro</h3>
+                    <p style="color: #64748b; font-size: 14px; margin: 0;">Encomenda não pode ser cancelada</p>
+                    ${motivoHTML}
+                  </div>
+                `,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#dc3545',
+                customClass: {
+                  popup: 'swal2-border-radius'
+                }
+              });
             }
           }
         });
@@ -1191,12 +1324,58 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
   function logout() {
     Swal.fire({
-      title: 'Terminar Sessão?',
-      text: 'Tem a certeza que pretende sair?',
-      icon: 'question',
+      html: `
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+            <i class="fas fa-sign-out-alt" style="font-size: 40px; color: white;"></i>
+          </div>
+          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Terminar Sessão?</h2>
+          <p style="color: #64748b; font-size: 15px; margin: 0;">Tem a certeza que pretende sair?</p>
+        </div>
+      `,
       showCancelButton: true,
-      confirmButtonText: 'Sim, sair',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: '<i class="fas fa-check"></i> Sim, sair',
+      cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+      customClass: {
+        confirmButton: 'swal2-confirm-modern',
+        cancelButton: 'swal2-cancel-modern',
+        popup: 'swal2-border-radius'
+      },
+      buttonsStyling: false,
+      didOpen: () => {
+        const style = document.createElement('style');
+        style.textContent = `
+          .swal2-confirm-modern, .swal2-cancel-modern {
+            padding: 12px 30px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+            margin: 5px !important;
+          }
+          .swal2-confirm-modern {
+            background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+            color: white !important;
+          }
+          .swal2-confirm-modern:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+          }
+          .swal2-cancel-modern {
+            background: #6c757d !important;
+            color: white !important;
+          }
+          .swal2-cancel-modern:hover {
+            background: #5a6268 !important;
+            transform: translateY(-2px) !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({

@@ -422,12 +422,61 @@ function renderRecomendacoes(produtos) {
 
         function logout() {
             Swal.fire({
-                title: 'Terminar Sessão?',
-                text: 'Tem a certeza que pretende sair?',
-                icon: 'question',
+                html: `
+                  <div style="text-align: center;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+                      <i class="fas fa-sign-out-alt" style="font-size: 40px; color: white;"></i>
+                    </div>
+                    <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Terminar Sessão?</h2>
+                    <p style="color: #64748b; font-size: 15px; margin: 0;">Tem a certeza que pretende sair?</p>
+                  </div>
+                `,
                 showCancelButton: true,
-                confirmButtonText: 'Sim, sair',
-                cancelButtonText: 'Cancelar'
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-check"></i> Sim, sair',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                customClass: {
+                  confirmButton: 'swal2-confirm-modern',
+                  cancelButton: 'swal2-cancel-modern',
+                  popup: 'swal2-border-radius'
+                },
+                buttonsStyling: false,
+                didOpen: () => {
+                  const style = document.createElement('style');
+                  style.textContent = `
+                    .swal2-confirm-modern, .swal2-cancel-modern {
+                      padding: 12px 30px !important;
+                      border-radius: 8px !important;
+                      font-weight: 600 !important;
+                      font-size: 14px !important;
+                      cursor: pointer !important;
+                      transition: all 0.3s ease !important;
+                      border: none !important;
+                      margin: 5px !important;
+                    }
+                    .swal2-confirm-modern {
+                      background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+                      color: white !important;
+                    }
+                    .swal2-confirm-modern:hover {
+                      transform: translateY(-2px) !important;
+                      box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+                    }
+                    .swal2-cancel-modern {
+                      background: #6c757d !important;
+                      color: white !important;
+                    }
+                    .swal2-cancel-modern:hover {
+                      background: #5a6268 !important;
+                      transform: translateY(-2px) !important;
+                    }
+                    .swal2-border-radius {
+                      border-radius: 12px !important;
+                    }
+                  `;
+                  document.head.appendChild(style);
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({

@@ -704,3 +704,30 @@ body {
     padding: 8px 20px;
   }
 }
+
+/* Estilos para botões de ação */
+.btn-info {
+  background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(60, 179, 113, 0.2);
+}
+
+.btn-info:hover {
+  background: linear-gradient(135deg, #2e8b57 0%, #1f6f42 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
+}
+
+.btn-info i {
+  font-size: 12px;
+}

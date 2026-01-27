@@ -214,10 +214,10 @@ class Encomendas {
         global $conn;
 
         $sql = "UPDATE encomendas
-                SET estado = 'cancelado'
+                SET estado = 'Cancelada'
                 WHERE codigo_encomenda = '$codigo_encomenda'
                 AND cliente_id = $cliente_id
-                AND estado IN ('pendente', 'processando')";
+                AND estado IN ('Pendente', 'Processando')";
 
         $result = $conn->query($sql);
 

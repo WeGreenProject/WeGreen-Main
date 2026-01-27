@@ -58,7 +58,7 @@ if (isset($_POST['op']) && $_POST['op'] == 'cancelarEncomenda') {
         exit();
     }
 
-    if ($detalhes['estado'] !== 'pendente' && $detalhes['estado'] !== 'processando') {
+    if ($detalhes['estado'] !== 'Pendente' && $detalhes['estado'] !== 'Processando') {
         echo json_encode(['success' => false, 'message' => 'Encomenda não pode ser cancelada']);
         exit();
     }
