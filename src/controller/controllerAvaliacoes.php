@@ -36,25 +36,64 @@ if (isset($_POST['op']) && $_POST['op'] == 'criarAvaliacao') {
 
 // Obter avaliações de um produto
 if (isset($_POST['op']) && $_POST['op'] == 'obterAvaliacoes') {
+    // Limpar qualquer output anterior ANTES de processar
+    ob_clean();
+
     $produto_id = $_POST['produto_id'] ?? null;
 
+    error_log("=== CONTROLLER AVALIACOES ===");
+    error_log("Produto ID recebido: " . $produto_id);
+
     if (empty($produto_id)) {
-        ob_clean();
+        error_log("Erro: Produto ID vazio");
         echo json_encode(['success' => false, 'message' => 'ID do produto não fornecido']);
         exit();
     }
 
-    $avaliacoes = $func->obterAvaliacoesProduto($produto_id);
-    $estatisticas = $func->obterEstatisticasProduto($produto_id);
+    try {
+        error_log("Chamando obterAvaliacoesProduto...");
+        $avaliacoes = $func->obterAvaliacoesProduto($produto_id);
+        error_log("Avaliações retornadas: " . count($avaliacoes));
 
-    // Limpar qualquer output anterior
-    ob_clean();
+        error_log("Chamando obterEstatisticasProduto...");
+        $estatisticas = $func->obterEstatisticasProduto($produto_id);
+        error_log("Estatísticas - Total: " . $estatisticas['total'] . ", Média: " . $estatisticas['media']);
 
-    echo json_encode([
-        'success' => true,
-        'avaliacoes' => $avaliacoes,
-        'estatisticas' => $estatisticas
-    ], JSON_UNESCAPED_UNICODE);
+        // Garantir que avaliacoes é sempre um array
+        if (!is_array($avaliacoes)) {
+            error_log("AVISO: avaliacoes não é array, convertendo...");
+            $avaliacoes = [];
+        }
+
+        // Garantir que estatisticas tem a estrutura correta
+        if (!is_array($estatisticas)) {
+            error_log("AVISO: estatisticas não é array, usando valores padrão...");
+            $estatisticas = [
+                'total' => 0,
+                'media' => 0,
+                'estrelas_5' => 0,
+                'estrelas_4' => 0,
+                'estrelas_3' => 0,
+                'estrelas_2' => 0,
+                'estrelas_1' => 0
+            ];
+        }
+
+        $response = [
+            'success' => true,
+            'avaliacoes' => $avaliacoes,
+            'estatisticas' => $estatisticas
+        ];
+
+        error_log("Enviando resposta JSON: " . json_encode($response));
+        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+    } catch (Exception $e) {
+        error_log("ERRO EXCEPTION: " . $e->getMessage());
+        echo json_encode([
+            'success' => false,
+            'message' => 'Erro ao buscar avaliações: ' . $e->getMessage()
+        ]);
+    }
     exit();
 }
 

@@ -985,7 +985,7 @@ function getEncomendas($ID_User) {
                 'payment_status' => $row['payment_status'] ?: 'N/A',
                 'data' => date('d/m/Y', strtotime($row['data_envio'])),
                 'data_completa' => $row['data_envio'],
-                'estado' => $row['estado'],
+                'estado' => $row['estado'] ?: 'Pendente',
                 'morada' => $row['morada'],
                 'morada_completa' => $row['morada_completa'] ?: $row['morada'],
                 'nome_destinatario' => $row['nome_destinatario'] ?: $row['cliente_nome'],

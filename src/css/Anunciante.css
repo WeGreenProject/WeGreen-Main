@@ -1525,7 +1525,8 @@
     .swal2-popup.product-modal-view {
         border-radius: 12px !important;
         max-height: none !important;
-        max-width: none !important;
+        width: 580px !important;
+        max-width: 580px !important;
         overflow: visible !important;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         background: #ffffff !important;
