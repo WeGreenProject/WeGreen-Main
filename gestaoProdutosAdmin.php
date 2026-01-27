@@ -2,110 +2,6 @@
 <html lang="pt">
 
 <head>
-<<<<<<< Updated upstream
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Produtos - WeGreen Admin</title>
-    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/AdminGestao.css">
-    <link rel="stylesheet" href="src/css/lib/datatables.css">
-    <link rel="stylesheet" href="src/css/lib/select2.css">
-
-    <script src="src/js/lib/bootstrap.js"></script>
-    <script src="src/js/lib/jquery.js"></script>
-    <script src="src/js/lib/datatables.js"></script>
-    <script src="src/js/lib/select2.js"></script>
-    <script src="src/js/lib/sweatalert.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-
-<body>
-    <div class="container">
-        <aside class="sidebar">
-            <a href="index.html" class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                <div class="logo-text">
-                    <h1>WeGreen</h1>
-                    <p>Painel Admin</p>
-                </div>
-            </a>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="DashboardAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Gestao de Utilizadores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoLucros.php">
-                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                            <span class="nav-text">Gestão de Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php">
-                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                            <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-history"></i></span>
-                            <span class="nav-text">Logs do Sistema</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-
-        <main class="main-content">
-            <div class="page-header">
-                <h2>Gestão de Produtos</h2>
-                <p>Gerir todos os produtos na plataforma</p>
-            </div>
-            <div class="charts-grid">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-fire"></i>Produto anunciados</h3>
-                    </div>
-                    <canvas id="topProductsChart"></canvas>
-                </div>
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3><i class="fas fa-star"></i>Produto Vendidos</h3>
-                    </div>
-                    <canvas id="salesChart"></canvas>
-                </div>
-            </div>
-            <br>
-            <br>
-            <div class="tabs-container">
-                <!-- <button class="tab-btn active" onclick="switchTab('minhas-vendas')">
-                    <i class="fas fa-list"></i> Meus Produtos
-                </button> -->
-                <!-- <button class="tab-btn" onclick="switchTab('adicionar-venda')">
-                    <i class="fas fa-plus-circle"></i> Adicionar Produto
-                </button> -->
-                <button class="tab-btn" onclick="switchTab('todas-vendas')">
-                    <i class="fas fa-globe"></i> Todos os Produtos
-                </button>
-                <button class="tab-btn" onclick="switchTab('Inativos')">
-                    <i class="fas fa-search"></i> Verificar Produtos
-                </button>
-=======
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestão de Produtos - WeGreen Admin</title>
@@ -307,7 +203,6 @@
                 <label>Preço Unitário (€)</label>
                 <input type="number" id="preco" step="0.01" required>
               </div>
->>>>>>> Stashed changes
             </div>
 
             <div id="Inativos" class="tab-content active">

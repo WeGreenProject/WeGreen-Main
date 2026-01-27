@@ -149,9 +149,9 @@ function removerGastos($ID_Gasto){
     global $conn;
     $msg = "";
     $flag = false;
-
-    $stmt = $conn->prepare("INSERT INTO Gastos (descricao,Valor, Data) VALUES (?, ?,?)");
-    $stmt->bind_param("sds", $descricao, $Valor, $Data);
+    $anunciante_id = 1;
+    $stmt = $conn->prepare("INSERT INTO gastos (descricao,anunciante_id,Valor, data_registo) VALUES (?, ?,?,?)");
+    $stmt->bind_param("sids", $descricao, $anunciante_id, $Valor, $Data);
 
     if($stmt->execute()){
         $msg = "Registado com sucesso!";
@@ -173,12 +173,11 @@ function removerGastos($ID_Gasto){
 }
 function registaRendimentos($descricao, $valor, $data){
     global $conn;
-
+    $anunciante_id = 1;
     $stmt = $conn->prepare(
-        "INSERT INTO rendimento (descricao, valor, data) VALUES (?, ?, ?)"
-    );
+        "INSERT INTO rendimento (descricao,anunciante_id,Valor, data_registo) VALUES (?, ?,?,?)");
 
-    $stmt->bind_param("sds", $descricao, $valor, $data);
+    $stmt->bind_param("sids", $descricao, $anunciante_id, $valor, $data);
 
     if($stmt->execute()){
         $msg = "Registado com sucesso!";
@@ -192,9 +191,6 @@ function registaRendimentos($descricao, $valor, $data){
         "flag" => $flag,
         "msg" => $msg
     ]);
-
-    $stmt->close();
-    $conn->close();
 
     return $resp;
 }

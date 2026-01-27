@@ -216,7 +216,7 @@ function registaGastos(){
         let obj = JSON.parse(msg);
         if(obj.flag){
             alerta("Gastos",obj.msg,"success");
-            getListaGastos();
+            getGastos();
         }else{
             alerta("Gastos",obj.msg,"error");    
         }
@@ -249,10 +249,10 @@ function registaRendimentos(){
 
         let obj = JSON.parse(msg);
         if(obj.flag){
-            alerta("Gastos",obj.msg,"success");
-            getListaGastos();
+            alerta("Rendimentos",obj.msg,"success");
+            getRendimentos();
         }else{
-            alerta("Gastos",obj.msg,"error");    
+            alerta("Rendimentos",obj.msg,"error");    
         }
         
     })

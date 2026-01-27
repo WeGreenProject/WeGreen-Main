@@ -163,6 +163,35 @@ class Perfil{
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        global $conn;   
+        $acao = "logout";
+
+        $stmtLog = $conn->prepare(
+            "INSERT INTO logs_acesso (utilizador_id, acao, email, data_hora)
+             VALUES (?, ?, ?, NOW())"
+        );
+
+            if (!$stmtLog) {
+                die("Erro prepare log: " . $conn->error);
+            }
+
+        if (!$stmtLog) {
+                    die("Erro prepare log: " . $conn->error);
+                }
+
+            $stmtLog->bind_param(
+                "iss",
+                $_SESSION['utilizador'],
+                $acao,
+                $_SESSION['email']
+            );
+
+            if (!$stmtLog->execute()) {
+                die("Erro insert log: " . $stmtLog->error);
+            }
+
+            $stmtLog->close();
+
         $_SESSION = array();
 
 

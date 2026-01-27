@@ -7,7 +7,7 @@ class LogAdmin{
     function getTabelaLog(){
         global $conn;
         $msg = "";
-        $sql = "SELECT * from logs_acesso,utilizadores where logs_acesso.utilizador_id = utilizadores.id";
+        $sql = "SELECT * from logs_acesso,utilizadores where logs_acesso.utilizador_id = utilizadores.id group by logs_acesso.id desc";
         $result = $conn->query($sql);
 
 
