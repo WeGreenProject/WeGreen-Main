@@ -558,6 +558,29 @@ function getProdutosInvativo() {
     });
 }
 
+function getInfoUserDropdown() {
+  let dados = new FormData();
+  dados.append("op", 9);
+
+  $.ajax({
+    url: "src/controller/controllerDashboardAdmin.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+
+    .done(function (msg) {
+      $("#userDropdown").html(msg);
+    })
+
+    .fail(function (jqXHR, textStatus) {
+      console.error("Erro ao carregar dropdown: " + textStatus);
+    });
+}
+
 $(function () {
   getAdminPerfil();
   getTopTipoGrafico();
@@ -567,5 +590,7 @@ $(function () {
   getGastos();
   getUtilizadores();
   getDadosPlanos();
+  getProdutosInvativo();
+  getInfoUserDropdown();
   initializeDropdownEvents();
 });

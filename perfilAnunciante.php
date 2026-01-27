@@ -825,8 +825,8 @@ if(!isset($_SESSION['utilizador']) || ($_SESSION['tipo'] != 1 && $_SESSION['tipo
           }
 
           // Pontos de confiança
-          if (dados.pontos_confianca !== undefined) {
-            $('#pontosConfianca').text(dados.pontos_confianca);
+          if (dados.pontos_conf !== undefined) {
+            $('#pontosConfianca').text(dados.pontos_conf);
           }
 
           // Plano

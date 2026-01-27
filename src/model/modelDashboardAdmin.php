@@ -360,27 +360,61 @@ function getVendasGrafico() {
     $msg = "";
     $flag = false;
 
-        $meses = [
+    $meses = [
         "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
+    // Buscar rendimentos agrupados por mês
+    $sqlRendimentos = "SELECT YEAR(data_registo) as ano, MONTH(data_registo) as mes, SUM(valor) as total
+                       FROM rendimento
+                       WHERE data_registo >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+                       GROUP BY YEAR(data_registo), MONTH(data_registo)
+                       ORDER BY ano, mes";
 
-    $sql = "SELECT rendimento.valor As ValorRendimentos,rendimento.data_registo As RegistoRendimento,gastos.data_registo As RegistoGastos,gastos.valor As ValorGastos from rendimento,gastos;";
-    $result = $conn->query($sql);
+    $resultRendimentos = $conn->query($sqlRendimentos);
+    $rendimentosPorMes = [];
 
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $dataGastos = strtotime($row['RegistoGastos']);
-             $mesGastos = date('n', $dataGastos);
-              $mesGastos = $meses[$mesGastos - 1];
-            $dados1[] = $mesGastos;
-            $dados2[] = $row['ValorRendimentos'];
-            $dados3[] = $row['ValorGastos'];
+    if ($resultRendimentos && $resultRendimentos->num_rows > 0) {
+        while ($row = $resultRendimentos->fetch_assoc()) {
+            $chave = $row['ano'] . '-' . $row['mes'];
+            $rendimentosPorMes[$chave] = $row['total'];
         }
         $flag = true;
-    } else {
-        $msg = "Nenhum Serviço encontrado.";
+    }
+
+    // Buscar gastos agrupados por mês
+    $sqlGastos = "SELECT YEAR(data_registo) as ano, MONTH(data_registo) as mes, SUM(valor) as total
+                  FROM gastos
+                  WHERE data_registo >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+                  GROUP BY YEAR(data_registo), MONTH(data_registo)
+                  ORDER BY ano, mes";
+
+    $resultGastos = $conn->query($sqlGastos);
+    $gastosPorMes = [];
+
+    if ($resultGastos && $resultGastos->num_rows > 0) {
+        while ($row = $resultGastos->fetch_assoc()) {
+            $chave = $row['ano'] . '-' . $row['mes'];
+            $gastosPorMes[$chave] = $row['total'];
+        }
+        $flag = true;
+    }
+
+    // Gerar dados dos últimos 12 meses
+    for ($i = 11; $i >= 0; $i--) {
+        $data = strtotime("-$i months");
+        $mes = date('n', $data);
+        $ano = date('Y', $data);
+        $chave = $ano . '-' . $mes;
+
+        $dados1[] = $meses[$mes - 1];
+        $dados2[] = isset($rendimentosPorMes[$chave]) ? floatval($rendimentosPorMes[$chave]) : 0;
+        $dados3[] = isset($gastosPorMes[$chave]) ? floatval($gastosPorMes[$chave]) : 0;
+    }
+
+    if (!$flag) {
+        $msg = "Nenhum dado encontrado.";
     }
 
     $resp = json_encode(array(
@@ -412,7 +446,7 @@ function getVendasGrafico() {
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td>".$row['stock']."</td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'></button></td>";
+                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'><i class='fas fa-edit'></i> Ver</button></td>";
                 $msg .= "</tr>";
             }
         } else {

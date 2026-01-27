@@ -1,4 +1,8 @@
 function verificarElegibilidadeDevolucao(encomenda_id) {
+  let dados = new FormData();
+  dados.append("op", 8);
+  dados.append("encomenda_id", encomenda_id);
+
   return $.ajax({
     url: "src/controller/controllerDevolucoes.php",
     method: "GET",
@@ -7,24 +11,28 @@ function verificarElegibilidadeDevolucao(encomenda_id) {
       encomenda_id: encomenda_id,
     },
     dataType: "json",
+    cache: false,
   });
 }
 
 /**
  * Abre modal de solicitação de devolução
+ * @param {number} encomenda_id - ID da encomenda
+ * @param {string} codigo_encomenda - Código da encomenda
+ * @param {Array} produtos - Array de produtos da encomenda
  */
-function abrirModalDevolucao(encomenda_id, codigo_encomenda, produto_nome) {
+function abrirModalDevolucao(encomenda_id, codigo_encomenda, produtos) {
   // Primeiro verifica elegibilidade
   verificarElegibilidadeDevolucao(encomenda_id)
     .done(function (response) {
       console.log("Resposta da verificação de elegibilidade:", response);
 
       if (response.success && response.data && response.data.elegivel) {
-        // Mostra modal
+        // Mostra modal com lista de produtos
         mostrarModalSolicitarDevolucao(
           encomenda_id,
           codigo_encomenda,
-          produto_nome,
+          produtos,
         );
       } else {
         // Verificar se há mensagem de erro ou motivo
@@ -56,13 +64,42 @@ function abrirModalDevolucao(encomenda_id, codigo_encomenda, produto_nome) {
 }
 
 /**
- * Mostra modal de solicitação de devolução
+ * Mostra modal de solicitação de devolução com seleção de produtos
  */
 function mostrarModalSolicitarDevolucao(
   encomenda_id,
   codigo_encomenda,
-  produto_nome,
+  produtos,
 ) {
+  // Gerar HTML dos produtos para seleção
+  let produtosHTML = "";
+  if (Array.isArray(produtos) && produtos.length > 0) {
+    produtosHTML = produtos
+      .map(
+        (prod, index) => `
+      <div class="produto-devolucao-item" data-produto-id="${prod.Produto_id}" style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 12px; cursor: pointer; transition: all 0.3s;" onclick="toggleProdutoDevolucao(${prod.Produto_id})">
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <input type="checkbox" class="form-check-input" id="prod_${prod.Produto_id}" style="width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;" onchange="event.stopPropagation(); updateQuantidadeMax(${prod.Produto_id}, ${prod.quantidade})">
+          <img src="${prod.foto}" alt="${prod.nome}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; flex-shrink: 0;">
+          <div style="flex: 1;">
+            <p style="margin: 0; font-weight: 600; color: #1e293b; font-size: 14px;">${prod.nome}</p>
+            <p style="margin: 0; color: #64748b; font-size: 12px; margin-top: 2px;">Quantidade comprada: ${prod.quantidade}</p>
+            <p style="margin: 0; color: #3cb371; font-size: 13px; font-weight: 600; margin-top: 4px;">€${parseFloat(prod.preco).toFixed(2)}</p>
+          </div>
+          <div class="quantidade-devolucao" id="qtd_container_${prod.Produto_id}" style="display: none; flex-shrink: 0;">
+            <label style="font-size: 11px; color: #64748b; margin-bottom: 4px; display: block;">Qtd a devolver:</label>
+            <input type="number" class="form-control form-control-sm" id="qtd_${prod.Produto_id}" min="1" max="${prod.quantidade}" value="${prod.quantidade}" style="width: 70px; text-align: center;" onclick="event.stopPropagation();">
+          </div>
+        </div>
+      </div>
+    `,
+      )
+      .join("");
+  } else {
+    produtosHTML =
+      '<p style="color: #64748b; text-align: center;">Nenhum produto disponível para devolução.</p>';
+  }
+
   const modalHTML = `
         <div class="modal fade" id="modalSolicitarDevolucao" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-lg" style="max-height: 90vh;">
@@ -74,7 +111,7 @@ function mostrarModalSolicitarDevolucao(
                             </div>
                             <div>
                                 <h3 class="modal-title" style="color: white; margin: 0; font-size: 20px; font-weight: 600;">Solicitar Devolução</h3>
-                                <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 12px;">Preencha os dados abaixo</p>
+                                <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 12px;">Selecione os produtos a devolver</p>
                             </div>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="opacity: 0.9;"></button>
@@ -88,13 +125,24 @@ function mostrarModalSolicitarDevolucao(
                                 <div>
                                     <p style="margin: 0; font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Encomenda</p>
                                     <p style="margin: 0; font-size: 14px; color: #1e293b; font-weight: 600;">${codigo_encomenda}</p>
-                                    <p style="margin: 0; font-size: 13px; color: #475569; margin-top: 2px;">${produto_nome}</p>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Seleção de Produtos -->
+                        <div style="margin-bottom: 20px;">
+                            <label class="form-label" style="font-weight: 600; color: #1e293b; font-size: 13px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-check-circle" style="color: #3cb371; font-size: 14px;"></i>
+                                Selecione o(s) produto(s) a devolver <span style="color: #ef4444;">*</span>
+                            </label>
+                            <div id="listaProdutosDevolucao">
+                                ${produtosHTML}
                             </div>
                         </div>
 
                         <form id="formSolicitarDevolucao">
                             <input type="hidden" name="encomenda_id" value="${encomenda_id}">
+                            <input type="hidden" name="produtos_selecionados" id="produtos_selecionados" value="[]">
 
                             <!-- Motivo -->
                             <div class="mb-3">
@@ -209,6 +257,20 @@ function mostrarModalSolicitarDevolucao(
 
   $("#fotosDevolucao").on("change", handleUploadFotos);
 
+  // Adicionar listeners para checkboxes de produtos
+  $('.produto-devolucao-item input[type="checkbox"]').on("change", function () {
+    const produtoId = $(this)
+      .closest(".produto-devolucao-item")
+      .data("produto-id");
+    const maxQtd = parseInt($(`#qtd_${produtoId}`).attr("max"));
+    updateQuantidadeMax(produtoId, maxQtd);
+  });
+
+  // Adicionar listeners para inputs de quantidade
+  $('.produto-devolucao-item input[type="number"]').on("change", function () {
+    atualizarProdutosSelecionados();
+  });
+
   // Adicionar efeitos de foco nos inputs
   $(
     "#modalSolicitarDevolucao .form-select, #modalSolicitarDevolucao .form-control",
@@ -222,6 +284,56 @@ function mostrarModalSolicitarDevolucao(
     .on("blur", function () {
       $(this).css({ "border-color": "#e2e8f0", "box-shadow": "none" });
     });
+}
+
+/**
+ * Toggle seleção de produto para devolução
+ */
+function toggleProdutoDevolucao(produtoId) {
+  const checkbox = $(`#prod_${produtoId}`);
+  checkbox.prop("checked", !checkbox.prop("checked"));
+  updateQuantidadeMax(produtoId, parseInt($(`#qtd_${produtoId}`).attr("max")));
+}
+
+/**
+ * Atualiza visibilidade do campo quantidade
+ */
+function updateQuantidadeMax(produtoId, maxQtd) {
+  const checkbox = $(`#prod_${produtoId}`);
+  const container = $(`#qtd_container_${produtoId}`);
+  const item = $(`.produto-devolucao-item[data-produto-id="${produtoId}"]`);
+
+  if (checkbox.is(":checked")) {
+    container.show();
+    item.css({ "border-color": "#3cb371", background: "#3cb37108" });
+  } else {
+    container.hide();
+    item.css({ "border-color": "#e2e8f0", background: "transparent" });
+  }
+
+  // Atualizar produtos selecionados
+  atualizarProdutosSelecionados();
+}
+
+/**
+ * Atualiza lista de produtos selecionados
+ */
+function atualizarProdutosSelecionados() {
+  const produtos = [];
+  $(".produto-devolucao-item").each(function () {
+    const produtoId = $(this).data("produto-id");
+    const checkbox = $(`#prod_${produtoId}`);
+
+    if (checkbox.is(":checked")) {
+      const quantidade = parseInt($(`#qtd_${produtoId}`).val()) || 1;
+      produtos.push({
+        produto_id: produtoId,
+        quantidade: quantidade,
+      });
+    }
+  });
+
+  $("#produtos_selecionados").val(JSON.stringify(produtos));
 }
 
 /**
@@ -260,18 +372,21 @@ function handleUploadFotos(event) {
       return;
     }
 
-    // Upload via AJAX
-    const formData = new FormData();
-    formData.append("foto", file);
-    formData.append("op", 9);
+    // Upload via AJAX com FormData
+    const dados = new FormData();
+    dados.append("foto", file);
+    dados.append("op", 9);
 
     $.ajax({
       url: "src/controller/controllerDevolucoes.php",
       method: "POST",
-      data: formData,
+      data: dados,
       processData: false,
       contentType: false,
-      success: function (response) {
+      dataType: "json",
+      cache: false,
+    })
+      .done(function (response) {
         if (response.success) {
           fotosUploadadas.push(response.url);
         }
@@ -285,15 +400,14 @@ function handleUploadFotos(event) {
           // Mostrar previews
           mostrarPreviewFotos(fotosUploadadas);
         }
-      },
-      error: function () {
+      })
+      .fail(function () {
         uploadCompleto++;
         if (uploadCompleto === files.length && fotosUploadadas.length > 0) {
           $("#fotosURLs").val(JSON.stringify(fotosUploadadas));
           mostrarPreviewFotos(fotosUploadadas);
         }
-      },
-    });
+      });
   });
 }
 
@@ -338,6 +452,40 @@ function enviarSolicitacaoDevolucao() {
     return;
   }
 
+  // Validar produtos selecionados
+  const produtosSelecionados = JSON.parse(
+    $("#produtos_selecionados").val() || "[]",
+  );
+
+  if (produtosSelecionados.length === 0) {
+    Swal.fire({
+      icon: "warning",
+      title: "Nenhum Produto Selecionado",
+      text: "Por favor, selecione pelo menos um produto para devolver.",
+      confirmButtonColor: "#f59e0b",
+    });
+    return;
+  }
+
+  // Validar quantidades
+  let quantidadeInvalida = false;
+  produtosSelecionados.forEach((prod) => {
+    const maxQtd = parseInt($(`#qtd_${prod.produto_id}`).attr("max"));
+    if (prod.quantidade < 1 || prod.quantidade > maxQtd) {
+      quantidadeInvalida = true;
+    }
+  });
+
+  if (quantidadeInvalida) {
+    Swal.fire({
+      icon: "warning",
+      title: "Quantidade Inválida",
+      text: "Verifique as quantidades selecionadas para devolução.",
+      confirmButtonColor: "#f59e0b",
+    });
+    return;
+  }
+
   // Mostrar loading
   Swal.fire({
     title: "Enviando...",
@@ -348,19 +496,21 @@ function enviarSolicitacaoDevolucao() {
     },
   });
 
-  // Preparar dados
-  const formData = new FormData(form[0]);
-  formData.append("op", 1);
+  // Preparar dados com FormData
+  const dados = new FormData(form[0]);
+  dados.append("op", 1);
 
   // Enviar
   $.ajax({
     url: "src/controller/controllerDevolucoes.php",
     method: "POST",
-    data: formData,
+    data: dados,
     processData: false,
     contentType: false,
     dataType: "json",
-    success: function (response) {
+    cache: false,
+  })
+    .done(function (response) {
       if (response.success) {
         Swal.fire({
           icon: "success",
@@ -373,7 +523,6 @@ function enviarSolicitacaoDevolucao() {
           confirmButtonColor: "#22c55e",
         }).then(() => {
           $("#modalSolicitarDevolucao").modal("hide");
-          // Recarregar página ou atualizar lista
           location.reload();
         });
       } else {
@@ -384,16 +533,15 @@ function enviarSolicitacaoDevolucao() {
           confirmButtonColor: "#ef4444",
         });
       }
-    },
-    error: function () {
+    })
+    .fail(function () {
       Swal.fire({
         icon: "error",
         title: "Erro de Comunicação",
         text: "Não foi possível conectar ao servidor. Tente novamente.",
         confirmButtonColor: "#ef4444",
       });
-    },
-  });
+    });
 }
 
 function carregarDevolucoesAnunciante(filtroEstado = null) {
@@ -411,7 +559,9 @@ function carregarDevolucoesAnunciante(filtroEstado = null) {
     url: url,
     method: "GET",
     dataType: "json",
-    success: function (response) {
+    cache: false,
+  })
+    .done(function (response) {
       console.log("Resposta recebida:", response);
       console.log("Success:", response.success);
       console.log("Data:", response.data);
@@ -433,13 +583,12 @@ function carregarDevolucoesAnunciante(filtroEstado = null) {
       } else {
         console.error("Response.success é false:", response.message);
       }
-    },
-    error: function (xhr, status, error) {
+    })
+    .fail(function (xhr, status, error) {
       console.error("Erro ao carregar devoluções:", error);
       console.error("Status:", status);
       console.error("Response:", xhr.responseText);
-    },
-  });
+    });
 }
 
 /**
@@ -460,7 +609,7 @@ function atualizarEstatisticasDevolucoesCompactas(devolucoes) {
     else if (dev.estado === "rejeitada") stats.rejeitadas++;
 
     if (dev.estado === "reembolsada") {
-      stats.valorReembolsado += parseFloat(dev.valor || 0);
+      stats.valorReembolsado += parseFloat(dev.valor_reembolso || 0);
     }
   });
 
@@ -658,7 +807,9 @@ function verDetalhesDevolucao(devolucao_id) {
     url: `src/controller/controllerDevolucoes.php?op=4&devolucao_id=${devolucao_id}`,
     method: "GET",
     dataType: "json",
-    success: function (response) {
+    cache: false,
+  })
+    .done(function (response) {
       console.log("Resposta da API:", response);
       if (response.success) {
         mostrarModalDetalhesDevolucao(response.data);
@@ -669,8 +820,8 @@ function verDetalhesDevolucao(devolucao_id) {
           text: response.message || "Erro ao carregar detalhes da devolução",
         });
       }
-    },
-    error: function (xhr, status, error) {
+    })
+    .fail(function (xhr, status, error) {
       console.error("=== ERRO AJAX ===");
       console.error("Status:", status);
       console.error("Error:", error);
@@ -681,8 +832,7 @@ function verDetalhesDevolucao(devolucao_id) {
         title: "Erro ao carregar detalhes",
         html: `<p>Status: ${xhr.status}</p><p>Erro: ${error}</p><pre>${xhr.responseText ? xhr.responseText.substring(0, 500) : "Sem resposta"}</pre>`,
       });
-    },
-  });
+    });
 }
 
 /**
@@ -999,16 +1149,21 @@ function aprovarDevolucao(devolucao_id) {
     console.log("Resultado do Swal:", result);
     if (result.isConfirmed) {
       console.log("Enviando requisição AJAX...");
+      let dados = new FormData();
+      dados.append("op", 5);
+      dados.append("devolucao_id", devolucao_id);
+      dados.append("notas_anunciante", result.value || "");
+
       $.ajax({
         url: "src/controller/controllerDevolucoes.php",
         method: "POST",
-        data: {
-          op: 5,
-          devolucao_id: devolucao_id,
-          notas_anunciante: result.value || "",
-        },
+        data: dados,
+        processData: false,
+        contentType: false,
         dataType: "json",
-        success: function (response) {
+        cache: false,
+      })
+        .done(function (response) {
           console.log("Resposta recebida:", response);
           if (response.success) {
             Swal.fire("Aprovada!", response.message, "success");
@@ -1016,13 +1171,12 @@ function aprovarDevolucao(devolucao_id) {
           } else {
             Swal.fire("Erro", response.message, "error");
           }
-        },
-        error: function (xhr, status, error) {
+        })
+        .fail(function (xhr, status, error) {
           console.error("Erro na requisição:", error);
           console.error("Response:", xhr.responseText);
           Swal.fire("Erro", "Falha na comunicação com o servidor", "error");
-        },
-      });
+        });
     }
   });
 }
@@ -1111,24 +1265,31 @@ function rejeitarDevolucao(devolucao_id) {
     },
   }).then((result) => {
     if (result.isConfirmed) {
+      let dados = new FormData();
+      dados.append("op", 6);
+      dados.append("devolucao_id", devolucao_id);
+      dados.append("notas_anunciante", result.value);
+
       $.ajax({
         url: "src/controller/controllerDevolucoes.php",
         method: "POST",
-        data: {
-          op: 6,
-          devolucao_id: devolucao_id,
-          notas_anunciante: result.value,
-        },
+        data: dados,
+        processData: false,
+        contentType: false,
         dataType: "json",
-        success: function (response) {
+        cache: false,
+      })
+        .done(function (response) {
           if (response.success) {
             Swal.fire("Rejeitada", response.message, "success");
             carregarDevolucoesAnunciante();
           } else {
             Swal.fire("Erro", response.message, "error");
           }
-        },
-      });
+        })
+        .fail(function () {
+          Swal.fire("Erro", "Falha na comunicação com o servidor", "error");
+        });
     }
   });
 }
@@ -1157,26 +1318,30 @@ function processarReembolsoDevolucao(devolucao_id) {
         },
       });
 
+      let dados = new FormData();
+      dados.append("op", 7);
+      dados.append("devolucao_id", devolucao_id);
+
       $.ajax({
         url: "src/controller/controllerDevolucoes.php",
         method: "POST",
-        data: {
-          op: 7,
-          devolucao_id: devolucao_id,
-        },
+        data: dados,
+        processData: false,
+        contentType: false,
         dataType: "json",
-        success: function (response) {
+        cache: false,
+      })
+        .done(function (response) {
           if (response.success) {
             Swal.fire("Sucesso!", response.message, "success");
             carregarDevolucoesAnunciante();
           } else {
             Swal.fire("Erro", response.message, "error");
           }
-        },
-        error: function () {
+        })
+        .fail(function () {
           Swal.fire("Erro", "Falha ao processar reembolso", "error");
-        },
-      });
+        });
     }
   });
 }
@@ -1250,16 +1415,21 @@ function confirmarEnvioCliente(devolucao_id, codigo_rastreio) {
     },
   });
 
+  let dados = new FormData();
+  dados.append("op", 11);
+  dados.append("devolucao_id", devolucao_id);
+  dados.append("codigo_rastreio", codigo_rastreio);
+
   $.ajax({
     url: "src/controller/controllerDevolucoes.php",
     method: "POST",
-    data: {
-      op: 11,
-      devolucao_id: devolucao_id,
-      codigo_rastreio: codigo_rastreio,
-    },
+    data: dados,
+    processData: false,
+    contentType: false,
     dataType: "json",
-    success: function (response) {
+    cache: false,
+  })
+    .done(function (response) {
       if (response.success) {
         Swal.fire({
           icon: "success",
@@ -1272,11 +1442,10 @@ function confirmarEnvioCliente(devolucao_id, codigo_rastreio) {
       } else {
         Swal.fire("Erro", response.message, "error");
       }
-    },
-    error: function () {
+    })
+    .fail(function () {
       Swal.fire("Erro", "Falha ao confirmar envio", "error");
-    },
-  });
+    });
 }
 
 /**
@@ -1342,16 +1511,21 @@ function confirmarRecebimentoVendedor(devolucao_id, notas_recebimento) {
     },
   });
 
+  let dados = new FormData();
+  dados.append("op", 12);
+  dados.append("devolucao_id", devolucao_id);
+  dados.append("notas_recebimento", notas_recebimento);
+
   $.ajax({
     url: "src/controller/controllerDevolucoes.php",
     method: "POST",
-    data: {
-      op: 12,
-      devolucao_id: devolucao_id,
-      notas_recebimento: notas_recebimento,
-    },
+    data: dados,
+    processData: false,
+    contentType: false,
     dataType: "json",
-    success: function (response) {
+    cache: false,
+  })
+    .done(function (response) {
       if (response.success) {
         Swal.fire({
           icon: "success",
@@ -1368,9 +1542,8 @@ function confirmarRecebimentoVendedor(devolucao_id, notas_recebimento) {
       } else {
         Swal.fire("Erro", response.message, "error");
       }
-    },
-    error: function () {
+    })
+    .fail(function () {
       Swal.fire("Erro", "Falha ao confirmar recebimento", "error");
-    },
-  });
+    });
 }

@@ -895,14 +895,61 @@ function editarProduto(id) {
 
 function removerProduto(id) {
   Swal.fire({
-    title: "Remover produto?",
-    text: "Esta ação não pode ser desfeita!",
-    icon: "warning",
+    html: `
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+          <i class="fas fa-trash-alt" style="font-size: 40px; color: white;"></i>
+        </div>
+        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Remover produto?</h2>
+        <p style="color: #64748b; font-size: 15px; margin: 0;">Esta ação não pode ser desfeita!</p>
+      </div>
+    `,
     showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Sim, remover!",
-    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: '<i class="fas fa-check"></i> Sim, remover',
+    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+    customClass: {
+      confirmButton: "swal2-confirm-modern",
+      cancelButton: "swal2-cancel-modern",
+      popup: "swal2-border-radius",
+    },
+    buttonsStyling: false,
+    didOpen: () => {
+      const style = document.createElement("style");
+      style.textContent = `
+        .swal2-confirm-modern, .swal2-cancel-modern {
+          padding: 12px 30px !important;
+          border-radius: 8px !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          border: none !important;
+          margin: 5px !important;
+        }
+        .swal2-confirm-modern {
+          background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+          color: white !important;
+        }
+        .swal2-confirm-modern:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+        }
+        .swal2-cancel-modern {
+          background: #6c757d !important;
+          color: white !important;
+        }
+        .swal2-cancel-modern:hover {
+          background: #5a6268 !important;
+          transform: translateY(-2px) !important;
+        }
+        .swal2-border-radius {
+          border-radius: 12px !important;
+        }
+      `;
+      document.head.appendChild(style);
+    },
   }).then((resultado) => {
     if (resultado.isConfirmed) {
       $.post(
@@ -943,11 +990,87 @@ function atualizarAcoesEmMassa() {
 function editarSelecionado() {
   const ids = obterProdutosSelecionados();
   if (ids.length === 0) {
-    Swal.fire("Atenção", "Selecione um produto para editar.", "warning");
+    Swal.fire({
+      html: `
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
+          </div>
+          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
+          <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione um produto para editar.</p>
+        </div>
+      `,
+      confirmButtonColor: "#ff9800",
+      confirmButtonText: "OK",
+      customClass: {
+        confirmButton: "swal2-confirm-modern-warning",
+        popup: "swal2-border-radius",
+      },
+      buttonsStyling: false,
+      didOpen: () => {
+        const style = document.createElement("style");
+        style.textContent = `
+          .swal2-confirm-modern-warning {
+            padding: 12px 30px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+            color: white !important;
+          }
+          .swal2-confirm-modern-warning:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
+          }
+        `;
+        document.head.appendChild(style);
+      },
+    });
     return;
   }
   if (ids.length > 1) {
-    Swal.fire("Atenção", "Selecione apenas um produto para editar.", "warning");
+    Swal.fire({
+      html: `
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
+          </div>
+          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
+          <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione apenas um produto para editar.</p>
+        </div>
+      `,
+      confirmButtonColor: "#ff9800",
+      confirmButtonText: "OK",
+      customClass: {
+        confirmButton: "swal2-confirm-modern-warning",
+        popup: "swal2-border-radius",
+      },
+      buttonsStyling: false,
+      didOpen: () => {
+        const style = document.createElement("style");
+        style.textContent = `
+          .swal2-confirm-modern-warning {
+            padding: 12px 30px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+            color: white !important;
+          }
+          .swal2-confirm-modern-warning:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
+          }
+        `;
+        document.head.appendChild(style);
+      },
+    });
     return;
   }
   editarProduto(ids[0]);
@@ -956,22 +1079,103 @@ function editarSelecionado() {
 function removerEmMassa() {
   const ids = obterProdutosSelecionados();
   if (ids.length === 0) {
-    Swal.fire(
-      "Atenção",
-      "Selecione pelo menos um produto para remover.",
-      "warning",
-    );
+    Swal.fire({
+      html: `
+        <div style="text-align: center;">
+          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
+          </div>
+          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
+          <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione pelo menos um produto para remover.</p>
+        </div>
+      `,
+      confirmButtonColor: "#ff9800",
+      confirmButtonText: "OK",
+      customClass: {
+        confirmButton: "swal2-confirm-modern-warning",
+        popup: "swal2-border-radius",
+      },
+      buttonsStyling: false,
+      didOpen: () => {
+        const style = document.createElement("style");
+        style.textContent = `
+          .swal2-confirm-modern-warning {
+            padding: 12px 30px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            border: none !important;
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+            color: white !important;
+          }
+          .swal2-confirm-modern-warning:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
+          }
+        `;
+        document.head.appendChild(style);
+      },
+    });
     return;
   }
   Swal.fire({
-    title: `Remover ${ids.length} produto${ids.length > 1 ? "s" : ""}?`,
-    text: "Esta ação não pode ser desfeita!",
-    icon: "warning",
+    html: `
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+          <i class="fas fa-trash-alt" style="font-size: 40px; color: white;"></i>
+        </div>
+        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Remover ${ids.length} produto${ids.length > 1 ? "s" : ""}?</h2>
+        <p style="color: #64748b; font-size: 15px; margin: 0;">Esta ação não pode ser desfeita!</p>
+      </div>
+    `,
     showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Sim, remover!",
-    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: '<i class="fas fa-check"></i> Sim, remover',
+    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+    customClass: {
+      confirmButton: "swal2-confirm-modern",
+      cancelButton: "swal2-cancel-modern",
+      popup: "swal2-border-radius",
+    },
+    buttonsStyling: false,
+    didOpen: () => {
+      const style = document.createElement("style");
+      style.textContent = `
+        .swal2-confirm-modern, .swal2-cancel-modern {
+          padding: 12px 30px !important;
+          border-radius: 8px !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          border: none !important;
+          margin: 5px !important;
+        }
+        .swal2-confirm-modern {
+          background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+          color: white !important;
+        }
+        .swal2-confirm-modern:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+        }
+        .swal2-cancel-modern {
+          background: #6c757d !important;
+          color: white !important;
+        }
+        .swal2-cancel-modern:hover {
+          background: #5a6268 !important;
+          transform: translateY(-2px) !important;
+        }
+        .swal2-border-radius {
+          border-radius: 12px !important;
+        }
+      `;
+      document.head.appendChild(style);
+    },
   }).then((resultado) => {
     if (resultado.isConfirmed) {
       $.ajax({
@@ -1120,9 +1324,14 @@ function abrirModalProduto(titulo, dados = {}) {
   const maxPhotos = 5; // Pode ser ajustado baseado no plano
 
   Swal.fire({
-    title: titulo,
     html: `
-      <form id="productFormSwal" style="text-align: left;">
+      <div style="background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%); padding: 18px 20px; margin: -20px -20px 20px -20px; border-radius: 12px 12px 0 0;">
+        <div style="display: flex; align-items: center; gap: 10px; justify-content: center;">
+          <i class="fas fa-${titulo.includes("Editar") ? "edit" : "plus-circle"}" style="font-size: 22px; color: white;"></i>
+          <h2 style="margin: 0; color: white; font-size: 20px; font-weight: 600;">${titulo}</h2>
+        </div>
+      </div>
+      <form id="productFormSwal" style="text-align: left; padding: 0 10px;">
         <input type="hidden" id="productId" value="${dados.Produto_id || ""}">
         <div class="form-row">
           <div class="form-col">
@@ -1216,7 +1425,7 @@ function abrirModalProduto(titulo, dados = {}) {
     showCancelButton: true,
     confirmButtonText: '<i class="fas fa-save"></i> Guardar Produto',
     cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-    width: 650,
+    width: 480,
     customClass: {
       popup: "product-modal-view",
       htmlContainer: "modal-view-wrapper",
@@ -1227,6 +1436,29 @@ function abrirModalProduto(titulo, dados = {}) {
       carregarTiposProduto();
       if (dados.tipo_produto_id) {
         setTimeout(() => $("#tipo_produto_id").val(dados.tipo_produto_id), 100);
+      }
+
+      // Carregar fotos existentes se estiver editando
+      if (dados.fotos_array && dados.fotos_array.length > 0) {
+        dados.fotos_array.forEach((fotoUrl) => {
+          if (fotoUrl && fotoUrl.trim()) {
+            // Criar um objeto File-like para as fotos existentes
+            fetch(fotoUrl)
+              .then((res) => res.blob())
+              .then((blob) => {
+                const file = new File([blob], fotoUrl.split("/").pop(), {
+                  type: blob.type,
+                });
+                file.isExisting = true; // Marcador para indicar que é foto existente
+                file.existingUrl = fotoUrl; // URL original para visualização
+                selectedFiles.push(file);
+                renderPhotoPreview();
+              })
+              .catch((err) => {
+                console.error("Erro ao carregar foto existente:", err);
+              });
+          }
+        });
       }
 
       // Handler para o botão de selecionar fotos
@@ -1271,26 +1503,47 @@ function abrirModalProduto(titulo, dados = {}) {
         $("#photoCount").text(`(${selectedFiles.length}/${maxPhotos})`);
 
         selectedFiles.forEach((file, index) => {
-          const reader = new FileReader();
-          reader.onload = function (e) {
+          // Se for foto existente, usar URL diretamente
+          if (file.isExisting && file.existingUrl) {
             const photoCard = $(`
               <div class="photo-preview-card" data-index="${index}" style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; border: 2px solid #3cb371; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: zoom-in; transition: all 0.2s;">
-                <img src="${e.target.result}"
-                     data-photo-url="${e.target.result}"
+                <img src="${file.existingUrl}"
+                     data-photo-url="${file.existingUrl}"
                      style="width: 100%; height: 100%; object-fit: cover;">
                 <button type="button" class="remove-photo" data-index="${index}" style="position: absolute; top: 5px; right: 5px; background: #E53E3E; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10;">
                   <i class="fas fa-times"></i>
                 </button>
                 ${
                   index === 0
-                    ? '<div style="position: absolute; bottom: 5px; left: 5px; background: #3cb371; color: #000; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Principal</div>'
+                    ? '<div style="position: absolute; bottom: 5px; left: 5px; background: #3cb371; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Principal</div>'
                     : ""
                 }
               </div>
             `);
             preview.append(photoCard);
-          };
-          reader.readAsDataURL(file);
+          } else {
+            // Se for nova foto, usar FileReader
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              const photoCard = $(`
+                <div class="photo-preview-card" data-index="${index}" style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; border: 2px solid #3cb371; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: zoom-in; transition: all 0.2s;">
+                  <img src="${e.target.result}"
+                       data-photo-url="${e.target.result}"
+                       style="width: 100%; height: 100%; object-fit: cover;">
+                  <button type="button" class="remove-photo" data-index="${index}" style="position: absolute; top: 5px; right: 5px; background: #E53E3E; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 10;">
+                    <i class="fas fa-times"></i>
+                  </button>
+                  ${
+                    index === 0
+                      ? '<div style="position: absolute; bottom: 5px; left: 5px; background: #3cb371; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">Principal</div>'
+                      : ""
+                  }
+                </div>
+              `);
+              preview.append(photoCard);
+            };
+            reader.readAsDataURL(file);
+          }
         });
 
         // Handler para remover foto
@@ -2520,24 +2773,16 @@ function criarLinhaEncomenda(encomenda) {
   const estadoTexto = encomenda.estado || "Pendente";
   const statusBadge = `<span class="badge badge-${statusClass}">${estadoTexto}</span>`;
 
-  // Calcular dias desde a encomenda
+  // Calcular dias desde a encomenda (mantido para referência futura)
   const dataEncomenda = new Date(encomenda.data_completa);
   const hoje = new Date();
   const diasDesdeEncomenda = Math.floor(
     (hoje - dataEncomenda) / (1000 * 60 * 60 * 24),
   );
 
-  // Badge "Novo" para últimas 24h
-  const badgeNovo =
-    diasDesdeEncomenda === 0
-      ? '<span class="badge badge-new">Novo</span> '
-      : "";
-
-  // Classe de urgência (mais de 3 dias pendente)
-  const classeUrgente =
-    diasDesdeEncomenda > 3 && encomenda.estado === "Pendente"
-      ? "row-urgent"
-      : "";
+  // Badge "Novo" e urgência removidos - lógica simplificada
+  const badgeNovo = "";
+  const classeUrgente = "";
 
   // Tooltip morada
   const moradaTooltip =
@@ -3339,41 +3584,55 @@ function verHistoricoEncomenda(encomendaId) {
               overflow-x: hidden !important;
             }
           </style>
-          <div style="background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%); padding: 25px 20px; margin: -20px -20px 20px -20px; border-radius: 12px 12px 0 0;">
-            <div style="display: flex; align-items: center; gap: 12px; justify-content: center;">
-              <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
-                <i class="fas fa-history" style="font-size: 24px; color: white;"></i>
-              </div>
-              <div style="text-align: left;">
-                <h3 style="margin: 0; color: white; font-size: 20px; font-weight: 700;">Histórico da Encomenda</h3>
-                <p style="margin: 4px 0 0 0; color: rgba(255,255,255,0.9); font-size: 13px;">Timeline completa de estados</p>
-              </div>
-            </div>
+          <div style="background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%); padding: 15px 20px; margin: 0; border-radius: 0; text-align: center;">
+            <h2 style="margin: 0; color: white; font-size: 18px; font-weight: 600;">Histórico da Encomenda</h2>
           </div>
-          <div style="max-height: 500px; overflow-y: auto; overflow-x: hidden; padding: 20px 16px; background: #fafbfc; width: 100%; box-sizing: border-box;">
+          <div style="max-height: 400px; overflow-y: auto; overflow-x: hidden; padding: 20px 16px; background: #fafbfc; width: 100%; box-sizing: border-box;">
             ${timelineHTML}
           </div>
         `,
-        width: 500,
+        width: 520,
         showConfirmButton: true,
         confirmButtonText: '<i class="fas fa-times"></i> Fechar',
         confirmButtonColor: "#3cb371",
         customClass: {
-          confirmButton: "swal2-confirm-modern",
+          confirmButton: "swal2-confirm-modern-history",
+          popup: "swal2-border-radius",
         },
+        buttonsStyling: false,
         didOpen: () => {
           const popup = Swal.getPopup();
-          popup.style.borderRadius = "16px";
+          popup.style.borderRadius = "0";
           popup.style.padding = "0";
           popup.style.overflow = "hidden";
           popup.style.overflowX = "hidden";
-          popup.style.width = "500px";
-          popup.style.maxWidth = "500px";
+          popup.style.width = "520px";
+          popup.style.maxWidth = "520px";
 
           const htmlContainer = popup.querySelector(".swal2-html-container");
           if (htmlContainer) {
             htmlContainer.style.overflowX = "hidden";
           }
+
+          const style = document.createElement("style");
+          style.textContent = `
+            .swal2-confirm-modern-history {
+              padding: 12px 30px !important;
+              border-radius: 8px !important;
+              font-weight: 600 !important;
+              font-size: 14px !important;
+              cursor: pointer !important;
+              transition: all 0.3s ease !important;
+              border: none !important;
+              background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%) !important;
+              color: white !important;
+            }
+            .swal2-confirm-modern-history:hover {
+              transform: translateY(-2px) !important;
+              box-shadow: 0 6px 20px rgba(60, 179, 113, 0.4) !important;
+            }
+          `;
+          document.head.appendChild(style);
         },
       });
     },
@@ -3524,12 +3783,61 @@ function logout() {
 
 function logoutIncomplete() {
   Swal.fire({
-    title: "Terminar Sessão?",
-    text: "Tem a certeza que pretende sair?",
-    icon: "question",
+    html: `
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+          <i class="fas fa-sign-out-alt" style="font-size: 40px; color: white;"></i>
+        </div>
+        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Terminar Sessão?</h2>
+        <p style="color: #64748b; font-size: 15px; margin: 0;">Tem a certeza que pretende sair?</p>
+      </div>
+    `,
     showCancelButton: true,
-    confirmButtonText: "Sim, sair",
-    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: '<i class="fas fa-check"></i> Sim, sair',
+    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+    customClass: {
+      confirmButton: "swal2-confirm-modern",
+      cancelButton: "swal2-cancel-modern",
+      popup: "swal2-border-radius",
+    },
+    buttonsStyling: false,
+    didOpen: () => {
+      const style = document.createElement("style");
+      style.textContent = `
+        .swal2-confirm-modern, .swal2-cancel-modern {
+          padding: 12px 30px !important;
+          border-radius: 8px !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          border: none !important;
+          margin: 5px !important;
+        }
+        .swal2-confirm-modern {
+          background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+          color: white !important;
+        }
+        .swal2-confirm-modern:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+        }
+        .swal2-cancel-modern {
+          background: #6c757d !important;
+          color: white !important;
+        }
+        .swal2-cancel-modern:hover {
+          background: #5a6268 !important;
+          transform: translateY(-2px) !important;
+        }
+        .swal2-border-radius {
+          border-radius: 12px !important;
+        }
+      `;
+      document.head.appendChild(style);
+    },
   }).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
@@ -3544,13 +3852,61 @@ function logoutIncomplete() {
 
 function logoutIncomplete() {
   Swal.fire({
-    title: "Terminar Sessão?",
-    text: "Tem a certeza que pretende sair?",
-    icon: "question",
+    html: `
+      <div style="text-align: center;">
+        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+          <i class="fas fa-sign-out-alt" style="font-size: 40px; color: white;"></i>
+        </div>
+        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Terminar Sessão?</h2>
+        <p style="color: #64748b; font-size: 15px; margin: 0;">Tem a certeza que pretende sair?</p>
+      </div>
+    `,
     showCancelButton: true,
-    confirmButtonText: "Sim, sair",
-    cancelButtonText: "Cancelar",
-    confirmButtonColor: "#3cb371",
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: '<i class="fas fa-check"></i> Sim, sair',
+    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+    customClass: {
+      confirmButton: "swal2-confirm-modern",
+      cancelButton: "swal2-cancel-modern",
+      popup: "swal2-border-radius",
+    },
+    buttonsStyling: false,
+    didOpen: () => {
+      const style = document.createElement("style");
+      style.textContent = `
+        .swal2-confirm-modern, .swal2-cancel-modern {
+          padding: 12px 30px !important;
+          border-radius: 8px !important;
+          font-weight: 600 !important;
+          font-size: 14px !important;
+          cursor: pointer !important;
+          transition: all 0.3s ease !important;
+          border: none !important;
+          margin: 5px !important;
+        }
+        .swal2-confirm-modern {
+          background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+          color: white !important;
+        }
+        .swal2-confirm-modern:hover {
+          transform: translateY(-2px) !important;
+          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+        }
+        .swal2-cancel-modern {
+          background: #6c757d !important;
+          color: white !important;
+        }
+        .swal2-cancel-modern:hover {
+          background: #5a6268 !important;
+          transform: translateY(-2px) !important;
+        }
+        .swal2-border-radius {
+          border-radius: 12px !important;
+        }
+      `;
+      document.head.appendChild(style);
+    },
   }).then((result) => {
     if (result.isConfirmed) {
       window.location.href = "src/controller/controllerPerfil.php?op=2";

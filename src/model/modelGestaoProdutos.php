@@ -40,7 +40,7 @@ class Vendas{
                 $msg .= "<td>".$row['genero']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
-                $msg .= "<td>".$row['marca']."</td>";  
+                $msg .= "<td>".$row['marca']."</td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -92,7 +92,7 @@ class Vendas{
                 $msg .= "<td>".$row['genero']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Editar</button></td>";  
+                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Editar</button></td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -181,8 +181,8 @@ class Vendas{
                 $msg .= "<td>".$row['NomeAnunciante']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
-                $msg .= "<td>".$row['marca']."</td>";  
-                $msg .= "<td><button class='btn-info' onclick='getDadosProduto(".$row['Produto_id'].")'>ℹ️ Editar</button><br><br><button class='btn-info' id='btnDesativar'onclick='getDesativacao(".$row['Produto_id'].")'>❌ Desativar</button></td>";  
+                $msg .= "<td>".$row['marca']."</td>";
+                $msg .= "<td><button class='btn-info' onclick='getDadosProduto(".$row['Produto_id'].")'>ℹ️ Editar</button><br><br><button class='btn-info' id='btnDesativar'onclick='getDesativacao(".$row['Produto_id'].")'>❌ Desativar</button></td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -221,16 +221,16 @@ class Vendas{
         return ($msg);
     }
     function getDesativacao($Produto_id){
-        
+
         global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
 
-        $sql = "UPDATE Produtos 
-                SET ativo = 0 
-                WHERE Produto_id = " . $Produto_id; 
+        $sql = "UPDATE Produtos
+                SET ativo = 0
+                WHERE Produto_id = " . $Produto_id;
 
         if ($conn->query($sql) === TRUE) {
             $msg = "Desativado com Sucesso";
@@ -243,22 +243,22 @@ class Vendas{
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);
 
     }
     function rejeitaEditProduto($Produto_id){
-        
+
         global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
 
-        $sql = "UPDATE Produtos 
-        SET ativo = 2 WHERE Produto_id = ".$Produto_id;   
+        $sql = "UPDATE Produtos
+        SET ativo = 2 WHERE Produto_id = ".$Produto_id;
 
         if ($conn->query($sql) === TRUE) {
             $msg = "Rejeitado com Sucesso";
@@ -271,30 +271,30 @@ class Vendas{
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);
 
     }
     function guardaEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
-        
+
         global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
 
-        $sql = "UPDATE Produtos 
-        SET nome = '".$nome."', 
-            tipo_produto_id = '".$categoria."', 
-            marca = '".$marca."', 
-            tamanho = '".$tamanho."', 
-            preco = '".$preco."', 
-            genero = '".$genero."', 
-            anunciante_id = '".$vendedor."', 
-            ativo = 1 
-        WHERE Produto_id = ".$Produto_id;   
+        $sql = "UPDATE Produtos
+        SET nome = '".$nome."',
+            tipo_produto_id = '".$categoria."',
+            marca = '".$marca."',
+            tamanho = '".$tamanho."',
+            preco = '".$preco."',
+            genero = '".$genero."',
+            anunciante_id = '".$vendedor."',
+            ativo = 1
+        WHERE Produto_id = ".$Produto_id;
 
         if ($conn->query($sql) === TRUE) {
             $msg = "Aprovado com Sucesso";
@@ -307,14 +307,14 @@ class Vendas{
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);
 
     }
 function adicionarProdutos($listaVendedor, $listaCategoria, $nomeprod, $estadoprod, $quantidade, $preco, $marca, $tamanho, $selectestado, $foto){
-    
+
     global $conn;
     $msg = "";
     $flag = true;
@@ -328,7 +328,7 @@ $sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, genero,anunciante_id
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sdssissssii", $listaCategoria, $preco, $resp['target'], $genero,$listaVendedor, $marca, $tamanho, $estadoprod, $descricao, $ativo,$quantidade);
     } else {
-        $sql = "INSERT INTO Produtos (tipo_produto_id, preco, anunciante_id, marca, tamanho, estado, nome, ativo, genero, descricao) 
+        $sql = "INSERT INTO Produtos (tipo_produto_id, preco, anunciante_id, marca, tamanho, estado, nome, ativo, genero, descricao)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, 'Descrição do produto')";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sdssssss", $listaCategoria, $preco, $listaVendedor, $marca, $tamanho, $estadoprod, $nomeprod, $selectestado);
@@ -341,12 +341,12 @@ $sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, genero,anunciante_id
         $msg = "Error: " . $stmt->error;
     }
     $stmt->close();
-   
+
     $resp = json_encode(array(
         "flag" => $flag,
         "msg" => $msg
     ));
-      
+
     $conn->close();
 
     return $resp;
@@ -356,12 +356,12 @@ function getDadosPerfil($ID_User){
         $msg = "";
         $row = "";
         $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg  = "<div class='profile-avatar'>";
                     $msg .= "<img src='" .$row["foto"]. "' alt='User Photo' id='userPhoto'>";
                     $msg .= "<span class='avatar-placeholder'>👤</span>";
@@ -385,14 +385,14 @@ function getDadosPerfil($ID_User){
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
 function uploads($foto, $nome){
-    
+
     $dirFisico = __DIR__ . "/../img/";
-    $dirWeb = "src/img/";  
+    $dirWeb = "src/img/";
     $flag = false;
     $targetBD = "";
 
@@ -401,28 +401,28 @@ function uploads($foto, $nome){
             die("Erro não é possível criar o diretório");
         }
     }
-    
+
     if(isset($foto) && is_array($foto) && !empty($foto['tmp_name']) && $foto['error'] === 0){
         file_put_contents('debug_upload.txt', "Entrou na condição de upload\n", FILE_APPEND);
-        
+
         if(is_uploaded_file($foto['tmp_name'])){
             file_put_contents('debug_upload.txt', "is_uploaded_file OK\n", FILE_APPEND);
             $fonte = $foto['tmp_name'];
             $ficheiro = $foto['name'];
             $end = explode(".", $ficheiro);
             $extensao = end($end);
-    
+
             $nomeLimpo = preg_replace('/[^a-zA-Z0-9]/', '_', $nome);
             $newName = "produto_" . $nomeLimpo . "_" . date("YmdHis") . "." . $extensao;
-    
+
             $targetFisico = $dirFisico . $newName;
             $targetBD = $dirWeb . $newName;
-    
+
             $flag = move_uploaded_file($fonte, $targetFisico);
 
         }
     }
-    
+
     return json_encode(array(
         "flag" => $flag,
         "target" => $targetBD
@@ -430,22 +430,22 @@ function uploads($foto, $nome){
 }
 
     function guardaDadosEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
-        
+
         global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
 
-        $sql = "UPDATE Produtos 
-        SET nome = '".$nome."', 
-            tipo_produto_id = '".$categoria."', 
-            marca = '".$marca."', 
-            tamanho = '".$tamanho."', 
-            preco = '".$preco."', 
-            genero = '".$genero."', 
+        $sql = "UPDATE Produtos
+        SET nome = '".$nome."',
+            tipo_produto_id = '".$categoria."',
+            marca = '".$marca."',
+            tamanho = '".$tamanho."',
+            preco = '".$preco."',
+            genero = '".$genero."',
             anunciante_id = '".$vendedor."'
-        WHERE Produto_id = ".$Produto_id;   
+        WHERE Produto_id = ".$Produto_id;
 
         if ($conn->query($sql) === TRUE) {
             $msg = "Aprovado com Sucesso";
@@ -458,7 +458,7 @@ function uploads($foto, $nome){
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);
@@ -492,7 +492,7 @@ function uploads($foto, $nome){
 
                 $i++;
             }
-            $msg .= "</div>";   
+            $msg .= "</div>";
         } else {
                 $msg .= "<h3>📸 Não existem fotos adicionais</h3>";
         }
@@ -528,13 +528,13 @@ function uploads($foto, $nome){
     $msg = "";
     $flag = false;
 
-    $sql = "SELECT 
+    $sql = "SELECT
         utilizadores.id AS Cliente_ID,
         utilizadores.nome AS Cliente_Nome,
         COUNT(produtos.produto_id) AS Produtos_Anunciados
-        FROM 
+        FROM
         utilizadores,produtos where utilizadores.id = produtos.anunciante_id
-        GROUP BY 
+        GROUP BY
         utilizadores.id, utilizadores.nome;";
     $result = $conn->query($sql);
 

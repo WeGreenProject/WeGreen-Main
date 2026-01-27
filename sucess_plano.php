@@ -47,18 +47,50 @@ try {
 
     // Se for anunciante, atualizar/inserir na tabela planos_ativos
     if($user_type == 3){
-        // Desativar planos anteriores
-        $stmt = $conn->prepare("UPDATE planos_ativos SET ativo = 0, data_fim = NOW() WHERE anunciante_id = ? AND ativo = 1");
+        // Verificar se existe um plano ativo do mesmo tipo
+        $stmt = $conn->prepare("SELECT id, data_fim, plano_id FROM planos_ativos WHERE anunciante_id = ? AND ativo = 1 ORDER BY data_fim DESC LIMIT 1");
         $stmt->bind_param("i", $utilizador_id);
         $stmt->execute();
+        $result = $stmt->get_result();
 
-        // Calcular data de fim (30 dias a partir de hoje)
-        $data_fim = date('Y-m-d', strtotime('+30 days'));
+        if($result->num_rows > 0) {
+            $plano_ativo = $result->fetch_assoc();
 
-        // Inserir novo plano ativo com data de fim
-        $stmt = $conn->prepare("INSERT INTO planos_ativos (anunciante_id, plano_id, data_inicio, data_fim, ativo) VALUES (?, ?, NOW(), ?, 1)");
-        $stmt->bind_param("iis", $utilizador_id, $plano_id, $data_fim);
-        $stmt->execute();
+            // Se for o mesmo plano, somar 30 dias à data de expiração
+            if($plano_ativo['plano_id'] == $plano_id) {
+                $data_fim_atual = strtotime($plano_ativo['data_fim']);
+                $hoje = time();
+
+                // Se o plano ainda está ativo (data_fim > hoje), somar à data_fim existente
+                if($data_fim_atual > $hoje) {
+                    $data_fim = date('Y-m-d', strtotime('+30 days', $data_fim_atual));
+                } else {
+                    // Plano já expirou, começar de hoje
+                    $data_fim = date('Y-m-d', strtotime('+30 days'));
+                }
+
+                // Atualizar o plano existente com nova data_fim
+                $stmt = $conn->prepare("UPDATE planos_ativos SET data_fim = ? WHERE id = ?");
+                $stmt->bind_param("si", $data_fim, $plano_ativo['id']);
+                $stmt->execute();
+            } else {
+                // Plano diferente: desativar anterior e criar novo
+                $stmt = $conn->prepare("UPDATE planos_ativos SET ativo = 0, data_fim = NOW() WHERE anunciante_id = ? AND ativo = 1");
+                $stmt->bind_param("i", $utilizador_id);
+                $stmt->execute();
+
+                $data_fim = date('Y-m-d', strtotime('+30 days'));
+                $stmt = $conn->prepare("INSERT INTO planos_ativos (anunciante_id, plano_id, data_inicio, data_fim, ativo) VALUES (?, ?, NOW(), ?, 1)");
+                $stmt->bind_param("iis", $utilizador_id, $plano_id, $data_fim);
+                $stmt->execute();
+            }
+        } else {
+            // Nenhum plano ativo: criar novo
+            $data_fim = date('Y-m-d', strtotime('+30 days'));
+            $stmt = $conn->prepare("INSERT INTO planos_ativos (anunciante_id, plano_id, data_inicio, data_fim, ativo) VALUES (?, ?, NOW(), ?, 1)");
+            $stmt->bind_param("iis", $utilizador_id, $plano_id, $data_fim);
+            $stmt->execute();
+        }
     }
 
     // Registrar no rendimento (comissão para a plataforma)
