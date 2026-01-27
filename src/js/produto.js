@@ -29,6 +29,15 @@ function getProdutoMostrar() {
         const produtoId = $(this).data("id");
         comprarAgora(produtoId);
       });
+
+      // Aguardar um pouco para garantir que o DOM está completamente atualizado
+      // antes de carregar as avaliações
+      setTimeout(function () {
+        console.log(
+          "✅ HTML do produto carregado, iniciando carregamento de avaliações...",
+        );
+        carregarAvaliacoes(produtoID);
+      }, 100);
     })
     .fail(function (jqXHR, textStatus) {
       alert("Erro ao carregar o produto: " + textStatus);
@@ -132,12 +141,8 @@ function alerta(titulo, msg, icon) {
 $(function () {
   getProdutoMostrar();
 
-  // Carregar avaliações quando a página carregar
-  const params = new URLSearchParams(window.location.search);
-  const produtoID = params.get("id");
-  if (produtoID) {
-    carregarAvaliacoes(produtoID);
-  }
+  // As avaliações agora são carregadas dentro de getProdutoMostrar()
+  // após o HTML ser inserido no DOM
 });
 
 /**
@@ -154,12 +159,23 @@ function carregarAvaliacoes(produtoId) {
       produto_id: produtoId,
     },
     dataType: "json",
+    cache: false, // Desabilitar cache
     success: function (response) {
       console.log("✅ Resposta recebida:", response);
 
-      if (response.success) {
+      if (response && response.success) {
         console.log("📊 Avaliações:", response.avaliacoes);
         console.log("📈 Estatísticas:", response.estatisticas);
+
+        // Verificar se os dados são válidos
+        if (!response.avaliacoes || !response.estatisticas) {
+          console.error("❌ Dados de avaliações inválidos na resposta");
+          $("#ListaAvaliacoes").html(
+            '<div class="text-center py-2" style="color: #888;"><small>Erro ao carregar avaliações</small></div>',
+          );
+          return;
+        }
+
         renderizarAvaliacoes(response.avaliacoes, response.estatisticas);
       } else {
         console.error("❌ Resposta sem sucesso:", response);
@@ -187,6 +203,22 @@ let paginaAtual = 1;
 const avaliacoesPorPagina = 3;
 
 function renderizarAvaliacoes(avaliacoes, estatisticas) {
+  console.log("🎨 Iniciando renderização de avaliações...");
+
+  // Verificar se os elementos necessários existem no DOM
+  if (!$("#MediaAvaliacoes").length) {
+    console.error("❌ Elemento #MediaAvaliacoes não encontrado no DOM");
+    return;
+  }
+  if (!$("#barrasEstrelas").length) {
+    console.error("❌ Elemento #barrasEstrelas não encontrado no DOM");
+    return;
+  }
+  if (!$("#ListaAvaliacoes").length) {
+    console.error("❌ Elemento #ListaAvaliacoes não encontrado no DOM");
+    return;
+  }
+
   // Guardar avaliações globalmente para paginação
   avaliacoesGlobal = avaliacoes;
 
@@ -195,9 +227,11 @@ function renderizarAvaliacoes(avaliacoes, estatisticas) {
   $("#MediaAvaliacoes .stars-display").html(starsHtml);
   $("#MediaAvaliacoes .rating-text").text(estatisticas.media.toFixed(1));
   $("#MediaAvaliacoes .total-reviews").text(`(${estatisticas.total})`);
+  console.log("✅ Média atualizada:", estatisticas.media);
 
   // Renderizar barras de estatísticas
   renderizarBarrasEstatisticas(estatisticas);
+  console.log("✅ Barras de estatísticas renderizadas");
 
   // Renderizar lista de avaliações com paginação
   if (avaliacoes.length === 0) {
@@ -208,10 +242,12 @@ function renderizarAvaliacoes(avaliacoes, estatisticas) {
       </div>
     `);
     $("#PaginacaoAvaliacoes").html("");
+    console.log("ℹ️ Nenhuma avaliação para exibir");
     return;
   }
 
   // Renderizar primeira página
+  console.log(`✅ Renderizando ${avaliacoes.length} avaliação(ões)...`);
   renderizarPagina(1);
 }
 

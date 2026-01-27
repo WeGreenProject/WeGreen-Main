@@ -34,7 +34,17 @@ if (isset($_POST['op']) && $_POST['op'] == 1) {
         $ordenacao,
         $limite
     );
-    echo $resp;
+
+    // Decodificar resposta para adicionar informação de sessão
+    $respData = json_decode($resp, true);
+    if ($respData && isset($respData['success'])) {
+        // Adicionar informação se o usuário é cliente logado
+        $respData['isCliente'] = isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2;
+        $respData['isLoggedIn'] = isset($_SESSION['utilizador']);
+        echo json_encode($respData);
+    } else {
+        echo $resp;
+    }
 }
 
 // op 2 - Obter filtros disponíveis

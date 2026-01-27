@@ -69,6 +69,11 @@ class Avaliacoes {
     function obterAvaliacoesProduto($produto_id) {
         global $conn;
 
+        if (!$conn) {
+            error_log("Erro: Conexão com BD não estabelecida em obterAvaliacoesProduto");
+            return [];
+        }
+
         $sql = "SELECT
                     a.id,
                     a.avaliacao,
@@ -82,9 +87,22 @@ class Avaliacoes {
                 ORDER BY a.data_criacao DESC";
 
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            error_log("Erro ao preparar query em obterAvaliacoesProduto: " . $conn->error);
+            return [];
+        }
+
         $stmt->bind_param("i", $produto_id);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            error_log("Erro ao executar query em obterAvaliacoesProduto: " . $stmt->error);
+            return [];
+        }
+
         $result = $stmt->get_result();
+        if (!$result) {
+            error_log("Erro ao obter resultado em obterAvaliacoesProduto");
+            return [];
+        }
 
         $avaliacoes = [];
         while($row = $result->fetch_assoc()) {
@@ -104,9 +122,22 @@ class Avaliacoes {
     function obterEstatisticasProduto($produto_id) {
         global $conn;
 
+        if (!$conn) {
+            error_log("Erro: Conexão com BD não estabelecida em obterEstatisticasProduto");
+            return [
+                'total' => 0,
+                'media' => 0,
+                'estrelas_5' => 0,
+                'estrelas_4' => 0,
+                'estrelas_3' => 0,
+                'estrelas_2' => 0,
+                'estrelas_1' => 0
+            ];
+        }
+
         $sql = "SELECT
                     COUNT(*) as total,
-                    AVG(avaliacao) as media,
+                    COALESCE(AVG(avaliacao), 0) as media,
                     SUM(CASE WHEN avaliacao = 5 THEN 1 ELSE 0 END) as estrelas_5,
                     SUM(CASE WHEN avaliacao = 4 THEN 1 ELSE 0 END) as estrelas_4,
                     SUM(CASE WHEN avaliacao = 3 THEN 1 ELSE 0 END) as estrelas_3,
@@ -116,13 +147,45 @@ class Avaliacoes {
                 WHERE produto_id = ?";
 
         $stmt = $conn->prepare($sql);
+        if (!$stmt) {
+            error_log("Erro ao preparar query em obterEstatisticasProduto: " . $conn->error);
+            return [
+                'total' => 0,
+                'media' => 0,
+                'estrelas_5' => 0,
+                'estrelas_4' => 0,
+                'estrelas_3' => 0,
+                'estrelas_2' => 0,
+                'estrelas_1' => 0
+            ];
+        }
+
         $stmt->bind_param("i", $produto_id);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            error_log("Erro ao executar query em obterEstatisticasProduto: " . $stmt->error);
+            return [
+                'total' => 0,
+                'media' => 0,
+                'estrelas_5' => 0,
+                'estrelas_4' => 0,
+                'estrelas_3' => 0,
+                'estrelas_2' => 0,
+                'estrelas_1' => 0
+            ];
+        }
+
         $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $row['media'] = round($row['media'], 1);
+            // Converter NULLs para 0 e garantir tipos corretos
+            $row['total'] = (int)($row['total'] ?? 0);
+            $row['media'] = round((float)($row['media'] ?? 0), 1);
+            $row['estrelas_5'] = (int)($row['estrelas_5'] ?? 0);
+            $row['estrelas_4'] = (int)($row['estrelas_4'] ?? 0);
+            $row['estrelas_3'] = (int)($row['estrelas_3'] ?? 0);
+            $row['estrelas_2'] = (int)($row['estrelas_2'] ?? 0);
+            $row['estrelas_1'] = (int)($row['estrelas_1'] ?? 0);
             return $row;
         }
 

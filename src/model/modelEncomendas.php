@@ -47,11 +47,41 @@ class Encomendas {
                 // Obter nome da transportadora
                 $transportadora = $this->obterTransportadora($row['id']);
                 $row['transportadora'] = $transportadora;
+
+                // Obter lista detalhada de produtos
+                $row['produtos_lista'] = $this->obterListaProdutos($row['id']);
+                $row['num_produtos'] = count($row['produtos_lista']);
+
                 $encomendas[] = $row;
             }
         }
 
         return $encomendas;
+    }
+
+    private function obterListaProdutos($encomenda_id) {
+        global $conn;
+
+        $sql = "SELECT
+                    p.Produto_id,
+                    p.nome,
+                    p.foto,
+                    v.quantidade,
+                    v.valor
+                FROM vendas v
+                INNER JOIN produtos p ON v.produto_id = p.Produto_id
+                WHERE v.encomenda_id = $encomenda_id";
+
+        $result = $conn->query($sql);
+        $produtos = [];
+
+        if ($result && $result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $produtos[] = $row;
+            }
+        }
+
+        return $produtos;
     }
 
     function obterDetalhes($codigo_encomenda, $cliente_id) {
@@ -83,8 +113,11 @@ class Encomendas {
                 $encomenda['morada_completa'] = $encomenda['morada'];
             }
 
-            // Buscar produtos da encomenda
+            // Buscar produtos da encomenda (HTML para compatibilidade)
             $encomenda['produtos_detalhes'] = $this->obterProdutosEncomenda($codigo_encomenda);
+
+            // Buscar lista detalhada de produtos (array para PDFs e faturas)
+            $encomenda['produtos_lista'] = $this->obterListaProdutos($encomenda['id']);
 
             // Calcular total
             $encomenda['total'] = $this->calcularTotal($codigo_encomenda);

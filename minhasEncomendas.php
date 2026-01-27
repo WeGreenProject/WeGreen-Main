@@ -269,6 +269,72 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     const statusInfo = getStatusInfo(enc.estado.toLowerCase());
     const timeline = criarTimeline(enc.estado.toLowerCase());
 
+    // Renderizar produtos - pode ser um array ou string
+    let produtosHTML = '';
+    let fotoProduto = enc.foto_produto || 'assets/media/products/default.jpg';
+    let nomeProdutos = enc.produtos || '';
+
+    if (enc.produtos_lista && Array.isArray(enc.produtos_lista) && enc.produtos_lista.length > 0) {
+      if (enc.produtos_lista.length === 1) {
+        // Um único produto
+        const p = enc.produtos_lista[0];
+        fotoProduto = p.foto || fotoProduto;
+        produtosHTML = `
+          <div class="product-image" onclick="previewImage('${fotoProduto}', '${p.nome}')">
+            <img src="${fotoProduto}" alt="${p.nome}">
+          </div>
+          <div class="product-info">
+            <div class="product-name">${p.nome}</div>
+            <div class="product-details">
+              <span><i class="fas fa-box"></i> Qtd: ${p.quantidade}</span>
+              <span><i class="fas fa-truck"></i> ${enc.transportadora}</span>
+              ${enc.plano_rastreio ? `<span><i class="fas fa-barcode"></i> ${enc.plano_rastreio}</span>` : ''}
+            </div>
+          </div>
+        `;
+      } else {
+        // Múltiplos produtos
+        fotoProduto = enc.produtos_lista[0].foto || fotoProduto;
+        const produtosText = enc.produtos_lista.map(p => p.nome).join(', ');
+        const qtdTotal = enc.produtos_lista.reduce((sum, p) => sum + parseInt(p.quantidade), 0);
+
+        produtosHTML = `
+          <div class="product-image" onclick="mostrarTodosProdutos(${JSON.stringify(enc.produtos_lista).replace(/"/g, '&quot;')})">
+            <img src="${fotoProduto}" alt="Produtos">
+            <div style="position: absolute; top: 5px; right: 5px; background: #3cb371; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+              ${enc.produtos_lista.length}
+            </div>
+          </div>
+          <div class="product-info">
+            <div class="product-name" style="cursor: pointer;" onclick="mostrarTodosProdutos(${JSON.stringify(enc.produtos_lista).replace(/"/g, '&quot;')})">
+              <i class="fas fa-cubes" style="margin-right: 6px; color: #3cb371;"></i>
+              ${enc.produtos_lista.length} produtos diferentes
+              <i class="fas fa-chevron-right" style="margin-left: 6px; font-size: 11px; color: #999;"></i>
+            </div>
+            <div class="product-details">
+              <span><i class="fas fa-box"></i> Qtd total: ${qtdTotal}</span>
+              <span><i class="fas fa-truck"></i> ${enc.transportadora}</span>
+              ${enc.plano_rastreio ? `<span><i class="fas fa-barcode"></i> ${enc.plano_rastreio}</span>` : ''}
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      // Fallback para formato antigo (apenas string)
+      produtosHTML = `
+        <div class="product-image" onclick="previewImage('${fotoProduto}', '${nomeProdutos}')">
+          <img src="${fotoProduto}" alt="${nomeProdutos}">
+        </div>
+        <div class="product-info">
+          <div class="product-name">${nomeProdutos}</div>
+          <div class="product-details">
+            <span><i class="fas fa-truck"></i> ${enc.transportadora}</span>
+            ${enc.plano_rastreio ? `<span><i class="fas fa-barcode"></i> ${enc.plano_rastreio}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
     return $(`
                 <div class="order-card">
                     <div class="order-header">
@@ -287,16 +353,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
 
                     <div class="order-body">
                         <div class="order-products">
-                            <div class="product-image" onclick="previewImage('${enc.foto_produto || 'assets/media/products/default.jpg'}', '${enc.produtos}')">
-                                <img src="${enc.foto_produto || 'assets/media/products/default.jpg'}" alt="${enc.produtos}">
-                            </div>
-                            <div class="product-info">
-                                <div class="product-name">${enc.produtos}</div>
-                                <div class="product-details">
-                                    <span><i class="fas fa-truck"></i> ${enc.transportadora}</span>
-                                    ${enc.plano_rastreio ? `<span><i class="fas fa-box"></i> ${enc.plano_rastreio}</span>` : ''}
-                                </div>
-                            </div>
+                            ${produtosHTML}
                         </div>
 
                         <div class="order-total">
@@ -832,12 +889,60 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     $('#detalhesModal').fadeIn();
   }
 
+  function mostrarTodosProdutos(produtos) {
+    let produtosHTML = produtos.map((p, index) => `
+      <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: ${index % 2 === 0 ? '#f9fafb' : '#ffffff'}; border-radius: 8px; margin-bottom: 10px;">
+        <img src="${p.foto || 'assets/media/products/default.jpg'}" alt="${p.nome}"
+             style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 2px solid #e5e7eb;">
+        <div style="flex: 1;">
+          <div style="font-weight: 600; color: #2d3748; font-size: 15px; margin-bottom: 4px;">${p.nome}</div>
+          <div style="color: #64748b; font-size: 13px;">
+            <i class="fas fa-box" style="color: #3cb371; margin-right: 4px;"></i>
+            Quantidade: ${p.quantidade}
+            <span style="margin-left: 15px;">
+              <i class="fas fa-tag" style="color: #3cb371; margin-right: 4px;"></i>
+              Preço: €${parseFloat(p.valor).toFixed(2)}
+            </span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    Swal.fire({
+      title: `<i class="fas fa-cubes" style="color: #3cb371; margin-right: 10px;"></i>Produtos da Encomenda`,
+      html: `
+        <div style="text-align: left; max-height: 500px; overflow-y: auto; padding: 10px;">
+          <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+            <span style="font-weight: 600; color: #2d3748;">
+              <i class="fas fa-shopping-bag" style="color: #3cb371; margin-right: 6px;"></i>
+              Total de ${produtos.length} produto${produtos.length > 1 ? 's' : ''} nesta encomenda
+            </span>
+          </div>
+          ${produtosHTML}
+        </div>
+      `,
+      width: '600px',
+      confirmButtonText: 'Fechar',
+      confirmButtonColor: '#3cb371',
+      showClass: {
+        popup: 'swal2-show',
+        backdrop: 'swal2-backdrop-show'
+      },
+      customClass: {
+        confirmButton: 'swal2-confirm-modern',
+        popup: 'swal2-border-radius'
+      }
+    });
+  }
+
   function fecharModal() {
     $('#detalhesModal').fadeOut();
   }
 
 
   function descarregarFatura(codigo) {
+    console.log('Gerando fatura para encomenda:', codigo);
+
     // Buscar detalhes da encomenda
     $.ajax({
       url: 'src/controller/controllerEncomendas.php',
@@ -848,147 +953,182 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
       },
       dataType: 'json',
       success: function(response) {
+        console.log('Resposta recebida:', response);
         if (response.success) {
           gerarPDFFatura(response.data);
         } else {
           Swal.fire('Erro', 'Não foi possível obter os detalhes da encomenda', 'error');
         }
+      },
+      error: function(xhr, status, error) {
+        console.error('Erro AJAX:', xhr.responseText);
+        Swal.fire('Erro', 'Erro ao comunicar com o servidor: ' + error, 'error');
       }
     });
   }
 
   function gerarPDFFatura(encomenda) {
-    const {
-      jsPDF
-    } = window.jspdf;
-    const doc = new jsPDF();
+    console.log('Dados da encomenda para fatura:', encomenda);
 
-    // Cabeçalho WeGreen
-    doc.setFillColor(60, 179, 113);
-    doc.rect(0, 0, 210, 35, 'F');
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont(undefined, 'bold');
-    doc.text('WeGreen', 14, 15);
+      // Cabeçalho WeGreen
+      doc.setFillColor(60, 179, 113);
+      doc.rect(0, 0, 210, 35, 'F');
 
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text('Marketplace Sustentável', 14, 22);
-    doc.text('NIF: 123456789 | Email: info@wegreen.pt', 14, 28);
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(24);
+      doc.setFont(undefined, 'bold');
+      doc.text('WeGreen', 14, 15);
 
-    // Título Fatura
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(20);
-    doc.setFont(undefined, 'bold');
-    doc.text('FATURA', 150, 15);
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text('Marketplace Sustentável', 14, 22);
+      doc.text('NIF: 123456789 | Email: info@wegreen.pt', 14, 28);
 
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text('#' + encomenda.codigo_encomenda, 150, 22);
-    doc.text('Data: ' + new Date(encomenda.data_envio).toLocaleDateString('pt-PT'), 150, 28);
+      // Título Fatura
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(20);
+      doc.setFont(undefined, 'bold');
+      doc.text('FATURA', 150, 15);
 
-    // Informações do Cliente
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.text('Cliente:', 14, 50);
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text('#' + encomenda.codigo_encomenda, 150, 22);
+      doc.text('Data: ' + new Date(encomenda.data_envio).toLocaleDateString('pt-PT'), 150, 28);
 
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text(encomenda.cliente_nome || '<?php echo $_SESSION['nome']; ?>', 14, 57);
-    doc.text(encomenda.morada || 'N/A', 14, 63);
+      // Informações do Cliente
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text('Cliente:', 14, 50);
 
-    // Linha separadora
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, 75, 196, 75);
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(encomenda.cliente_nome || '<?php echo $_SESSION['nome']; ?>', 14, 57);
+      doc.text(encomenda.morada || 'N/A', 14, 63);
 
-    // Produtos
-    const produtosHTML = $(encomenda.produtos_html);
-    const produtos = [];
+      // Linha separadora
+      doc.setDrawColor(200, 200, 200);
+      doc.line(14, 75, 196, 75);
 
-    produtosHTML.find('tr').each(function() {
-      const cols = $(this).find('td');
-      if (cols.length > 0) {
-        produtos.push([
-          cols.eq(0).text().trim(),
-          cols.eq(1).text().trim(),
-          cols.eq(2).text().trim(),
-          cols.eq(3).text().trim()
+      // Processar produtos
+      let produtos = [];
+
+      // Verificar se temos produtos_lista (novo formato)
+      if (encomenda.produtos_lista && Array.isArray(encomenda.produtos_lista)) {
+        produtos = encomenda.produtos_lista.map(p => [
+          p.nome,
+          p.quantidade.toString(),
+          '€' + parseFloat(p.valor / p.quantidade).toFixed(2),
+          '€' + parseFloat(p.valor).toFixed(2)
         ]);
       }
-    });
-
-    doc.autoTable({
-      startY: 80,
-      head: [
-        ['Produto', 'Quantidade', 'Preço Unit.', 'Total']
-      ],
-      body: produtos,
-      theme: 'striped',
-      headStyles: {
-        fillColor: [60, 179, 113],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        fontSize: 11
-      },
-      styles: {
-        fontSize: 10,
-        cellPadding: 5
-      },
-      columnStyles: {
-        0: {
-          cellWidth: 80
-        },
-        1: {
-          halign: 'center',
-          cellWidth: 30
-        },
-        2: {
-          halign: 'right',
-          cellWidth: 35
-        },
-        3: {
-          halign: 'right',
-          cellWidth: 35
-        }
+      // Se não, tentar processar produtos_detalhes (HTML)
+      else if (encomenda.produtos_detalhes) {
+        const produtosHTML = $(encomenda.produtos_detalhes);
+        produtosHTML.find('tr').each(function() {
+          const cols = $(this).find('td');
+          if (cols.length >= 3) {
+            produtos.push([
+              cols.eq(0).text().trim(),
+              cols.eq(1).text().trim(),
+              cols.eq(2).text().trim(),
+              cols.eq(2).text().trim() // Total = Preço (já calculado no HTML)
+            ]);
+          }
+        });
       }
-    });
+      // Fallback: se não houver produtos, criar linha genérica
+      else if (encomenda.produtos) {
+        produtos.push([
+          encomenda.produtos,
+          '1',
+          '€' + parseFloat(encomenda.total).toFixed(2),
+          '€' + parseFloat(encomenda.total).toFixed(2)
+        ]);
+      }
 
-    // Total
-    const finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.text('Total:', 140, finalY);
-    doc.text('€' + parseFloat(encomenda.total).toFixed(2), 180, finalY, {
-      align: 'right'
-    });
+      console.log('Produtos processados:', produtos);
 
-    // Transportadora
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
-    doc.text('Transportadora: ' + encomenda.transportadora, 14, finalY + 10);
-    doc.text('Estado: ' + encomenda.estado, 14, finalY + 16);
+      doc.autoTable({
+        startY: 80,
+        head: [
+          ['Produto', 'Quantidade', 'Preço Unit.', 'Total']
+        ],
+        body: produtos,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [60, 179, 113],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 11
+        },
+        styles: {
+          fontSize: 10,
+          cellPadding: 5
+        },
+        columnStyles: {
+          0: {
+            cellWidth: 80
+          },
+          1: {
+            halign: 'center',
+            cellWidth: 30
+          },
+          2: {
+            halign: 'right',
+            cellWidth: 35
+          },
+          3: {
+            halign: 'right',
+            cellWidth: 35
+          }
+        }
+      });
 
-    // Rodapé
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text('Obrigado pela sua compra! WeGreen - Sustentabilidade em cada produto.', 105, 280, {
-      align: 'center'
-    });
-    doc.text('www.wegreen.pt | suporte@wegreen.pt', 105, 285, {
-      align: 'center'
-    });
+      // Total
+      const finalY = doc.lastAutoTable.finalY + 10;
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text('Total:', 140, finalY);
+      doc.text('€' + parseFloat(encomenda.total).toFixed(2), 180, finalY, {
+        align: 'right'
+      });
 
-    // Download
-    doc.save('fatura_' + encomenda.codigo_encomenda + '.pdf');
+      // Transportadora
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text('Transportadora: ' + (encomenda.transportadora || 'N/A'), 14, finalY + 10);
+      doc.text('Estado: ' + (encomenda.estado || 'N/A'), 14, finalY + 16);
 
-    Swal.fire({
-      icon: 'success',
-      title: 'Fatura Gerada!',
-      text: 'O download iniciou automaticamente',
-      timer: 2000,
-      showConfirmButton: false
-    });
+      // Rodapé
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text('Obrigado pela sua compra! WeGreen - Sustentabilidade em cada produto.', 105, 280, {
+        align: 'center'
+      });
+      doc.text('www.wegreen.pt | suporte@wegreen.pt', 105, 285, {
+        align: 'center'
+      });
+
+      // Download
+      console.log('Gerando PDF...');
+      doc.save('fatura_' + encomenda.codigo_encomenda + '.pdf');
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Fatura Gerada!',
+        text: 'O download iniciou automaticamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
+    } catch (error) {
+      console.error('Erro ao gerar PDF:', error);
+      Swal.fire('Erro', 'Erro ao gerar a fatura: ' + error.message, 'error');
+    }
   }
 
   function cancelarEncomenda(codigo) {

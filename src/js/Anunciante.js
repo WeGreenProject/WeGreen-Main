@@ -1155,7 +1155,17 @@ function abrirModalProduto(titulo, dados = {}) {
           </div>
           <div class="form-col">
             <label><i class="fas fa-ruler" style="color: #3cb371; margin-right: 6px;"></i>Tamanho</label>
-            <input type="text" id="tamanho" value="${dados.tamanho || ""}">
+            <select id="tamanho">
+              <option value="" disabled>Selecionar Tamanho</option>
+              <option value="XXS" ${dados.tamanho === "XXS" ? "selected" : ""}>XXS</option>
+              <option value="XS" ${dados.tamanho === "XS" ? "selected" : ""}>XS</option>
+              <option value="S" ${dados.tamanho === "S" ? "selected" : ""}>S</option>
+              <option value="M" ${dados.tamanho === "M" ? "selected" : ""}>M</option>
+              <option value="L" ${dados.tamanho === "L" ? "selected" : ""}>L</option>
+              <option value="XL" ${dados.tamanho === "XL" ? "selected" : ""}>XL</option>
+              <option value="XXL" ${dados.tamanho === "XXL" ? "selected" : ""}>XXL</option>
+              <option value="XXXL" ${dados.tamanho === "XXXL" ? "selected" : ""}>XXXL</option>
+            </select>
           </div>
         </div>
         <div class="form-row">
@@ -1206,7 +1216,7 @@ function abrirModalProduto(titulo, dados = {}) {
     showCancelButton: true,
     confirmButtonText: '<i class="fas fa-save"></i> Guardar Produto',
     cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-    width: 750,
+    width: 650,
     customClass: {
       popup: "product-modal-view",
       htmlContainer: "modal-view-wrapper",
@@ -1922,174 +1932,436 @@ $(document).ready(function () {
     const tabela = $("#productsTable").DataTable();
     const dados = tabela.rows({ search: "applied" }).data();
 
-    doc.setFontSize(18);
-    doc.setTextColor(166, 217, 12);
-    doc.text("WeGreen - Lista de Produtos", 14, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Data: " + new Date().toLocaleDateString("pt-PT"), 14, 30);
+    // Cabeçalho com logo e título
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(60, 179, 113);
+    doc.text("WeGreen", 14, 20);
+
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(45, 55, 72);
+    doc.text("Relatório de Produtos", 14, 30);
+
+    // Data e informações adicionais
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(
+      "Data de Geração: " +
+        new Date().toLocaleDateString("pt-PT", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      14,
+      38,
+    );
+    doc.text("Total de Produtos: " + dados.length, 14, 44);
 
     const linhasTabela = [];
+    let totalStock = 0;
+    let totalAtivos = 0;
+
     dados.each(function (linha) {
+      const stock = parseInt(linha.stock) || 0;
+      totalStock += stock;
+      if (linha.ativo) totalAtivos++;
+
       linhasTabela.push([
-        linha.nome,
-        linha.tipo_descricao,
-        "€" + parseFloat(linha.preco).toFixed(2),
-        linha.stock,
-        linha.estado,
+        linha.nome || "N/A",
+        linha.tipo_descricao || "N/A",
+        "€" + parseFloat(linha.preco || 0).toFixed(2),
+        stock.toString(),
+        linha.estado || "N/A",
         linha.ativo ? "Sim" : "Não",
       ]);
     });
 
     doc.autoTable({
-      startY: 35,
+      startY: 50,
       head: [["Nome", "Tipo", "Preço", "Stock", "Estado", "Ativo"]],
       body: linhasTabela,
-      theme: "striped",
+      theme: "grid",
       headStyles: {
-        fillColor: [166, 217, 12],
+        fillColor: [60, 179, 113],
         textColor: [255, 255, 255],
         fontStyle: "bold",
+        fontSize: 10,
+        halign: "center",
       },
-      styles: { fontSize: 9, cellPadding: 3 },
+      styles: {
+        fontSize: 9,
+        cellPadding: 4,
+        lineColor: [220, 220, 220],
+        lineWidth: 0.5,
+      },
       columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: 35 },
-        2: { cellWidth: 25 },
-        3: { cellWidth: 20 },
-        4: { cellWidth: 30 },
-        5: { cellWidth: 20 },
+        0: { cellWidth: 55, halign: "left" },
+        1: { cellWidth: 30, halign: "center" },
+        2: { cellWidth: 25, halign: "right" },
+        3: { cellWidth: 20, halign: "center" },
+        4: { cellWidth: 30, halign: "center" },
+        5: { cellWidth: 20, halign: "center" },
+      },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252],
+      },
+      didDrawPage: function (data) {
+        // Rodapé em cada página
+        const pageHeight = doc.internal.pageSize.height;
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(
+          "WeGreen - Moda Sustentável | Página " +
+            doc.internal.getNumberOfPages(),
+          14,
+          pageHeight - 10,
+        );
       },
     });
 
-    doc.save("produtos_" + new Date().toISOString().split("T")[0] + ".pdf");
+    // Resumo no final
+    const finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(45, 55, 72);
+    doc.text("Resumo:", 14, finalY);
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 116, 139);
+    doc.text("Total de Produtos: " + dados.length, 14, finalY + 6);
+    doc.text("Produtos Ativos: " + totalAtivos, 14, finalY + 12);
+    doc.text("Stock Total: " + totalStock + " unidades", 14, finalY + 18);
+
+    doc.save(
+      "WeGreen_Produtos_" + new Date().toISOString().split("T")[0] + ".pdf",
+    );
   });
 
   // Exportar Encomendas PDF
   $("#exportEncomendasBtn").on("click", function () {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("l"); // landscape
-    const tabela = $("#encomendasTable").DataTable();
-    const dados = tabela.rows({ search: "applied" }).data();
+    // Buscar dados diretos do servidor
+    $.post(
+      "src/controller/controllerDashboardAnunciante.php",
+      { op: 32 },
+      function (resp) {
+        const encomendas = JSON.parse(resp);
 
-    doc.setFontSize(18);
-    doc.setTextColor(166, 217, 12);
-    doc.text("WeGreen - Lista de Encomendas", 14, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Data: " + new Date().toLocaleDateString("pt-PT"), 14, 30);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF("l"); // landscape
 
-    const linhasTabela = [];
-    dados.each(function (linha) {
-      linhasTabela.push([
-        linha.codigo_encomenda || "",
-        linha.cliente_nome || "",
-        "€" + parseFloat(linha.total || 0).toFixed(2),
-        linha.estado || "",
-        linha.data_encomenda || "",
-        linha.metodo_pagamento || "",
-        linha.codigo_rastreio || "N/A",
-      ]);
-    });
+        // Cabeçalho com logo e título
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(60, 179, 113);
+        doc.text("WeGreen", 14, 20);
 
-    doc.autoTable({
-      startY: 35,
-      head: [
-        [
-          "Código",
-          "Cliente",
-          "Total",
-          "Estado",
-          "Data",
-          "Pagamento",
-          "Rastreio",
-        ],
-      ],
-      body: linhasTabela,
-      theme: "striped",
-      headStyles: {
-        fillColor: [166, 217, 12],
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(45, 55, 72);
+        doc.text("Relatório de Encomendas", 14, 30);
+
+        // Data e informações
+        doc.setFontSize(9);
+        doc.setTextColor(100, 116, 139);
+        doc.text(
+          "Data de Geração: " +
+            new Date().toLocaleDateString("pt-PT", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          14,
+          38,
+        );
+        doc.text("Total de Encomendas: " + encomendas.length, 14, 44);
+
+        const linhasTabela = [];
+        let totalReceita = 0;
+
+        encomendas.forEach(function (encomenda) {
+          const total = parseFloat(
+            encomenda.lucro_liquido || encomenda.valor || 0,
+          );
+          totalReceita += total;
+
+          linhasTabela.push([
+            encomenda.codigo || "N/A",
+            encomenda.cliente_nome || "N/A",
+            "€" + total.toFixed(2),
+            encomenda.estado || "N/A",
+            encomenda.data || "N/A",
+            (encomenda.payment_method || "N/A").toUpperCase(),
+            encomenda.transportadora || "N/A",
+          ]);
+        });
+
+        doc.autoTable({
+          startY: 50,
+          head: [
+            [
+              "Código",
+              "Cliente",
+              "Valor",
+              "Estado",
+              "Data",
+              "Pagamento",
+              "Transportadora",
+            ],
+          ],
+          body: linhasTabela,
+          theme: "grid",
+          headStyles: {
+            fillColor: [60, 179, 113],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            fontSize: 10,
+            halign: "center",
+          },
+          styles: {
+            fontSize: 8,
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.5,
+          },
+          columnStyles: {
+            0: { cellWidth: 35, halign: "center" },
+            1: { cellWidth: 50, halign: "left" },
+            2: { cellWidth: 30, halign: "right" },
+            3: { cellWidth: 35, halign: "center" },
+            4: { cellWidth: 35, halign: "center" },
+            5: { cellWidth: 35, halign: "center" },
+            6: { cellWidth: 40, halign: "center" },
+          },
+          alternateRowStyles: {
+            fillColor: [248, 250, 252],
+          },
+          didDrawPage: function (data) {
+            const pageHeight = doc.internal.pageSize.height;
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text(
+              "WeGreen - Moda Sustentável | Página " +
+                doc.internal.getNumberOfPages(),
+              14,
+              pageHeight - 10,
+            );
+          },
+        });
+
+        // Resumo
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(45, 55, 72);
+        doc.text("Resumo:", 14, finalY);
+
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100, 116, 139);
+        doc.text("Total de Encomendas: " + encomendas.length, 14, finalY + 6);
+        doc.text("Receita Total: €" + totalReceita.toFixed(2), 14, finalY + 12);
+
+        doc.save(
+          "WeGreen_Encomendas_" +
+            new Date().toISOString().split("T")[0] +
+            ".pdf",
+        );
       },
-      styles: { fontSize: 8, cellPadding: 2 },
-      columnStyles: {
-        0: { cellWidth: 35 },
-        1: { cellWidth: 45 },
-        2: { cellWidth: 25 },
-        3: { cellWidth: 30 },
-        4: { cellWidth: 30 },
-        5: { cellWidth: 30 },
-        6: { cellWidth: 35 },
-      },
+    ).fail(function () {
+      Swal.fire(
+        "Erro",
+        "Não foi possível gerar o PDF. Tente novamente.",
+        "error",
+      );
     });
-
-    doc.save("encomendas_" + new Date().toISOString().split("T")[0] + ".pdf");
   });
 
   // Exportar Devoluções PDF
   $("#exportDevolucoesBtn").on("click", function () {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF("l"); // landscape
-    const tabela = $("#tabelaDevolucoes").DataTable();
-    const dados = tabela.rows({ search: "applied" }).data();
+    // Buscar dados diretos do servidor
+    $.ajax({
+      url: "src/controller/controllerDevolucoes.php?op=3",
+      method: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (!response.success || !response.data) {
+          Swal.fire(
+            "Erro",
+            "Não foi possível obter os dados das devoluções.",
+            "error",
+          );
+          return;
+        }
 
-    doc.setFontSize(18);
-    doc.setTextColor(166, 217, 12);
-    doc.text("WeGreen - Lista de Devoluções", 14, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text("Data: " + new Date().toLocaleDateString("pt-PT"), 14, 30);
+        const devolucoes = response.data;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF("l"); // landscape
 
-    const linhasTabela = [];
-    dados.each(function (linha) {
-      linhasTabela.push([
-        linha.codigo_devolucao || "",
-        linha.codigo_encomenda || "",
-        linha.produto_nome || "",
-        linha.cliente_nome || "",
-        linha.motivo || "",
-        "€" + parseFloat(linha.valor || 0).toFixed(2),
-        linha.data_criacao || "",
-        linha.estado || "",
-      ]);
-    });
+        // Cabeçalho com logo e título
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(60, 179, 113);
+        doc.text("WeGreen", 14, 20);
 
-    doc.autoTable({
-      startY: 35,
-      head: [
-        [
-          "Cód. Devolução",
-          "Encomenda",
-          "Produto",
-          "Cliente",
-          "Motivo",
-          "Valor",
-          "Data",
-          "Estado",
-        ],
-      ],
-      body: linhasTabela,
-      theme: "striped",
-      headStyles: {
-        fillColor: [166, 217, 12],
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(45, 55, 72);
+        doc.text("Relatório de Devoluções", 14, 30);
+
+        // Data e informações
+        doc.setFontSize(9);
+        doc.setTextColor(100, 116, 139);
+        doc.text(
+          "Data de Geração: " +
+            new Date().toLocaleDateString("pt-PT", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          14,
+          38,
+        );
+        doc.text("Total de Devoluções: " + devolucoes.length, 14, 44);
+
+        const linhasTabela = [];
+        let valorTotal = 0;
+
+        devolucoes.forEach(function (dev) {
+          const valor = parseFloat(dev.valor_reembolso || 0);
+          valorTotal += valor;
+
+          // Formatar motivo de forma amigável
+          const motivoTexto = {
+            defeituoso: "Produto Defeituoso",
+            tamanho_errado: "Tamanho Errado",
+            nao_como_descrito: "Não como Descrito",
+            arrependimento: "Arrependimento",
+            outro: "Outro",
+          };
+          const motivoFormatado =
+            motivoTexto[dev.motivo] || dev.motivo || "N/A";
+
+          // Formatar estado de forma amigável
+          const estadoTexto = {
+            solicitada: "Solicitada",
+            aprovada: "Aprovada",
+            enviada: "Enviada",
+            recebida: "Recebida",
+            rejeitada: "Rejeitada",
+            reembolsada: "Reembolsada",
+            cancelada: "Cancelada",
+          };
+          const estadoFormatado =
+            estadoTexto[dev.estado] || dev.estado || "N/A";
+
+          linhasTabela.push([
+            dev.codigo_devolucao || "N/A",
+            dev.codigo_encomenda || "N/A",
+            dev.produto_nome || "N/A",
+            dev.cliente_nome || "N/A",
+            motivoFormatado,
+            "€" + valor.toFixed(2),
+            dev.data_solicitacao
+              ? new Date(dev.data_solicitacao).toLocaleDateString("pt-PT")
+              : "N/A",
+            estadoFormatado,
+          ]);
+        });
+
+        doc.autoTable({
+          startY: 50,
+          head: [
+            [
+              "Cód. Devolução",
+              "Encomenda",
+              "Produto",
+              "Cliente",
+              "Motivo",
+              "Valor",
+              "Data",
+              "Estado",
+            ],
+          ],
+          body: linhasTabela,
+          theme: "grid",
+          headStyles: {
+            fillColor: [60, 179, 113],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+            fontSize: 10,
+            halign: "center",
+          },
+          styles: {
+            fontSize: 8,
+            cellPadding: 3,
+            lineColor: [220, 220, 220],
+            lineWidth: 0.5,
+          },
+          columnStyles: {
+            0: { cellWidth: 32, halign: "center" },
+            1: { cellWidth: 32, halign: "center" },
+            2: { cellWidth: 45, halign: "left" },
+            3: { cellWidth: 40, halign: "left" },
+            4: { cellWidth: 35, halign: "left" },
+            5: { cellWidth: 25, halign: "right" },
+            6: { cellWidth: 28, halign: "center" },
+            7: { cellWidth: 28, halign: "center" },
+          },
+          alternateRowStyles: {
+            fillColor: [248, 250, 252],
+          },
+          didDrawPage: function (data) {
+            const pageHeight = doc.internal.pageSize.height;
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text(
+              "WeGreen - Moda Sustentável | Página " +
+                doc.internal.getNumberOfPages(),
+              14,
+              pageHeight - 10,
+            );
+          },
+        });
+
+        // Resumo
+        const finalY = doc.lastAutoTable.finalY + 10;
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(45, 55, 72);
+        doc.text("Resumo:", 14, finalY);
+
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100, 116, 139);
+        doc.text("Total de Devoluções: " + devolucoes.length, 14, finalY + 6);
+        doc.text(
+          "Valor Total Devolvido: €" + valorTotal.toFixed(2),
+          14,
+          finalY + 12,
+        );
+
+        doc.save(
+          "WeGreen_Devolucoes_" +
+            new Date().toISOString().split("T")[0] +
+            ".pdf",
+        );
       },
-      styles: { fontSize: 8, cellPadding: 2 },
-      columnStyles: {
-        0: { cellWidth: 30 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 40 },
-        3: { cellWidth: 35 },
-        4: { cellWidth: 30 },
-        5: { cellWidth: 25 },
-        6: { cellWidth: 25 },
-        7: { cellWidth: 25 },
+      error: function () {
+        Swal.fire(
+          "Erro",
+          "Não foi possível gerar o PDF. Tente novamente.",
+          "error",
+        );
       },
     });
-
-    doc.save("devolucoes_" + new Date().toISOString().split("T")[0] + ".pdf");
   });
 
   carregarEstatisticasProdutos();
@@ -2709,7 +2981,7 @@ function verDetalhesEncomenda(encomendaId) {
                                               ? "📦"
                                               : "❌"
                                     }
-                                    ${encomenda.estado}
+                                    ${encomenda.estado || "Pendente"}
                                 </span>
                             </p>
                         </div>

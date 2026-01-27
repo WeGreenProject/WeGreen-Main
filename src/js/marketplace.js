@@ -105,7 +105,7 @@ function loadProducts() {
     success: function (response) {
       console.log("Resposta recebida:", response);
       if (response.success) {
-        displayProducts(response.produtos);
+        displayProducts(response.produtos, response.isCliente);
         updateResultsCount(response.total);
       } else {
         console.error("Erro no response:", response.error || response);
@@ -137,7 +137,7 @@ function loadProducts() {
 }
 
 // Função para exibir produtos
-function displayProducts(produtos) {
+function displayProducts(produtos, isCliente = false) {
   const grid = $("#productsGrid");
 
   if (produtos.length === 0) {
@@ -160,11 +160,16 @@ function displayProducts(produtos) {
       ? produto.foto
       : "assets/media/products/placeholder.jpg";
 
+    // Botão de favoritos só aparece se for cliente logado
+    const favoritoBtn = isCliente
+      ? `<button class="btn-favorite" onclick="event.stopPropagation(); addToFavorites(${produto.id})">
+                    <i class="far fa-heart"></i>
+                </button>`
+      : "";
+
     html += `
             <div class="product-card" onclick="window.location.href='produto.php?id=${produto.id}'">
-                <button class="btn-favorite" onclick="event.stopPropagation(); addToFavorites(${produto.id})">
-                    <i class="far fa-heart"></i>
-                </button>
+                ${favoritoBtn}
                 ${badgeText ? `<span class="product-badge ${badgeClass}">${badgeText}</span>` : ""}
                 <img src="${imageUrl}" alt="${produto.nome}" class="product-image"
                      onerror="this.src='assets/media/products/placeholder.jpg'">
