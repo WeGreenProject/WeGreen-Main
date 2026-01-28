@@ -283,7 +283,17 @@ function renderizarPagina(numeroPagina) {
             <strong style="color: #1a1a1a; font-size: 15px;">${nomeCompleto}</strong>
             <div>${gerarEstrelasHtml(avaliacao.avaliacao, "small")}</div>
           </div>
-          <small style="color: #888; font-size: 11px;">${dataFormatada}</small>
+          <div class="d-flex align-items-center gap-2">
+            <small style="color: #888; font-size: 11px;">${dataFormatada}</small>
+            <button onclick="abrirModalReporte(${avaliacao.id})"
+                    class="btn btn-sm"
+                    title="Reportar avaliação"
+                    style="color: #ef4444; background: transparent; border: none; padding: 4px 8px; transition: all 0.3s ease;"
+                    onmouseover="this.style.background='#fee2e2'; this.style.borderRadius='6px';"
+                    onmouseout="this.style.background='transparent';">
+              <i class="fas fa-flag" style="font-size: 12px;"></i>
+            </button>
+          </div>
         </div>
         ${
           avaliacao.comentario
@@ -467,4 +477,98 @@ function escapeHtml(text) {
     "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
+/**
+ * Abrir modal de reportar avaliação
+ */
+function abrirModalReporte(avaliacaoId) {
+  $("#reportAvaliacaoId").val(avaliacaoId);
+  $("#reportMotivo").val("");
+  $("#reportDescricao").val("");
+
+  const modal = new bootstrap.Modal(
+    document.getElementById("modalReportarAvaliacao"),
+  );
+  modal.show();
+}
+
+/**
+ * Enviar reporte (preparado para backend)
+ */
+function enviarReporte() {
+  const avaliacaoId = $("#reportAvaliacaoId").val();
+  const motivo = $("#reportMotivo").val();
+  const descricao = $("#reportDescricao").val();
+
+  if (!motivo) {
+    Swal.fire({
+      icon: "warning",
+      title: "Atenção",
+      text: "Por favor, selecione um motivo para o reporte.",
+      confirmButtonColor: "#3cb371",
+    });
+    return;
+  }
+
+  console.log("📝 Reporte preparado:");
+  console.log("- Avaliação ID:", avaliacaoId);
+  console.log("- Motivo:", motivo);
+  console.log("- Descrição:", descricao);
+
+  // TODO: Implementar chamada AJAX ao backend
+  // const dados = new FormData();
+  // dados.append('op', 'reportarAvaliacao');
+  // dados.append('avaliacao_id', avaliacaoId);
+  // dados.append('motivo', motivo);
+  // dados.append('descricao', descricao);
+  //
+  // $.ajax({
+  //   url: 'src/controller/controllerAvaliacoes.php',
+  //   method: 'POST',
+  //   data: dados,
+  //   processData: false,
+  //   contentType: false,
+  //   dataType: 'json',
+  //   cache: false
+  // })
+  // .done(function(response) {
+  //   if (response.success) {
+  //     Swal.fire({
+  //       icon: 'success',
+  //       title: 'Reporte Enviado!',
+  //       text: response.message,
+  //       confirmButtonColor: '#3cb371',
+  //       timer: 3000
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Erro',
+  //       text: response.message,
+  //       confirmButtonColor: '#ef4444'
+  //     });
+  //   }
+  // })
+  // .fail(function() {
+  //   Swal.fire({
+  //     icon: 'error',
+  //     title: 'Erro de Comunicação',
+  //     text: 'Não foi possível enviar o reporte. Tente novamente.',
+  //     confirmButtonColor: '#ef4444'
+  //   });
+  // });
+
+  // Por agora, apenas fechar o modal e mostrar confirmação
+  bootstrap.Modal.getInstance(
+    document.getElementById("modalReportarAvaliacao"),
+  ).hide();
+
+  Swal.fire({
+    icon: "success",
+    title: "Reporte Enviado!",
+    text: "Obrigado pelo seu reporte. A nossa equipa irá analisar esta avaliação.",
+    confirmButtonColor: "#3cb371",
+    timer: 3000,
+  });
 }
