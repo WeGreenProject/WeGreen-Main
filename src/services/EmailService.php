@@ -2,7 +2,6 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../model/modelNotificacoes.php';
@@ -16,18 +15,32 @@ class EmailService {
      * Construtor - Inicializa PHPMailer com configurações do Brevo
      */
     public function __construct() {
-        $this->config = require __DIR__ . '/../config/email_config.php';
-        $this->modelNotificacoes = new Notificacoes();
-        $this->setupMailer();
+        try {
+            $this->config = require __DIR__ . '/../config/email_config.php';
+            $this->modelNotificacoes = new Notificacoes();
+            $this->setupMailer();
+        } catch (\Exception $e) {
+            error_log("AVISO: Falha ao inicializar EmailService: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
+            // Não lançar exceção - permitir que o objeto seja criado mesmo com erro
+            $this->mailer = null;
+        }
     }
 
     /**
      * Configura o PHPMailer com as credenciais do Brevo
      */
     private function setupMailer() {
-        $this->mailer = new PHPMailer(true);
-
         try {
+            error_log("EmailService: Inicializando PHPMailer...");
+
+            if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+                throw new \Exception("Classe PHPMailer não encontrada! Verifique o autoload.");
+            }
+
+            $this->mailer = new PHPMailer(true);
+            error_log("EmailService: PHPMailer criado com sucesso");
+
             // Configurações do servidor SMTP
             $this->mailer->isSMTP();
             $this->mailer->Host       = $this->config['smtp']['host'];
@@ -58,13 +71,21 @@ class EmailService {
                 $this->config['from']['name']
             );
 
-        } catch (Exception $e) {
+            error_log("EmailService: Configuração SMTP completa");
+
+        } catch (\Exception $e) {
             error_log("Erro ao configurar EmailService: " . $e->getMessage());
             throw $e;
         }
     }
 
     public function send($to, $subject, $body, $altBody = '') {
+        // Verificar se o mailer foi inicializado
+        if ($this->mailer === null) {
+            error_log("AVISO: EmailService não inicializado. Email não será enviado para: {$to}");
+            return false;
+        }
+
         $attempts = 0;
         $maxAttempts = $this->config['limits']['retry_attempts'];
 
@@ -90,7 +111,7 @@ class EmailService {
                     return true;
                 }
 
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $attempts++;
                 error_log("Tentativa {$attempts} falhou ao enviar email para {$to}: " . $e->getMessage());
 
@@ -109,15 +130,27 @@ class EmailService {
     }
 
     public function addEmbeddedImage($path, $cid) {
+        // Verificar se o mailer foi inicializado
+        if ($this->mailer === null) {
+            error_log("AVISO: Mailer não inicializado. Não é possível anexar imagem.");
+            return false;
+        }
+        
         try {
             return $this->mailer->addEmbeddedImage($path, $cid);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log("Erro ao anexar imagem inline: " . $e->getMessage());
             return false;
         }
     }
 
     public function sendFromTemplate($utilizador_id, $template, $data, $tipo = 'cliente', $inlineImages = []) {
+        // Verificar se o mailer foi inicializado
+        if ($this->mailer === null) {
+            error_log("AVISO: EmailService não inicializado. Email não será enviado. Template: {$template}");
+            return false;
+        }
+        
         global $conn;
 
         // Obter email do utilizador
