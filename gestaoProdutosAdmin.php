@@ -30,14 +30,7 @@
       </a>
       <nav>
         <ul class="nav-menu">
-          <li class="nav-item">
-            <a class="nav-link" href="DashboardAdmin.php">
-              <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-              <span class="nav-text">Dashboard</span>
-            </a>
-            <nav>
-                <ul class="nav-menu">
-                                        <li class="nav-item">
+                    <li class="nav-item">
                         <a class="nav-link" href="DashboardAdmin.php">
                             <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
                             <span class="nav-text">Dashboard</span>
@@ -65,12 +58,6 @@
                         <a class="nav-link" href="Chatadmin.php">
                             <span class="nav-icon"><i class="fas fa-comments"></i></span>
                             <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="fornecedores.php">
-                            <span class="nav-icon"><i class="fas fa-truck"></i></span>
-                            <span class="nav-text">Gestão de Fornecedores</span>
                         </a>
                     </li>
                     <li class="nav-item">
