@@ -15,6 +15,10 @@ class SucessoCarrinho {
         require_once __DIR__ . '/../vendor/autoload.php';
         \Stripe\Stripe::setApiKey('sk_test_51SAniYBgsjq4eGslagm3l86yXwCOicwq02ABZ54SCT7e8p9HiOTdciQcB3hQXxN4i6hVwlxohVvbtzQXEoPhg7yd009a6ubA3l');
 
+        // Iniciar transação do banco de dados
+        $conn->begin_transaction();
+        error_log("✓ Transação do banco iniciada");
+
         try {
             // Recuperar sessão do Stripe
             $session = \Stripe\Checkout\Session::retrieve($session_id);
@@ -23,6 +27,7 @@ class SucessoCarrinho {
             // Verificar pagamento
             if ($session->payment_status !== 'paid') {
                 error_log("ERRO: Pagamento não confirmado. Status: " . $session->payment_status);
+                $conn->rollback();
                 return false;
             }
 
@@ -119,7 +124,7 @@ class SucessoCarrinho {
             }
 
             // Buscar produtos do carrinho
-            $sql = "SELECT ci.produto_id, ci.quantidade, p.preco, p.nome, p.anunciante_id
+            $sql = "SELECT ci.produto_id, ci.quantidade, p.preco, p.nome, p.anunciante_id, p.foto
                     FROM Carrinho_Itens ci
                     INNER JOIN Produtos p ON ci.produto_id = p.Produto_id
                     WHERE ci.utilizador_id = $utilizador_id AND p.ativo = 1";
@@ -161,7 +166,7 @@ class SucessoCarrinho {
                     $produtos_nomes[] = $row['nome'];
                     $produtos_detalhes[] = array(
                         'nome' => $row['nome'],
-                        'imagem' => $row['imagem_principal'],
+                        'imagem' => $row['foto'],
                         'quantidade' => $row['quantidade'],
                         'preco' => $row['preco']
                     );
@@ -235,6 +240,10 @@ class SucessoCarrinho {
                     error_log("✓ Carrinho limpo: removidos " . $conn->affected_rows . " itens");
                 }
 
+                // COMMIT da transação - garantir que tudo foi salvo
+                $conn->commit();
+                error_log("✓ Transação do banco confirmada (COMMIT)");
+
                 // Enviar emails de notificação com dados completos de entrega
                 $dadosEntrega = [
                     'tipo_entrega' => $tipo_entrega,
@@ -247,17 +256,24 @@ class SucessoCarrinho {
                     'prazo_estimado_entrega' => $prazo_estimado
                 ];
 
-                $this->enviarEmailsConfirmacao(
-                    $utilizador_id,
-                    $codigo_encomenda,
-                    $primeiro_anunciante_id,
-                    $payment_method,
-                    $transportadora_id,
-                    $morada,
-                    $total,
-                    $produtos_nomes,
-                    $dadosEntrega
-                );
+                // Tentar enviar emails, mas não falhar o checkout se houver erro
+                try {
+                    $this->enviarEmailsConfirmacao(
+                        $utilizador_id,
+                        $codigo_encomenda,
+                        $primeiro_anunciante_id,
+                        $payment_method,
+                        $transportadora_id,
+                        $morada,
+                        $total,
+                        $produtos_nomes,
+                        $dadosEntrega
+                    );
+                    error_log("✓ Emails de confirmação enviados com sucesso");
+                } catch (Exception $e) {
+                    error_log("⚠️ AVISO: Falha ao enviar emails (checkout continua): " . $e->getMessage());
+                    // Não bloquear o processo - a encomenda já foi criada
+                }
 
                 // Retornar resultado
                 error_log("Encomenda processada com sucesso! Código: " . $codigo_encomenda);
@@ -270,11 +286,15 @@ class SucessoCarrinho {
                 );
             } else {
                 error_log("ERRO: Carrinho vazio! Nenhum produto encontrado.");
+                $conn->rollback();
             }
 
+            $conn->rollback();
             return false;
 
         } catch (Exception $e) {
+            // Rollback em caso de erro
+            $conn->rollback();
             error_log("ERRO CRÍTICO ao processar pagamento: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
             return false;
@@ -301,7 +321,7 @@ class SucessoCarrinho {
             $transportadora = $transportadoras[$transportadora_id] ?? 'CTT';
 
             // Buscar produtos completos para o template
-            $sql_produtos = "SELECT p.nome, p.preco, p.Foto_Produto, 1 as quantidade
+            $sql_produtos = "SELECT p.nome, p.preco, p.foto, 1 as quantidade
                             FROM Encomendas e
                             INNER JOIN Produtos p ON e.produto_id = p.Produto_id
                             WHERE e.codigo_encomenda = '$codigo_encomenda'";
@@ -313,7 +333,7 @@ class SucessoCarrinho {
             if ($result_produtos && $result_produtos->num_rows > 0) {
                 $index = 1;
                 while ($prod = $result_produtos->fetch_assoc()) {
-                    $foto_path = $prod['Foto_Produto'];
+                    $foto_path = $prod['foto'];
                     $cid = "produto_$index";
 
                     // Processar caminho da foto para inline image
