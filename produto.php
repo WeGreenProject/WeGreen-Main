@@ -117,6 +117,87 @@
       <!-- Produtos relacionados serão carregados aqui via AJAX -->
     </div>
 
+    <!-- Modal Reportar Avaliação -->
+    <div class="modal fade" id="modalReportarAvaliacao" tabindex="-1" aria-labelledby="modalReportarLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+          <!-- Header -->
+          <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border-radius: 16px 16px 0 0; padding: 20px 24px; border: none;">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-flag" style="font-size: 20px;"></i>
+              <h5 class="modal-title fw-bold mb-0" id="modalReportarLabel">Reportar Avaliação</h5>
+            </div>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+
+          <!-- Body -->
+          <div class="modal-body" style="padding: 24px;">
+            <div class="mb-4">
+              <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
+                <i class="fas fa-info-circle" style="color: #3cb371; margin-right: 6px;"></i>
+                Selecione o motivo pelo qual está a reportar esta avaliação. A nossa equipa irá analisar o conteúdo.
+              </p>
+            </div>
+
+            <form id="formReportarAvaliacao">
+              <input type="hidden" id="reportAvaliacaoId" name="avaliacao_id">
+
+              <!-- Motivo -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold" style="color: #1e293b; font-size: 14px; margin-bottom: 10px;">
+                  <i class="fas fa-exclamation-triangle" style="color: #ef4444; margin-right: 6px;"></i>
+                  Motivo do Reporte <span style="color: #ef4444;">*</span>
+                </label>
+                <select class="form-select" id="reportMotivo" name="motivo" required
+                        style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 14px; transition: all 0.3s ease;">
+                  <option value="" selected disabled>Selecione um motivo...</option>
+                  <option value="spam">Spam ou Publicidade</option>
+                  <option value="linguagem_ofensiva">Linguagem Ofensiva ou Abusiva</option>
+                  <option value="informacao_falsa">Informação Falsa ou Enganosa</option>
+                  <option value="conteudo_inapropriado">Conteúdo Inapropriado</option>
+                  <option value="fora_contexto">Fora do Contexto do Produto</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </div>
+
+              <!-- Descrição Adicional -->
+              <div class="mb-3">
+                <label class="form-label fw-semibold" style="color: #1e293b; font-size: 14px; margin-bottom: 10px;">
+                  <i class="fas fa-comment-dots" style="color: #3cb371; margin-right: 6px;"></i>
+                  Detalhes Adicionais <span style="color: #94a3b8; font-weight: normal;">(Opcional)</span>
+                </label>
+                <textarea class="form-control" id="reportDescricao" name="descricao" rows="4"
+                          placeholder="Forneça mais informações sobre o problema (opcional)..."
+                          style="border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 14px; resize: vertical; transition: all 0.3s ease;"></textarea>
+                <small style="color: #94a3b8; font-size: 12px; margin-top: 6px; display: block;">
+                  <i class="fas fa-shield-alt" style="margin-right: 4px;"></i>
+                  As informações serão tratadas confidencialmente.
+                </small>
+              </div>
+            </form>
+          </div>
+
+          <!-- Footer -->
+          <div class="modal-footer" style="border-top: 1px solid #e2e8f0; padding: 16px 24px; background: #f8fafc; border-radius: 0 0 16px 16px;">
+            <button type="button" class="btn" data-bs-dismiss="modal"
+                    style="background: white; color: #64748b; border: 2px solid #e2e8f0; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; transition: all 0.3s ease;"
+                    onmouseover="this.style.background='#f1f5f9'; this.style.borderColor='#cbd5e1';"
+                    onmouseout="this.style.background='white'; this.style.borderColor='#e2e8f0';">
+              <i class="fas fa-times" style="margin-right: 6px;"></i>
+              Cancelar
+            </button>
+            <button type="button" class="btn" id="btnConfirmarReporte" onclick="enviarReporte()"
+                    style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s ease;"
+                    onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(239, 68, 68, 0.4)';"
+                    onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(239, 68, 68, 0.3)';">
+              <i class="fas fa-paper-plane" style="margin-right: 6px;"></i>
+              Enviar Reporte
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
 <footer>
