@@ -1,302 +1,201 @@
+<?php
+session_start();
+if($_SESSION['tipo'] != 1){
+    header("Location: index.html");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logs do Sistema - WeGreen</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="src/css/admin.css">
-    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
-    <link rel="stylesheet" href="src/css/logAdmin.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-
-    <script src="src/js/lib/jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous">
-    </script>
-    <script src="src/js/lib/datatables.js"></script>
-    <script src="src/js/lib/select2.js"></script>
-    <script src="src/js/lib/sweatalert.js"></script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logs do Sistema - WeGreen Admin</title>
+  <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/lib/datatables.css">
+  <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+  <script src="src/js/lib/jquery.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+  </script>
+  <script src="src/js/lib/datatables.js"></script>
+  <script src="src/js/lib/select2.js"></script>
+  <script src="src/js/lib/sweatalert.js"></script>
+  <script src="src/js/notifications.js"></script>
 </head>
+
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <a href="index.html" class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                <div class="logo-text">
-                    <h1>WeGreen</h1>
-                    <p>Painel do Administrador</p>
-                </div>
-            </a>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="DashboardAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Gestao de Utilizadores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoLucros.php">
-                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                            <span class="nav-text">Gestão de Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php">
-                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                            <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="logAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-history"></i></span>
-                            <span class="nav-text">Logs do Sistema</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-
-        <main class="main-content">
-            <nav class="top-navbar">
-                <div class="navbar-left">
-                    <i class="navbar-icon fas fa-history"></i>
-                    <h2 class="navbar-title">Logs do Sistema</h2>
-                </div>
-                <div class="navbar-right">
-                    <?php include 'src/views/notifications-widget.php'; ?>
-                    <div class="navbar-user">
-                        <div id="AdminPerfilInfo" style="display:flex;"></div>
-                        <i class="fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>
-                        <div class="user-dropdown" id="userDropdown"></div>
-                    </div>
-                </div>
-            </nav>
-
-            <div class="page-content">
-                <div class="page-header">
-                    <h2>Logs de Atividade</h2>
-                </div>
-
-                <div class="stats-row" id="CardsLogs">
-
-                </div>
-
-            <div class="logs-container">
-                <div class="logs-header">
-                    <h3>
-                        <i class="fas fa-list"></i>
-                        Histórico de Atividades
-                    </h3>
-                </div>
-
-    <div id="logsContent">
-        <div class="chart-card">
-
-            <table id="LogAdminTable" class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Foto</th>
-                        <th>Email</th>
-                        <th>Ação</th>
-                        <th>Hora</th>
-                    </tr>
-                </thead>
-
-                <tbody id="LogAdminBody">
-                </tbody>
-            </table>
-
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <i class="fas fa-leaf"></i>
+        <div class="logo-text">
+          <h2>WeGreen</h2>
+          <p>Moda Sustentável</p>
         </div>
-    </div>
-</div>
+      </a>
 
-        </main>
-    </div>
-    <script src="src/js/logAdmin.js"></script>
-    <script>
-        // Carregar informações do perfil do admin
-        function getAdminPerfil() {
-          let dados = new FormData();
-          dados.append("op", 21);
+      <nav class="sidebar-menu">
+        <div class="menu-section">
+          <div class="menu-section-title">Menu</div>
+          <a href="DashboardAdmin.php" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="gestaoProdutosAdmin.php" class="menu-item">
+            <i class="fas fa-tshirt"></i>
+            <span>Produtos</span>
+          </a>
+          <a href="gestaoCliente.php" class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>Utilizadores</span>
+          </a>
+          <a href="gestaoLucros.php" class="menu-item">
+            <i class="fas fa-euro-sign"></i>
+            <span>Lucros</span>
+          </a>
+          <a href="logAdmin.php" class="menu-item active">
+            <i class="fas fa-history"></i>
+            <span>Logs do Sistema</span>
+          </a>
+          <a href="Chatadmin.php" class="menu-item">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
 
-          $.ajax({
-            url: "src/controller/controllerDashboardAdmin.php",
-            method: "POST",
-            data: dados,
-            dataType: "html",
-            cache: false,
-            contentType: false,
-            processData: false,
-          }).done(function (msg) {
-            $("#AdminPerfilInfo").html(msg);
-          }).fail(function (jqXHR, textStatus) {
-            console.error("Erro ao carregar perfil: " + textStatus);
-          });
-        }
-
-        // Carregar dropdown do usuário
-        function getInfoUserDropdown() {
-          let dados = new FormData();
-          dados.append("op", 9);
-
-          $.ajax({
-            url: "src/controller/controllerDashboardAdmin.php",
-            method: "POST",
-            data: dados,
-            dataType: "html",
-            cache: false,
-            contentType: false,
-            processData: false,
-          }).done(function (msg) {
-            $("#userDropdown").html(msg);
-          }).fail(function (jqXHR, textStatus) {
-            console.error("Erro ao carregar dropdown: " + textStatus);
-          });
-        }
-
-        // Toggle dropdown ao clicar no navbar-user
-        document.querySelector('.navbar-user').addEventListener('click', function(e) {
-          e.stopPropagation();
-          document.getElementById('userDropdown').classList.toggle('active');
-        });
-
-        // Fecha ao clicar fora
-        document.addEventListener('click', function(e) {
-          const user = document.querySelector('.navbar-user');
-          const dropdown = document.getElementById('userDropdown');
-
-          if (!user.contains(e.target)) {
-            dropdown.classList.remove('active');
-          }
-        });
-
-        // Função de logout
-        function logout() {
-          Swal.fire({
-            html: `
-              <div style="padding: 20px 0;">
-                <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                  <i class="fas fa-sign-out-alt" style="font-size: 32px; color: #dc2626;"></i>
-                </div>
-                <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 24px; font-weight: 700;">Terminar Sessao?</h2>
-                <p style="margin: 0; color: #64748b; font-size: 15px; line-height: 1.6;">Tem a certeza que pretende sair da sua conta?</p>
+    <main class="main-content">
+      <nav class="top-navbar">
+        <div class="navbar-left">
+          <h1 class="page-title"><i class="fas fa-history"></i> Logs do Sistema</h1>
+        </div>
+        <div class="navbar-right">
+          <?php include 'src/views/notifications-widget.php'; ?>
+          <div class="navbar-user" id="userMenuBtn">
+            <img
+              src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+              alt="Administrador" class="user-avatar">
+            <div class="user-info">
+              <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></span>
+              <span class="user-role">Administrador</span>
+            </div>
+            <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-header">
+              <img
+                src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+                alt="Administrador" class="dropdown-avatar">
+              <div>
+                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></div>
+                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'admin@wegreen.com'; ?></div>
               </div>
-            `,
-            showCancelButton: true,
-            confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Sim, sair',
-            cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-            confirmButtonColor: "#dc2626",
-            cancelButtonColor: "#64748b",
-            customClass: {
-              confirmButton: "swal2-confirm-modern",
-              cancelButton: "swal2-cancel-modern",
-              popup: "swal2-logout-popup",
-            },
-            buttonsStyling: false,
-            reverseButtons: true,
-            didOpen: () => {
-              const popup = Swal.getPopup();
-              popup.style.borderRadius = "16px";
-              popup.style.padding = "25px";
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="perfilAdmin.php">
+              <i class="fas fa-user"></i>
+              <span>Meu Perfil</span>
+            </a>
+            <a class="dropdown-item" href="alterarSenha.php">
+              <i class="fas fa-key"></i>
+              <span>Alterar Senha</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Sair</span>
+            </button>
+          </div>
+        </div>
+      </nav>
 
-              const confirmBtn = popup.querySelector(".swal2-confirm");
-              const cancelBtn = popup.querySelector(".swal2-cancel");
+      <div class="content-area">
+        <div class="stats-grid-compact" id="CardsLogs">
+        </div>
 
-              if (confirmBtn) {
-                confirmBtn.style.padding = "12px 28px";
-                confirmBtn.style.borderRadius = "10px";
-                confirmBtn.style.fontSize = "15px";
-                confirmBtn.style.fontWeight = "600";
-                confirmBtn.style.border = "none";
-                confirmBtn.style.cursor = "pointer";
-                confirmBtn.style.transition = "all 0.3s ease";
-                confirmBtn.style.backgroundColor = "#dc2626";
-                confirmBtn.style.color = "#ffffff";
-                confirmBtn.style.marginLeft = "10px";
-              }
+        <div class="table-container">
+          <table id="LogAdminTable" class="display">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Foto</th>
+                <th>Email</th>
+                <th>Ação</th>
+                <th>Hora</th>
+              </tr>
+            </thead>
+            <tbody id="LogAdminBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="src/js/logAdmin.js"></script>
+  <script>
+  // User dropdown toggle
+  const userMenuBtn = document.getElementById("userMenuBtn");
+  const userDropdown = document.getElementById("userDropdown");
 
-              if (cancelBtn) {
-                cancelBtn.style.padding = "12px 28px";
-                cancelBtn.style.borderRadius = "10px";
-                cancelBtn.style.fontSize = "15px";
-                cancelBtn.style.fontWeight = "600";
-                cancelBtn.style.border = "2px solid #e2e8f0";
-                cancelBtn.style.cursor = "pointer";
-                cancelBtn.style.transition = "all 0.3s ease";
-                cancelBtn.style.backgroundColor = "#ffffff";
-                cancelBtn.style.color = "#64748b";
-              }
-            },
-          }).then((result) => {
-            if (result.isConfirmed) {
-              Swal.fire({
-                html: `
-                  <div style="padding: 20px;">
-                    <div class="swal2-loading-spinner" style="margin: 0 auto 20px;">
-                      <div style="width: 50px; height: 50px; border: 4px solid #f3f4f6; border-top: 4px solid #3cb371; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+  if (userMenuBtn) {
+    userMenuBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      userDropdown.classList.toggle("active");
+    });
+  }
+
+  document.addEventListener("click", function(e) {
+    if (!userMenuBtn?.contains(e.target) && !userDropdown?.contains(e.target)) {
+      userDropdown?.classList.remove("active");
+    }
+  });
+
+  // Função de logout
+  function logout() {
+    Swal.fire({
+      html: `
+                    <div style="background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%); padding: 20px; margin: -20px -20px 20px -20px; border-radius: 12px 12px 0 0; text-align: center;">
+                        <i class="fas fa-sign-out-alt" style="font-size: 48px; color: white; margin-bottom: 15px;"></i>
+                        <h2 style="margin: 0; color: white; font-size: 24px; font-weight: 700;">Terminar Sessão</h2>
                     </div>
-                    <p style="margin: 0; color: #64748b; font-size: 15px;">A terminar sessao...</p>
-                  </div>
-                  <style>
-                    @keyframes spin {
-                      0% { transform: rotate(0deg); }
-                      100% { transform: rotate(360deg); }
-                    }
-                  </style>
+                    <p style="font-size: 16px; color: #64748b; margin: 20px 0;">Tem a certeza que deseja sair da plataforma?</p>
                 `,
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                  const popup = Swal.getPopup();
-                  popup.style.borderRadius = "16px";
-                },
-              });
+      showCancelButton: true,
+      confirmButtonText: '<i class="fas fa-check"></i> Sim, sair',
+      cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+      confirmButtonColor: '#3cb371',
+      cancelButtonColor: '#6b7280',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let dados = new FormData();
+        dados.append("op", 10);
 
-              let dados = new FormData();
-              dados.append("op", 10);
-
-              $.ajax({
-                url: "src/controller/controllerDashboardAdmin.php",
-                method: "POST",
-                data: dados,
-                dataType: "html",
-                cache: false,
-                contentType: false,
-                processData: false,
-              })
-                .done(function (msg) {
-                  window.location.href = "index.html";
-                })
-                .fail(function (jqXHR, textStatus) {
-                  alert("Request failed: " + textStatus);
-                });
-            }
-          });
-        }
-
-        // Carregar ao iniciar
-        $(document).ready(function() {
-          getAdminPerfil();
-          getInfoUserDropdown();
+        $.ajax({
+          url: "src/controller/controllerDashboardAdmin.php",
+          method: "POST",
+          data: dados,
+          dataType: "json",
+          cache: false,
+          contentType: false,
+          processData: false,
+        }).done(function(response) {
+          if (response.success) {
+            window.location.href = "index.html";
+          }
+        }).fail(function() {
+          window.location.href = "index.html";
         });
-    </script>
+      }
+    });
+  }
+  </script>
 </body>
+
 </html>
