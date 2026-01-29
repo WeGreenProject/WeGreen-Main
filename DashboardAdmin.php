@@ -12,107 +12,114 @@ if($_SESSION['tipo'] == 1){
     <title>Dashboard Administrador - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="src/css/admin.css">
+    <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
     <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="src/js/notifications.js"></script>
 </head>
 
 <body>
-    <div class="container">
+    <div class="dashboard-container">
         <aside class="sidebar">
-            <a href="index.html" class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <i class="fas fa-leaf"></i>
                 <div class="logo-text">
-                    <h1>WeGreen</h1>
-                    <p>Painel do Administrador</p>
+                    <h2>WeGreen</h2>
+                    <p>Moda Sustentável</p>
                 </div>
             </a>
-            <nav>
-                <ul class="nav-menu">
-    <li class="nav-item">
-                            <a class="nav-link active" href="DashboardAdmin.php">
-                                <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                                <span class="nav-text">Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="gestaoProdutosAdmin.php">
-                                <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                                <span class="nav-text">Produtos</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="gestaoCliente.php">
-                                <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                                <span class="nav-text">Gestao de Utilizadores</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="gestaoLucros.php">
-                                <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                                <span class="nav-text">Gestão de Lucros</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="Chatadmin.php">
-                                <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                                <span class="nav-text">Chats</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="logAdmin.php">
-                                <span class="nav-icon"><i class="fas fa-history"></i></span>
-                                <span class="nav-text">Logs do Sistema</span>
-                            </a>
-                        </li>
-                </ul>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu</div>
+                    <a href="DashboardAdmin.php" class="menu-item active">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="gestaoProdutosAdmin.php" class="menu-item">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Produtos</span>
+                    </a>
+                    <a href="gestaoCliente.php" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        <span>Utilizadores</span>
+                    </a>
+                    <a href="gestaoLucros.php" class="menu-item">
+                        <i class="fas fa-euro-sign"></i>
+                        <span>Lucros</span>
+                    </a>
+                    <a href="logAdmin.php" class="menu-item">
+                        <i class="fas fa-history"></i>
+                        <span>Logs do Sistema</span>
+                    </a>
+                    <a href="Chatadmin.php" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
+                    </a>
+                </div>
             </nav>
         </aside>
 
         <main class="main-content">
             <nav class="top-navbar">
                 <div class="navbar-left">
-                    <i class="navbar-icon fas fa-chart-line"></i>
-                    <h2 class="navbar-title">Dashboard</h2>
+                    <h1 class="page-title"><i class="fas fa-chart-line"></i> Dashboard</h1>
                 </div>
                 <div class="navbar-right">
                     <?php include 'src/views/notifications-widget.php'; ?>
-                    <div class="navbar-user">
-                        <div id="AdminPerfilInfo" style="display:flex;"></div>
-                        <i class=" fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>
-
-                        <div class="user-dropdown" id="userDropdown"></div>
+                    <div class="navbar-user" id="userMenuBtn">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff" alt="Administrador" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff" alt="Administrador" class="dropdown-avatar">
+                            <div>
+                                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></div>
+                                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'admin@wegreen.com'; ?></div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="perfilAdmin.php">
+                            <i class="fas fa-user"></i>
+                            <span>Meu Perfil</span>
+                        </a>
+                        <a class="dropdown-item" href="alterarSenha.php">
+                            <i class="fas fa-key"></i>
+                            <span>Alterar Senha</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sair</span>
+                        </button>
                     </div>
                 </div>
             </nav>
 
-            <div id="dashboard" class="page active">
-                <div class="page-header">
-                    <h2>Dashboard</h2>
-                    <p>Visão geral do seu negócio</p>
+            <div class="content-area">
+                <!-- KPIs/Stats Cards -->
+                <div class="stats-grid-compact">
+                    <div id="RendimentosCard" class="stat-card-compact"></div>
+                    <div id="GastosCard" class="stat-card-compact"></div>
+                    <div id="UtilizadoresCard" class="stat-card-compact"></div>
+                    <div id="PlanosAtivos" class="stat-card-compact"></div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card" id="RendimentosCard">
-
-                    </div>
-                    <div class="stat-card" id="GastosCard">
-                    </div>
-                    <div class="stat-card" id="UtilizadoresCard">
-                    </div>
-                    <div class="stat-card" id="PlanosAtivos">
-
-                    </div>
-                </div>
-
+                <!-- Charts Section -->
                 <div class="charts-grid">
                     <div class="chart-card">
                         <div class="chart-header">
@@ -130,22 +137,23 @@ if($_SESSION['tipo'] == 1){
                     </div>
                 </div>
 
+                <!-- Products Table Section -->
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3><i class="fas fa-clock"></i> Produtos ainda para verificar</h3>
                         <p>Últimos produtos adicionados</p>
                     </div>
-                    <div id="ProdutosInativosTable">
-                        <table class="ProdutosInativosTable">
+                    <div class="table-container">
+                        <table id="ProdutosInativosTable" class="display">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Foto</th>
-                                    <th>Nome</th>
-                                    <th>Categoria</th>
-                                    <th>Preço</th>
-                                    <th>Stock</th>
-                                    <th>Ação</th>
+                                    <th><i class="fas fa-hashtag"></i> ID</th>
+                                    <th><i class="fas fa-image"></i> Foto</th>
+                                    <th><i class="fas fa-tag"></i> Nome</th>
+                                    <th><i class="fas fa-box"></i> Categoria</th>
+                                    <th><i class="fas fa-euro-sign"></i> Preço</th>
+                                    <th><i class="fas fa-warehouse"></i> Stock</th>
+                                    <th><i class="fas fa-cog"></i> Ação</th>
                                 </tr>
                             </thead>
                             <tbody id="ProdutosInativosBody">
@@ -192,28 +200,15 @@ if($_SESSION['tipo'] == 1){
         </main>
     </div>
 
-
+    <script src="src/js/Adminstrador.js"></script>
+    <script>
+        // Override do getInfoUserDropdown para manter o HTML correto da página
+        function getInfoUserDropdown() {
+            // Não fazer nada - o HTML já está correto na página
+            console.log('Dropdown já configurado no HTML');
+        }
+    </script>
 </body>
-<script src="src/js/Adminstrador.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-// Toggle dropdown ao clicar no navbar-user
-document.querySelector('.navbar-user').addEventListener('click', function(e) {
-    e.stopPropagation();
-    document.getElementById('userDropdown').classList.toggle('active');
-});
-
-// Fecha ao clicar fora
-document.addEventListener('click', function(e) {
-    const user = document.querySelector('.navbar-user');
-    const dropdown = document.getElementById('userDropdown');
-
-    if (!user.contains(e.target)) {
-        dropdown.classList.remove('active');
-    }
-});
-</script>
-
 </html>
 <?php
 }else{

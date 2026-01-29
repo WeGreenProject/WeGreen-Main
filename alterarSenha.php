@@ -228,21 +228,26 @@ $email = $_SESSION['email'] ?? '';
       });
 
       function voltarPagina() {
-        // Volta para a página anterior ou dashboard
-        const tipo = <?php echo $_SESSION['tipo'] ?? 0; ?>;
-
-        if (tipo === 1 || tipo === 3) {
-          // Anunciante
-          window.location.href = 'DashboardAnunciante.php';
-        } else if (tipo === 2) {
-          // Cliente
-          window.location.href = 'DashboardCliente.php';
-        } else if (tipo === 4) {
-          // Admin
-          window.location.href = 'DashboardAdmin.php';
+        // Tenta voltar para a página anterior
+        if (document.referrer && document.referrer.includes(window.location.hostname)) {
+          window.location.href = document.referrer;
         } else {
-          // Fallback - voltar para login
-          window.location.href = 'login.html';
+          // Se não houver referrer, redireciona baseado no tipo
+          const tipo = <?php echo $_SESSION['tipo'] ?? 0; ?>;
+
+          if (tipo === 1) {
+            // Admin
+            window.location.href = 'DashboardAdmin.php';
+          } else if (tipo === 2) {
+            // Cliente
+            window.location.href = 'DashboardCliente.php';
+          } else if (tipo === 3) {
+            // Anunciante
+            window.location.href = 'DashboardAnunciante.php';
+          } else {
+            // Fallback - voltar para login
+            window.location.href = 'login.html';
+          }
         }
       }
     </script>

@@ -14,7 +14,7 @@ class ChatAdmin{
     Utilizadores.foto,
     MensagensAdmin.mensagem As MensagemCliente
 FROM MensagensAdmin, Utilizadores, Utilizadores AS Admins, Tipo_Utilizadores
-WHERE 
+WHERE
     MensagensAdmin.remetente_id = Utilizadores.id
     AND MensagensAdmin.destinatario_id = Admins.id
     AND Admins.tipo_utilizador_id = Tipo_Utilizadores.id
@@ -27,7 +27,7 @@ AND MensagensAdmin.created_at = (
   );";
             $result1 = $conn->query($sql);
             if ($result1->num_rows > 0) {
-                while ($row = $result1->fetch_assoc()) {    
+                while ($row = $result1->fetch_assoc()) {
                     $msg .= "<div class='conversation-item' onclick='getFaixa(".$row['IdUtilizador']."); getBotao(".$row['IdUtilizador']."); getConversas(".$row['IdUtilizador'].");' data-user='".$row['foto']."'>";
                     $msg .= "<img src='" . $row['foto'] . "' class='conversation-avatar' alt='User Photo' id='userPhoto'>";
                     $msg .= "<div class='conversation-info'>";
@@ -60,7 +60,7 @@ AND MensagensAdmin.created_at = (
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -75,7 +75,7 @@ AND MensagensAdmin.created_at = (
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();    
+        $row = $result->fetch_assoc();
 
         $msg .= "<div id='chatContentWrapper' style='display: flex; flex-direction: column; height: 100%;'>";
         $msg .= "<div class='chat-header'>";
@@ -103,7 +103,7 @@ function getConversas($ID_Anunciante,$ID_Consumidor){
         global $conn;
         $msg = "";
         $row = "";
-        
+
     $sqlFoto2 = "SELECT foto As PerfilAnunciante FROM Utilizadores WHERE id = $ID_Anunciante";
     $resultFoto2 = $conn->query($sqlFoto2);
     $fotoPerfil2 = "";
@@ -122,9 +122,9 @@ function getConversas($ID_Anunciante,$ID_Consumidor){
         $rowFoto = $resultFoto->fetch_assoc();
         $fotoPerfil = $rowFoto["foto"];
     }
-        
-        $sql = "SELECT * FROM MensagensAdmin 
-    WHERE 
+
+        $sql = "SELECT * FROM MensagensAdmin
+    WHERE
     (
         (remetente_id = $ID_Anunciante AND destinatario_id = $ID_Consumidor)
         OR
@@ -160,14 +160,14 @@ function getConversas($ID_Anunciante,$ID_Consumidor){
                     $msg .= "</div>";
                 }
             }
-            
+
         }
         else
         {
                 $msg  = "";
         }
         $conn->close();
-        
+
         return ($msg);
 
     }
@@ -222,7 +222,7 @@ ORDER BY MensagensAdmin.created_at DESC;";
     $result1 = $conn->query($sql);
 
     if ($result1->num_rows > 0) {
-        while ($row = $result1->fetch_assoc()) {    
+        while ($row = $result1->fetch_assoc()) {
                     $msg .= "<div class='conversation-item' onclick='getFaixa(".$row['IdUtilizador']."); getBotao(".$row['IdUtilizador']."); getConversas(".$row['IdUtilizador'].");' data-user='".$row['foto']."'>";
                     $msg .= "<img src='" . $row['foto'] . "' class='conversation-avatar' alt='User Photo' id='userPhoto'>";
                     $msg .= "<div class='conversation-info'>";
@@ -251,47 +251,46 @@ ORDER BY MensagensAdmin.created_at DESC;";
         $sql = "SELECT * from utilizadores where utilizadores.id =".$ID_User;
             $result1 = $conn->query($sql);
             if ($result1->num_rows > 0) {
-                while ($row = $result1->fetch_assoc()) {    
-                    $msg .= "<div class='chat-input-wrapper'>";
-                    $msg .= "<div class='chat-input-tools'>";
-                    $msg .= "<input type='file' id='fileInput' style='display:none;'>";
-                    $msg .= "<button class='input-tool-btn' title='Anexar ficheiro'
-                        onclick=\"document.getElementById('fileInput').click();\">";
+                while ($row = $result1->fetch_assoc()) {
+                    $msg .= "<input type='file' id='fileInput' accept='image/*' style='display: none;'>";
+                    $msg .= "<button class='chat-attach-btn' id='attachBtn' title='Anexar imagem'>";
                     $msg .= "<i class='fas fa-paperclip'></i>";
                     $msg .= "</button>";
-                    $msg .= "<button class='input-tool-btn' title='Emoji'>";
-                    $msg .= "<i class='fas fa-smile'></i>";
+                    $msg .= "<div class='input-wrapper'>";
+                    $msg .= "<input type='text' class='chat-input' id='messageInput' placeholder='Escreva uma mensagem ou cole uma imagem (Ctrl+V)...'>";
+                    $msg .= "<div id='imagePreview' class='image-preview' style='display: none;'>";
+                    $msg .= "<img id='previewImg' src='' alt='Preview'>";
+                    $msg .= "<button id='removePreview' class='remove-preview'>";
+                    $msg .= "<i class='fas fa-times'></i>";
                     $msg .= "</button>";
                     $msg .= "</div>";
-                    $msg .= "<textarea class='chat-input' id='messageInput'
-                        placeholder='Escreva sua mensagem...' rows='1'></textarea>";
-                    $msg .= "<button class='send-btn' id='sendBtn'
-                        onclick='ConsumidorRes(".$ID_User.")'>";
+                    $msg .= "</div>";
+                    $msg .= "<button class='chat-send-btn' id='sendButton' onclick='ConsumidorRes(".$ID_User.")'>";
                     $msg .= "<i class='fas fa-paper-plane'></i>";
                     $msg .= "</button>";
-
-                    $msg .= "</div>";
                 }
             }
             else
             {
-                $msg .= "<div class='chat-input-wrapper'>";
-                $msg .= "<div class='chat-input-tools'>";
-                $msg .= "<button class='input-tool-btn' title='Anexar ficheiro'>";
+                $msg .= "<input type='file' id='fileInput' accept='image/*' style='display: none;'>";
+                $msg .= "<button class='chat-attach-btn' id='attachBtn' title='Anexar imagem'>";
                 $msg .= "<i class='fas fa-paperclip'></i>";
                 $msg .= "</button>";
-                $msg .= "<button class='input-tool-btn' title='Emoji'>";
-                $msg .= "<i class='fas fa-smile'></i>";
+                $msg .= "<div class='input-wrapper'>";
+                $msg .= "<input type='text' class='chat-input' id='messageInput' placeholder='Escreva uma mensagem ou cole uma imagem (Ctrl+V)...'>";
+                $msg .= "<div id='imagePreview' class='image-preview' style='display: none;'>";
+                $msg .= "<img id='previewImg' src='' alt='Preview'>";
+                $msg .= "<button id='removePreview' class='remove-preview'>";
+                $msg .= "<i class='fas fa-times'></i>";
                 $msg .= "</button>";
                 $msg .= "</div>";
-                $msg .= "<textarea class='chat-input' id='messageInput' placeholder='Escreva sua mensagem...' rows='1'></textarea>";
-                $msg .= "<button class='send-btn' id='sendBtn'>";
+                $msg .= "</div>";
+                $msg .= "<button class='chat-send-btn' id='sendButton'>";
                 $msg .= "<i class='fas fa-paper-plane'></i>";
                 $msg .= "</button>";
-                $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
