@@ -16,4 +16,12 @@ if ($_POST['op'] == 3) {
     $resp = $func->getButaoNav();
     echo $resp;
 }
+if ($_POST['op'] == 5) {
+    $resp = $func->getButaoReports();
+    echo $resp;
+}
+if ($_POST['op'] == 6) {
+    $resp = $func->getReports();
+    echo $resp;
+}
 ?>
