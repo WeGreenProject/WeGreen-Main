@@ -114,14 +114,18 @@ if($_SESSION['tipo'] == 1){
                 <!-- Tab Navigation -->
                 <div class="tab-navigation">
                     <button class="tab-button active" data-tab="comentarios">
-                        <i class="fas fa-comments"></i>
-                        <span>Comentários</span>
-                        <span class="tab-badge" id="badgeComentarios">0</span>
+                        <div id="btnComentarios">
+                            <i class=" fas fa-comments"></i>
+                            <span>Comentários</span>
+                            <span class="tab-badge" id="badgeComentarios">0</span>
+                        </div>
                     </button>
                     <button class="tab-button" data-tab="reports">
-                        <i class="fas fa-flag"></i>
-                        <span>Reports</span>
-                        <span class="tab-badge alert" id="badgeReports">0</span>
+                        <div id="btnReports">
+                            <i class="fas fa-flag"></i>
+                            <span>Reports</span>
+                            <span class="tab-badge alert" id="badgeReports">0</span>
+                            <div>
                     </button>
                 </div>
 
@@ -286,17 +290,14 @@ if($_SESSION['tipo'] == 1){
                             <table id="reportsTable" class="modern-table" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th style="width: 40px;">
-                                            <input type="checkbox" id="selectAllReports">
-                                        </th>
-                                        <th><i class="fas fa-user"></i> Denunciante</th>
-                                        <th><i class="fas fa-comment"></i> Comentário Reportado</th>
-                                        <th><i class="fas fa-user-circle"></i> Autor do Comentário</th>
-                                        <th><i class="fas fa-exclamation-triangle"></i> Motivo</th>
-                                        <th><i class="fas fa-align-left"></i> Descrição</th>
-                                        <th><i class="fas fa-calendar"></i> Data</th>
+                                        <th><i class="fas fa-hashtag"></i> ID</th>
+                                        <th><i class="fas fa-image"></i> Foto</th>
+                                        <th><i class="fas fa-user"></i>Denunciante</th>
+                                        <th><i class="fas fa-align-left"></i> Motivo</th>
+                                        <th><i class="fas fa-exclamation-triangle"></i> Denunciado</th>
                                         <th><i class="fas fa-info-circle"></i> Estado</th>
-                                        <th><i class="fas fa-cog"></i> Ações</th>
+                                        <th><i class="fas fa-calendar"></i> Data</th>
+                                        <th><i class="fas fa-cog"></i> Ação</th>
                                     </tr>
                                 </thead>
                                 <tbody id="reportsTableBody">
@@ -345,37 +346,7 @@ if($_SESSION['tipo'] == 1){
 <script src="src/js/Adminstrador.js"></script>
 <script src="src/js/gestaoComentarios.js"></script>
 <script>
-// Toggle dropdown ao clicar no navbar-user
-document.querySelector('.navbar-user').addEventListener('click', function(e) {
-    e.stopPropagation();
-    document.getElementById('userDropdown').classList.toggle('active');
-});
-
-// Fecha ao clicar fora
-document.addEventListener('click', function(e) {
-    const user = document.querySelector('.navbar-user');
-    const dropdown = document.getElementById('userDropdown');
-
-    if (!user.contains(e.target)) {
-        dropdown.classList.remove('active');
-    }
-});
-
 // Tab Navigation
-document.querySelectorAll('.tab-button').forEach(button => {
-    button.addEventListener('click', function() {
-        const tabName = this.dataset.tab;
-
-        // Remove active class from all buttons and contents
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove(
-            'active'));
-
-        // Add active class to clicked button and corresponding content
-        this.classList.add('active');
-        document.getElementById('tab-' + tabName).classList.add('active');
-    });
-});
 </script>
 
 </html>

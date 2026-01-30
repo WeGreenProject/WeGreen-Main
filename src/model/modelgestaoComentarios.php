@@ -64,24 +64,30 @@ class Comentarios{
         $result = $conn->query($sqlDenuncias);
         $rowDenuncias = $result->fetch_assoc();
         
-        $msg .= "<button class='tab-button active' data-tab='comentarios'>";
         $msg .= "    <i class='fas fa-comments'></i>";
         $msg .= "    <span>Comentários</span>";
-        $msg .= "    <span class='tab-badge' id='badgeComentarios'>".$rowProdutos["TotalProdutosComComentarios"]."</span>";
-        $msg .= "</button>";
+        $msg .= "    <span class='tab-badge' id='badgeComentarios'>".$rowProdutos["TotalProdutosComComentarios"]."</span>";        $msg .= "</button>";
 
-        $msg .= "<button class='tab-button' data-tab='reports'>";
+        return ($msg);
+    }
+    function getButaoReports(){
+        global $conn;
+        $msg = "";
+
+        $sqlDenuncias = "SELECT COUNT(*) AS Total FROM denuncias;";
+        $result = $conn->query($sqlDenuncias);
+        $rowDenuncias = $result->fetch_assoc();
+        
         $msg .= "    <i class='fas fa-flag'></i>";
         $msg .= "    <span>Reports</span>";
         $msg .= "    <span class='tab-badge alert' id='badgeReports'>".$rowDenuncias["Total"]."</span>";
-        $msg .= "</button>";
 
         return ($msg);
     }
     function getProdutos(){
             global $conn;
         $msg = "";
-        $sql = "SELECT *, avaliacoes_produtos.id As IdProd,produtos.nome AS NomeProd, produtos.foto As ProdFoto,produtos.data_criacao As ProdData  from avaliacoes_produtos,produtos,utilizadores where produtos.produto_id = avaliacoes_produtos.produto_id group by avaliacoes_produtos.produto_id;";
+        $sql = "SELECT *, avaliacoes_produtos.id As IdProd,produtos.produto_id As IDProduto,produtos.nome AS NomeProd, produtos.foto As ProdFoto,produtos.data_criacao As ProdData  from avaliacoes_produtos,produtos,utilizadores where produtos.produto_id = avaliacoes_produtos.produto_id group by avaliacoes_produtos.produto_id;";
         $result = $conn->query($sql);
         $text = "";
         $text2 = "";
@@ -96,7 +102,71 @@ class Comentarios{
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td>".$row['avaliacao']."</td>";
                 $msg .= "<td>".$row['ProdData']."</td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'><i class='fas fa-edit'></i> Ver</button></td>";
+                $msg .= "<td><button class='btn-info' onclick='getComentariosModal(".$row['IDProduto'].")'><i class='fas fa-edit'></i> Ver</button></td>";
+                $msg .= "</tr>";
+            }
+        } else {
+            $msg .= "<tr>";
+            $msg .= "<td>Sem Registos</td>";
+            $msg .= "<th scope='row'></th>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "<td></td>";
+            $msg .= "</tr>";
+        }
+        $conn->close();
+
+        return ($msg);
+    }
+        function getComentariosModal($idProduto){
+        global $conn;
+        $msg = "";
+        $row = "";
+
+        $sql = "SELECT * FROM avaliacoes_produtos WHERE produto_id = ".$idProduto.";";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+        }
+
+        $conn->close();
+
+        return (json_encode($row));
+
+    }
+    function getReports(){
+            global $conn;
+        $msg = "";
+        $sql = "SELECT denuncias.*,u1.nome AS nome_denunciante,u2.nome AS nome_denunciado FROM denuncias, utilizadores u1, utilizadores u2
+        WHERE u1.id = denuncias.denunciante_id AND u2.id = denuncias.denunciado_id;";
+        $result = $conn->query($sql);
+        $text = "";
+        $text2 = "";
+
+
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $msg .= "<tr>";
+                $msg .= "<th scope='row'>".$row['id']."</th>";
+                if($row['imagem_anexo'] != null)
+                {
+                    $msg .= "<td><img src=".$row['imagem_anexo']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
+                }
+                else
+                {
+                    $msg .= "<td>Não existe imagem!</td>";
+                }
+                    
+                $msg .= "<td>".$row['nome_denunciante']."</td>";
+                $msg .= "<td>".$row['descricao']."</td>";
+                $msg .= "<td>".$row['nome_denunciado']."</td>";
+                $msg .= "<td>".$row['estado']."</td>";
+                $msg .= "<td>".$row['data_registo']."</td>";
+                $msg .= "<td><button class='btn-info' onclick='getComentariosModal(".$row['id'].")'><i class='fas fa-edit'></i> Ver</button></td>";
                 $msg .= "</tr>";
             }
         } else {
