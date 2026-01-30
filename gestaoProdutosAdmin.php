@@ -1,3 +1,8 @@
+<?php
+session_start();
+
+if($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 3){
+?>
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -7,473 +12,410 @@
   <title>Gestão de Produtos - WeGreen Admin</title>
   <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="src/css/admin.css">
-  <link rel="stylesheet" href="src/css/AdminGestao.css">
+  <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/modalProduto.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="src/css/lib/datatables.css">
   <link rel="stylesheet" href="src/css/lib/select2.css">
+  <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
 
   <script src="src/js/lib/jquery.js"></script>
   <script src="src/js/lib/datatables.js"></script>
   <script src="src/js/lib/select2.js"></script>
   <script src="src/js/lib/sweatalert.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <script src="src/js/notifications.js"></script>
+  <style>
+    /* Status badges simplificados */
+    .status-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    /* Badge ATIVO - Verde */
+    .badge-ativo {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    /* Badge INATIVO - Laranja */
+    .badge-inativo {
+      background-color: #fed7aa;
+      color: #92400e;
+    }
+
+    /* Badge REJEITADO - Vermelho */
+    .badge-rejeitado {
+      background-color: #fecaca;
+      color: #991b1b;
+    }
+
+    /* Botões de editar/ação nas tabelas */
+    .btn-edit,
+    .btn-action-table {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(60, 179, 113, 0.3);
+      text-decoration: none;
+    }
+
+    .btn-edit:hover,
+    .btn-action-table:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(60, 179, 113, 0.5);
+      color: #ffffff;
+      background: linear-gradient(135deg, #2e8b57 0%, #22a05e 100%);
+    }
+
+    .btn-edit i,
+    .btn-action-table i {
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    .btn-edit:hover i,
+    .btn-action-table:hover i {
+      color: #ffffff;
+    }
+
+    /* Desativar botão */
+    .btn-desativar {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+      color: #3cb371;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-desativar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+      color: #2e8b57;
+    }
+
+    .btn-desativar i {
+      color: #3cb371;
+    }
+
+    .btn-desativar:hover i {
+      color: #2e8b57;
+    }
+  </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="dashboard-container">
     <aside class="sidebar">
-      <a href="index.html" class="logo">
-        <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+      <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <i class="fas fa-leaf"></i>
         <div class="logo-text">
-          <h1>WeGreen</h1>
-          <p>Painel Admin</p>
+          <h2>WeGreen</h2>
+          <p>Moda Sustentável</p>
         </div>
       </a>
-      <nav>
-        <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="DashboardAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Gestao de Utilizadores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoLucros.php">
-                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                            <span class="nav-text">Gestão de Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php">
-                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                            <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-history"></i></span>
-                            <span class="nav-text">Logs do Sistema</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+
+      <nav class="sidebar-menu">
+        <div class="menu-section">
+          <div class="menu-section-title">Menu</div>
+          <a href="DashboardAdmin.php" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="gestaoProdutosAdmin.php" class="menu-item active">
+            <i class="fas fa-tshirt"></i>
+            <span>Produtos</span>
+          </a>
+          <a href="gestaoCliente.php" class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>Utilizadores</span>
+          </a>
+          <a href="gestaoLucros.php" class="menu-item">
+            <i class="fas fa-euro-sign"></i>
+            <span>Lucros</span>
+          </a>
+          <a href="logAdmin.php" class="menu-item">
+            <i class="fas fa-history"></i>
+            <span>Logs do Sistema</span>
+          </a>
+          <a href="Chatadmin.php" class="menu-item">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
 
     <main class="main-content">
       <nav class="top-navbar">
         <div class="navbar-left">
-          <i class="navbar-icon fas fa-box"></i>
-          <h2 class="navbar-title">Gestão de Produtos</h2>
+          <h1 class="page-title"><i class="fas fa-tshirt"></i> Gestão de Produtos</h1>
         </div>
         <div class="navbar-right">
-          <div class="navbar-user">
-            <div id="AdminPerfilInfo" style="display:flex;"></div>
-            <i class="fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>
-            <div class="user-dropdown" id="userDropdown"></div>
+          <?php include 'src/views/notifications-widget.php'; ?>
+          <div class="navbar-user" id="userMenuBtn">
+            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff" alt="Administrador" class="user-avatar">
+            <div class="user-info">
+              <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></span>
+              <span class="user-role">Administrador</span>
+            </div>
+            <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-header">
+              <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff" alt="Administrador" class="dropdown-avatar">
+              <div>
+                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></div>
+                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'admin@wegreen.com'; ?></div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="perfilAdmin.php">
+              <i class="fas fa-user"></i>
+              <span>Meu Perfil</span>
+            </a>
+            <a class="dropdown-item" href="alterarSenha.php">
+              <i class="fas fa-key"></i>
+              <span>Alterar Senha</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Sair</span>
+            </button>
           </div>
         </div>
       </nav>
 
-      <div class="content-wrapper">
-        <div class="page-header">
-          <h2>Gestão de Produtos</h2>
-          <p>Gerir todos os produtos na plataforma</p>
-        </div>
+      <div class="content-area">
+        <!-- Charts Section -->
         <div class="charts-grid">
-        <div class="chart-card">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3><i class="fas fa-fire"></i> Produtos Anunciados</h3>
+              <p>Evolução de produtos na plataforma</p>
+            </div>
+            <canvas id="topProductsChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3><i class="fas fa-star"></i> Produtos Vendidos</h3>
+              <p>Performance de vendas</p>
+            </div>
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Tabs and Products Management -->
+        <div class="chart-card" style="margin-top: 30px;">
           <div class="chart-header">
-            <h3><i class="fas fa-fire"></i>Produto anunciados</h3>
+            <h3><i class="fas fa-globe"></i> Gestão de Produtos</h3>
+            <p>Todos os produtos da plataforma - Ativos, Inativos e Rejeitados</p>
           </div>
-          <canvas id="topProductsChart"></canvas>
-        </div>
-        <div class="chart-card">
-          <div class="chart-header">
-            <h3><i class="fas fa-star"></i>Produto Vendidos</h3>
-          </div>
-          <canvas id="salesChart"></canvas>
-        </div>
-      </div>
-      <br>
-      <br>
-      <div class="tabs-container">
-        <!-- <button class="tab-btn active" onclick="switchTab('minhas-vendas')">
-                    <i class="fas fa-list"></i> Meus Produtos
-                </button> -->
-        <!-- <button class="tab-btn" onclick="switchTab('adicionar-venda')">
-                    <i class="fas fa-plus-circle"></i> Adicionar Produto
-                </button> -->
-        <button class="tab-btn" onclick="switchTab('todas-vendas')">
-          <i class="fas fa-globe"></i> Todos os Produtos
-        </button>
-        <button class="tab-btn" onclick="switchTab('Inativos')">
-          <i class="fas fa-search"></i> Verificar Produtos
-        </button>
-      </div>
-
-      <div id="Inativos" class="tab-content">
-        <div class="table-container">
-          <h3><i class="fas fa-clock" style="color: #f59e0b;"></i> Produtos Aguardando Verificação</h3>
-          <table id="inativosTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Foto</th>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Género</th>
-                <th>Total (€)</th>
-                <th>Estado</th>
-                <th>Info</th>
-              </tr>
-            </thead>
-            <tbody id="inativosBody">
-              <tr>
-                <td colspan="8" style="text-align: center; padding: 40px;">
-                  <i class="fas fa-box" style="font-size: 48px; color: #cbd5e0; margin-bottom: 15px;"></i>
-                  <p style="color: #718096;"></p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div id="adicionar-venda" class="tab-content">
-        <div class="form-container">
-          <h3 style="margin-bottom: 30px; color: #3657c5ff;">➕ Novo Produto</h3>
-          <form id="addVendaForm">
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Vendedor</label>
-                <select id="listaVendedor" required>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Categoria</label>
-                <select id="listaCategoria" required>
-                </select>
-              </div>
-            </div>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Nome Produto</label>
-                <input type="text" id="nomeprod" required>
-              </div>
-              <div class="form-group">
-                <label>Estado</label>
-                <input type="text" id="estadoprod" required>
-              </div>
-            </div>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Quantidade</label>
-                <input type="number" id="quantidade" required>
-              </div>
-              <div class="form-group">
-                <label>Preço Unitário (€)</label>
-                <input type="number" id="preco" step="0.01" required>
-              </div>
-            </div>
-
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Marca</label>
-                <input type="text" id="marca" required>
-              </div>
-              <div class="form-group">
-                <label>Tamanho</label>
-                <input type="text" id="tamanho" step="0.01" required>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Genero</label>
-              <select id="estado" required>
-                <option value="Homem">Masculino</option>
-                <option value="Mulher">Feminino</option>
-                <option value="Crianca">Criança</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Foto</label>
-              <input type="file" id="fotoProduto" step="0.01" required>
-            </div>
-            <div class="form-group">
-              <label>Descrição</label>
-              <textarea id="observacoes" rows="4" placeholder="Adicionar notas sobre a descrição..."></textarea>
-            </div>
-            <button type="button" class="btn-primary" onclick="adicionarProdutos()" style="width: 100%;">
-              <span>✅</span>
-              Registar Produto
-            </button>
-          </form>
-        </div>
-      </div>
-      <div id="todas-vendas" class="tab-content">
-        <div class="table-container">
-          <h3><i class="fa-solid fa-globe" style="color: #007bff;"></i> Todos os Produtos</h3>
-          <table id="todasVendasTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Foto</th>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Vendedor</th>
-                <th>Total (€)</th>
-                <th>Estado</th>
-                <th>Marca</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="todasVendasBody">
-              <tr>
-                <td colspan="8" style="text-align: center; padding: 40px;">
-                  <i class="fas fa-box" style="font-size: 48px; color: #cbd5e0; margin-bottom: 15px;"></i>
-                  <p style="color: #718096;">Nenhum produto aguardando verificação</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div id="minhas-vendas" class="tab-content active">
-        <div class="table-container">
-          <h3><i class="fas fa-box-open" style="color: #A6D90C;"></i> Histórico de Meus Produtos</h3>
-          <table id="minhasVendasTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Foto</th>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Género</th>
-                <th>Total (€)</th>
-                <th>Estado</th>
-                <th>Marca</th>
-              </tr>
-            </thead>
-            <tbody id="minhasVendasBody">
-              <tr>
-                <td colspan="8" style="text-align: center; padding: 40px;">
-                  <i class="fas fa-tshirt" style="font-size: 48px; color: #cbd5e0; margin-bottom: 15px;"></i>
-                  <p style="color: #718096;">Nenhum produto cadastrado ainda</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="modal fade" id="formEditInativo2" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-
-            <div class="modal-header">
-              <h2>Editar Produto</h2>
-              <button type="button" class="modal-close" data-bs-dismiss="modal">×</button>
-            </div>
-            <br>
-            <div class=" product-info-grid">
-              <div class="info-item">
-                <label>ID do Produto</label>
-                <input type="text" class="form-control" id="numprodutoEdit2" disabled>
-              </div>
-              <div class="info-item">
-                <label>Nome do Produto</label>
-                <input type="text" class="form-control" id="nomeprodutoEdit2" disabled>
-              </div>
-              <div class="info-item">
-                <label>Categoria</label>
-                <select name="" id="categoriaprodutoEdit2">
-
-                </select>
-              </div>
-              <div class="info-item">
-                <label>Marca</label>
-                <input type="text" class="form-control" id="marcaprodutoEdit2">
-              </div>
-              <div class="info-item">
-                <label>Tamanho</label>
-                <input type="text" class="form-control" id="tamanhoprodutoEdit2">
-              </div>
-              <div class="info-item">
-                <label>Preço</label>
-                <input type="text" class="form-control" id="precoprodutoEdit2" disabled>
-              </div>
-              <div class="info-item">
-                <label>Gênero</label>
-                <input type="text" class="form-control" id="generoprodutoEdit2" disabled>
-              </div>
-              <div class="info-item">
-                <label>Vendedor</label>
-                <select name="" id="vendedorprodutoEdit2">
-
-                </select>
-              </div>
-            </div>
-
-            <div class="photos-section" id="fotos-section2">
-
-            </div>
-
-            <div class="modal-actions">
-              <button class="btn-approve" id="btnGuardar2">✅ Salvar Alterações</button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      <div class="modal fade" id="formEditInativo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-
-            <div class="modal-header">
-              <h2>🔍 Verificação de Produto</h2>
-              <button class="modal-close" type="button" class="modal-close" data-bs-dismiss="modal">×</button>
-            </div>
-            <br>
-
-            <div class="product-info-grid">
-              <div class="info-item">
-                <label>ID do Produto</label>
-                <input type="text" class="form-control" id="numprodutoEdit" disabled>
-              </div>
-              <div class="info-item">
-                <label>Nome do Produto</label>
-                <input type="text" class="form-control" id="nomeprodutoEdit" disabled>
-              </div>
-              <div class="info-item">
-                <label>Categoria</label>
-                <select name="" id="categoriaprodutoEdit" disabled>
-
-                </select>
-              </div>
-              <div class="info-item">
-                <label>Marca</label>
-                <input type="text" class="form-control" id="marcaprodutoEdit" disabled>
-              </div>
-              <div class="info-item">
-                <label>Tamanho</label>
-                <input type="text" class="form-control" id="tamanhoprodutoEdit" disabled>
-              </div>
-
-              <div class="info-item">
-                <label>Preço</label>
-                <input type="text" class="form-control" id="precoprodutoEdit" disabled>
-              </div>
-              <div class="info-item">
-                <label>Gênero</label>
-                <input type="text" class="form-control" id="generoprodutoEdit" disabled>
-              </div>
-              <div class="info-item">
-                <label>Vendedor</label>
-                <select name="" id="vendedorprodutoEdit" disabled>
-
-                </select>
-              </div>
-            </div>
-
-            <div class="photos-section" id="fotos-section">
-
-            </div>
-
-            <div class="modal-actions">
-              <button class="btn-approve" id="btnGuardar">✅ Aprovar Produto</button>
-              <button class=" btn-reject" id="btnRejeitar">❌ Rejeitar Produto</button>
-            </div>
-
+          <div class="table-container">
+            <table id="produtosTable" class="display">
+              <thead>
+                <tr>
+                  <th><i class="fas fa-hashtag"></i> ID</th>
+                  <th><i class="fas fa-image"></i> Foto</th>
+                  <th><i class="fas fa-tag"></i> Nome</th>
+                  <th><i class="fas fa-box"></i> Categoria</th>
+                  <th><i class="fas fa-user"></i> Vendedor</th>
+                  <th><i class="fas fa-euro-sign"></i> Preço (€)</th>
+                  <th><i class="fas fa-info-circle"></i> Estado</th>
+                  <th><i class="fas fa-trademark"></i> Marca</th>
+                  <th><i class="fas fa-cog"></i> Ações</th>
+                </tr>
+              </thead>
+              <tbody id="produtosBody">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-box" style="font-size: 48px; color: #cbd5e0; margin-bottom: 15px;"></i>
+                    <p style="color: #718096;">Nenhum produto encontrado</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-    </div> <!-- Fecha .content-wrapper -->
+      <!-- Modais agora são criados via SweetAlert2 - veja gestaoProdutos.js -->
+
+    </div> <!-- Fecha .content-area -->
   </main> <!-- Fecha .main-content -->
+  </div> <!-- Fecha .dashboard-container -->
 
   <script>
-      function switchTab(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    function logout() {
+      Swal.fire({
+        html: `
+          <div style="padding: 20px 0;">
+            <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+              <i class="fas fa-sign-out-alt" style="font-size: 32px; color: #dc2626;"></i>
+            </div>
+            <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 24px; font-weight: 700;">Terminar Sessão?</h2>
+            <p style="margin: 0; color: #64748b; font-size: 15px; line-height: 1.6;">Tem a certeza que pretende sair da sua conta?</p>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Sim, sair',
+        cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+        confirmButtonColor: "#dc2626",
+        cancelButtonColor: "#64748b",
+        customClass: {
+          confirmButton: "swal2-confirm-modern",
+          cancelButton: "swal2-cancel-modern",
+          popup: "swal2-logout-popup",
+        },
+        buttonsStyling: false,
+        reverseButtons: true,
+        didOpen: () => {
+          const popup = Swal.getPopup();
+          popup.style.borderRadius = "16px";
+          popup.style.padding = "25px";
 
-        event.target.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-      }
-      </script>
-      <script src="src/js/gestaoProdutos.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      <script>
-        // Carregar informações do perfil do admin
-        function getAdminPerfil() {
-          let dados = new FormData();
-          dados.append("op", 21);
+          const confirmBtn = popup.querySelector(".swal2-confirm");
+          const cancelBtn = popup.querySelector(".swal2-cancel");
 
-          $.ajax({
-            url: "src/controller/controllerDashboardAdmin.php",
-            method: "POST",
-            data: dados,
-            dataType: "html",
-            cache: false,
-            contentType: false,
-            processData: false,
-          }).done(function (msg) {
-            $("#AdminPerfilInfo").html(msg);
-          }).fail(function (jqXHR, textStatus) {
-            console.error("Erro ao carregar perfil: " + textStatus);
-          });
-        }
-
-        // Carregar dropdown do usuário
-        function getInfoUserDropdown() {
-          let dados = new FormData();
-          dados.append("op", 9);
-
-          $.ajax({
-            url: "src/controller/controllerDashboardAdmin.php",
-            method: "POST",
-            data: dados,
-            dataType: "html",
-            cache: false,
-            contentType: false,
-            processData: false,
-          }).done(function (msg) {
-            $("#userDropdown").html(msg);
-          }).fail(function (jqXHR, textStatus) {
-            console.error("Erro ao carregar dropdown: " + textStatus);
-          });
-        }
-
-        // Toggle dropdown ao clicar no navbar-user
-        document.querySelector('.navbar-user').addEventListener('click', function(e) {
-          e.stopPropagation();
-          document.getElementById('userDropdown').classList.toggle('active');
-        });
-
-        // Fecha ao clicar fora
-        document.addEventListener('click', function(e) {
-          const user = document.querySelector('.navbar-user');
-          const dropdown = document.getElementById('userDropdown');
-
-          if (!user.contains(e.target)) {
-            dropdown.classList.remove('active');
+          if (confirmBtn) {
+            confirmBtn.style.padding = "12px 28px";
+            confirmBtn.style.borderRadius = "10px";
+            confirmBtn.style.fontSize = "15px";
+            confirmBtn.style.fontWeight = "600";
+            confirmBtn.style.border = "none";
+            confirmBtn.style.cursor = "pointer";
+            confirmBtn.style.transition = "all 0.3s ease";
+            confirmBtn.style.backgroundColor = "#dc2626";
+            confirmBtn.style.color = "#ffffff";
+            confirmBtn.style.marginLeft = "10px";
           }
-        });
 
-        // Carregar ao iniciar
-        $(document).ready(function() {
-          getAdminPerfil();
-          getInfoUserDropdown();
-        });
-      </script>
+          if (cancelBtn) {
+            cancelBtn.style.padding = "12px 28px";
+            cancelBtn.style.borderRadius = "10px";
+            cancelBtn.style.fontSize = "15px";
+            cancelBtn.style.fontWeight = "600";
+            cancelBtn.style.border = "2px solid #e2e8f0";
+            cancelBtn.style.cursor = "pointer";
+            cancelBtn.style.transition = "all 0.3s ease";
+            cancelBtn.style.backgroundColor = "#ffffff";
+            cancelBtn.style.color = "#64748b";
+          }
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            html: `
+              <div style="padding: 20px;">
+                <div class="swal2-loading-spinner" style="margin: 0 auto 20px;">
+                  <div style="width: 50px; height: 50px; border: 4px solid #f3f4f6; border-top: 4px solid #3cb371; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                </div>
+                <p style="margin: 0; color: #64748b; font-size: 15px;">A terminar sessão...</p>
+              </div>
+              <style>
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              </style>
+            `,
+            showConfirmButton: false,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => {
+              const popup = Swal.getPopup();
+              popup.style.borderRadius = "16px";
+            },
+          });
+
+          let dados = new FormData();
+          dados.append("op", 10);
+
+          $.ajax({
+            url: "src/controller/controllerDashboardAdmin.php",
+            method: "POST",
+            data: dados,
+            dataType: "html",
+            cache: false,
+            contentType: false,
+            processData: false,
+          })
+          .done(function (msg) {
+            window.location.href = "index.html";
+          })
+          .fail(function (jqXHR, textStatus) {
+            alert("Request failed: " + textStatus);
+          });
+        }
+      });
+    }
+
+    // Override da função getInfoUserDropdown para evitar sobrescrever o dropdown
+    function getInfoUserDropdown() {
+      // Já está criado no PHP, não fazer nada
+      return;
+    }
+
+    // Toggle dropdown
+    document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      document.getElementById('userDropdown').classList.toggle('active');
+    });
+
+    // Fecha dropdown ao clicar fora
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('userDropdown');
+      if (!e.target.closest('.navbar-user')) {
+        dropdown.classList.remove('active');
+      }
+    });
+
+    // Modais agora são gerenciados via SweetAlert2 - veja gestaoProdutos.js
+
+    // Fechar modal ao clicar no botão X ou fora do conteúdo
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal')) {
+        closeModal(e.target.id);
+      }
+      if (e.target.classList.contains('modal-close')) {
+        const modal = e.target.closest('.modal');
+        if (modal) {
+          closeModal(modal.id);
+        }
+      }
+    });
+  </script>
+  <script src="src/js/gestaoProdutos.js"></script>
 </body>
 
 </html>
+<?php
+}else{
+    echo "sem permissão!";
+}
+?>

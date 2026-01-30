@@ -1,158 +1,187 @@
+<?php
+session_start();
+if($_SESSION['tipo'] != 1){
+    header("Location: index.html");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat de Suporte - Admin</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="src/css/Chatadmin.css">
-    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/lib/datatables.css">
-    <link rel="stylesheet" href="src/css/lib/select2.css">
-
-    <script src="src/js/lib/jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
-    <script src="src/js/lib/datatables.js"></script>
-    <script src="src/js/lib/select2.js"></script>
-    <script src="src/js/lib/sweatalert.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat de Suporte - Admin</title>
+  <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+  <link rel="stylesheet" href="src/css/DashboardCliente.css">
+  <link rel="stylesheet" href="src/css/DashboardAnunciante.css">
+  <link rel="stylesheet" href="src/css/DashboardAdmin.css">
+  <link rel="stylesheet" href="src/css/ChatCliente.css">
+  <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="src/js/lib/jquery.js"></script>
+  <script src="src/js/lib/sweatalert.js"></script>
+  <script src="src/js/notifications.js"></script>
 </head>
+<body class="page-chat-cliente">
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <i class="fas fa-leaf"></i>
+        <div class="logo-text">
+          <h2>WeGreen</h2>
+          <p>Moda Sustentável</p>
+        </div>
+      </a>
 
-<body>
-    <div class="container">
-        <aside class="sidebar">
-            <a href="index.html" class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                <div class="logo-text">
-                    <h1>WeGreen</h1>
-                    <p>Painel do Administrador</p>
-                </div>
+      <nav class="sidebar-menu">
+        <div class="menu-section">
+          <div class="menu-section-title">Menu</div>
+          <a href="DashboardAdmin.php" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="gestaoProdutosAdmin.php" class="menu-item">
+            <i class="fas fa-tshirt"></i>
+            <span>Produtos</span>
+          </a>
+          <a href="gestaoCliente.php" class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>Utilizadores</span>
+          </a>
+          <a href="gestaoLucros.php" class="menu-item">
+            <i class="fas fa-euro-sign"></i>
+            <span>Lucros</span>
+          </a>
+          <a href="logAdmin.php" class="menu-item">
+            <i class="fas fa-history"></i>
+            <span>Logs do Sistema</span>
+          </a>
+          <a href="Chatadmin.php" class="menu-item active">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main class="main-content">
+      <nav class="top-navbar">
+        <div class="navbar-left">
+          <h1 class="page-title"><i class="fas fa-comments"></i> Chat de Suporte</h1>
+        </div>
+        <div class="navbar-right">
+          <?php include 'src/views/notifications-widget.php'; ?>
+          <div class="navbar-user" id="userMenuBtn">
+            <img
+              src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+              alt="Administrador" class="user-avatar">
+            <div class="user-info">
+              <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></span>
+              <span class="user-role">Administrador</span>
+            </div>
+            <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-header">
+              <img
+                src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+                alt="Administrador" class="dropdown-avatar">
+              <div>
+                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></div>
+                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'admin@wegreen.com'; ?></div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="perfilAdmin.php">
+              <i class="fas fa-user"></i>
+              <span>Meu Perfil</span>
             </a>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="DashboardAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Gestao de Utilizadores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoLucros.php">
-                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                            <span class="nav-text">Gestão de Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="Chatadmin.php">
-                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                            <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-history"></i></span>
-                            <span class="nav-text">Logs do Sistema</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+            <a class="dropdown-item" href="alterarSenha.php">
+              <i class="fas fa-key"></i>
+              <span>Alterar Senha</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Sair</span>
+            </button>
+          </div>
+        </div>
+      </nav>
 
-        <main class="main-content">
-            <nav class="top-navbar">
-                <div class="navbar-left">
-                    <i class="fas fa-comments navbar-icon"></i>
-                    <h2 class="navbar-title">Chat de Suporte</h2>
+      <div class="page-content">
+        <div class="content-area">
+          <div class="chat-container">
+            <div class="conversations-panel">
+              <div class="conversations-header">
+                <h3>Conversas</h3>
+                <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" placeholder="Pesquisar conversas..." id="searchInput" onkeyup="pesquisarChat()">
                 </div>
-                <div class="navbar-right">
-                    <button class="navbar-icon-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
+              </div>
+              <div class="conversations-list" id="ListaCliente">
+                <!-- Conversas carregadas via AJAX -->
+              </div>
+            </div>
+
+            <div class="chat-panel" id="FaixaPessoa">
+              <div class="chat-header">
+                <div class="chat-header-info">
+                  <div class="chat-user-avatar" id="chatUserAvatar">U</div>
+                  <div class="chat-user-details">
+                    <h4 id="chatUserName">Selecione uma conversa</h4>
+                  </div>
+                </div>
+              </div>
+
+              <div class="chat-messages" id="chatMessages">
+                <div class="empty-chat">
+                  <i class="fas fa-comments" style="font-size: 64px; color: #3cb371; margin-bottom: 16px;"></i>
+                  <h3>Nenhuma conversa selecionada</h3>
+                  <p>Escolha uma conversa à esquerda para começar</p>
+                </div>
+              </div>
+
+              <div class="chat-input-container" id="BotaoEscrever">
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <button class="chat-attach-btn" id="attachBtn" title="Anexar imagem">
+                  <i class="fas fa-paperclip"></i>
+                </button>
+                <div class="input-wrapper">
+                  <input type="text" class="chat-input" id="messageInput"
+                    placeholder="Escreva uma mensagem ou cole uma imagem (Ctrl+V)...">
+                  <div id="imagePreview" class="image-preview" style="display: none;">
+                    <img id="previewImg" src="" alt="Preview">
+                    <button id="removePreview" class="remove-preview">
+                      <i class="fas fa-times"></i>
                     </button>
-                    <button class="navbar-icon-btn">
-                        <i class="fas fa-envelope"></i>
-                    </button>
-                    <div class="navbar-user">
-                        <div class="user-avatar">A</div>
-                        <div class="user-info">
-                            <span class="user-name">Admin User</span>
-                            <span class="user-role">Administrador</span>
-                        </div>
-                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #718096;"></i>
-                    </div>
+                  </div>
                 </div>
-            </nav>
+                <button class="chat-send-btn" id="sendButton">
+                  <i class="fas fa-paper-plane"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 
-            <div class="chat-container">
-                <div class="conversations-panel">
-                    <div class="conversations-header">
-                        <h3>Conversas</h3>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Pesquisar conversas..." id="searchInput"
-                                onkeyup="pesquisarChat()">
-                        </div>
-                    </div>
-                    <div class="conversations-list" id="ListaCliente">
+  <script src="src/js/ChatAdmin.js"></script>
+  <script>
+  function logout() {
+    $.ajax({
+      url: 'src/controller/controllerPerfil.php?op=2',
+      method: 'GET'
+    }).always(function() {
+      window.location.href = 'index.html';
+    });
+  }
+  </script>
+</body>
 
-                        <div class="conversation-item" data-user="pedro">
-                            <div class="conversation-avatar">P</div>
-                            <div class="conversation-info">
-                                <div class="conversation-header">
-                                    <span class="conversation-name">Pedro Lima</span>
-                                    <span class="conversation-time">Segunda</span>
-                                </div>
-                                <div class="conversation-preview">
-                                    Preciso alterar o endereço de entrega
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="chat-panel" id="FaixaPessoa">
-                    <div id="chatContent" style="display: flex; flex: 1; flex-direction: column;">
-                        <div class="chat-header">
-                            <div class="chat-header-info">
-
-                                <div class="chat-user-details">
-                                    <h4 id="chatUserName">Não Encontrado - Selecione uma conversa</h4>
-                                </div>
-                            </div>
-                            <div class="chat-actions">
-                                <button class="chat-action-btn" title="Arquivar">
-                                    <i class="fas fa-archive"></i>
-                                </button>
-                                <button class="chat-action-btn" title="Informações">
-                                    <i class="fas fa-info-circle"></i>
-                                </button>
-                                <button class="chat-action-btn" title="Mais opções">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="chat-messages" id="chatMessages">
-
-                        </div>
-                        <div class="chat-input-container" id="BotaoEscrever">
-                        </div>
-                    </div>
-                </div>
-        </main>
-    </div>
-    <script src="src/js/ChatAdmin.js"></script>
+</html>

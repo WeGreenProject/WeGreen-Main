@@ -8,172 +8,686 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
 <html lang="pt">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil - WeGreen</title>
-    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
-    <link rel="stylesheet" href="src/css/Anunciante.css">
-    <link rel="stylesheet" href="src/css/lib/select2.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil - WeGreen</title>
+  <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+  <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="src/js/lib/jquery.js"></script>
-    <script src="src/js/lib/select2.js"></script>
-    <script src="src/js/lib/sweatalert.js"></script>
-    <script src="src/js/PerfilAdmin.js"></script>
-    <script src="src/js/Adminstrador.js"></script>
+  <script src="src/js/lib/jquery.js"></script>
+  <script src="src/js/lib/sweatalert.js"></script>
+  <script src="src/js/notifications.js"></script>
+  <style>
+  /* Estilos do Perfil - Similar ao perfilAnunciante */
+  .profile-header-card {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #3cb371;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(60, 179, 113, 0.3);
+    position: relative;
+  }
+
+  .profile-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar-edit-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    background: #3cb371;
+    border: 3px solid #2d3748;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+    transition: all 0.3s;
+  }
+
+  .avatar-edit-btn:hover {
+    background: #2e8b57;
+    transform: scale(1.1);
+  }
+
+  .profile-header-info {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .profile-header-left h1 {
+    font-size: 32px;
+    color: #ffffff;
+    margin-bottom: 8px;
+  }
+
+  .role-badge {
+    background: rgba(60, 179, 113, 0.2);
+    color: #3cb371;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-block;
+    border: 1px solid #3cb371;
+  }
+
+  .profile-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .profile-tab {
+    background: transparent;
+    border: none;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .profile-tab:hover {
+    color: #3cb371;
+  }
+
+  .profile-tab.active {
+    color: #3cb371;
+    border-bottom-color: #3cb371;
+  }
+
+  .profile-tab-content {
+    min-height: 400px;
+  }
+
+  .tab-pane {
+    display: none;
+  }
+
+  .tab-pane.active {
+    display: block;
+  }
+
+  .profile-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .section-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .section-header h3 {
+    font-size: 20px;
+    color: #1a1a1a;
+    font-weight: 600;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .section-header i {
+    color: #3cb371;
+    font-size: 20px;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .info-item {
+    margin-bottom: 24px;
+  }
+
+  .info-item label {
+    display: block;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .info-item input,
+  .info-item select,
+  .info-item textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s;
+    background-color: white;
+    font-family: inherit;
+  }
+
+  .info-item textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .info-item input:focus,
+  .info-item select:focus,
+  .info-item textarea:focus {
+    outline: none;
+    border-color: #3cb371;
+    box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
+  }
+
+  .btn-save {
+    background: linear-gradient(135deg, #3cb371, #2e8b57);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3);
+  }
+
+  .security-item {
+    display: flex;
+    gap: 20px;
+    padding: 24px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  .security-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3cb371, #2e8b57);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .security-info {
+    flex: 1;
+  }
+
+  .security-info h4 {
+    font-size: 16px;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+
+  .security-info p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .btn-secondary {
+    background: #64748b;
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: auto;
+  }
+
+  .btn-secondary:hover {
+    background: #475569;
+    transform: translateY(-2px);
+  }
+
+  .profile-section {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+  }
+
+  .profile-section h3 {
+    font-size: 20px;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .profile-section h3 i {
+    color: #3cb371;
+    font-size: 22px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .info-item label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .info-item input {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s;
+  }
+
+  .info-item input:focus {
+    outline: none;
+    border-color: #3cb371;
+    box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
+  }
+
+  .info-item select {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s;
+    background: white;
+  }
+
+  .info-item select:focus {
+    outline: none;
+    border-color: #3cb371;
+    box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .section-header i {
+    color: #3cb371;
+    font-size: 22px;
+  }
+
+  .section-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #1a1a1a;
+  }
+
+  .btn-save {
+    background: linear-gradient(135deg, #3cb371, #2e8b57);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 20px;
+    width: 100%;
+  }
+
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3);
+  }
+  </style>
 </head>
 
 
 <body>
-    <div class="container">
-        <aside class="sidebar">
-            <a href="index.html" style="text-decoration: none;">
-                <div class="logo">
-                    <span class="logo-icon"><i class="fas fa-leaf"></i></span>
-                    <div class="logo-text">
-                        <h1>WeGreen</h1>
-                        <p>Moda Sustentável</p>
-                    </div>
-                </div>
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+        <i class="fas fa-leaf"></i>
+        <div class="logo-text">
+          <h2>WeGreen</h2>
+          <p>Moda Sustentável</p>
+        </div>
+      </a>
+
+      <nav class="sidebar-menu">
+        <div class="menu-section">
+          <div class="menu-section-title">Menu</div>
+          <a href="DashboardAdmin.php" class="menu-item">
+            <i class="fas fa-chart-line"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="gestaoProdutosAdmin.php" class="menu-item">
+            <i class="fas fa-tshirt"></i>
+            <span>Produtos</span>
+          </a>
+          <a href="gestaoCliente.php" class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>Utilizadores</span>
+          </a>
+          <a href="gestaoLucros.php" class="menu-item">
+            <i class="fas fa-euro-sign"></i>
+            <span>Lucros</span>
+          </a>
+          <a href="logAdmin.php" class="menu-item">
+            <i class="fas fa-history"></i>
+            <span>Logs do Sistema</span>
+          </a>
+          <a href="Chatadmin.php" class="menu-item">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <nav class="top-navbar">
+        <div class="navbar-left">
+          <h1 class="page-title"><i class="fas fa-user"></i> Meu Perfil</h1>
+        </div>
+        <div class="navbar-right">
+          <?php include 'src/views/notifications-widget.php'; ?>
+          <div class="navbar-user" id="userMenuBtn">
+            <img
+              src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+              alt="Administrador" class="user-avatar">
+            <div class="user-info">
+              <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></span>
+              <span class="user-role">Administrador</span>
+            </div>
+            <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+          </div>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="dropdown-header">
+              <img
+                src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+                alt="Administrador" class="dropdown-avatar">
+              <div>
+                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></div>
+                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'admin@wegreen.com'; ?></div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="perfilAdmin.php" style="background: #f8f9fa;">
+              <i class="fas fa-user"></i>
+              <span>Meu Perfil</span>
             </a>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="DashboardAdmin.php" style="text-decoration: none;">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php" style="text-decoration: none;">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php" style="text-decoration: none;">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Gestão de Utilizadores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoLucros.php" style="text-decoration: none;">
-                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                            <span class="nav-text">Gestão de Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php" style="text-decoration: none;">
-                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                            <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+            <a class="dropdown-item" href="alterarSenha.php">
+              <i class="fas fa-key"></i>
+              <span>Alterar Senha</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Sair</span>
+            </button>
+          </div>
+        </div>
+      </nav>
 
-        <main class="main-content">
-            <nav class="top-navbar">
-                <div class="navbar-left">
-                    <div class="breadcrumb">
-                        <span class="breadcrumb-item">
-                            <i class="fas fa-home"></i> WeGreen
-                        </span>
-                        <i class="fas fa-chevron-right breadcrumb-separator"></i>
-                        <span class="breadcrumb-item active">
-                            <i class="fas fa-user"></i> Perfil
-                        </span>
-                    </div>
-                </div>
-                <div class="navbar-right">
-                    <?php include 'src/views/notifications-widget.php'; ?>
-                    <div class="navbar-user" id="userMenuBtn">
-
-                    </div>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item active" href="perfilAdmin.php">
-                            <i class="fas fa-user"></i>
-                            <span>Meu Perfil</span>
-                        </a>
-                        <button class="dropdown-item" onclick="showPasswordModal()">
-                            <i class="fas fa-key"></i>
-                            <span>Alterar Senha</span>
-                        </button>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item dropdown-item-danger" onclick="logout()">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Sair</span>
-                        </button>
-                    </div>
-                </div>
-            </nav>
-
-            <div id="profile" class="page active">
-                <div class="profile-container" id="profileCard">
-                </div>
-
-
-
-                <div class="profile-tab-content">
-                    <div id="tab-personal" class="tab-pane active">
-                        <div class="profile-section" id="profileInfo">
-                        </div>
-                    </div>
-                    <div id="tab-plan" class="tab-pane">
-                        <div class="profile-section" id="profilePlan">
-                        </div>
-                    </div>
-                    <div id="tab-security" class="tab-pane">
-                        <div class="profile-section" id="profileSecurity">
-                        </div>
-                    </div>
-                </div>
+      <div class="page-content">
+        <div class="content-area">
+          <!-- Header do Perfil -->
+          <div class="profile-header-card">
+            <div class="profile-avatar-large">
+              <img id="avatarPreview"
+                src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+                alt="Perfil">
             </div>
-
-            <!-- Modal Alterar Senha -->
-            <div id="passwordModal" class="modal">
-                <div class="modal-content" style="max-width: 500px;">
-                    <div class="modal-header">
-                        <h3>Alterar Senha</h3>
-                        <span class="close close-btn" onclick="closePasswordModal()">&times;</span>
-                    </div>
-                    <form id="passwordForm" class="profile-form" style="margin-top: 20px;">
-                        <input type="text" name="username" autocomplete="username"
-                            value="<?php echo $_SESSION['email'] ?? ''; ?>" style="display: none;" readonly>
-                        <div class="form-group">
-                            <label>Senha Atual</label>
-                            <input type="password" id="currentPassword" autocomplete="current-password" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Nova Senha</label>
-                            <input type="password" id="newPassword" autocomplete="new-password" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Confirmar Nova Senha</label>
-                            <input type="password" id="confirmPassword" autocomplete="new-password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-                            <i class="fas fa-key"></i> Alterar Senha
-                        </button>
-                    </form>
-                </div>
+            <div class="profile-header-info">
+              <div class="profile-header-left">
+                <h1><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></h1>
+                <span class="role-badge"><i class="fas fa-shield-alt"></i> Administrador</span>
+              </div>
             </div>
+          </div>
 
-        </main>
-    </div>
+          <!-- Informações Pessoais -->
+          <div class="profile-section">
+            <div class="section-header">
+              <i class="fas fa-user"></i><h3>Informações Pessoais</h3>
+            </div>
+            <form id="profileForm">
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Nome Completo</label>
+                  <input type="text" id="nome" placeholder="Nome Completo" required>
+                </div>
 
-    <script>
-    $(document).ready(function() {
-        initProfilePage();
+                <div class="info-item">
+                  <label>Email</label>
+                  <input type="email" id="email" placeholder="exemplo@email.com" required>
+                </div>
+
+                <div class="info-item">
+                  <label>NIF</label>
+                  <input type="text" id="nif" placeholder="000000000" maxlength="9">
+                </div>
+
+                <div class="info-item">
+                  <label>Telefone</label>
+                  <input type="text" id="telefone" placeholder="900000000" maxlength="9">
+                </div>
+              </div>
+
+              <button type="submit" class="btn-save">
+                <i class="fas fa-save"></i> Guardar Alterações
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  // Funções globais necessárias
+  function getInfoUserDropdown() {
+    // Dropdown já está no HTML, não precisa fazer nada
+    console.log('Dropdown estático no HTML');
+  }
+
+  // Dropdown toggle
+  $("#userMenuBtn").click(function(e) {
+    e.stopPropagation();
+    $("#userDropdown").toggleClass("active");
+  });
+
+  $(document).click(function(e) {
+    if (!$(e.target).closest('.navbar-user').length) {
+      $("#userDropdown").removeClass("active");
+    }
+  });
+
+  // Função para fechar modal de senha
+  function closePasswordModal() {
+    $('#passwordModal').removeClass('active');
+  }
+
+  // Função para abrir modal de senha
+  function openPasswordModal() {
+    $('#passwordModal').addClass('active');
+  }
+
+  // Carregar dados do perfil ao iniciar
+  $(document).ready(function() {
+    carregarPerfilAdmin();
+  });
+
+  function carregarPerfilAdmin() {
+    console.log('Carregando perfil do administrador...');
+
+    $.ajax({
+      url: 'src/controller/controllerAdminPerfil.php',
+      type: 'POST',
+      data: { op: 3 },
+      success: function(response) {
+        console.log('Resposta recebida:', response);
+
+        try {
+          const dados = typeof response === 'string' ? JSON.parse(response) : response;
+          console.log('Dados parseados:', dados);
+
+          if (dados.error) {
+            console.error('Erro:', dados.error);
+            Swal.fire('Erro', dados.error, 'error');
+            return;
+          }
+
+          // Preencher os campos com os dados do usuário
+          if (dados.nome) $('#nome').val(dados.nome);
+          if (dados.email) $('#email').val(dados.email);
+          if (dados.nif) $('#nif').val(dados.nif);
+          if (dados.telefone) $('#telefone').val(dados.telefone);
+
+          console.log('Perfil carregado com sucesso');
+        } catch (e) {
+          console.error('Erro ao processar dados:', e, response);
+          Swal.fire('Erro', 'Não foi possível carregar os dados do perfil', 'error');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error('Erro AJAX:', status, error);
+        Swal.fire('Erro', 'Não foi possível carregar o perfil', 'error');
+      }
     });
-    </script>
-    <script src="src/js/PerfilAdmin.js"></script>
+  }
+
+  // Salvar alterações do perfil
+  $('#profileForm').submit(function(e) {
+    e.preventDefault();
+
+    const dados = {
+      op: 11,
+      nomeAdminEdit: $('#nome').val(),
+      emailAdminEdit: $('#email').val(),
+      nifAdminEdit: $('#nif').val(),
+      telefoneAdminEdit: $('#telefone').val()
+    };
+
+    // Validações básicas
+    if (!dados.nomeAdminEdit || dados.nomeAdminEdit.trim().length < 3) {
+      return Swal.fire('Atenção', 'Nome completo é obrigatório (mínimo 3 caracteres)', 'warning');
+    }
+
+    if (!dados.emailAdminEdit || !dados.emailAdminEdit.includes('@')) {
+      return Swal.fire('Atenção', 'Email inválido', 'warning');
+    }
+
+    Swal.fire({
+      title: 'Guardar alterações?',
+      text: 'As suas informações de perfil serão atualizadas',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3cb371',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Sim, guardar!',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.post('src/controller/controllerAdminPerfil.php', dados, function(resp) {
+          try {
+            const resultado = typeof resp === 'string' ? JSON.parse(resp) : resp;
+            if (resultado.flag) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Perfil atualizado!',
+                text: resultado.msg || 'Dados atualizados com sucesso',
+                confirmButtonColor: '#3cb371',
+                timer: 2000
+              }).then(() => {
+                carregarPerfilAdmin();
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: resultado.msg || 'Não foi possível atualizar o perfil',
+                confirmButtonColor: '#3cb371'
+              });
+            }
+          } catch(e) {
+            console.error('Erro ao processar resposta:', e, resp);
+            Swal.fire('Erro', 'Resposta inválida do servidor', 'error');
+          }
+        }).fail(function() {
+          Swal.fire('Erro', 'Não foi possível atualizar o perfil', 'error');
+        });
+      }
+    });
+  });
+
+  function logout() {
+    $.ajax({
+      url: 'src/controller/controllerAdminPerfil.php?op=logout',
+      method: 'GET'
+    }).always(function() {
+      window.location.href = 'index.html';
+    });
+  }
+  </script>
 </body>
+</html>
 <?php
 }else{
     echo "sem permissão!";
 }
 ?>
-
-</html>

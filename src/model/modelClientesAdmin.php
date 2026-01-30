@@ -72,7 +72,7 @@ class ClienteAdmin{
 
     }
     function guardaEditCliente($nome, $email, $telefone, $tipo,$nif,$plano,$rank,$ID_Utilizador){
-        
+
         global $conn;
         $msg = "";
         $flag = true;
@@ -92,8 +92,8 @@ class ClienteAdmin{
             "flag" => $flag,
             "msg" => $msg
         ));
-          
-        $conn->close(); 
+
+        $conn->close();
 
         return($resp);
 
@@ -103,11 +103,11 @@ class ClienteAdmin{
     $msg = "";
     $flag = true;
     $sql = "";
-    
+
     // Guardar password em texto claro para enviar por email (apenas para o email)
     $password_temporaria = $password;
     $password_hash = md5($password); // Encriptar para guardar na BD
-    
+
     $resp = $this->uploads($foto, $nome);
     $resp = json_decode($resp, TRUE);
 
@@ -123,13 +123,13 @@ class ClienteAdmin{
 
     if ($stmt->execute()) {
         $msg = "Cliente registado com sucesso!";
-        
+
         // Enviar email com credenciais de acesso
         try {
             require_once __DIR__ . '/../services/EmailService.php';
             $emailService = new EmailService();
             $emailEnviado = $emailService->sendContaCriadaAdmin($email, $nome, $password_temporaria, $tipo);
-            
+
             if ($emailEnviado) {
                 $msg .= " Email enviado com as credenciais de acesso.";
             } else {
@@ -145,12 +145,12 @@ class ClienteAdmin{
         $msg = "Error: " . $stmt->error;
     }
     $stmt->close();
-   
+
     $resp = json_encode(array(
         "flag" => $flag,
         "msg" => $msg
     ));
-      
+
     $conn->close();
 
     return $resp;
@@ -173,15 +173,15 @@ class ClienteAdmin{
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);
     }
 function uploads($foto, $nome){
-    
+
     $dirFisico = __DIR__ . "/../img/";
-    $dirWeb = "src/img/";  
+    $dirWeb = "src/img/";
     $flag = false;
     $targetBD = "";
 
@@ -190,28 +190,28 @@ function uploads($foto, $nome){
             die("Erro não é possível criar o diretório");
         }
     }
-    
+
     if(isset($foto) && is_array($foto) && !empty($foto['tmp_name']) && $foto['error'] === 0){
         file_put_contents('debug_upload.txt', "Entrou na condição de upload\n", FILE_APPEND);
-        
+
         if(is_uploaded_file($foto['tmp_name'])){
             file_put_contents('debug_upload.txt', "is_uploaded_file OK\n", FILE_APPEND);
             $fonte = $foto['tmp_name'];
             $ficheiro = $foto['name'];
             $end = explode(".", $ficheiro);
             $extensao = end($end);
-    
+
             $nomeLimpo = preg_replace('/[^a-zA-Z0-9]/', '_', $nome);
             $newName = "produto_" . $nomeLimpo . "_" . date("YmdHis") . "." . $extensao;
-    
+
             $targetFisico = $dirFisico . $newName;
             $targetBD = $dirWeb . $newName;
-    
+
             $flag = move_uploaded_file($fonte, $targetFisico);
 
         }
     }
-    
+
     return json_encode(array(
         "flag" => $flag,
         "target" => $targetBD
@@ -231,54 +231,86 @@ function uploads($foto, $nome){
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    $msg  = '<div class="stat-card">
-                                <i class="stat-icon fas fa-users"></i>
-                                <div class="stat-label">Total Utilizadores</div>
-                                <div class="stat-value" id="totalClients">'.$row["total"].'</div>
+                    $msg  = '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Total Utilizadores</div>
+                                    <div class="stat-value" id="totalClients">'.$row["total"].'</div>
+                                </div>
                             </div>';
 
-                    $msg .= '<div class="stat-card">
-                                <i class="stat-icon fas fa-user"></i>
-                                <div class="stat-label">Clientes</div>
-                                <div class="stat-value" id="totalNormalClients">'.$row["clientes"].'</div>
+                    $msg .= '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Clientes</div>
+                                    <div class="stat-value" id="totalNormalClients">'.$row["clientes"].'</div>
+                                </div>
                             </div>';
 
-                    $msg .= '<div class="stat-card">
-                                <i class="stat-icon fas fa-store"></i>
-                                <div class="stat-label">Anunciantes</div>
-                                <div class="stat-value" id="totalAdvertisers">'.$row["anunciantes"].'</div>
+                    $msg .= '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Anunciantes</div>
+                                    <div class="stat-value" id="totalAdvertisers">'.$row["anunciantes"].'</div>
+                                </div>
                             </div>';
 
-                    $msg .= '<div class="stat-card">
-                                <i class="stat-icon fas fa-user-shield"></i>
-                                <div class="stat-label">Administradores</div>
-                                <div class="stat-value" id="totalAdmins">'.$row["admins"].'</div>
+                    $msg .= '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Administradores</div>
+                                    <div class="stat-value" id="totalAdmins">'.$row["admins"].'</div>
+                                </div>
                             </div>';
                 }
             }
         else {
-                                $msg  = '<div class="stat-card">
-                                <i class="stat-icon fas fa-users"></i>
-                                <div class="stat-label">Total Utilizadores</div>
-                                <div class="stat-value" id="totalClients">Não encontrado</div>
+                                $msg  = '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Total Utilizadores</div>
+                                    <div class="stat-value" id="totalClients">Não encontrado</div>
+                                </div>
                             </div>';
 
-                    $msg .= '<div class="stat-card">
-                                <i class="stat-icon fas fa-user"></i>
-                                <div class="stat-label">Clientes</div>
-                                <div class="stat-value" id="totalNormalClients">Não encontrado</div>
+                    $msg .= '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Clientes</div>
+                                    <div class="stat-value" id="totalNormalClients">Não encontrado</div>
+                                </div>
                             </div>';
 
-                    $msg .= '<div class="stat-card">
-                                <i class="stat-icon fas fa-store"></i>
-                                <div class="stat-label">Anunciantes</div>
-                                <div class="stat-value" id="totalAdvertisers">Não encontrado</div>
+                    $msg .= '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Anunciantes</div>
+                                    <div class="stat-value" id="totalAdvertisers">Não encontrado</div>
+                                </div>
                             </div>';
 
-                    $msg .= '<div class="stat-card">
-                                <i class="stat-icon fas fa-user-shield"></i>
-                                <div class="stat-label">Administradores</div>
-                                <div class="stat-value" id="totalAdmins">Não encontrado</div>
+                    $msg .= '<div class="stat-card-compact">
+                                <div class="stat-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-label">Administradores</div>
+                                    <div class="stat-value" id="totalAdmins">Não encontrado</div>
+                                </div>
                             </div>';
         }
         $conn->close();
@@ -303,7 +335,7 @@ function removerFornecedores($ID_Fornecedores){
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);

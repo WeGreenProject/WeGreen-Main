@@ -446,7 +446,7 @@ function getVendasGrafico() {
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td>".$row['stock']."</td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'><i class='fas fa-edit'></i> Ver</button></td>";
+                $msg .= "<td><a href='gestaoProdutosAdmin.php?id=".$row['Produto_id']."' class='btn-action'><i class='fas fa-eye'></i> Ver</a></td>";
                 $msg .= "</tr>";
             }
         } else {

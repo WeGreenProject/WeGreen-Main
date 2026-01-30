@@ -1,610 +1,781 @@
-function getMinhasVendas(){
+function getMinhasVendas() {
+  if ($.fn.DataTable.isDataTable("#minhasVendasBody")) {
+    $("#minhasVendasBody").DataTable().destroy();
+  }
 
-    
-    if ( $.fn.DataTable.isDataTable('#minhasVendasBody') ) {
-        $('#minhasVendasBody').DataTable().destroy();
-    }
+  let dados = new FormData();
+  dados.append("op", 2);
 
-    let dados = new FormData();
-    dados.append("op", 2);
-
-    $.ajax({
+  $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
     method: "POST",
     data: dados,
     dataType: "html",
     cache: false,
     contentType: false,
-    processData: false
-    })
-    
-    .done(function( msg ) {
-        $('#minhasVendasBody').html(msg);
-        $('#minhasVendasTable').DataTable();
-        
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
-});
+    processData: false,
+  })
 
+    .done(function (msg) {
+      $("#minhasVendasBody").html(msg);
+      $("#minhasVendasTable").DataTable();
+    })
+
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
+    });
 }
 function getTopTipoGrafico() {
-    $.ajax({
-        url: "src/controller/controllerGestaoProdutos.php",
-        type: "POST",
-        data: { op: 15 },
-        dataType: "json",
-        success: function(response) {
-            console.log("Resposta AJAX:", response);
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    type: "POST",
+    data: { op: 15 },
+    dataType: "json",
+    success: function (response) {
+      console.log("Resposta AJAX:", response);
 
-                const ctx3 = document.getElementById('topProductsChart').getContext('2d');
-                
-                new Chart(ctx3, {
-                    type: 'doughnut',
-                    data: {
-                        labels: response.dados1,
-                        datasets: [{
-                            data: response.dados2,
-                            backgroundColor: ['#a4d70a', '#2a3548', '#c8e200', '#1a2a3b', '#d1d3d4', '#f4c542'],
-                            borderColor: '#1a1a1a',
-                            borderWidth: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#888',
-                                    padding: 15
-                                }
-                            }
-                        }
-                    }
-                });
+      const ctx3 = document.getElementById("topProductsChart").getContext("2d");
+
+      new Chart(ctx3, {
+        type: "doughnut",
+        data: {
+          labels: response.dados1,
+          datasets: [
+            {
+              data: response.dados2,
+              backgroundColor: [
+                "#3cb371", // Verde principal
+                "#2d3748", // Cinza escuro
+                "#2e8b57", // Verde escuro
+                "#1a202c", // Preto suave
+                "#90c896", // Verde claro
+                "#4a5568", // Cinza médio
+                "#22c55e", // Verde brilhante
+                "#374151", // Cinza slate
+              ],
+              borderColor: "#ffffff",
+              borderWidth: 4,
+              hoverOffset: 15,
+              hoverBorderColor: "#ffffff",
+              hoverBorderWidth: 5,
+            },
+          ],
         },
-        error: function(xhr, status, error) {
-            console.error("Erro AJAX:", error);
-            console.error("Resposta do servidor:", xhr.responseText);
-        }
-    });
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          cutout: "65%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#64748b",
+                padding: 15,
+                font: {
+                  size: 13,
+                  family: "'Inter', 'Segoe UI', sans-serif",
+                  weight: "500",
+                },
+                usePointStyle: true,
+                pointStyle: "circle",
+              },
+            },
+            tooltip: {
+              backgroundColor: "rgba(26, 26, 26, 0.95)",
+              titleColor: "#fff",
+              bodyColor: "#fff",
+              borderColor: "rgba(255, 255, 255, 0.1)",
+              borderWidth: 1,
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: function (context) {
+                  return context.label + ": " + context.parsed + " produtos";
+                },
+              },
+            },
+          },
+        },
+      });
+    },
+    error: function (xhr, status, error) {
+      console.error("Erro AJAX:", error);
+      console.error("Resposta do servidor:", xhr.responseText);
+    },
+  });
 }
 function getProdutoVendidos() {
-    $.ajax({
-        url: "src/controller/controllerGestaoProdutos.php",
-        type: "POST",
-        data: { op: 16 },
-        dataType: "json",
-        success: function(response) {
-            console.log("Resposta AJAX:", response);
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    type: "POST",
+    data: { op: 16 },
+    dataType: "json",
+    success: function (response) {
+      console.log("Resposta AJAX:", response);
 
-                const ctx3 = document.getElementById('salesChart').getContext('2d');
-                
-                new Chart(ctx3, {
-                    type: 'doughnut',
-                    data: {
-                        labels: response.dados1,
-                        datasets: [{
-                            data: response.dados2,
-                            backgroundColor: ['#8fad3cff', '#384f70ff', '#aec519ff', '#274766ff', '#c6c9ca', '#f1c450ff'],
-                            borderColor: '#1a1a1a',
-                            borderWidth: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#888',
-                                    padding: 15
-                                }
-                            }
-                        }
-                    }
-                });
+      const ctx3 = document.getElementById("salesChart").getContext("2d");
+
+      new Chart(ctx3, {
+        type: "doughnut",
+        data: {
+          labels: response.dados1,
+          datasets: [
+            {
+              data: response.dados2,
+              backgroundColor: [
+                "#2e8b57", // Verde escuro
+                "#374151", // Cinza slate
+                "#3cb371", // Verde principal
+                "#1f2937", // Cinza muito escuro
+                "#90c896", // Verde claro
+                "#4b5563", // Cinza médio
+                "#22c55e", // Verde brilhante
+                "#2d3748", // Cinza escuro
+              ],
+              borderColor: "#ffffff",
+              borderWidth: 4,
+              hoverOffset: 15,
+              hoverBorderColor: "#ffffff",
+              hoverBorderWidth: 5,
+            },
+          ],
         },
-        error: function(xhr, status, error) {
-            console.error("Erro AJAX:", error);
-            console.error("Resposta do servidor:", xhr.responseText);
-        }
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          cutout: "65%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#64748b",
+                padding: 15,
+                font: {
+                  size: 13,
+                  family: "'Inter', 'Segoe UI', sans-serif",
+                  weight: "500",
+                },
+                usePointStyle: true,
+                pointStyle: "circle",
+              },
+            },
+            tooltip: {
+              backgroundColor: "rgba(26, 26, 26, 0.95)",
+              titleColor: "#fff",
+              bodyColor: "#fff",
+              borderColor: "rgba(255, 255, 255, 0.1)",
+              borderWidth: 1,
+              padding: 12,
+              cornerRadius: 8,
+              callbacks: {
+                label: function (context) {
+                  return context.label + ": " + context.parsed + " vendas";
+                },
+              },
+            },
+          },
+        },
+      });
+    },
+    error: function (xhr, status, error) {
+      console.error("Erro AJAX:", error);
+      console.error("Resposta do servidor:", xhr.responseText);
+    },
+  });
+}
+function getInativos() {
+  if ($.fn.DataTable.isDataTable("#inativosBody")) {
+    $("#inativosBody").DataTable().destroy();
+  }
+
+  let dados = new FormData();
+  dados.append("op", 5);
+
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  });
+}
+function getDesativacao(produto_id) {
+  let dados = new FormData();
+  dados.append("op", 12);
+  dados.append("produto_id", produto_id);
+
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+
+    .done(function (msg) {
+      let obj = JSON.parse(msg);
+      alerta2(obj.msg, "success");
+      getProdutos();
+    })
+
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
     });
 }
-function getInativos(){
+function getProdutos() {
+  if ($.fn.DataTable.isDataTable("#produtosTable")) {
+    $("#produtosTable").DataTable().destroy();
+  }
 
-    
-    if ( $.fn.DataTable.isDataTable('#inativosBody') ) {
-        $('#inativosBody').DataTable().destroy();
-    }
+  let dados = new FormData();
+  dados.append("op", 1);
 
-    let dados = new FormData();
-    dados.append("op", 5);
-
-    $.ajax({
+  $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
     method: "POST",
     data: dados,
     dataType: "html",
     cache: false,
     contentType: false,
-    processData: false
+    processData: false,
+  })
+    .done(function (msg) {
+      $("#produtosBody").html(msg);
+      $("#produtosTable").DataTable({
+        language: {
+          url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/pt-PT.json",
+        },
+        order: [[0, "desc"]],
+      });
     })
-    
-    .done(function( msg ) {
-        $('#inativosBody').html(msg);
-        $('#inativosTable').DataTable();
-        
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
-});
-
-}
-function getDesativacao(produto_id)
-{
-
-    let dados = new FormData();
-    dados.append("op", 12);
-    dados.append("produto_id",produto_id)
-
-    $.ajax({
-    url: "src/controller/controllerGestaoProdutos.php",
-    method: "POST",
-    data: dados,
-    dataType: "html",
-    cache: false,
-    contentType: false,
-    processData: false
-    })
-    
-    .done(function( msg ) { 
-        let obj = JSON.parse(msg);
-        alerta2(obj.msg,"success");
-        getProdutos();
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
-});
-}
-function getProdutos(){
-
-    
-    if ( $.fn.DataTable.isDataTable('#todasVendasBody') ) {
-        $('#todasVendasBody').DataTable().destroy();
-    }
-
-    let dados = new FormData();
-    dados.append("op", 1);
-
-    $.ajax({
-    url: "src/controller/controllerGestaoProdutos.php",
-    method: "POST",
-    data: dados,
-    dataType: "html",
-    cache: false,
-    contentType: false,
-    processData: false
-    })
-    
-    .done(function( msg ) {
-        $('#todasVendasBody').html(msg);
-        $('#todasVendasTable').DataTable();
-        
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
-});
-
-}
-function getDadosProduto(Produto_id){
-
-
-    let dados = new FormData();
-    dados.append("op", 10);
-    dados.append("Produto_id", Produto_id);
-
-    $.ajax({
-    url: "src/controller/controllerGestaoProdutos.php",
-    method: "POST",
-    data: dados,
-    dataType: "html",
-    cache: false,
-    contentType: false,
-    processData: false
-    })
-    
-    .done(function( msg ) {
-
-        let obj = JSON.parse(msg);
-        getFotosSection(obj.Produto_id);
-        $('#numprodutoEdit2').val(obj.Produto_id);
-        $('#nomeprodutoEdit2').val(obj.nome);
-        $('#categoriaprodutoEdit2').val(obj.tipo_produto_id);
-        $('#marcaprodutoEdit2').val(obj.marca);
-        $('#tamanhoprodutoEdit2').val(obj.tamanho);
-        $('#precoprodutoEdit2').val(obj.preco);
-        $('#generoprodutoEdit2').val(obj.genero);
-        $('#vendedorprodutoEdit2').val(obj.anunciante_id);
-       $('#btnGuardar2').attr("onclick", "guardaDadosEditProduto(" + obj.Produto_id + ");");
-        
-       $('#formEditInativo2').modal('show');
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
     });
 }
-function guardaDadosEditProduto(Produto_id) {
-    let dados = new FormData();
-    dados.append("op", 11);
-    dados.append("numprodutoEdit2", $('#numprodutoEdit2').val());
-    dados.append("nomeprodutoEdit2", $('#nomeprodutoEdit2').val());
-    dados.append("categoriaprodutoEdit2", $('#categoriaprodutoEdit2').val());
-    dados.append("marcaprodutoEdit2", $('#marcaprodutoEdit2').val());
-    dados.append("tamanhoprodutoEdit2", $('#tamanhoprodutoEdit2').val());
-    dados.append("precoprodutoEdit2", $('#precoprodutoEdit2').val());
-    dados.append("generoprodutoEdit2", $('#generoprodutoEdit2').val());
-    dados.append("vendedorprodutoEdit2", $('#vendedorprodutoEdit2').val());
-    dados.append("Produto_id", Produto_id);
+function getListaVendedores() {
+  let dados = new FormData();
+  dados.append("op", 3);
 
-    $.ajax({
-        url: "src/controller/controllerGestaoProdutos.php",
-        method: "POST",
-        data: dados,
-        dataType: "html",
-        cache: false,
-        contentType: false,
-        processData: false
-    })
-    .done(function(msg) {
-    $('#formEditInativo2').modal('hide');
-        
-        let obj = JSON.parse(msg);
-        if(obj.flag) {
-            alerta("Inativo", obj.msg, "success");
-            alerta2(obj.msg,"success");
-            getProdutos();
-        } else {
-            alerta2(obj.msg,"error");
-            alerta("Inativo", obj.msg, "error");
-        }
-        console.log(msg);
-    })
-    .fail(function(jqXHR, textStatus) {
-        alert("Request failed: " + textStatus);
-    });
-}
-function getListaVendedores(){
-    let dados = new FormData();
-    dados.append("op", 3);
-
-    $.ajax({
+  $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
     method: "POST",
     data: dados,
     dataType: "html",
     cache: false,
     contentType: false,
-    processData: false
-    })  
-    
-    .done(function( msg ) {
-        console.log(msg);
-         $('#listaVendedor').html(msg);
-         $('#vendedorprodutoEdit').html(msg);
-         $('#vendedorprodutoEdit2').html(msg);
+    processData: false,
+  })
 
+    .done(function (msg) {
+      console.log(msg);
+      $("#listaVendedor").html(msg);
+      $("#vendedorprodutoEdit").html(msg);
+      $("#vendedorprodutoEdit2").html(msg);
     })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
+
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
     });
-
 }
-function getListaCategoria(){
-    let dados = new FormData();
-    dados.append("op", 4);
+function getListaCategoria() {
+  let dados = new FormData();
+  dados.append("op", 4);
 
-    $.ajax({
+  $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
     method: "POST",
     data: dados,
     dataType: "html",
     cache: false,
     contentType: false,
-    processData: false
-    })  
-    
-    .done(function( msg ) {
-        console.log(msg);
-         $('#listaCategoria').html(msg);
-        $('#categoriaprodutoEdit').html(msg);
-        $('#categoriaprodutoEdit2').html(msg);
+    processData: false,
+  })
 
+    .done(function (msg) {
+      console.log(msg);
+      $("#listaCategoria").html(msg);
+      $("#categoriaprodutoEdit").html(msg);
+      $("#categoriaprodutoEdit2").html(msg);
     })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
+
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
     });
-
 }
-function getDadosInativos(Produto_id){
+function getDadosInativos(Produto_id) {
+  let dados = new FormData();
+  dados.append("op", 6);
+  dados.append("Produto_id", Produto_id);
 
-
-    let dados = new FormData();
-    dados.append("op", 6);
-    dados.append("Produto_id", Produto_id);
-
-    $.ajax({
+  $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
     method: "POST",
     data: dados,
     dataType: "html",
     cache: false,
     contentType: false,
-    processData: false
+    processData: false,
+  })
+    .done(function (msg) {
+      let obj = JSON.parse(msg);
+      abrirModalVerificacao(obj);
     })
-    
-    .done(function( msg ) {
-
-        let obj = JSON.parse(msg);
-        getFotosSection(obj.Produto_id);
-        $('#numprodutoEdit').val(obj.Produto_id);
-        $('#nomeprodutoEdit').val(obj.nome);
-        $('#categoriaprodutoEdit').val(obj.tipo_produto_id);
-        $('#marcaprodutoEdit').val(obj.marca);
-        $('#tamanhoprodutoEdit').val(obj.tamanho);
-        $('#precoprodutoEdit').val(obj.preco);
-        $('#generoprodutoEdit').val(obj.genero);
-        $('#vendedorprodutoEdit').val(obj.anunciante_id);
-       $('#btnGuardar').attr("onclick", "alerta3(" + obj.Produto_id + ");");
-        $('#btnRejeitar').attr("onclick", "rejeitaEditProduto(" + obj.Produto_id + ");");
-       $('#formEditInativo').modal('show');
-
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
     });
 }
-function getFotosSection(Produto_id){
-
-
-    let dados = new FormData();
-    dados.append("op", 8);
-    dados.append("Produto_id", Produto_id);
-    $.ajax({
+function getFotosSection(Produto_id) {
+  let dados = new FormData();
+  dados.append("op", 8);
+  dados.append("Produto_id", Produto_id);
+  $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
     method: "POST",
     data: dados,
     dataType: "html",
     cache: false,
     contentType: false,
-    processData: false
+    processData: false,
+  })
+
+    .done(function (msg) {
+      $("#fotos-section").html(msg);
+      $("#fotos-section2").html(msg);
+      console.log(msg);
     })
-    
-    .done(function( msg ) {
-        $('#fotos-section').html(msg);
-        $('#fotos-section2').html(msg);
-        console.log(msg);
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
+
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
     });
 }
 function guardaEditProduto(Produto_id) {
-    let dados = new FormData();
-    dados.append("op", 7);
-    dados.append("numprodutoEdit", $('#numprodutoEdit').val());
-    dados.append("nomeprodutoEdit", $('#nomeprodutoEdit').val());
-    dados.append("categoriaprodutoEdit", $('#categoriaprodutoEdit').val());
-    dados.append("marcaprodutoEdit", $('#marcaprodutoEdit').val());
-    dados.append("tamanhoprodutoEdit", $('#tamanhoprodutoEdit').val());
-    dados.append("precoprodutoEdit", $('#precoprodutoEdit').val());
-    dados.append("generoprodutoEdit", $('#generoprodutoEdit').val());
-    dados.append("vendedorprodutoEdit", $('#vendedorprodutoEdit').val());
-    dados.append("Produto_id", Produto_id);
+  let dados = new FormData();
+  dados.append("op", 7);
+  dados.append("Produto_id", Produto_id);
 
-    $.ajax({
-        url: "src/controller/controllerGestaoProdutos.php",
-        method: "POST",
-        data: dados,
-        dataType: "html",
-        cache: false,
-        contentType: false,
-        processData: false
-    })
-    .done(function(msg) {
-    $('#formEditInativo').modal('hide');
-        
-        let obj = JSON.parse(msg);
-        if(obj.flag) {
-            alerta("Inativo", obj.msg, "success");
-            alerta2(obj.msg,"success");
-            getInativos();
-            getMeusProdutos();
-        } else {
-            alerta2(obj.msg,"error");
-            alerta("Inativo", obj.msg, "error");
-        }
-        console.log(msg);
-    })
-    .fail(function(jqXHR, textStatus) {
-        alert("Request failed: " + textStatus);
-    });
-}
-function rejeitaEditProduto(Produto_id) {
-    let dados = new FormData();
-    dados.append("op", 9);
-
-    dados.append("Produto_id", Produto_id);
-
-    $.ajax({
-        url: "src/controller/controllerGestaoProdutos.php",
-        method: "POST",
-        data: dados,
-        dataType: "html",
-        cache: false,
-        contentType: false,
-        processData: false
-    })
-    .done(function(msg) {
-    $('#formEditInativo').modal('hide');
-        
-        let obj = JSON.parse(msg);
-        if(obj.flag) {
-            alerta("Inativo", obj.msg, "success");
-            alerta2(obj.msg,"success");
-            getInativos();
-        } else {
-            alerta2(obj.msg,"error");
-            alerta("Inativo", obj.msg, "error");
-        }
-        console.log(msg);
-    })
-    .fail(function(jqXHR, textStatus) {
-        alert("Request failed: " + textStatus);
-    });
-}
-function adicionarProdutos(){
-
-    let dados = new FormData();
-    dados.append("op", 13);
-    dados.append("listaVendedor", $('#listaVendedor').val());
-    dados.append("listaCategoria", $('#listaCategoria').val());
-    dados.append("nomeprod", $('#nomeprod').val());
-    dados.append("estadoprod", $('#estadoprod').val());
-    dados.append("quantidade", $('#quantidade').val());
-    dados.append("preco", $('#preco').val());
-    dados.append("marca", $('#marca').val());
-    dados.append("tamanho", $('#tamanho').val());
-    dados.append("selectestado", $('#estado').val());
-    dados.append("foto", $('#fotoProduto').prop('files')[0]);
-
-
-
-    $.ajax({
-        url: "src/controller/controllerGestaoProdutos.php",
-        method: "POST",
-        data: dados,
-        dataType: "html",
-        cache: false,
-        contentType: false,
-        processData: false
-    })
-    .done(function(msg) {
-        console.log("Resposta do servidor:", msg);
-            let obj = JSON.parse(msg);
-            if(obj.flag) {
-                alerta("Sucesso", obj.msg, "success");
-                alerta2(obj.msg,"success");
-                getProdutos();
-                $('#addVendaForm')[0].reset();
-            } else {
-                alerta2(obj.msg,"error");
-                alerta("Erro", obj.msg, "error");
-            }
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        console.error("Erro AJAX:", textStatus, errorThrown);
-        console.log("Resposta:", jqXHR.responseText);
-        alert("Request failed: " + textStatus);
-    });
-}
-function getDadosPerfil()
-{
-    let dados = new FormData();
-    dados.append("op", 14);
-
-    $.ajax({
+  $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
     method: "POST",
     data: dados,
     dataType: "html",
     cache: false,
     contentType: false,
-    processData: false
+    processData: false,
+  })
+    .done(function (msg) {
+      Swal.close();
+
+      let obj = JSON.parse(msg);
+      if (obj.flag) {
+        alerta("Sucesso", obj.msg, "success");
+        alerta2(obj.msg, "success");
+        getInativos();
+        getMeusProdutos();
+      } else {
+        alerta2(obj.msg, "error");
+        alerta("Erro", obj.msg, "error");
+      }
+      console.log(msg);
     })
-    
-    .done(function( msg ) {
-         $('#ProfileUser').html(msg);
-    })
-    
-    .fail(function( jqXHR, textStatus ) {
-    alert( "Request failed: " + textStatus );
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
     });
-
 }
-function alerta(titulo,msg,icon){
-    Swal.fire({
-        position: 'center',
-        icon: icon,
-        title: titulo,
-        text: msg,
-        showConfirmButton: true,
+function rejeitaEditProduto(Produto_id) {
+  let dados = new FormData();
+  dados.append("op", 9);
+  dados.append("Produto_id", Produto_id);
 
-      })
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+    .done(function (msg) {
+      Swal.close();
+
+      let obj = JSON.parse(msg);
+      if (obj.flag) {
+        alerta("Sucesso", obj.msg, "success");
+        alerta2(obj.msg, "success");
+        getInativos();
+      } else {
+        alerta2(obj.msg, "error");
+        alerta("Erro", obj.msg, "error");
+      }
+      console.log(msg);
+    })
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
+    });
 }
-function alerta2(msg,icon)
-{
-  let customClass = '';
-  if (icon === 'success') {
-    customClass = 'toast-success';
-  } else if (icon === 'error') {
-    customClass = 'toast-error';
+function adicionarProdutos() {
+  let dados = new FormData();
+  dados.append("op", 13);
+  dados.append("listaVendedor", $("#listaVendedor").val());
+  dados.append("listaCategoria", $("#listaCategoria").val());
+  dados.append("nomeprod", $("#nomeprod").val());
+  dados.append("estadoprod", $("#estadoprod").val());
+  dados.append("quantidade", $("#quantidade").val());
+  dados.append("preco", $("#preco").val());
+  dados.append("marca", $("#marca").val());
+  dados.append("tamanho", $("#tamanho").val());
+  dados.append("selectestado", $("#estado").val());
+  dados.append("foto", $("#fotoProduto").prop("files")[0]);
+
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+    .done(function (msg) {
+      console.log("Resposta do servidor:", msg);
+      let obj = JSON.parse(msg);
+      if (obj.flag) {
+        alerta("Sucesso", obj.msg, "success");
+        alerta2(obj.msg, "success");
+        getProdutos();
+        $("#addVendaForm")[0].reset();
+      } else {
+        alerta2(obj.msg, "error");
+        alerta("Erro", obj.msg, "error");
+      }
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      console.error("Erro AJAX:", textStatus, errorThrown);
+      console.log("Resposta:", jqXHR.responseText);
+      alert("Request failed: " + textStatus);
+    });
+}
+function getDadosPerfil() {
+  let dados = new FormData();
+  dados.append("op", 14);
+
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+
+    .done(function (msg) {
+      $("#ProfileUser").html(msg);
+    })
+
+    .fail(function (jqXHR, textStatus) {
+      alert("Request failed: " + textStatus);
+    });
+}
+function alerta(titulo, msg, icon) {
+  Swal.fire({
+    position: "center",
+    icon: icon,
+    title: titulo,
+    text: msg,
+    showConfirmButton: true,
+  });
+}
+function alerta2(msg, icon) {
+  let customClass = "";
+  if (icon === "success") {
+    customClass = "toast-success";
+  } else if (icon === "error") {
+    customClass = "toast-error";
   }
   const Toast = Swal.mixin({
-  toast: true,
-  position: "top-end",
-  showConfirmButton: false,
-  timer: 3000,
-  timerProgressBar: true,
-      customClass: {
-      popup: 'custom-toast'
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    customClass: {
+      popup: "custom-toast",
     },
-  didOpen: (toast) => {
-    toast.onmouseenter = Swal.stopTimer;
-    toast.onmouseleave = Swal.resumeTimer;
-  }
-});
-Toast.fire({
-  icon: icon,
-  title: msg
-});
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+  Toast.fire({
+    icon: icon,
+    title: msg,
+  });
 }
 function alerta3(Produto_id) {
-    Swal.fire({
-        title: "Tens a certeza?",
-        text: "Queres mesmo guardar as alterações?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Sim, guardar!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            guardaEditProduto(Produto_id);
-        }
-    });
+  Swal.fire({
+    title: "Tens a certeza?",
+    text: "Queres mesmo guardar as alterações?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Sim, guardar!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      guardaEditProduto(Produto_id);
+    }
+  });
 }
 
-$(function() {
-    getFotosSection();
-    getInativos();
-    getListaCategoria();
-    getListaVendedores();
-    getProdutos();
-    getMinhasVendas();
-    getDadosPerfil();
-    getTopTipoGrafico();
-    getProdutoVendidos();
+// Modal de Verificação de Produto (Aprovar/Rejeitar)
+function abrirModalVerificacao(dados) {
+  // Buscar fotos do produto
+  let fotosHTML =
+    '<div style="display: flex; align-items: center; justify-content: center; height: 400px;"><p style="color: #64748b;">Carregando fotos...</p></div>';
+
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: { op: 8, Produto_id: dados.Produto_id },
+    dataType: "html",
+    cache: false,
+  })
+    .done(function (fotosResponse) {
+      fotosHTML =
+        fotosResponse ||
+        '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #f3f4f6; border-radius: 12px;"><p style="color: #64748b;">📸 Sem fotos disponíveis</p></div>';
+      exibirModal();
+    })
+    .fail(function () {
+      fotosHTML =
+        '<div style="display: flex; align-items: center; justify-content: center; height: 400px; background: #fee; border-radius: 12px;"><p style="color: #ef4444;">Erro ao carregar fotos</p></div>';
+      exibirModal();
+    });
+
+  function exibirModal() {
+    Swal.fire({
+      html: `
+        <div style="background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%); padding: 12px 20px; margin: -20px -20px 15px -20px; border-radius: 12px 12px 0 0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+          <i class="fas fa-search" style="font-size: 18px; color: white;"></i>
+          <h2 style="margin: 0; color: white; font-size: 18px; font-weight: 700; letter-spacing: -0.5px;">Verificação de Produto</h2>
+        </div>
+
+        <!-- Grid de 4 Colunas com Informações -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 15px; margin-bottom: 15px;">
+          <!-- Linha 1 -->
+          <!-- ID do Produto -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-hashtag" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">ID</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 700;">${dados.Produto_id || "N/A"}</div>
+            </div>
+          </div>
+
+          <!-- Nome -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-tag" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Nome</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 600;">${dados.nome || "N/A"}</div>
+            </div>
+          </div>
+
+          <!-- Marca -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-copyright" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Marca</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 600;">${dados.marca || "N/A"}</div>
+            </div>
+          </div>
+
+          <!-- Stock -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-boxes" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Stock</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 700;">${dados.stock || "0"} un</div>
+            </div>
+          </div>
+
+          <!-- Linha 2 -->
+          <!-- Tamanho -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-ruler" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Tamanho</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 700;">${dados.tamanho || "N/A"}</div>
+            </div>
+          </div>
+
+          <!-- Categoria -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-list" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Categoria</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 600;">${dados.tipo_produto_id || "N/A"}</div>
+            </div>
+          </div>
+
+          <!-- Preço -->
+          <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 6px; padding: 8px; border-left: 3px solid #059669; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-euro-sign" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #065f46; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Preço</div>
+              <div style="font-size: 14px; color: #059669; font-weight: 800;">€${dados.preco || "0.00"}</div>
+            </div>
+          </div>
+
+          <!-- Vendedor -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-user" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Vendedor</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 600;">${dados.vendedor || dados.anunciante_id || "N/A"}</div>
+            </div>
+          </div>
+
+          <!-- Linha 3 -->
+          <!-- Estado -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-star" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Estado</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 600;">${dados.estado || "Como Novo"}</div>
+            </div>
+          </div>
+
+          <!-- Género -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; display: flex; align-items: center; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-venus-mars" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Género</div>
+              <div style="font-size: 12px; color: #1e293b; font-weight: 600;">${dados.genero || "N/A"}</div>
+            </div>
+          </div>
+
+          <!-- Descrição (ocupa 2 colunas) -->
+          <div style="background: #f9fafb; border-radius: 6px; padding: 8px; border-left: 3px solid #3cb371; grid-column: span 2; display: flex; gap: 8px;">
+            <div style="width: 24px; height: 24px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <i class="fas fa-align-left" style="color: #059669; font-size: 11px;"></i>
+            </div>
+            <div style="flex: 1;">
+              <div style="font-size: 8px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;">Descrição</div>
+              <div style="font-size: 11px; color: #475569; line-height: 1.4;">${dados.descricao || "Sem descrição."}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Galeria de Fotos - Full Width -->
+        <div style="padding: 0 15px;">
+          <div style="background: #f9fafb; border-radius: 12px; padding: 12px; border: 2px solid #e5e7eb;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+              <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-images" style="color: #059669; font-size: 14px;"></i>
+              </div>
+              <h3 style="margin: 0; font-size: 14px; color: #1e293b; font-weight: 700;">Galeria de Fotos</h3>
+            </div>
+            ${fotosHTML}
+          </div>
+        </div>
+      `,
+      showCancelButton: true,
+      showDenyButton: true,
+      confirmButtonText: '<i class="fas fa-check"></i> Aprovar Produto',
+      denyButtonText: '<i class="fas fa-times"></i> Rejeitar Produto',
+      cancelButtonText: '<i class="fas fa-arrow-left"></i> Cancelar',
+      width: 1200,
+      confirmButtonColor: "#3cb371",
+      denyButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      customClass: {
+        popup: "product-modal-view",
+        htmlContainer: "modal-view-wrapper",
+        confirmButton: "btn-primary",
+        denyButton: "btn-danger",
+        cancelButton: "btn-cancel",
+      },
+      didOpen: () => {
+        const confirmBtn = Swal.getConfirmButton();
+        const denyBtn = Swal.getDenyButton();
+        const cancelBtn = Swal.getCancelButton();
+
+        if (confirmBtn) {
+          confirmBtn.style.background =
+            "linear-gradient(135deg, #3cb371 0%, #2e8b57 100%)";
+          confirmBtn.style.color = "#ffffff";
+          confirmBtn.style.padding = "10px 24px";
+          confirmBtn.style.borderRadius = "8px";
+          confirmBtn.style.fontWeight = "600";
+          confirmBtn.style.border = "none";
+          confirmBtn.style.boxShadow = "0 2px 8px rgba(60, 179, 113, 0.3)";
+        }
+
+        if (denyBtn) {
+          denyBtn.style.background =
+            "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)";
+          denyBtn.style.color = "#ffffff";
+          denyBtn.style.padding = "10px 24px";
+          denyBtn.style.borderRadius = "8px";
+          denyBtn.style.fontWeight = "600";
+          denyBtn.style.border = "none";
+          denyBtn.style.boxShadow = "0 2px 8px rgba(239, 68, 68, 0.3)";
+        }
+
+        if (cancelBtn) {
+          cancelBtn.style.background =
+            "linear-gradient(135deg, #6b7280 0%, #4b5563 100%)";
+          cancelBtn.style.color = "#ffffff";
+          cancelBtn.style.padding = "10px 24px";
+          cancelBtn.style.borderRadius = "8px";
+          cancelBtn.style.fontWeight = "600";
+          cancelBtn.style.border = "none";
+          cancelBtn.style.boxShadow = "0 2px 8px rgba(107, 114, 128, 0.3)";
+        }
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        guardaEditProduto(dados.Produto_id);
+      } else if (result.isDenied) {
+        rejeitaEditProduto(dados.Produto_id);
+      }
+    });
+  }
+}
+
+$(function () {
+  getFotosSection();
+  getListaCategoria();
+  getListaVendedores();
+  getProdutos();
+  getMinhasVendas();
+  getDadosPerfil();
+  getTopTipoGrafico();
+  getProdutoVendidos();
 });

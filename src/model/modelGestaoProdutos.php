@@ -18,23 +18,23 @@ class Vendas{
             while($row = $result->fetch_assoc()) {
                 if($row['ativo'] == 1)
                 {
-                    $text = "Ativo";
-                    $text2 = 'status-approved';
+                    $text = "<i class='fas fa-check-circle'></i> ATIVO";
+                    $text2 = 'badge-ativo';
                 }
                 else if($row['ativo'] == 2)
                 {
-                    $text = "Rejeitado";
-                    $text2 = 'status-rejected';
+                    $text = "<i class='fas fa-times-circle'></i> REJEITADO";
+                    $text2 = 'badge-rejeitado';
                 }
                 else
                 {
-                    $text = "Inativo";
-                    $text2 = 'status-rejected';
+                    $text = "<i class='fas fa-clock'></i> INATIVO";
+                    $text2 = 'badge-inativo';
                 }
 
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
-                $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
+                $msg .= "<td><img src='".$row['foto']."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;'></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['genero']."</td>";
@@ -72,27 +72,27 @@ class Vendas{
                 if($row['ativo'] == 1)
                 {
                     $text = "Ativo";
-                    $text2 = 'status-approved';
+                    $text2 = 'badge-ativo';
                 }
                 else if($row['ativo'] == 2)
                 {
                     $text = "Rejeitado";
-                    $text2 = 'status-rejected';
+                    $text2 = 'badge-rejeitado';
                 }
                 else
                 {
                     $text = "Inativo";
-                    $text2 = 'status-rejected';
+                    $text2 = 'badge-inativo';
                 }
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
-                $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
+                $msg .= "<td><img src='".$row['foto']."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;'></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['genero']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosInativos(".$row['Produto_id'].")'>ℹ️ Editar</button></td>";
+                $msg .= "<td><button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto'><i class='fas fa-search'></i> Verificar</button></td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -160,29 +160,32 @@ class Vendas{
                 if($row['ativo'] == 1)
                 {
                     $text = "Ativo";
-                    $text2 = 'status-approved';
+                    $text2 = 'badge-ativo';
                 }
                 else if($row['ativo'] == 2)
                 {
                     $text = "Rejeitado";
-                    $text2 = 'status-rejected';
+                    $text2 = 'badge-rejeitado';
                 }
                 else
                 {
                     $text = "Inativo";
-                    $text2 = 'status-rejected';
+                    $text2 = 'badge-inativo';
                 }
 
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
-                $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
+                $msg .= "<td><img src='".$row['foto']."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;'></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['NomeAnunciante']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
                 $msg .= "<td>".$row['marca']."</td>";
-                $msg .= "<td><button class='btn-info' onclick='getDadosProduto(".$row['Produto_id'].")'>ℹ️ Editar</button><br><br><button class='btn-info' id='btnDesativar'onclick='getDesativacao(".$row['Produto_id'].")'>❌ Desativar</button></td>";
+                $msg .= "<td>";
+                $msg .= "<button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto' style='margin-bottom: 8px;'><i class='fas fa-search'></i> Verificar</button><br>";
+                $msg .= "<button class='btn-desativar' onclick='getDesativacao(".$row['Produto_id'].")' title='Desativar Produto'><i class='fas fa-times-circle'></i> Desativar</button>";
+                $msg .= "</td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -469,35 +472,69 @@ function uploads($foto, $nome){
         global $conn;
         $msg = "";
         $Produto_id = intval($Produto_id);
+
+        // Buscar foto principal do produto
+        $sqlMain = "SELECT foto FROM produtos WHERE Produto_id = ".$Produto_id;
+        $resultMain = $conn->query($sqlMain);
+        $fotoPrincipal = "";
+
+        if ($resultMain && $resultMain->num_rows > 0) {
+            $rowMain = $resultMain->fetch_assoc();
+            $fotoPrincipal = $rowMain['foto'];
+        }
+
+        // Buscar fotos adicionais
         $sql = "SELECT * FROM produto_fotos WHERE produto_id = ".$Produto_id;
         $result = $conn->query($sql);
-        $text = "";
-        $text2 = "";
-        $labels = [
-            "Foto Frontal",
-            "Foto Traseira",
-            "Etiqueta",
-            "Detalhes"
-            ];
 
-        if ($result->num_rows > 0) {
-            $msg .= "<h3>📸 Fotos do Produto Adicionais</h3>";
-            $msg .= "<div class='photos-grid' id='photosGrid'>";
-            $i = 0;
-            while($row = $result->fetch_assoc()) {
-                $msg .= "<div class='photo-item'>";
-                $msg .= "<img src=".$row["foto"]." alt='Foto Frontal'>";
-                $msg .= "<div class='photo-label'>".$labels[$i]."</div>";
-                $msg .= "</div>";
+        // Criar carrossel Bootstrap
+        $msg .= "<div id='productGalleryVerify' class='carousel slide' data-bs-ride='carousel' style='max-width: 100%; margin: 0 auto;'>";
+        $msg .= "<div class='carousel-inner rounded-4 shadow-sm'>";
 
-                $i++;
-            }
+        // Primeira imagem (foto principal) - sempre ativa
+        if (!empty($fotoPrincipal)) {
+            $msg .= "<div class='carousel-item active'>";
+            $msg .= "<img src='".$fotoPrincipal."' class='d-block w-100 rounded-4' style='height: 400px; object-fit: cover;' alt='Foto Principal'>";
             $msg .= "</div>";
-        } else {
-                $msg .= "<h3>📸 Não existem fotos adicionais</h3>";
         }
-        $conn->close();
 
+        // Fotos adicionais
+        if ($result && $result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $msg .= "<div class='carousel-item'>";
+                $msg .= "<img src='".$row["foto"]."' class='d-block w-100 rounded-4' style='height: 400px; object-fit: cover;' alt='Foto Adicional'>";
+                $msg .= "</div>";
+            }
+        }
+
+        // Se não houver fotos, mostrar placeholder
+        if (empty($fotoPrincipal) && (!$result || $result->num_rows == 0)) {
+            $msg .= "<div class='carousel-item active'>";
+            $msg .= "<div class='d-flex align-items-center justify-content-center' style='height: 400px; background: #f3f4f6; border-radius: 12px;'>";
+            $msg .= "<div style='text-align: center; color: #64748b;'>";
+            $msg .= "<i class='fas fa-image' style='font-size: 48px; margin-bottom: 10px;'></i>";
+            $msg .= "<p style='margin: 0;'>Sem fotos disponíveis</p>";
+            $msg .= "</div></div></div>";
+        }
+
+        $msg .= "</div>"; // Fim carousel-inner
+
+        // Controles do carrossel (apenas se houver mais de uma foto)
+        $totalFotos = ($result ? $result->num_rows : 0) + (!empty($fotoPrincipal) ? 1 : 0);
+        if ($totalFotos > 1) {
+            $msg .= "<button class='carousel-control-prev' type='button' data-bs-target='#productGalleryVerify' data-bs-slide='prev'>";
+            $msg .= "<span class='carousel-control-prev-icon' aria-hidden='true'></span>";
+            $msg .= "<span class='visually-hidden'>Anterior</span>";
+            $msg .= "</button>";
+            $msg .= "<button class='carousel-control-next' type='button' data-bs-target='#productGalleryVerify' data-bs-slide='next'>";
+            $msg .= "<span class='carousel-control-next-icon' aria-hidden='true'></span>";
+            $msg .= "<span class='visually-hidden'>Próximo</span>";
+            $msg .= "</button>";
+        }
+
+        $msg .= "</div>"; // Fim carousel
+
+        $conn->close();
         return ($msg);
     }
     function getListaCategoria(){
