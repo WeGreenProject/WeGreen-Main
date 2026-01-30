@@ -36,22 +36,32 @@ function getCardLog() {
     global $conn;
     $msg = "";
 
+    $sqlSessoes = "SELECT COUNT(*) AS TodasSessoes FROM logs_acesso, utilizadores WHERE logs_acesso.utilizador_id = utilizadores.id";
     // Total sessões
     $sqlSessoes = "SELECT COUNT(*) AS TodasSessoes FROM logs_acesso";
     $result = $conn->query($sqlSessoes);
     $row = $result->fetch_assoc();
     $todasSessoes = $row['TodasSessoes'];
 
-    // Total logins
     $sqlLogin = "SELECT COUNT(*) AS total_logins FROM logs_acesso WHERE acao = 'login'";
     $result = $conn->query($sqlLogin);
     $row = $result->fetch_assoc();
     $totalLogins = $row['total_logins'];
 
-    // Total logouts
     $sqlLogout = "SELECT COUNT(*) AS total_logouts FROM logs_acesso WHERE acao = 'logout'";
     $result = $conn->query($sqlLogout);
     $row = $result->fetch_assoc();
+    $logoutsHoje = $row['total_logouts'];
+
+    $msg .= "<div class='stat-card'>
+                <div class='stat-header'>
+                    <div>
+                        <div class='stat-label'>Logins</div>
+                        <div class='stat-value'>{$loginsHoje}</div>
+                    </div>
+                    <div class='stat-icon login'>
+                        <i class='fas fa-sign-in-alt'></i>
+                    </div>
     $totalLogouts = $row['total_logouts'];
 
     // Atividades hoje
