@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Logs do Sistema - WeGreen</title>
+    <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="src/css/admin.css">
     <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
@@ -12,14 +14,14 @@
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous">
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
 
 </head>
+
 <body>
     <div class="container">
         <aside class="sidebar">
@@ -97,46 +99,46 @@
 
                 </div>
 
-            <div class="logs-container">
-                <div class="logs-header">
-                    <h3>
-                        <i class="fas fa-list"></i>
-                        Histórico de Atividades
-                    </h3>
+                <div class="logs-container">
+                    <div class="logs-header">
+                        <h3>
+                            <i class="fas fa-list"></i>
+                            Histórico de Atividades
+                        </h3>
+                    </div>
+
+                    <div id="logsContent">
+                        <div class="chart-card">
+
+                            <table id="LogAdminTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Foto</th>
+                                        <th>Email</th>
+                                        <th>Ação</th>
+                                        <th>Hora</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="LogAdminBody">
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
                 </div>
-
-    <div id="logsContent">
-        <div class="chart-card">
-
-            <table id="LogAdminTable" class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Foto</th>
-                        <th>Email</th>
-                        <th>Ação</th>
-                        <th>Hora</th>
-                    </tr>
-                </thead>
-
-                <tbody id="LogAdminBody">
-                </tbody>
-            </table>
-
-        </div>
-    </div>
-</div>
 
         </main>
     </div>
     <script src="src/js/logAdmin.js"></script>
     <script>
-        // Carregar informações do perfil do admin
-        function getAdminPerfil() {
-          let dados = new FormData();
-          dados.append("op", 21);
+    // Carregar informações do perfil do admin
+    function getAdminPerfil() {
+        let dados = new FormData();
+        dados.append("op", 21);
 
-          $.ajax({
+        $.ajax({
             url: "src/controller/controllerDashboardAdmin.php",
             method: "POST",
             data: dados,
@@ -144,19 +146,19 @@
             cache: false,
             contentType: false,
             processData: false,
-          }).done(function (msg) {
+        }).done(function(msg) {
             $("#AdminPerfilInfo").html(msg);
-          }).fail(function (jqXHR, textStatus) {
+        }).fail(function(jqXHR, textStatus) {
             console.error("Erro ao carregar perfil: " + textStatus);
-          });
-        }
+        });
+    }
 
-        // Carregar dropdown do usuário
-        function getInfoUserDropdown() {
-          let dados = new FormData();
-          dados.append("op", 9);
+    // Carregar dropdown do usuário
+    function getInfoUserDropdown() {
+        let dados = new FormData();
+        dados.append("op", 9);
 
-          $.ajax({
+        $.ajax({
             url: "src/controller/controllerDashboardAdmin.php",
             method: "POST",
             data: dados,
@@ -164,32 +166,32 @@
             cache: false,
             contentType: false,
             processData: false,
-          }).done(function (msg) {
+        }).done(function(msg) {
             $("#userDropdown").html(msg);
-          }).fail(function (jqXHR, textStatus) {
+        }).fail(function(jqXHR, textStatus) {
             console.error("Erro ao carregar dropdown: " + textStatus);
-          });
-        }
-
-        // Toggle dropdown ao clicar no navbar-user
-        document.querySelector('.navbar-user').addEventListener('click', function(e) {
-          e.stopPropagation();
-          document.getElementById('userDropdown').classList.toggle('active');
         });
+    }
 
-        // Fecha ao clicar fora
-        document.addEventListener('click', function(e) {
-          const user = document.querySelector('.navbar-user');
-          const dropdown = document.getElementById('userDropdown');
+    // Toggle dropdown ao clicar no navbar-user
+    document.querySelector('.navbar-user').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('userDropdown').classList.toggle('active');
+    });
 
-          if (!user.contains(e.target)) {
+    // Fecha ao clicar fora
+    document.addEventListener('click', function(e) {
+        const user = document.querySelector('.navbar-user');
+        const dropdown = document.getElementById('userDropdown');
+
+        if (!user.contains(e.target)) {
             dropdown.classList.remove('active');
-          }
-        });
+        }
+    });
 
-        // Função de logout
-        function logout() {
-          Swal.fire({
+    // Função de logout
+    function logout() {
+        Swal.fire({
             html: `
               <div style="padding: 20px 0;">
                 <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
@@ -205,49 +207,49 @@
             confirmButtonColor: "#dc2626",
             cancelButtonColor: "#64748b",
             customClass: {
-              confirmButton: "swal2-confirm-modern",
-              cancelButton: "swal2-cancel-modern",
-              popup: "swal2-logout-popup",
+                confirmButton: "swal2-confirm-modern",
+                cancelButton: "swal2-cancel-modern",
+                popup: "swal2-logout-popup",
             },
             buttonsStyling: false,
             reverseButtons: true,
             didOpen: () => {
-              const popup = Swal.getPopup();
-              popup.style.borderRadius = "16px";
-              popup.style.padding = "25px";
+                const popup = Swal.getPopup();
+                popup.style.borderRadius = "16px";
+                popup.style.padding = "25px";
 
-              const confirmBtn = popup.querySelector(".swal2-confirm");
-              const cancelBtn = popup.querySelector(".swal2-cancel");
+                const confirmBtn = popup.querySelector(".swal2-confirm");
+                const cancelBtn = popup.querySelector(".swal2-cancel");
 
-              if (confirmBtn) {
-                confirmBtn.style.padding = "12px 28px";
-                confirmBtn.style.borderRadius = "10px";
-                confirmBtn.style.fontSize = "15px";
-                confirmBtn.style.fontWeight = "600";
-                confirmBtn.style.border = "none";
-                confirmBtn.style.cursor = "pointer";
-                confirmBtn.style.transition = "all 0.3s ease";
-                confirmBtn.style.backgroundColor = "#dc2626";
-                confirmBtn.style.color = "#ffffff";
-                confirmBtn.style.marginLeft = "10px";
-              }
+                if (confirmBtn) {
+                    confirmBtn.style.padding = "12px 28px";
+                    confirmBtn.style.borderRadius = "10px";
+                    confirmBtn.style.fontSize = "15px";
+                    confirmBtn.style.fontWeight = "600";
+                    confirmBtn.style.border = "none";
+                    confirmBtn.style.cursor = "pointer";
+                    confirmBtn.style.transition = "all 0.3s ease";
+                    confirmBtn.style.backgroundColor = "#dc2626";
+                    confirmBtn.style.color = "#ffffff";
+                    confirmBtn.style.marginLeft = "10px";
+                }
 
-              if (cancelBtn) {
-                cancelBtn.style.padding = "12px 28px";
-                cancelBtn.style.borderRadius = "10px";
-                cancelBtn.style.fontSize = "15px";
-                cancelBtn.style.fontWeight = "600";
-                cancelBtn.style.border = "2px solid #e2e8f0";
-                cancelBtn.style.cursor = "pointer";
-                cancelBtn.style.transition = "all 0.3s ease";
-                cancelBtn.style.backgroundColor = "#ffffff";
-                cancelBtn.style.color = "#64748b";
-              }
+                if (cancelBtn) {
+                    cancelBtn.style.padding = "12px 28px";
+                    cancelBtn.style.borderRadius = "10px";
+                    cancelBtn.style.fontSize = "15px";
+                    cancelBtn.style.fontWeight = "600";
+                    cancelBtn.style.border = "2px solid #e2e8f0";
+                    cancelBtn.style.cursor = "pointer";
+                    cancelBtn.style.transition = "all 0.3s ease";
+                    cancelBtn.style.backgroundColor = "#ffffff";
+                    cancelBtn.style.color = "#64748b";
+                }
             },
-          }).then((result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
-              Swal.fire({
-                html: `
+                Swal.fire({
+                    html: `
                   <div style="padding: 20px;">
                     <div class="swal2-loading-spinner" style="margin: 0 auto 20px;">
                       <div style="width: 50px; height: 50px; border: 4px solid #f3f4f6; border-top: 4px solid #3cb371; border-radius: 50%; animation: spin 1s linear infinite;"></div>
@@ -261,42 +263,43 @@
                     }
                   </style>
                 `,
-                showConfirmButton: false,
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                  const popup = Swal.getPopup();
-                  popup.style.borderRadius = "16px";
-                },
-              });
-
-              let dados = new FormData();
-              dados.append("op", 10);
-
-              $.ajax({
-                url: "src/controller/controllerDashboardAdmin.php",
-                method: "POST",
-                data: dados,
-                dataType: "html",
-                cache: false,
-                contentType: false,
-                processData: false,
-              })
-                .done(function (msg) {
-                  window.location.href = "index.html";
-                })
-                .fail(function (jqXHR, textStatus) {
-                  alert("Request failed: " + textStatus);
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        const popup = Swal.getPopup();
+                        popup.style.borderRadius = "16px";
+                    },
                 });
-            }
-          });
-        }
 
-        // Carregar ao iniciar
-        $(document).ready(function() {
-          getAdminPerfil();
-          getInfoUserDropdown();
+                let dados = new FormData();
+                dados.append("op", 10);
+
+                $.ajax({
+                        url: "src/controller/controllerDashboardAdmin.php",
+                        method: "POST",
+                        data: dados,
+                        dataType: "html",
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                    })
+                    .done(function(msg) {
+                        window.location.href = "index.html";
+                    })
+                    .fail(function(jqXHR, textStatus) {
+                        alert("Request failed: " + textStatus);
+                    });
+            }
         });
+    }
+
+    // Carregar ao iniciar
+    $(document).ready(function() {
+        getAdminPerfil();
+        getInfoUserDropdown();
+    });
     </script>
 </body>
+
 </html>

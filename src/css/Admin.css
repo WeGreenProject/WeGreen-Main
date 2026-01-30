@@ -731,3 +731,42 @@ body {
 .btn-info i {
   font-size: 12px;
 }
+/* Estilos específicos para comentários */
+.status-badge.badge-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.action-buttons .btn-action {
+    margin: 0 3px;
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 560px;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #64748b;
+}
