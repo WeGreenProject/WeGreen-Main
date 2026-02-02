@@ -4,76 +4,141 @@ require_once 'connection.php';
 
 class Lucros{
 
-    function getCards(){
+    function getCardsReceitas(){
         global $conn;
         $msg = "";
         $row = "";
-        $sql = "SELECT (SELECT SUM(valor) FROM rendimento) AS total_rendimentos,(SELECT SUM(valor) FROM gastos) AS total_gastos from rendimento,gastos LIMIT 1;";
-        
+        $sql = "SELECT (SELECT SUM(valor) FROM rendimento) AS total_rendimentos FROM rendimento LIMIT 1;";
+
         $result = $conn->query($sql);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+                    $msg .= "<div class='stat-icon stat-icon-green'><i class='fas fa-arrow-up'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>RECEITAS TOTAIS</div>";
+                    $msg .= "<div class='stat-value'>".$row["total_rendimentos"]."€</div>";
+                    $msg .= "</div>";
+                }
+            }
+            else
+            {
+                    $msg .= "<div class='stat-icon stat-icon-gray'><i class='fas fa-info-circle'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>RECEITAS TOTAIS</div>";
+                    $msg .= "<div class='stat-value'>0€</div>";
+                    $msg .= "</div>";
+            }
+        $conn->close();
+
+        return ($msg);
+
+    }
+
+    function getCardsDespesas(){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT (SELECT SUM(valor) FROM gastos) AS total_gastos FROM gastos LIMIT 1;";
+
+        $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $msg .= "<div class='stat-icon stat-icon-red'><i class='fas fa-arrow-down'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>DESPESAS TOTAIS</div>";
+                    $msg .= "<div class='stat-value'>".$row["total_gastos"]."€</div>";
+                    $msg .= "</div>";
+                }
+            }
+            else
+            {
+                    $msg .= "<div class='stat-icon stat-icon-gray'><i class='fas fa-info-circle'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>DESPESAS TOTAIS</div>";
+                    $msg .= "<div class='stat-value'>0€</div>";
+                    $msg .= "</div>";
+            }
+        $conn->close();
+
+        return ($msg);
+
+    }
+
+    function getCardsLucro(){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT (SELECT SUM(valor) FROM rendimento) AS total_rendimentos,(SELECT SUM(valor) FROM gastos) AS total_gastos FROM rendimento, gastos LIMIT 1;";
+
+        $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $lucroliq = $row["total_rendimentos"] - $row["total_gastos"];
+
+                    $msg .= "<div class='stat-icon stat-icon-blue'><i class='fas fa-coins'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>LUCRO LÍQUIDO</div>";
+                    $msg .= "<div class='stat-value'>".$lucroliq."€</div>";
+                    $msg .= "</div>";
+                }
+            }
+            else
+            {
+                    $msg .= "<div class='stat-icon stat-icon-gray'><i class='fas fa-info-circle'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>LUCRO LÍQUIDO</div>";
+                    $msg .= "<div class='stat-value'>0€</div>";
+                    $msg .= "</div>";
+            }
+        $conn->close();
+
+        return ($msg);
+
+    }
+
+    function getCardsMargem(){
+        global $conn;
+        $msg = "";
+        $row = "";
+        $sql = "SELECT (SELECT SUM(valor) FROM rendimento) AS total_rendimentos,(SELECT SUM(valor) FROM gastos) AS total_gastos FROM rendimento, gastos LIMIT 1;";
+
+        $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
                     $lucroliq = $row["total_rendimentos"] - $row["total_gastos"];
                     if ($row["total_rendimentos"] > 0) {
                         $margem = ($lucroliq / $row["total_rendimentos"]) * 100;
                         $margemFormatada = number_format($margem, 0);
                     } else {
                         $margem = 0;
+                        $margemFormatada = "0";
                     }
-                     
-                    $msg .= "<div class='summary-card receitas'>";
-                    $msg .= "    <div class='summary-icon'>";
-                    $msg .= "        <i class='fas fa-arrow-up'></i>";
-                    $msg .= "    </div>";
-                    $msg .= "    <div class='summary-label'>Receitas Totais</div>";
-                    $msg .= "    <div class='summary-value'>".$row["total_rendimentos"]."€</div>";
-                    $msg .= "</div>";
 
-                    $msg .= "<div class='summary-card despesas'>";
-                    $msg .= "    <div class='summary-icon'>";
-                    $msg .= "        <i class='fas fa-arrow-down'></i>";
-                    $msg .= "    </div>";
-                    $msg .= "    <div class='summary-label'>Despesas Totais</div>";
-                    $msg .= "    <div class='summary-value'>".$row["total_gastos"]."€</div>";
+                    $msg .= "<div class='stat-icon stat-icon-orange'><i class='fas fa-percentage'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>MARGEM DE LUCRO</div>";
+                    $msg .= "<div class='stat-value'>".$margemFormatada."%</div>";
                     $msg .= "</div>";
-
-                    $msg .= "<div class='summary-card lucro'>";
-                    $msg .= "    <div class='summary-icon'>";
-                    $msg .= "        <i class='fas fa-coins'></i>";
-                    $msg .= "    </div>";
-                    $msg .= "    <div class='summary-label'>Lucro Líquido</div>";
-                    $msg .= "    <div class='summary-value'>".$lucroliq."€</div>";
-                    $msg .= "</div>";
-
-                    $msg .= "<div class='summary-card margem'>";
-                    $msg .= "    <div class='summary-icon'>";
-                    $msg .= "        <i class='fas fa-percentage'></i>";
-                    $msg .= "    </div>";
-                    $msg .= "    <div class='summary-label'>Margem de Lucro</div>";
-                    $msg .= "    <div class='summary-value'>".$margemFormatada."%</div>";
-                    $msg .= "</div>";
-
                 }
             }
             else
             {
-                    $msg .= "<div class='profile-avatar'>";
-                    $msg .= "<img src='src/img/default_user.png' alt='Erro a encontrar foto' id='userPhoto'>";
-                    $msg .= "<span class='avatar-placeholder'>👤</span>";
-                    $msg .= "</div>";
-
-                    $msg .= "<div class='profile-details'>";
-                    $msg .= "<div class='profile-name'>Erro a encontrar nome</div>";
-                    $msg .= "<div class='profile-role'>Administrador</div>";
+                    $msg .= "<div class='stat-icon stat-icon-gray'><i class='fas fa-info-circle'></i></div>";
+                    $msg .= "<div class='stat-content'>";
+                    $msg .= "<div class='stat-label'>MARGEM DE LUCRO</div>";
+                    $msg .= "<div class='stat-value'>0%</div>";
                     $msg .= "</div>";
             }
         $conn->close();
-        
+
         return ($msg);
 
     }
+
 function getGastos(){
     global $conn;
     $msg = "";
@@ -84,16 +149,15 @@ function getGastos(){
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
             $msg .= "<tr>";
+            $msg .= "<td><input type='checkbox' class='row-checkbox' data-id='".$row['id']."'></td>";
             $msg .= "<td>".$row['id']."</td>";
-            $msg .= "<td>".$row['descricao']."</td>";        
-            $msg .= "<td>".$row['valor']."€</td>";          
-            $msg .= "<td>".$row['data_registo']."</td>";     
-            $msg .= "<td><button class='btn-action btn-edit' onclick='getDadosGastos(".$row['id'].")'><i class='fa fa-pencil'></i> Editar</button></td>";
-            $msg .= "<td><button class='btn-action btn-remove' onclick='removerGastos(".$row['id'].")'><i class='fa fa-trash'></i> Remover</button></td>";
+            $msg .= "<td>".$row['descricao']."</td>";
+            $msg .= "<td>".$row['valor']."€</td>";
+            $msg .= "<td>".$row['data_registo']."</td>";
             $msg .= "</tr>";
         }
     } else {
-        $msg .= "<tr><td colspan='6' style='text-align:center;'>Sem Registos</td></tr>";
+        $msg .= "<tr><td colspan='5' style='text-align:center;'>Sem Registos</td></tr>";
     }
     $conn->close();
 
@@ -117,7 +181,7 @@ function removerGastos($ID_Gasto){
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);
@@ -140,7 +204,7 @@ function removerGastos($ID_Gasto){
             "flag" => $flag,
             "msg" => $msg
         ));
-          
+
         $conn->close();
 
         return($resp);
@@ -204,21 +268,67 @@ function getRendimentos(){
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
             $msg .= "<tr>";
+            $msg .= "<td><input type='checkbox' class='row-checkbox' data-id='".$row['id']."'></td>";
             $msg .= "<td>".$row['id']."</td>";
-            $msg .= "<td>".$row['descricao']."</td>";      
-            $msg .= "<td>".$row['valor']."€</td>";        
-            $msg .= "<td>".$row['data_registo']."</td>";    
-            $msg .= "<td><button class='btn-action btn-edit' onclick='getDadosRendimento(".$row['id'].")'><i class='fa fa-pencil'></i> Editar</button></td>";
-            $msg .= "<td><button class='btn-action btn-remove' onclick='removerRendimentos(".$row['id'].")'><i class='fa fa-trash'></i> Remover</button></td>";
+            $msg .= "<td>".$row['descricao']."</td>";
+            $msg .= "<td>".$row['valor']."€</td>";
+            $msg .= "<td>".$row['data_registo']."</td>";
             $msg .= "</tr>";
         }
     } else {
-        $msg .= "<tr><td colspan='6' style='text-align:center;'>Sem Registos</td></tr>";
+        $msg .= "<tr><td colspan='5' style='text-align:center;'>Sem Registos</td></tr>";
     }
     $conn->close();
 
     return ($msg);
 }
+
+public function editarGasto($id, $descricao, $valor, $data) {
+    global $conn;
+
+    $stmt = $conn->prepare("UPDATE gastos SET descricao=?, valor=?, data_registo=? WHERE id=?");
+    $stmt->bind_param("sdsi", $descricao, $valor, $data, $id);
+
+    if($stmt->execute()) {
+        $msg = "Gasto atualizado com sucesso!";
+        $flag = true;
+    } else {
+        $msg = "Erro ao atualizar gasto: " . $stmt->error;
+        $flag = false;
+    }
+
+    $resp = json_encode([
+        "flag" => $flag,
+        "msg" => $msg
+    ]);
+
+    $stmt->close();
+    return $resp;
+}
+
+public function editarRendimento($id, $descricao, $valor, $data) {
+    global $conn;
+
+    $stmt = $conn->prepare("UPDATE rendimento SET descricao=?, valor=?, data_registo=? WHERE id=?");
+    $stmt->bind_param("sdsi", $descricao, $valor, $data, $id);
+
+    if($stmt->execute()) {
+        $msg = "Rendimento atualizado com sucesso!";
+        $flag = true;
+    } else {
+        $msg = "Erro ao atualizar rendimento: " . $stmt->error;
+        $flag = false;
+    }
+
+    $resp = json_encode([
+        "flag" => $flag,
+        "msg" => $msg
+    ]);
+
+    $stmt->close();
+    return $resp;
+}
+
     function GraficoReceita() {
     global $conn;
     $dados1 = [];
@@ -290,7 +400,7 @@ ORDER BY ano DESC, mes DESC;";
 function getTransicoes(){
         global $conn;
         $msg = "";
-        $sql = "SELECT 
+        $sql = "SELECT
     'Rendimento' AS tipo_transacao,
     r.id,
     u.nome AS anunciante,
@@ -302,7 +412,7 @@ JOIN Utilizadores u ON r.anunciante_id = u.id
 
 UNION ALL
 
-SELECT 
+SELECT
     'Gasto' AS tipo_transacao,
     g.id,
     u.nome AS anunciante,
@@ -369,6 +479,72 @@ ORDER BY data DESC;";
         $conn->close();
 
         return ($msg);
+    }
+
+    function removerGastosEmMassa($ids){
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $removidos = 0;
+
+        foreach($ids as $id) {
+            $sql = "DELETE FROM gastos WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id);
+
+            if ($stmt->execute()) {
+                $removidos++;
+            } else {
+                $flag = false;
+            }
+            $stmt->close();
+        }
+
+        if ($flag) {
+            $msg = $removidos . " gasto(s) removido(s) com sucesso";
+        } else {
+            $msg = "Erro ao remover alguns gastos";
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+
+        return($resp);
+    }
+
+    function removerRendimentosEmMassa($ids){
+        global $conn;
+        $msg = "";
+        $flag = true;
+        $removidos = 0;
+
+        foreach($ids as $id) {
+            $sql = "DELETE FROM rendimento WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id);
+
+            if ($stmt->execute()) {
+                $removidos++;
+            } else {
+                $flag = false;
+            }
+            $stmt->close();
+        }
+
+        if ($flag) {
+            $msg = $removidos . " rendimento(s) removido(s) com sucesso";
+        } else {
+            $msg = "Erro ao remover alguns rendimentos";
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ));
+
+        return($resp);
     }
 
 }

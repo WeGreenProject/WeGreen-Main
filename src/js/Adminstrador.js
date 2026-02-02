@@ -251,7 +251,12 @@ function getVendasGrafico() {
     dataType: "json",
     success: function (response) {
       console.log("Resposta AJAX:", response);
-      const ctx3 = document.getElementById("salesChart").getContext("2d");
+      const salesChartElement = document.getElementById("salesChart");
+      if (!salesChartElement) {
+        console.log("Elemento salesChart não encontrado na página");
+        return;
+      }
+      const ctx3 = salesChartElement.getContext("2d");
 
       // Gradientes para as áreas preenchidas
       const gradientRendimentos = ctx3.createLinearGradient(0, 0, 0, 400);
@@ -426,7 +431,13 @@ function getTopTipoGrafico() {
     success: function (response) {
       console.log("Resposta AJAX:", response);
 
-      const ctx3 = document.getElementById("topProductsChart").getContext("2d");
+      const topProductsChartElement =
+        document.getElementById("topProductsChart");
+      if (!topProductsChartElement) {
+        console.log("Elemento topProductsChart não encontrado na página");
+        return;
+      }
+      const ctx3 = topProductsChartElement.getContext("2d");
 
       new Chart(ctx3, {
         type: "doughnut",

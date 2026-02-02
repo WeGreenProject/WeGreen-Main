@@ -20,33 +20,33 @@ class Comentarios{
         $result = $conn->query($sqlDenuncias);
         $row = $result->fetch_assoc();
 
-        $msg  = "<div class='stat-card stat-primary'>";
+        $msg  = "<div class='stat-card-compact'>";
+        $msg .= "  <div class='stat-icon' style='background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);'>";
+        $msg .= "      <i class='fas fa-comments'></i>";
+        $msg .= "  </div>";
         $msg .= "  <div class='stat-content'>";
-        $msg .= "      <div class='stat-icon'><i class='fas fa-comments'></i></div>";
-        $msg .= "      <div class='stat-info'>";
-        $msg .= "          <div class='stat-label'>Total Comentários</div>";
-        $msg .= "          <div class='stat-value' id='totalComentarios'>".$rowComents["TotalComents"]."</div>";
-        $msg .= "      </div>";
+        $msg .= "      <div class='stat-label'>TOTAL COMENTÁRIOS</div>";
+        $msg .= "      <div class='stat-value'>".$rowComents["TotalComents"]."</div>";
         $msg .= "  </div>";
         $msg .= "</div>";
 
-        $msg .= "<div class='stat-card stat-success'>";
+        $msg .= "<div class='stat-card-compact'>";
+        $msg .= "  <div class='stat-icon' style='background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);'>";
+        $msg .= "      <i class='fas fa-check-circle'></i>";
+        $msg .= "  </div>";
         $msg .= "  <div class='stat-content'>";
-        $msg .= "      <div class='stat-icon'><i class='fas fa-check-circle'></i></div>";
-        $msg .= "      <div class='stat-info'>";
-        $msg .= "          <div class='stat-label'>Produtos</div>";
-        $msg .= "          <div class='stat-value' id='comentariosAprovados'>".$rowProdutos["NProdutos"]."</div>";
-        $msg .= "      </div>";
+        $msg .= "      <div class='stat-label'>PRODUTOS</div>";
+        $msg .= "      <div class='stat-value'>".$rowProdutos["NProdutos"]."</div>";
         $msg .= "  </div>";
         $msg .= "</div>";
 
-        $msg .= "<div class='stat-card stat-danger'>";
+        $msg .= "<div class='stat-card-compact'>";
+        $msg .= "  <div class='stat-icon' style='background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);'>";
+        $msg .= "      <i class='fas fa-flag'></i>";
+        $msg .= "  </div>";
         $msg .= "  <div class='stat-content'>";
-        $msg .= "      <div class='stat-icon'><i class='fas fa-flag'></i></div>";
-        $msg .= "      <div class='stat-info'>";
-        $msg .= "          <div class='stat-label'>Reports Ativos</div>";
-        $msg .= "          <div class='stat-value' id='reportsAtivos'>".$row["denuncias"]."</div>";
-        $msg .= "      </div>";
+        $msg .= "      <div class='stat-label'>REPORTS ATIVOS</div>";
+        $msg .= "      <div class='stat-value'>".$row["denuncias"]."</div>";
         $msg .= "  </div>";
         $msg .= "</div>";
 
@@ -55,34 +55,19 @@ class Comentarios{
     }
     function getButaoNav(){
         global $conn;
-        $msg = "";
         $sqlProdutos = "SELECT COUNT(DISTINCT produto_id) AS TotalProdutosComComentarios FROM avaliacoes_produtos;";
         $result = $conn->query($sqlProdutos);
         $rowProdutos = $result->fetch_assoc();
-
-        $sqlDenuncias = "SELECT COUNT(*) AS Total FROM denuncias;";
-        $result = $conn->query($sqlDenuncias);
-        $rowDenuncias = $result->fetch_assoc();
-        
-        $msg .= "    <i class='fas fa-comments'></i>";
-        $msg .= "    <span>Comentários</span>";
-        $msg .= "    <span class='tab-badge' id='badgeComentarios'>".$rowProdutos["TotalProdutosComComentarios"]."</span>";        $msg .= "</button>";
-
-        return ($msg);
+        $conn->close();
+        return $rowProdutos["TotalProdutosComComentarios"];
     }
     function getButaoReports(){
         global $conn;
-        $msg = "";
-
         $sqlDenuncias = "SELECT COUNT(*) AS Total FROM denuncias;";
         $result = $conn->query($sqlDenuncias);
         $rowDenuncias = $result->fetch_assoc();
-        
-        $msg .= "    <i class='fas fa-flag'></i>";
-        $msg .= "    <span>Reports</span>";
-        $msg .= "    <span class='tab-badge alert' id='badgeReports'>".$rowDenuncias["Total"]."</span>";
-
-        return ($msg);
+        $conn->close();
+        return $rowDenuncias["Total"];
     }
     function getProdutos(){
             global $conn;
@@ -102,7 +87,7 @@ class Comentarios{
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td>".$row['avaliacao']."</td>";
                 $msg .= "<td>".$row['ProdData']."</td>";
-                $msg .= "<td><button class='btn-info' onclick='getComentariosModal(".$row['IDProduto'].")'><i class='fas fa-edit'></i> Ver</button></td>";
+                $msg .= "<td><button class='btn-icon' onclick='getComentariosModal(".$row['IDProduto'].")'><i class='fas fa-eye'></i> Ver</button></td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -138,6 +123,48 @@ class Comentarios{
         return (json_encode($row));
 
     }
+
+    function getComentariosProduto($idProduto){
+        global $conn;
+        $msg = "";
+
+        $sql = "SELECT ap.*, u.nome AS nome_utilizador, u.email, p.nome AS nome_produto
+                FROM avaliacoes_produtos ap
+                LEFT JOIN utilizadores u ON ap.utilizador_id = u.id
+                LEFT JOIN produtos p ON ap.produto_id = p.produto_id
+                WHERE ap.produto_id = ".$idProduto."
+                ORDER BY ap.id DESC";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            $msg .= "<div class='comentarios-list'>";
+            while($row = $result->fetch_assoc()) {
+                $msg .= "<div class='comentario-item'>";
+                $msg .= "<div class='comentario-header'>";
+                $msg .= "<strong>".$row['nome_utilizador']."</strong>";
+                $msg .= "</div>";
+                $msg .= "<div class='comentario-rating'>";
+                for($i = 1; $i <= 5; $i++) {
+                    if($i <= $row['avaliacao']) {
+                        $msg .= "<i class='fas fa-star' style='color: #ffc107;'></i>";
+                    } else {
+                        $msg .= "<i class='far fa-star' style='color: #ddd;'></i>";
+                    }
+                }
+                $msg .= " <span>(".$row['avaliacao']."/5)</span>";
+                $msg .= "</div>";
+                $msg .= "<div class='comentario-texto'>".$row['comentario']."</div>";
+                $msg .= "</div>";
+            }
+            $msg .= "</div>";
+        } else {
+            $msg .= "<p>Nenhum comentário encontrado para este produto.</p>";
+        }
+
+        $conn->close();
+        return $msg;
+    }
+
     function getReports(){
             global $conn;
         $msg = "";
@@ -160,7 +187,7 @@ class Comentarios{
                 {
                     $msg .= "<td>Não existe imagem!</td>";
                 }
-                    
+
                 $msg .= "<td>".$row['nome_denunciante']."</td>";
                 $msg .= "<td>".$row['descricao']."</td>";
                 $msg .= "<td>".$row['nome_denunciado']."</td>";

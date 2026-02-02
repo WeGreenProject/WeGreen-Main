@@ -16,6 +16,11 @@ if ($_POST['op'] == 3) {
     $resp = $func->getButaoNav();
     echo $resp;
 }
+if ($_POST['op'] == 4) {
+    $idProduto = $_POST['idProduto'];
+    $resp = $func->getComentariosProduto($idProduto);
+    echo $resp;
+}
 if ($_POST['op'] == 5) {
     $resp = $func->getButaoReports();
     echo $resp;
