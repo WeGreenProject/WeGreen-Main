@@ -422,6 +422,10 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             <i class="fas fa-users"></i>
             <span>Utilizadores</span>
           </a>
+          <a href="gestaoComentarios.php" class="menu-item">
+            <i class="fas fa-comment-dots"></i>
+            <span>Comentários</span>
+          </a>
           <a href="gestaoLucros.php" class="menu-item">
             <i class="fas fa-euro-sign"></i>
             <span>Lucros</span>

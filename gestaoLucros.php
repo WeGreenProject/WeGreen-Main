@@ -12,7 +12,11 @@ if($_SESSION['tipo'] == 1){
     <title>Gestão de Lucros - WeGreen</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="src/css/admin.css">
+    <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/gestaoProdutos.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/gestaoComentariosAdmin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
@@ -22,902 +26,281 @@ if($_SESSION['tipo'] == 1){
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    <script src="src/js/notifications.js"></script>
     <style>
-    .lucros-filters {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 15px;
-        padding: 25px;
-        margin-bottom: 30px;
-        display: flex;
-        gap: 20px;
-        flex-wrap: wrap;
-        align-items: end;
-    }
-
-    .filter-group {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .filter-group label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #4a5568;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .filter-group select,
-    .filter-group input {
-        width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 14px;
-        color: #1a202c;
-        transition: all 0.3s;
-    }
-
-    .filter-group select:focus,
-    .filter-group input:focus {
-        outline: none;
-        border-color: #A6D90C;
-        box-shadow: 0 0 0 3px rgba(166, 217, 12, 0.1);
-    }
-
-    .btn-filter {
-        padding: 12px 30px;
-        background: linear-gradient(90deg, #A6D90C 0%, #90c207 100%);
-        color: #1a202c;
-        border: none;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-filter:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(166, 217, 12, 0.4);
-    }
-
-    .lucros-summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 25px;
-        margin-bottom: 40px;
-    }
-
-    /* Substituir o CSS dos summary-card existente por este */
-
-    .lucros-summary {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 25px;
-        margin-bottom: 40px;
-    }
-
-    .summary-card {
-        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-        border: 1px solid #4a5568;
-        border-radius: 20px;
-        padding: 35px;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        min-height: 180px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .summary-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 35px rgba(166, 217, 12, 0.2);
-    }
-
-    .summary-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 150px;
-        height: 150px;
-        background: radial-gradient(circle, rgba(166, 217, 12, 0.12) 0%, transparent 70%);
-    }
-
-    /* Bordas específicas por tipo */
-    .summary-card.receitas {
-        border-left: 4px solid #48bb78;
-    }
-
-    .summary-card.receitas:hover {
-        border-left-color: #38a169;
-    }
-
-    .summary-card.despesas {
-        border-left: 4px solid #f56565;
-    }
-
-    .summary-card.despesas:hover {
-        border-left-color: #e53e3e;
-    }
-
-    .summary-card.lucro {
-        border-left: 4px solid #A6D90C;
-    }
-
-    .summary-card.lucro:hover {
-        border-left-color: #8fb80a;
-    }
-
-    .summary-card.margem {
-        border-left: 4px solid #4299e1;
-    }
-
-    .summary-card.margem:hover {
-        border-left-color: #3182ce;
-    }
-
-    .summary-icon {
-        font-size: 48px;
-        margin-bottom: 18px;
-        width: auto;
-        height: auto;
-        border-radius: 0;
-        display: block;
-        box-shadow: none;
-        background: none;
-    }
-
-    /* Ícones coloridos por tipo */
-    .summary-card.receitas .summary-icon {
-        filter: drop-shadow(0 4px 8px rgba(72, 187, 120, 0.4));
-        color: #48bb78;
-    }
-
-    .summary-card.despesas .summary-icon {
-        filter: drop-shadow(0 4px 8px rgba(245, 101, 101, 0.4));
-        color: #f56565;
-    }
-
-    .summary-card.lucro .summary-icon {
-        filter: drop-shadow(0 4px 8px rgba(166, 217, 12, 0.4));
-        color: #A6D90C;
-    }
-
-    .summary-card.margem .summary-icon {
-        filter: drop-shadow(0 4px 8px rgba(66, 153, 225, 0.4));
-        color: #4299e1;
-    }
-
-    .summary-label {
-        color: #cbd5e0;
-        font-size: 12px;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        font-weight: 600;
-    }
-
-    .summary-value {
-        font-size: 48px;
-        font-weight: 800;
-        line-height: 1;
-        margin-bottom: 12px;
-    }
-
-    /* Valores coloridos por tipo */
-    .summary-card.receitas .summary-value {
-        color: #48bb78;
-        text-shadow: 0 2px 6px rgba(72, 187, 120, 0.25);
-    }
-
-    .summary-card.despesas .summary-value {
-        color: #f56565;
-        text-shadow: 0 2px 6px rgba(245, 101, 101, 0.25);
-    }
-
-    .summary-card.lucro .summary-value {
-        color: #A6D90C;
-        text-shadow: 0 2px 6px rgba(166, 217, 12, 0.25);
-    }
-
-    .summary-card.margem .summary-value {
-        color: #4299e1;
-        text-shadow: 0 2px 6px rgba(66, 153, 225, 0.25);
-    }
-
-    .summary-change {
-        font-size: 14px;
-        margin-top: 0;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 0;
-        border-radius: 0;
-        background: none;
-    }
-
-    .summary-change.positive {
-        color: #4ade80;
-        background: none;
-    }
-
-    .summary-change.negative {
-        color: #f87171;
-        background: none;
-    }
-
-    .lucros-tables {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 25px;
-    }
-
-    .lucros-table-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 15px;
-        padding: 25px;
-        transition: all 0.3s ease;
-    }
-
-    .lucros-table-card:hover {
-        border-color: #A6D90C;
-    }
-
-    .table-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .table-header h3 {
-        font-size: 18px;
-        color: #1a202c;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .table-header h3 i {
-        color: #A6D90C;
-    }
-
-    /* Adicionar este CSS ao arquivo - Seção de Formulários */
-
-    .forms-lucros {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 25px;
-        margin-bottom: 30px;
-    }
-
-    @media (max-width: 1024px) {
-        .forms-lucros {
-            grid-template-columns: 1fr;
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
-    }
 
-    .form-section {
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-    }
+        .modal.hidden {
+            display: none !important;
+        }
 
-    /* Card de Formulário */
-    .form-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 15px;
-        padding: 25px;
-        transition: all 0.3s ease;
-        min-height: 280px;
-    }
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 560px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
 
-    .form-card:hover {
-        border-color: #A6D90C;
-        box-shadow: 0 4px 12px rgba(166, 217, 12, 0.1);
-    }
+        .modal-header-success {
+            background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    .form-header {
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e2e8f0;
-    }
+        .modal-header-success h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    .form-header h3 {
-        font-size: 18px;
-        color: #1a202c;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 5px;
-    }
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .form-header h3 i {
-        color: #A6D90C;
-        font-size: 20px;
-    }
+        .modal-close:hover {
+            opacity: 0.8;
+        }
 
-    .form-header p {
-        color: #718096;
-        font-size: 13px;
-        margin: 0;
-    }
+        .modal-body {
+            padding: 24px;
+        }
 
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-group.full-width {
-        grid-column: 1 / -1;
-    }
-
-    .form-group label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #4a5568;
-        margin-bottom: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 14px;
-        color: #1a202c;
-        transition: all 0.3s;
-        background: #ffffff;
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: #A6D90C;
-        box-shadow: 0 0 0 3px rgba(166, 217, 12, 0.1);
-    }
-
-    .form-input::placeholder {
-        color: #a0aec0;
-    }
-
-    .btn-submit {
-        width: 100%;
-        padding: 14px 25px;
-        border: none;
-        border-radius: 10px;
-        font-size: 15px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 10px;
-    }
-
-    .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .btn-success {
-        background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
-        color: #ffffff;
-    }
-
-    .btn-success:hover {
-        box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-    }
-
-    .btn-danger {
-        background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
-        color: #ffffff;
-    }
-
-    .btn-danger:hover {
-        box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
-    }
-
-    /* Card de Tabela */
-    .table-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 15px;
-        padding: 25px;
-        transition: all 0.3s ease;
-        min-height: 450px;
-    }
-
-    .table-card:hover {
-        border-color: #A6D90C;
-    }
-
-    .table-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .table-card-header h3 {
-        font-size: 18px;
-        color: #1a202c;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 0;
-    }
-
-    .table-card-header h3 i {
-        color: #A6D90C;
-    }
-
-    .btn-export-sm {
-        padding: 8px 16px;
-        background: #2d3748;
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .btn-export-sm:hover {
-        background: #1a202c;
-        transform: translateY(-2px);
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .data-table thead {
-        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-    }
-
-    .data-table th {
-        padding: 12px 15px;
-        text-align: left;
-        font-weight: 600;
-        color: #2d3748;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #e2e8f0;
-        white-space: nowrap;
-    }
-
-    .data-table td {
-        padding: 12px 15px;
-        border-bottom: 1px solid #e2e8f0;
-        color: #1a202c;
-        font-size: 14px;
-    }
-
-    .data-table tbody tr {
-        transition: all 0.2s;
-    }
-
-    .data-table tbody tr:hover {
-        background: #f7fafc;
-    }
-
-    /* Botões de ação na tabela */
-    .btn-action {
-        padding: 6px 12px;
-        border: none;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .btn-edit {
-        background: #bee3f8;
-        color: #1e4e8c;
-    }
-
-    .btn-edit:hover {
-        background: #90cdf4;
-    }
-
-    .btn-remove {
-        background: #fed7d7;
-        color: #742a2a;
-    }
-
-    .btn-remove:hover {
-        background: #fc8181;
-        color: #ffffff;
-    }
-
-    /* Responsividade */
-    @media (max-width: 768px) {
         .form-grid {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
-        .table-card {
-            min-height: auto;
+        .form-group {
+            display: flex;
+            flex-direction: column;
         }
 
-        .data-table {
-            font-size: 12px;
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
-        .data-table th,
-        .data-table td {
-            padding: 8px 10px;
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1f2937;
+            font-size: 14px;
         }
-    }
 
-    .btn-export {
-        padding: 10px 20px;
-        background: #2d3748;
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-export:hover {
-        background: #1a202c;
-        transform: translateY(-2px);
-    }
-
-    .lucros-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .lucros-table thead {
-        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
-    }
-
-    .lucros-table th {
-        padding: 15px;
-        text-align: left;
-        font-weight: 600;
-        color: #2d3748;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .lucros-table td {
-        padding: 15px;
-        border-bottom: 1px solid #e2e8f0;
-        color: #1a202c;
-        font-size: 14px;
-    }
-
-    .lucros-table tbody tr {
-        transition: all 0.2s;
-    }
-
-    .lucros-table tbody tr:hover {
-        background: #f7fafc;
-    }
-
-    .valor-positivo {
-        color: #48bb78;
-        font-weight: 600;
-    }
-
-    .valor-negativo {
-        color: #f56565;
-        font-weight: 600;
-    }
-
-    .valor-neutro {
-        color: #A6D90C;
-        font-weight: 600;
-    }
-
-    .badge {
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .badge-success {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .badge-warning {
-        background: #feebc8;
-        color: #7c2d12;
-    }
-
-    .badge-danger {
-        background: #fed7d7;
-        color: #742a2a;
-    }
-
-    .badge-info {
-        background: #bee3f8;
-        color: #1e4e8c;
-    }
-
-    /* Gráficos */
-    .charts-lucros {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 25px;
-        margin-bottom: 30px;
-    }
-
-    @media (max-width: 1024px) {
-        .charts-lucros {
-            grid-template-columns: 1fr;
+        .form-input {
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            resize: vertical;
         }
-    }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3cb371;
+            box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.1);
+        }
+
+        .btn-submit {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(60, 179, 113, 0.4);
+        }
+
+        .btn-add-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        .btn-add-primary:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="dashboard-container">
         <aside class="sidebar">
-            <a href="index.html" class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <i class="fas fa-leaf"></i>
                 <div class="logo-text">
-                    <h1>WeGreen</h1>
-                    <p>Painel do Administrador</p>
+                    <h2>WeGreen</h2>
+                    <p>Moda Sustentável</p>
                 </div>
             </a>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="DashboardAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php">
-                            <span class="nav-icon"><i class="fas fa-shopping-bag"></i></span>
-                            <span class="nav-text">Gestao de Utilizadores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="gestaoLucros.php">
-                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                            <span class="nav-text">Gestão de Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php">
-                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                            <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-history"></i></span>
-                            <span class="nav-text">Logs do Sistema</span>
-                        </a>
-                    </li>
-                </ul>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu</div>
+                    <a href="DashboardAdmin.php" class="menu-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="gestaoProdutosAdmin.php" class="menu-item">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Produtos</span>
+                    </a>
+                    <a href="gestaoCliente.php" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        <span>Utilizadores</span>
+                    </a>
+                    <a href="gestaoComentarios.php" class="menu-item">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>Comentários</span>
+                    </a>
+                    <a href="gestaoLucros.php" class="menu-item active">
+                        <i class="fas fa-euro-sign"></i>
+                        <span>Lucros</span>
+                    </a>
+                    <a href="logAdmin.php" class="menu-item">
+                        <i class="fas fa-history"></i>
+                        <span>Logs do Sistema</span>
+                    </a>
+                    <a href="Chatadmin.php" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
+                    </a>
+                </div>
             </nav>
         </aside>
 
         <main class="main-content">
             <nav class="top-navbar">
                 <div class="navbar-left">
-                    <i class="navbar-icon fas fa-euro-sign"></i>
-                    <h2 class="navbar-title">Gestão de Lucros</h2>
+                    <h1 class="page-title"><i class="fas fa-euro-sign"></i> Gestão de Lucros</h1>
                 </div>
                 <div class="navbar-right">
                     <?php include 'src/views/notifications-widget.php'; ?>
-                    <div class="navbar-user">
-                        <div id="AdminPerfilInfo" style="display:flex;"></div>
-                        <i class="fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>
-                        <div class="user-dropdown" id="userDropdown"></div>
+                    <div class="navbar-user" id="userMenuBtn">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff" alt="Administrador" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff" alt="Administrador" class="dropdown-avatar">
+                            <div>
+                                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></div>
+                                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'admin@wegreen.com'; ?></div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="perfilAdmin.php">
+                            <i class="fas fa-user"></i>
+                            <span>Meu Perfil</span>
+                        </a>
+                        <a class="dropdown-item" href="alterarSenha.php">
+                            <i class="fas fa-key"></i>
+                            <span>Alterar Senha</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sair</span>
+                        </button>
                     </div>
                 </div>
             </nav>
 
-            <div class="page active">
-                <div class="page-header">
-                    <h2>Gestão de Lucros</h2>
-                    <p>Análise detalhada de receitas, despesas e margem de lucro</p>
+            <div class="content-area">
+                <div class="stats-grid-compact">
+                    <div id="ReceitasCard" class="stat-card-compact"></div>
+                    <div id="DespesasCard" class="stat-card-compact"></div>
+                    <div id="LucroCard" class="stat-card-compact"></div>
+                    <div id="MargemCard" class="stat-card-compact"></div>
                 </div>
 
-                <div class="lucros-summary">
-
-                </div>
-                <div class="forms-lucros">
-                    <div class="form-section">
-                        <div class="form-card">
-                            <div class="form-header">
-                                <h3><i class="fas fa-wallet"></i> Adicionar Gastos</h3>
-                                <p>Registar novos gastos e despesas</p>
-                            </div>
-                            <form class="form-grid">
-                                <div class="form-group">
-                                    <label>Descrição</label>
-                                    <input type="text" class="form-input" placeholder="Ex: Fornecedor, Material..."
-                                        id="descricaoGasto">
-                                </div>
-                                <div class="form-group">
-                                    <label>Valor (€)</label>
-                                    <input type="text" class="form-input" placeholder="0.00" id="valorGasto">
-                                </div>
-                                <div class="form-group">
-                                    <label>Data</label>
-                                    <input type="date" class="form-input" id="dataGasto">
-                                </div>
-                                <div class="form-group full-width">
-                                    <button type="button" class="btn-submit btn-danger" onclick="registaGastos()">
-                                        <i class="fas fa-plus-circle"></i>
-                                        Registar Gasto
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Tabela Gastos -->
-                        <div class="table-card">
-                            <div class="table-card-header">
-                                <h3><i class="fas fa-list"></i> Lista de Gastos</h3>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="data-table" id="tblGastos">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Descrição</th>
-                                            <th>Valor</th>
-                                            <th>Data</th>
-                                            <th>Editar</th>
-                                            <th>Remover</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="listagemGastos">
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Coluna Rendimentos -->
-                    <div class="form-section">
-                        <!-- Card Adicionar Rendimentos -->
-                        <div class="form-card">
-                            <div class="form-header">
-                                <h3><i class="fas fa-hand-holding-usd"></i> Adicionar Rendimentos</h3>
-                                <p>Registar novas receitas e rendimentos</p>
-                            </div>
-                            <form class="form-grid">
-                                <div class="form-group">
-                                    <label>Descrição</label>
-                                    <input type="text" class="form-input" placeholder="Ex: Venda, Serviço..."
-                                        id="descricaoRendimento">
-                                </div>
-                                <div class="form-group">
-                                    <label>Valor (€)</label>
-                                    <input type="text" class="form-input" placeholder="0.00" id="valorRendimento">
-                                </div>
-                                <div class="form-group">
-                                    <label>Data</label>
-                                    <input type="date" class="form-input" id="dataRendimento">
-                                </div>
-                                <div class="form-group full-width">
-                                    <button type="button" class="btn-submit btn-success" onclick="registaRendimentos()">
-                                        <i class="fas fa-plus-circle"></i>
-                                        Registar Rendimento
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Tabela Rendimentos -->
-                        <div class="table-card">
-                            <div class="table-card-header">
-                                <h3><i class="fas fa-list"></i> Lista de Rendimentos</h3>
-
-                            </div>
-                            <div class="table-responsive">
-                                <table class="data-table" id="tblRendimentos">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Descrição</th>
-                                            <th>Valor</th>
-                                            <th>Data</th>
-                                            <th>Editar</th>
-                                            <th>Remover</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="listagemRendimentos">
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Tab Navigation -->
+                <div class="tab-navigation">
+                    <button class="tab-button active" data-tab="total">
+                        <i class="fas fa-receipt"></i>
+                        <span>Total</span>
+                    </button>
+                    <button class="tab-button" data-tab="gastos">
+                        <i class="fas fa-wallet"></i>
+                        <span>Gastos</span>
+                    </button>
+                    <button class="tab-button" data-tab="rendimentos">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Rendimentos</span>
+                    </button>
                 </div>
 
-                <div class="lucros-tables">
-                    <div class="lucros-table-card">
-                        <div class="table-header">
-                            <h3><i class="fas fa-receipt"></i> Transações Recentes</h3>
-                            <button class="btn-export">
-                                <i class="fas fa-download"></i>
-                                Exportar Excel
-                            </button>
-                        </div>
-                        <table class="lucros-table" id="transacoesTable">
+                <!-- Tab Content: Total -->
+                <div class="tab-content active" id="tab-total">
+                    <div class="table-container">
+                        <table class="display" id="transacoesTable">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Data</th>
-                                    <th>Tipo</th>
-                                    <th>Anunciante</th>
-                                    <th>Descrição</th>
-                                    <th>Valor</th>
+                                    <th><i class="fas fa-hashtag"></i> ID</th>
+                                    <th><i class="fas fa-calendar"></i> Data</th>
+                                    <th><i class="fas fa-tag"></i> Tipo</th>
+                                    <th><i class="fas fa-user"></i> Anunciante</th>
+                                    <th><i class="fas fa-align-left"></i> Descrição</th>
+                                    <th><i class="fas fa-euro-sign"></i> Valor</th>
                                 </tr>
                             </thead>
                             <tbody id="transacoesBody">
@@ -925,10 +308,797 @@ if($_SESSION['tipo'] == 1){
                         </table>
                     </div>
                 </div>
+
+                <!-- Tab Content: Gastos -->
+                <div class="tab-content" id="tab-gastos">
+                    <div id="bulkActionsGastos" class="bulk-actions" style="display: none; width: 100%; margin-bottom: 15px;">
+                        <span id="selectedCountGastos">0 selecionados</span>
+                        <div style="display: flex; gap: 10px; margin-left: auto;">
+                            <button onclick="editarSelecionadoGastos()" class="btn-bulk"><i class="fas fa-edit"></i> Editar</button>
+                            <button onclick="removerEmMassaGastos()" class="btn-bulk"><i class="fas fa-trash"></i> Remover</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px; display: flex; justify-content: flex-start;">
+                        <button class="btn-add-primary" onclick="openModalGasto()" style="background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3); transition: all 0.3s ease;">
+                            <i class="fas fa-plus-circle"></i>
+                            Adicionar Gasto
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="tblGastos" class="display">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllGastos"></th>
+                                    <th><i class="fas fa-hashtag"></i> ID</th>
+                                    <th><i class="fas fa-align-left"></i> Descrição</th>
+                                    <th><i class="fas fa-euro-sign"></i> Valor</th>
+                                    <th><i class="fas fa-calendar"></i> Data</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listagemGastos">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Rendimentos -->
+                <div class="tab-content" id="tab-rendimentos">
+                    <div id="bulkActionsRendimentos" class="bulk-actions" style="display: none; width: 100%; margin-bottom: 15px;">
+                        <span id="selectedCountRendimentos">0 selecionados</span>
+                        <div style="display: flex; gap: 10px; margin-left: auto;">
+                            <button onclick="editarSelecionadoRendimentos()" class="btn-bulk"><i class="fas fa-edit"></i> Editar</button>
+                            <button onclick="removerEmMassaRendimentos()" class="btn-bulk"><i class="fas fa-trash"></i> Remover</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 20px; display: flex; justify-content: flex-start;">
+                        <button class="btn-add-primary" onclick="openModalRendimento()" style="background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3); transition: all 0.3s ease;">
+                            <i class="fas fa-plus-circle"></i>
+                            Adicionar Rendimento
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table id="tblRendimentos" class="display">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllRendimentos"></th>
+                                    <th><i class="fas fa-hashtag"></i> ID</th>
+                                    <th><i class="fas fa-align-left"></i> Descrição</th>
+                                    <th><i class="fas fa-euro-sign"></i> Valor</th>
+                                    <th><i class="fas fa-calendar"></i> Data</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listagemRendimentos">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
+
+    <!-- Modal Adicionar Gasto -->
+    <div class="modal hidden" id="modalGasto">
+        <div class="modal-content">
+            <div class="modal-header-success">
+                <h2><i class="fas fa-wallet"></i> Adicionar Gasto</h2>
+                <button class="modal-close" onclick="closeModalGasto()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="form-grid">
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" class="form-input" id="dataGasto">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor (€)</label>
+                        <input type="text" class="form-input" placeholder="0.00" id="valorGasto">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Descrição</label>
+                        <textarea class="form-input" rows="3" placeholder="Ex: Fornecedor, Material..." id="descricaoGasto"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="button" class="btn-submit btn-success" onclick="registaGastos()">
+                            <i class="fas fa-plus-circle"></i>
+                            Registar Gasto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Rendimento -->
+    <div class="modal hidden" id="modalRendimento">
+        <div class="modal-content">
+            <div class="modal-header-success">
+                <h2><i class="fas fa-hand-holding-usd"></i> Adicionar Rendimento</h2>
+                <button class="modal-close" onclick="closeModalRendimento()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form class="form-grid">
+                    <div class="form-group">
+                        <label>Data</label>
+                        <input type="date" class="form-input" id="dataRendimento">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor (€)</label>
+                        <input type="text" class="form-input" placeholder="0.00" id="valorRendimento">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Descrição</label>
+                        <textarea class="form-input" rows="3" placeholder="Ex: Venda, Serviço..." id="descricaoRendimento"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <button type="button" class="btn-submit btn-success" onclick="registaRendimentos()">
+                            <i class="fas fa-plus-circle"></i>
+                            Registar Rendimento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/js/Adminstrador.js"></script>
     <script src="src/js/GestaoLucros.js"></script>
-    <?php
+    <script>
+        // Override do getInfoUserDropdown para manter o HTML correto da página
+        function getInfoUserDropdown() {
+            // Não fazer nada - o HTML já está correto na página
+            console.log('Dropdown já configurado no HTML');
+        }
+
+        // ========== Funcionalidade das Tabs ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    document.getElementById('tab-' + targetTab).classList.add('active');
+                });
+            });
+        });
+
+        // ========== Função Alerta ==========
+        function alerta(titulo, msg, icon) {
+            let iconClass = 'fa-check';
+            let gradient = 'linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%)';
+            let buttonColor = '#3cb371';
+
+            if (icon === 'error') {
+                iconClass = 'fa-times';
+                gradient = 'linear-gradient(135deg, #dc3545 0%, #c92a2a 100%)';
+                buttonColor = '#dc3545';
+            } else if (icon === 'warning') {
+                iconClass = 'fa-exclamation-triangle';
+                gradient = 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)';
+                buttonColor = '#ff9800';
+            } else if (icon === 'info') {
+                iconClass = 'fa-info-circle';
+                gradient = 'linear-gradient(135deg, #17a2b8 0%, #138496 100%)';
+                buttonColor = '#17a2b8';
+            }
+
+            Swal.fire({
+                html: `
+                    <div style="text-align: center;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: ${gradient}; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3);">
+                            <i class="fas ${iconClass}" style="font-size: 40px; color: white;"></i>
+                        </div>
+                        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">${titulo}</h2>
+                        <p style="color: #64748b; font-size: 15px; margin: 0;">${msg}</p>
+                    </div>
+                `,
+                confirmButtonColor: buttonColor,
+                confirmButtonText: 'OK',
+                customClass: {
+                    confirmButton: 'swal2-confirm-modern-alert',
+                    popup: 'swal2-border-radius'
+                },
+                buttonsStyling: false,
+                didOpen: () => {
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .swal2-confirm-modern-alert {
+                            padding: 12px 30px !important;
+                            border-radius: 8px !important;
+                            font-weight: 600 !important;
+                            font-size: 14px !important;
+                            cursor: pointer !important;
+                            transition: all 0.3s ease !important;
+                            border: none !important;
+                            background: ${gradient} !important;
+                            color: white !important;
+                        }
+                        .swal2-confirm-modern-alert:hover {
+                            transform: translateY(-2px) !important;
+                            box-shadow: 0 6px 20px rgba(60, 179, 113, 0.4) !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            });
+        }
+
+        // ========== Funções Modal Gasto ==========
+        function openModalGasto() {
+            // Resetar título para "Adicionar"
+            document.querySelector('#modalGasto .modal-header-success h2').innerHTML = '<i class="fas fa-wallet"></i> Adicionar Gasto';
+            document.querySelector('#modalGasto .btn-submit').innerHTML = '<i class="fas fa-plus-circle"></i> Registar Gasto';
+            window.editandoGastoId = null;
+            document.getElementById('modalGasto').classList.remove('hidden');
+        }
+
+        function closeModalGasto() {
+            document.getElementById('modalGasto').classList.add('hidden');
+            // Limpar campos
+            document.getElementById('descricaoGasto').value = '';
+            document.getElementById('valorGasto').value = '';
+            document.getElementById('dataGasto').value = '';
+            window.editandoGastoId = null;
+        }
+
+        // ========== Funções Modal Rendimento ==========
+        function openModalRendimento() {
+            // Resetar título para "Adicionar"
+            document.querySelector('#modalRendimento .modal-header-success h2').innerHTML = '<i class="fas fa-hand-holding-usd"></i> Adicionar Rendimento';
+            document.querySelector('#modalRendimento .btn-submit').innerHTML = '<i class="fas fa-plus-circle"></i> Registar Rendimento';
+            window.editandoRendimentoId = null;
+            document.getElementById('modalRendimento').classList.remove('hidden');
+        }
+
+        function closeModalRendimento() {
+            document.getElementById('modalRendimento').classList.add('hidden');
+            // Limpar campos
+            document.getElementById('descricaoRendimento').value = '';
+            document.getElementById('valorRendimento').value = '';
+            document.getElementById('dataRendimento').value = '';
+            window.editandoRendimentoId = null;
+        }
+
+        // Fechar modais ao clicar fora
+        window.onclick = function(event) {
+            const modalGasto = document.getElementById('modalGasto');
+            const modalRendimento = document.getElementById('modalRendimento');
+
+            if (event.target == modalGasto) {
+                closeModalGasto();
+            }
+            if (event.target == modalRendimento) {
+                closeModalRendimento();
+            }
+        }
+
+        // ========== Seleção Múltipla Gastos ==========
+        $(document).on('change', '#selectAllGastos', function() {
+            const isChecked = $(this).prop('checked');
+            $('#tblGastos tbody input[type="checkbox"]').prop('checked', isChecked);
+            updateBulkActionsGastos();
+        });
+
+        $(document).on('change', '#tblGastos tbody input[type="checkbox"]', function() {
+            updateBulkActionsGastos();
+        });
+
+        function updateBulkActionsGastos() {
+            const checkedCount = $('#tblGastos tbody input[type="checkbox"]:checked').length;
+            const totalCount = $('#tblGastos tbody input[type="checkbox"]').length;
+
+            $('#selectAllGastos').prop('checked', checkedCount === totalCount && totalCount > 0);
+            $('#selectedCountGastos').text(checkedCount + ' selecionados');
+
+            if (checkedCount > 0) {
+                $('#bulkActionsGastos').slideDown(200);
+            } else {
+                $('#bulkActionsGastos').slideUp(200);
+            }
+        }
+
+        function editarSelecionadoGastos() {
+            const selected = [];
+            $('#tblGastos tbody input[type="checkbox"]:checked').each(function() {
+                const row = $(this).closest('tr');
+                selected.push({
+                    id: row.find('td:eq(1)').text(),
+                    descricao: row.find('td:eq(2)').text(),
+                    valor: row.find('td:eq(3)').text().replace('€', ''),
+                    data: row.find('td:eq(4)').text()
+                });
+            });
+
+            if (selected.length === 0) {
+                alerta('Atenção', 'Nenhum gasto selecionado', 'warning');
+                return;
+            }
+
+            if (selected.length > 1) {
+                alerta('Atenção', 'Selecione apenas um gasto para editar', 'warning');
+                return;
+            }
+
+            // Preencher modal com dados
+            const gasto = selected[0];
+            $('#descricaoGasto').val(gasto.descricao);
+            $('#valorGasto').val(gasto.valor);
+            $('#dataGasto').val(gasto.data);
+
+            // Armazenar ID para edição
+            window.editandoGastoId = gasto.id;
+
+            // Alterar título do modal para "Editar"
+            document.querySelector('#modalGasto .modal-header-success h2').innerHTML = '<i class="fas fa-edit"></i> Editar Gasto';
+            document.querySelector('#modalGasto .btn-submit').innerHTML = '<i class="fas fa-save"></i> Atualizar Gasto';
+
+            $('#modalGasto').removeClass('hidden');
+        }
+
+        function removerEmMassaGastos() {
+            const ids = [];
+            $('#tblGastos tbody input[type="checkbox"]:checked').each(function() {
+                ids.push($(this).closest('tr').find('td:eq(1)').text());
+            });
+
+            if (ids.length === 0) {
+                Swal.fire({
+                    html: `
+                        <div style="text-align: center;">
+                            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
+                            </div>
+                            <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
+                            <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione pelo menos um gasto para remover.</p>
+                        </div>
+                    `,
+                    confirmButtonColor: '#ff9800',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm-modern-warning',
+                        popup: 'swal2-border-radius'
+                    },
+                    buttonsStyling: false,
+                    didOpen: () => {
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            .swal2-confirm-modern-warning {
+                                padding: 12px 30px !important;
+                                border-radius: 8px !important;
+                                font-weight: 600 !important;
+                                font-size: 14px !important;
+                                cursor: pointer !important;
+                                transition: all 0.3s ease !important;
+                                border: none !important;
+                                background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+                                color: white !important;
+                            }
+                            .swal2-confirm-modern-warning:hover {
+                                transform: translateY(-2px) !important;
+                                box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                });
+                return;
+            }
+
+            Swal.fire({
+                html: `
+                    <div style="text-align: center;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+                            <i class="fas fa-trash-alt" style="font-size: 40px; color: white;"></i>
+                        </div>
+                        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Remover ${ids.length} gasto${ids.length > 1 ? 's' : ''}?</h2>
+                        <p style="color: #64748b; font-size: 15px; margin: 0;">Esta ação não pode ser desfeita!</p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-check"></i> Sim, remover',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                customClass: {
+                    confirmButton: 'swal2-confirm-modern',
+                    cancelButton: 'swal2-cancel-modern',
+                    popup: 'swal2-border-radius'
+                },
+                buttonsStyling: false,
+                didOpen: () => {
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .swal2-confirm-modern, .swal2-cancel-modern {
+                            padding: 12px 30px !important;
+                            border-radius: 8px !important;
+                            font-weight: 600 !important;
+                            font-size: 14px !important;
+                            cursor: pointer !important;
+                            transition: all 0.3s ease !important;
+                            border: none !important;
+                        }
+                        .swal2-confirm-modern {
+                            background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+                            color: white !important;
+                        }
+                        .swal2-confirm-modern:hover {
+                            transform: translateY(-2px) !important;
+                            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+                        }
+                        .swal2-cancel-modern {
+                            background: #6c757d !important;
+                            color: white !important;
+                        }
+                        .swal2-cancel-modern:hover {
+                            background: #5a6268 !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('Removendo gastos com IDs:', ids);
+                    $.ajax({
+                        url: 'src/controller/controllerGestaoLucros.php',
+                        method: 'POST',
+                        data: { op: 14, ids: ids },
+                        traditional: true,
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Resposta do servidor:', response);
+                            if (response.flag) {
+                                Swal.fire({
+                                    html: `
+                                        <div style="text-align: center;">
+                                            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3);">
+                                                <i class="fas fa-check" style="font-size: 40px; color: white;"></i>
+                                            </div>
+                                            <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Sucesso!</h2>
+                                            <p style="color: #64748b; font-size: 15px; margin: 0;">${response.msg}</p>
+                                        </div>
+                                    `,
+                                    confirmButtonColor: '#3cb371',
+                                    confirmButtonText: 'OK',
+                                    customClass: {
+                                        confirmButton: 'swal2-confirm-modern-success',
+                                        popup: 'swal2-border-radius'
+                                    },
+                                    buttonsStyling: false,
+                                    didOpen: () => {
+                                        const style = document.createElement('style');
+                                        style.textContent = `
+                                            .swal2-confirm-modern-success {
+                                                padding: 12px 30px !important;
+                                                border-radius: 8px !important;
+                                                font-weight: 600 !important;
+                                                font-size: 14px !important;
+                                                cursor: pointer !important;
+                                                transition: all 0.3s ease !important;
+                                                border: none !important;
+                                                background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%) !important;
+                                                color: white !important;
+                                            }
+                                            .swal2-confirm-modern-success:hover {
+                                                transform: translateY(-2px) !important;
+                                                box-shadow: 0 6px 20px rgba(60, 179, 113, 0.4) !important;
+                                            }
+                                        `;
+                                        document.head.appendChild(style);
+                                    }
+                                });
+                                getGastos();
+                                getCards();
+                                getCardsDespesas();
+                                getCardsLucro();
+                                getCardsMargem();
+                                $('#selectAllGastos').prop('checked', false);
+                                updateBulkActionsGastos();
+                            } else {
+                                Swal.fire({
+                                    html: `
+                                        <div style="text-align: center;">
+                                            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+                                                <i class="fas fa-times" style="font-size: 40px; color: white;"></i>
+                                            </div>
+                                            <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Erro</h2>
+                                            <p style="color: #64748b; font-size: 15px; margin: 0;">${response.msg}</p>
+                                        </div>
+                                    `,
+                                    confirmButtonColor: '#dc3545',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Erro AJAX Gastos:', {xhr, status, error});
+                            console.error('Resposta:', xhr.responseText);
+                            Swal.fire({
+                                html: `
+                                    <div style="text-align: center;">
+                                        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+                                            <i class="fas fa-times" style="font-size: 40px; color: white;"></i>
+                                        </div>
+                                        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Erro</h2>
+                                        <p style="color: #64748b; font-size: 15px; margin: 0;">Não foi possível remover os gastos</p>
+                                    </div>
+                                `,
+                                confirmButtonColor: '#dc3545',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // ========== Seleção Múltipla Rendimentos ==========
+        $(document).on('change', '#selectAllRendimentos', function() {
+            const isChecked = $(this).prop('checked');
+            $('#tblRendimentos tbody input[type="checkbox"]').prop('checked', isChecked);
+            updateBulkActionsRendimentos();
+        });
+
+        $(document).on('change', '#tblRendimentos tbody input[type="checkbox"]', function() {
+            updateBulkActionsRendimentos();
+        });
+
+        function updateBulkActionsRendimentos() {
+            const checkedCount = $('#tblRendimentos tbody input[type="checkbox"]:checked').length;
+            const totalCount = $('#tblRendimentos tbody input[type="checkbox"]').length;
+
+            $('#selectAllRendimentos').prop('checked', checkedCount === totalCount && totalCount > 0);
+            $('#selectedCountRendimentos').text(checkedCount + ' selecionados');
+
+            if (checkedCount > 0) {
+                $('#bulkActionsRendimentos').slideDown(200);
+            } else {
+                $('#bulkActionsRendimentos').slideUp(200);
+            }
+        }
+
+        function editarSelecionadoRendimentos() {
+            const selected = [];
+            $('#tblRendimentos tbody input[type="checkbox"]:checked').each(function() {
+                const row = $(this).closest('tr');
+                selected.push({
+                    id: row.find('td:eq(1)').text(),
+                    descricao: row.find('td:eq(2)').text(),
+                    valor: row.find('td:eq(3)').text().replace('€', ''),
+                    data: row.find('td:eq(4)').text()
+                });
+            });
+
+            if (selected.length === 0) {
+                alerta('Atenção', 'Nenhum rendimento selecionado', 'warning');
+                return;
+            }
+
+            if (selected.length > 1) {
+                alerta('Atenção', 'Selecione apenas um rendimento para editar', 'warning');
+                return;
+            }
+
+            // Preencher modal com dados
+            const rendimento = selected[0];
+            $('#descricaoRendimento').val(rendimento.descricao);
+            $('#valorRendimento').val(rendimento.valor);
+            $('#dataRendimento').val(rendimento.data);
+
+            // Armazenar ID para edição
+            window.editandoRendimentoId = rendimento.id;
+
+            // Alterar título do modal para "Editar"
+            document.querySelector('#modalRendimento .modal-header-success h2').innerHTML = '<i class="fas fa-edit"></i> Editar Rendimento';
+            document.querySelector('#modalRendimento .btn-submit').innerHTML = '<i class="fas fa-save"></i> Atualizar Rendimento';
+
+            $('#modalRendimento').removeClass('hidden');
+        }
+
+        function removerEmMassaRendimentos() {
+            const ids = [];
+            $('#tblRendimentos tbody input[type="checkbox"]:checked').each(function() {
+                ids.push($(this).closest('tr').find('td:eq(1)').text());
+            });
+
+            if (ids.length === 0) {
+                Swal.fire({
+                    html: `
+                        <div style="text-align: center;">
+                            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
+                                <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
+                            </div>
+                            <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
+                            <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione pelo menos um rendimento para remover.</p>
+                        </div>
+                    `,
+                    confirmButtonColor: '#ff9800',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        confirmButton: 'swal2-confirm-modern-warning',
+                        popup: 'swal2-border-radius'
+                    },
+                    buttonsStyling: false,
+                    didOpen: () => {
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            .swal2-confirm-modern-warning {
+                                padding: 12px 30px !important;
+                                border-radius: 8px !important;
+                                font-weight: 600 !important;
+                                font-size: 14px !important;
+                                cursor: pointer !important;
+                                transition: all 0.3s ease !important;
+                                border: none !important;
+                                background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+                                color: white !important;
+                            }
+                            .swal2-confirm-modern-warning:hover {
+                                transform: translateY(-2px) !important;
+                                box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+                });
+                return;
+            }
+
+            Swal.fire({
+                html: `
+                    <div style="text-align: center;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+                            <i class="fas fa-trash-alt" style="font-size: 40px; color: white;"></i>
+                        </div>
+                        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Remover ${ids.length} rendimento${ids.length > 1 ? 's' : ''}?</h2>
+                        <p style="color: #64748b; font-size: 15px; margin: 0;">Esta ação não pode ser desfeita!</p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-check"></i> Sim, remover',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                customClass: {
+                    confirmButton: 'swal2-confirm-modern',
+                    cancelButton: 'swal2-cancel-modern',
+                    popup: 'swal2-border-radius'
+                },
+                buttonsStyling: false,
+                didOpen: () => {
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .swal2-confirm-modern, .swal2-cancel-modern {
+                            padding: 12px 30px !important;
+                            border-radius: 8px !important;
+                            font-weight: 600 !important;
+                            font-size: 14px !important;
+                            cursor: pointer !important;
+                            transition: all 0.3s ease !important;
+                            border: none !important;
+                        }
+                        .swal2-confirm-modern {
+                            background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
+                            color: white !important;
+                        }
+                        .swal2-confirm-modern:hover {
+                            transform: translateY(-2px) !important;
+                            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+                        }
+                        .swal2-cancel-modern {
+                            background: #6c757d !important;
+                            color: white !important;
+                        }
+                        .swal2-cancel-modern:hover {
+                            background: #5a6268 !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('Removendo rendimentos com IDs:', ids);
+                    $.ajax({
+                        url: 'src/controller/controllerGestaoLucros.php',
+                        method: 'POST',
+                        data: { op: 15, ids: ids },
+                        traditional: true,
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Resposta do servidor:', response);
+                            if (response.flag) {
+                                Swal.fire({
+                                    html: `
+                                        <div style="text-align: center;">
+                                            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(60, 179, 113, 0.3);">
+                                                <i class="fas fa-check" style="font-size: 40px; color: white;"></i>
+                                            </div>
+                                            <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Sucesso!</h2>
+                                            <p style="color: #64748b; font-size: 15px; margin: 0;">${response.msg}</p>
+                                        </div>
+                                    `,
+                                    confirmButtonColor: '#3cb371',
+                                    confirmButtonText: 'OK',
+                                    customClass: {
+                                        confirmButton: 'swal2-confirm-modern-success',
+                                        popup: 'swal2-border-radius'
+                                    },
+                                    buttonsStyling: false,
+                                    didOpen: () => {
+                                        const style = document.createElement('style');
+                                        style.textContent = `
+                                            .swal2-confirm-modern-success {
+                                                padding: 12px 30px !important;
+                                                border-radius: 8px !important;
+                                                font-weight: 600 !important;
+                                                font-size: 14px !important;
+                                                cursor: pointer !important;
+                                                transition: all 0.3s ease !important;
+                                                border: none !important;
+                                                background: linear-gradient(135deg, #3cb371 0%, #2d8a5a 100%) !important;
+                                                color: white !important;
+                                            }
+                                            .swal2-confirm-modern-success:hover {
+                                                transform: translateY(-2px) !important;
+                                                box-shadow: 0 6px 20px rgba(60, 179, 113, 0.4) !important;
+                                            }
+                                        `;
+                                        document.head.appendChild(style);
+                                    }
+                                });
+                                getRendimentos();
+                                getCards();
+                                getCardsDespesas();
+                                getCardsLucro();
+                                getCardsMargem();
+                                $('#selectAllRendimentos').prop('checked', false);
+                                updateBulkActionsRendimentos();
+                            } else {
+                                Swal.fire({
+                                    html: `
+                                        <div style="text-align: center;">
+                                            <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+                                                <i class="fas fa-times" style="font-size: 40px; color: white;"></i>
+                                            </div>
+                                            <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Erro</h2>
+                                            <p style="color: #64748b; font-size: 15px; margin: 0;">${response.msg}</p>
+                                        </div>
+                                    `,
+                                    confirmButtonColor: '#dc3545',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Erro AJAX Rendimentos:', {xhr, status, error});
+                            console.error('Resposta:', xhr.responseText);
+                            Swal.fire({
+                                html: `
+                                    <div style="text-align: center;">
+                                        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
+                                            <i class="fas fa-times" style="font-size: 40px; color: white;"></i>
+                                        </div>
+                                        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Erro</h2>
+                                        <p style="color: #64748b; font-size: 15px; margin: 0;">Não foi possível remover os rendimentos</p>
+                                    </div>
+                                `,
+                                confirmButtonColor: '#dc3545',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+<?php
 }else{
 header("Location: forbiddenerror.html");
 }

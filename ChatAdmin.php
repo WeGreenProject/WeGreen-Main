@@ -7,6 +7,7 @@ if($_SESSION['tipo'] != 1){
 ?>
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,6 +23,7 @@ if($_SESSION['tipo'] != 1){
   <script src="src/js/lib/sweatalert.js"></script>
   <script src="src/js/notifications.js"></script>
 </head>
+
 <body class="page-chat-cliente">
   <div class="dashboard-container">
     <!-- Sidebar -->
@@ -48,6 +50,10 @@ if($_SESSION['tipo'] != 1){
           <a href="gestaoCliente.php" class="menu-item">
             <i class="fas fa-users"></i>
             <span>Utilizadores</span>
+          </a>
+          <a href="gestaoComentarios.php" class="menu-item">
+            <i class="fas fa-comment-dots"></i>
+            <span>Comentários</span>
           </a>
           <a href="gestaoLucros.php" class="menu-item">
             <i class="fas fa-euro-sign"></i>

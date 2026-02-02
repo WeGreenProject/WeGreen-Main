@@ -5,7 +5,19 @@ session_start();
 $func = new Lucros();
 
 if ($_POST['op'] == 1) {
-    $resp = $func->getCards();
+    $resp = $func->getCardsReceitas();
+    echo $resp;
+}
+if ($_POST['op'] == 11) {
+    $resp = $func->getCardsDespesas();
+    echo $resp;
+}
+if ($_POST['op'] == 12) {
+    $resp = $func->getCardsLucro();
+    echo $resp;
+}
+if ($_POST['op'] == 13) {
+    $resp = $func->getCardsMargem();
     echo $resp;
 }
 if ($_POST['op'] == 2) {
@@ -51,5 +63,37 @@ elseif ($_POST['op'] == 10) {
         );
     echo $resp;
 
+}
+elseif ($_POST['op'] == 14) {
+    // Remover gastos em massa
+    $ids = is_array($_POST['ids']) ? $_POST['ids'] : [$_POST['ids']];
+    $resp = $func->removerGastosEmMassa($ids);
+    echo $resp;
+}
+elseif ($_POST['op'] == 15) {
+    // Remover rendimentos em massa
+    $ids = is_array($_POST['ids']) ? $_POST['ids'] : [$_POST['ids']];
+    $resp = $func->removerRendimentosEmMassa($ids);
+    echo $resp;
+}
+elseif ($_POST['op'] == 16) {
+    // Editar gasto
+    $resp = $func->editarGasto(
+        $_POST['id'],
+        $_POST['descricao'],
+        $_POST['valor'],
+        $_POST['data']
+    );
+    echo $resp;
+}
+elseif ($_POST['op'] == 17) {
+    // Editar rendimento
+    $resp = $func->editarRendimento(
+        $_POST['id'],
+        $_POST['descricao'],
+        $_POST['valor'],
+        $_POST['data']
+    );
+    echo $resp;
 }
 ?>

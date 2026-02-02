@@ -13,7 +13,10 @@ if($_SESSION['tipo'] == 1){
     <title>Gestão de Comentários - WeGreen Admin</title>
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="src/css/admin.css">
+    <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="src/css/gestaoProdutos.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/gestaoComentariosAdmin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
@@ -23,130 +26,136 @@ if($_SESSION['tipo'] == 1){
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="src/js/notifications.js"></script>
 </head>
 
 <body>
-    <div class="container">
+    <div class="dashboard-container">
         <aside class="sidebar">
-            <a href="index.html" class="logo">
-                <span class="logo-icon"><i class="fas fa-leaf"></i></span>
+            <a href="index.html" class="sidebar-logo" style="text-decoration: none; color: inherit; cursor: pointer;">
+                <i class="fas fa-leaf"></i>
                 <div class="logo-text">
-                    <h1>WeGreen</h1>
-                    <p>Painel do Administrador</p>
+                    <h2>WeGreen</h2>
+                    <p>Moda Sustentável</p>
                 </div>
             </a>
-            <nav>
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="DashboardAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoProdutosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-tshirt"></i></span>
-                            <span class="nav-text">Produtos</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoCliente.php">
-                            <span class="nav-icon"><i class="fas fa-users"></i></span>
-                            <span class="nav-text">Utilizadores</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="gestaoComentariosAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-comments"></i></span>
-                            <span class="nav-text">Comentários</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="gestaoLucros.php">
-                            <span class="nav-icon"><i class="fas fa-euro-sign"></i></span>
-                            <span class="nav-text">Lucros</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Chatadmin.php">
-                            <span class="nav-icon"><i class="fas fa-message"></i></span>
-                            <span class="nav-text">Chats</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="logAdmin.php">
-                            <span class="nav-icon"><i class="fas fa-history"></i></span>
-                            <span class="nav-text">Logs</span>
-                        </a>
-                    </li>
-                </ul>
+
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu</div>
+                    <a href="DashboardAdmin.php" class="menu-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="gestaoProdutosAdmin.php" class="menu-item">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Produtos</span>
+                    </a>
+                    <a href="gestaoCliente.php" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        <span>Utilizadores</span>
+                    </a>
+                    <a href="gestaoComentarios.php" class="menu-item active">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>Comentários</span>
+                    </a>
+                    <a href="gestaoLucros.php" class="menu-item">
+                        <i class="fas fa-euro-sign"></i>
+                        <span>Lucros</span>
+                    </a>
+                    <a href="logAdmin.php" class="menu-item">
+                        <i class="fas fa-history"></i>
+                        <span>Logs do Sistema</span>
+                    </a>
+                    <a href="Chatadmin.php" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Chat</span>
+                    </a>
+                </div>
             </nav>
         </aside>
 
         <main class="main-content">
             <nav class="top-navbar">
                 <div class="navbar-left">
-                    <i class="navbar-icon fas fa-comments"></i>
-                    <h2 class="navbar-title">Gestão de Comentários</h2>
+                    <h1 class="page-title"><i class="fas fa-comment-dots"></i> Gestão de Comentários</h1>
                 </div>
                 <div class="navbar-right">
                     <?php include 'src/views/notifications-widget.php'; ?>
-                    <div class="navbar-user">
-                        <div id="AdminPerfilInfo" style="display:flex;"></div>
-                        <i class="fas fa-chevron-down user-trigger" style="font-size: 12px; color: #4a5568;"></i>
-                        <div class="user-dropdown" id="userDropdown"></div>
+                    <div class="navbar-user" id="userMenuBtn">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+                            alt="Administrador" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></span>
+                            <span class="user-role">Administrador</span>
+                        </div>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #64748b;"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['nome'] ?? 'Admin'); ?>&background=3cb371&color=fff"
+                                alt="Administrador" class="dropdown-avatar">
+                            <div>
+                                <div class="dropdown-name"><?php echo $_SESSION['nome'] ?? 'Administrador'; ?></div>
+                                <div class="dropdown-email"><?php echo $_SESSION['email'] ?? 'admin@wegreen.com'; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="perfilAdmin.php">
+                            <i class="fas fa-user"></i>
+                            <span>Meu Perfil</span>
+                        </a>
+                        <a class="dropdown-item" href="alterarSenha.php">
+                            <i class="fas fa-key"></i>
+                            <span>Alterar Senha</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item dropdown-item-danger" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Sair</span>
+                        </button>
                     </div>
                 </div>
             </nav>
 
-            <div id="comentarios" class="page active">
-                <div class="page-header">
-                    <h2>Gestão de Comentários & Reports</h2>
-                    <p>Modere comentários e analise denúncias</p>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="stats-grid">
+            <div class="content-area">
+                <!-- KPIs/Stats Cards -->
+                <div class="stats-grid-compact">
 
                 </div>
 
                 <!-- Tab Navigation -->
                 <div class="tab-navigation">
                     <button class="tab-button active" data-tab="comentarios">
-                        <div id="btnComentarios">
-                            <i class=" fas fa-comments"></i>
-                            <span>Comentários</span>
-                            <span class="tab-badge" id="badgeComentarios">0</span>
-                        </div>
+                        <i class="fas fa-comments"></i>
+                        <span>Comentários</span>
+                        <span class="tab-badge" id="badgeComentarios">0</span>
                     </button>
                     <button class="tab-button" data-tab="reports">
-                        <div id="btnReports">
-                            <i class="fas fa-flag"></i>
-                            <span>Reports</span>
-                            <span class="tab-badge alert" id="badgeReports">0</span>
-                            <div>
+                        <i class="fas fa-flag"></i>
+                        <span>Reports</span>
+                        <span class="tab-badge alert" id="badgeReports">0</span>
                     </button>
                 </div>
 
                 <!-- Tab Content: Comentários -->
                 <div class="tab-content active" id="tab-comentarios">
                     <!-- Filtros -->
-                    <div class="filters-card">
-                        <div class="filters-header">
-                            <h3><i class="fas fa-filter"></i> Filtros</h3>
-                            <button class="btn-clear-filters" id="clearFiltersComentarios">
-                                <i class="fas fa-times"></i> Limpar
-                            </button>
-                        </div>
+                    <div class="filters-container">
                         <div class="filters-grid">
                             <div class="filter-item">
-                                <label><i class="fas fa-search"></i> Pesquisar</label>
+                                <label>
+                                    <i class="fas fa-search"></i> Pesquisar
+                                </label>
                                 <input type="text" id="filterSearchComentarios" class="filter-input"
                                     placeholder="Procurar por produto, utilizador...">
                             </div>
                             <div class="filter-item">
-                                <label><i class="fas fa-star"></i> Avaliação</label>
+                                <label>
+                                    <i class="fas fa-star"></i> Avaliação
+                                </label>
                                 <select id="filterAvaliacaoComentarios" class="filter-select">
                                     <option value="">Todas</option>
                                     <option value="5">5 Estrelas</option>
@@ -157,7 +166,9 @@ if($_SESSION['tipo'] == 1){
                                 </select>
                             </div>
                             <div class="filter-item">
-                                <label><i class="fas fa-calendar"></i> Período</label>
+                                <label>
+                                    <i class="fas fa-calendar"></i> Período
+                                </label>
                                 <select id="filterPeriodoComentarios" class="filter-select">
                                     <option value="">Todos</option>
                                     <option value="hoje">Hoje</option>
@@ -165,6 +176,11 @@ if($_SESSION['tipo'] == 1){
                                     <option value="mes">Este Mês</option>
                                     <option value="ano">Este Ano</option>
                                 </select>
+                            </div>
+                            <div class="filter-item-button">
+                                <button class="btn-clear-filters" id="clearFiltersComentarios">
+                                    <i class="fas fa-redo"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -187,50 +203,42 @@ if($_SESSION['tipo'] == 1){
                         </div>
                     </div>
 
+                    <div class="table-container">
+                        <table id="comentariosTable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag"></i> ID</th>
+                                    <th><i class="fas fa-image"></i> Foto Produto</th>
+                                    <th><i class="fas fa-box"></i> Nome Produto</th>
+                                    <th><i class="fas fa-euro-sign"></i> Preço</th>
+                                    <th><i class="fas fa-star"></i> Avaliação</th>
+                                    <th><i class="fas fa-calendar-alt"></i> Data</th>
+                                    <th><i class="fas fa-tools"></i> Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comentariosTableBody">
 
-                    <div class="table-card">
-                        <div class="table-header">
-                            <h3><i class="fas fa-list"></i> Lista de Produtos Comentados</h3>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="comentariosTable" class="modern-table" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th><i class="fas fa-hashtag"></i> ID</th>
-                                        <th><i class="fas fa-image"></i> Foto Produto</th>
-                                        <th><i class="fas fa-box"></i> Nome Produto</th>
-                                        <th><i class="fas fa-euro-sign"></i> Preço</th>
-                                        <th><i class="fas fa-star"></i> Avaliação</th>
-                                        <th><i class="fas fa-calendar-alt"></i> Data</th>
-                                        <th><i class="fas fa-tools"></i> Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="comentariosTableBody">
-
-                                </tbody>
-                            </table>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 <!-- Tab Content: Reports -->
                 <div class="tab-content" id="tab-reports">
                     <!-- Filtros Reports -->
-                    <div class="filters-card">
-                        <div class="filters-header">
-                            <h3><i class="fas fa-filter"></i> Filtros de Reports</h3>
-                            <button class="btn-clear-filters" id="clearFiltersReports">
-                                <i class="fas fa-times"></i> Limpar
-                            </button>
-                        </div>
+                    <div class="filters-container">
                         <div class="filters-grid">
                             <div class="filter-item">
-                                <label><i class="fas fa-search"></i> Pesquisar</label>
+                                <label>
+                                    <i class="fas fa-search"></i> Pesquisar
+                                </label>
                                 <input type="text" id="filterSearchReports" class="filter-input"
                                     placeholder="Procurar por denunciante, comentário...">
                             </div>
                             <div class="filter-item">
-                                <label><i class="fas fa-list"></i> Estado</label>
+                                <label>
+                                    <i class="fas fa-list"></i> Estado
+                                </label>
                                 <select id="filterEstadoReports" class="filter-select">
                                     <option value="">Todos</option>
                                     <option value="pendente">Pendente</option>
@@ -240,7 +248,9 @@ if($_SESSION['tipo'] == 1){
                                 </select>
                             </div>
                             <div class="filter-item">
-                                <label><i class="fas fa-exclamation-triangle"></i> Tipo</label>
+                                <label>
+                                    <i class="fas fa-exclamation-triangle"></i> Tipo
+                                </label>
                                 <select id="filterTipoReports" class="filter-select">
                                     <option value="">Todos</option>
                                     <option value="spam">Spam</option>
@@ -251,13 +261,20 @@ if($_SESSION['tipo'] == 1){
                                 </select>
                             </div>
                             <div class="filter-item">
-                                <label><i class="fas fa-calendar"></i> Período</label>
+                                <label>
+                                    <i class="fas fa-calendar"></i> Período
+                                </label>
                                 <select id="filterPeriodoReports" class="filter-select">
                                     <option value="">Todos</option>
                                     <option value="hoje">Hoje</option>
                                     <option value="semana">Esta Semana</option>
                                     <option value="mes">Este Mês</option>
                                 </select>
+                            </div>
+                            <div class="filter-item-button">
+                                <button class="btn-clear-filters" id="clearFiltersReports">
+                                    <i class="fas fa-redo"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -282,29 +299,24 @@ if($_SESSION['tipo'] == 1){
                     </div>
 
                     <!-- Tabela de Reports -->
-                    <div class="table-card">
-                        <div class="table-header">
-                            <h3><i class="fas fa-flag"></i> Lista de Reports</h3>
-                        </div>
-                        <div class="table-responsive">
-                            <table id="reportsTable" class="modern-table" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th><i class="fas fa-hashtag"></i> ID</th>
-                                        <th><i class="fas fa-image"></i> Foto</th>
-                                        <th><i class="fas fa-user"></i>Denunciante</th>
-                                        <th><i class="fas fa-align-left"></i> Motivo</th>
-                                        <th><i class="fas fa-exclamation-triangle"></i> Denunciado</th>
-                                        <th><i class="fas fa-info-circle"></i> Estado</th>
-                                        <th><i class="fas fa-calendar"></i> Data</th>
-                                        <th><i class="fas fa-cog"></i> Ação</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="reportsTableBody">
+                    <div class="table-container">
+                        <table id="reportsTable" class="display" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag"></i> ID</th>
+                                    <th><i class="fas fa-image"></i> Foto</th>
+                                    <th><i class="fas fa-user"></i>Denunciante</th>
+                                    <th><i class="fas fa-align-left"></i> Motivo</th>
+                                    <th><i class="fas fa-exclamation-triangle"></i> Denunciado</th>
+                                    <th><i class="fas fa-info-circle"></i> Estado</th>
+                                    <th><i class="fas fa-calendar"></i> Data</th>
+                                    <th><i class="fas fa-cog"></i> Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBody">
 
-                                </tbody>
-                            </table>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -346,7 +358,31 @@ if($_SESSION['tipo'] == 1){
 <script src="src/js/Adminstrador.js"></script>
 <script src="src/js/gestaoComentarios.js"></script>
 <script>
-// Tab Navigation
+// Override do getInfoUserDropdown para manter o HTML correto da página
+function getInfoUserDropdown() {
+    // Não fazer nada - o HTML já está correto na página
+    console.log('Dropdown já configurado no HTML');
+}
+
+// ========== Funcionalidade das Tabs ==========
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetTab = this.getAttribute('data-tab');
+
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button and corresponding content
+            this.classList.add('active');
+            document.getElementById('tab-' + targetTab).classList.add('active');
+        });
+    });
+});
 </script>
 
 </html>

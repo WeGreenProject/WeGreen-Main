@@ -51,17 +51,6 @@ function getCardLog() {
     $sqlLogout = "SELECT COUNT(*) AS total_logouts FROM logs_acesso WHERE acao = 'logout'";
     $result = $conn->query($sqlLogout);
     $row = $result->fetch_assoc();
-    $logoutsHoje = $row['total_logouts'];
-
-    $msg .= "<div class='stat-card'>
-                <div class='stat-header'>
-                    <div>
-                        <div class='stat-label'>Logins</div>
-                        <div class='stat-value'>{$loginsHoje}</div>
-                    </div>
-                    <div class='stat-icon login'>
-                        <i class='fas fa-sign-in-alt'></i>
-                    </div>
     $totalLogouts = $row['total_logouts'];
 
     // Atividades hoje

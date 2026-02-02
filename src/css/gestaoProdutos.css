@@ -1,5 +1,39 @@
 /* ========== CSS Específico para Gestão de Produtos ========== */
 
+/* Grid específico para comentários (3 filtros + botão) */
+#tab-comentarios .filters-grid {
+  grid-template-columns: 2fr 1fr 1fr auto !important;
+}
+
+/* Grid específico para reports (4 filtros + botão) */
+#tab-reports .filters-grid {
+  grid-template-columns: 2fr 1fr 1fr 1fr auto !important;
+}
+
+/* Botão limpar filtros verde */
+#tab-comentarios .btn-clear-filters,
+#tab-reports .btn-clear-filters {
+  padding: 10px 20px !important;
+  background: #3cb371 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  color: #ffffff !important;
+  font-size: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 42px !important;
+  box-shadow: 0 2px 8px rgba(60, 179, 113, 0.3) !important;
+}
+
+#tab-comentarios .btn-clear-filters:hover,
+#tab-reports .btn-clear-filters:hover {
+  background: #2e8b57 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(60, 179, 113, 0.4) !important;
+}
+
 /* Aproximar tabela dos filtros */
 .table-container {
   margin-top: -25px !important;
@@ -202,4 +236,110 @@
   object-fit: cover;
   border: 2px solid #e2e8f0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================
+   Tab Navigation - Sistema de Abas
+   ============================================= */
+.tab-navigation {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  background: transparent;
+  padding: 0;
+}
+
+.tab-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #2d2d2d !important;
+  border: none;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3cb371 !important;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.tab-button:hover {
+  background: #3a3a3a !important;
+  color: #3cb371 !important;
+}
+
+.tab-button.active {
+  background: #3cb371 !important;
+  color: white !important;
+  box-shadow: none;
+}
+
+.tab-button i {
+  font-size: 1.25rem;
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 10px;
+  background: #dc2626 !important;
+  color: white !important;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active .tab-badge {
+  background: #dc2626 !important;
+  color: white !important;
+}
+
+.tab-badge.alert {
+  background: #dc2626 !important;
+  color: white !important;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.tab-button.active .tab-badge.alert {
+  background: #dc2626;
+  color: white;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
