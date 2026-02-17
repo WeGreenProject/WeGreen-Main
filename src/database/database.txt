@@ -524,7 +524,8 @@ CREATE TABLE IF NOT EXISTS `mensagensadmin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `remetente_id` int(11) DEFAULT NULL,
   `destinatario_id` int(11) DEFAULT NULL,
-  `mensagem` text NOT NULL,
+  `mensagem` text DEFAULT NULL,
+  `anexo` varchar(500) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
@@ -704,7 +705,7 @@ CREATE TABLE IF NOT EXISTS `planos` (
 INSERT INTO `planos` (`id`, `nome`, `preco`, `limite_produtos`, `rastreio_tipo`, `relatorio_pdf`) VALUES
 (1, 'Plano Essencial Verde', 0.00, 5, 'Basico', 0),
 (2, 'Plano Crescimento Circular', 25.00, 10, 'Basico', 1),
-(3, 'Plano Profissional Eco+', 100.00, NULL, 'Avancado', 1);
+(3, 'Plano Profissional Eco+', 70.00, NULL, 'Avancado', 1);
 
 -- --------------------------------------------------------
 
@@ -828,16 +829,18 @@ CREATE TABLE IF NOT EXISTS `ranking` (
   `nome` varchar(250) DEFAULT NULL,
   `pontos` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Extraindo dados da tabela `ranking`
 --
 
 INSERT INTO `ranking` (`id`, `nome`, `pontos`) VALUES
-(1, 'Bronze', 0),
-(2, 'Ouro', 50),
-(3, 'Diamante', 150);
+(1, 'Sem classificação', 0),
+(2, 'Bronze', 200),
+(3, 'Prata', 400),
+(4, 'Ouro', 650),
+(5, 'Platina', 850);
 
 -- --------------------------------------------------------
 
@@ -995,16 +998,16 @@ CREATE TABLE IF NOT EXISTS `utilizadores` (
 --
 
 INSERT INTO `utilizadores` (`id`, `nome`, `apelido`, `email`, `email_verificado`, `token_verificacao`, `token_expira_em`, `nif`, `telefone`, `morada`, `foto`, `password`, `tipo_utilizador_id`, `plano_id`, `ranking_id`, `pontos_conf`, `data_criacao`, `data_expiracao_plano`, `ultimo_email_expiracao`) VALUES
-(1, 'Admin WeGreen', NULL, 'admin@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 1, 3, 200, NULL, NULL, NULL),
+(1, 'Admin WeGreen', NULL, 'admin@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'admin123', 1, 1, 2, 200, NULL, NULL, NULL),
 (2, 'Joao', NULL, 'joao@wegreen.pt', 1, NULL, NULL, '000000000', '900000000', 'Rua, Número, Código Postal, Cidade', 'src/img/pexels-stefanstefancik-91227.jpg', 'cliente123', 2, 1, 1, 10, NULL, NULL, NULL),
-(3, 'Maria Santos', NULL, 'maria@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 2, 2, 75, NULL, '2026-01-29 20:40:11', NULL),
-(4, 'Maria Luiza', NULL, 'Luiza@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 3, 3, 54, NULL, NULL, NULL),
-(5, 'Matilde Mayer', NULL, 'Matilde@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 1, 3, 350, NULL, NULL, NULL),
-(6, 'Carlos Pereira', NULL, 'Carlos@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 3, 98, NULL, NULL, NULL),
+(3, 'Maria Santos', NULL, 'maria@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-olly-733872.jpg', 'anunciante123', 3, 1, 1, 75, NULL, NULL, NULL),
+(4, 'Maria Luiza', NULL, 'Luiza@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/josefina-pereyra-dupe.jpeg', 'anunciante123', 3, 1, 1, 54, NULL, NULL, NULL),
+(5, 'Matilde Mayer', NULL, 'Matilde@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095531.jpg', 'anunciante123', 3, 1, 2, 350, NULL, NULL, NULL),
+(6, 'Carlos Pereira', NULL, 'Carlos@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-rb-audiovisual-1819481.jpg', 'anunciante123', 3, 1, 1, 98, NULL, NULL, NULL),
 (7, 'Mango', NULL, 'mango@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/3186bd92-91b4-480e-a033-be3c45e9fe76.jpeg', 'mango123', 2, 1, 1, 10, NULL, NULL, NULL),
-(8, 'Solange Jewels', NULL, 'Solange@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 2, 3, 350, NULL, '2026-02-25 20:37:26', NULL),
+(8, 'Solange Jewels', NULL, 'Solange@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexepexels-victor-dubugras-1479988588-26976686.jpg', 'anunciante123', 3, 1, 2, 350, NULL, NULL, NULL),
 (11, 'joão', 'santos', 'jmssgames@gmail.com', 1, NULL, NULL, '012345678', NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', '3dfcab79ed21fd89c9eb25e9864a6155', 2, 1, 1, 0, '2026-01-13', NULL, NULL),
-(14, 'Joao', 'Silva', 'joao@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'e10adc3949ba59abbe56e057f20f883e', 3, 2, 1, 0, '2026-01-16', '2026-02-25 20:38:25', NULL);
+(14, 'Joao', 'Silva', 'joao@wegreen.pt', 1, NULL, NULL, NULL, NULL, NULL, 'src/img/pexels-beccacorreiaph-31095884.jpg', 'e10adc3949ba59abbe56e057f20f883e', 3, 1, 1, 0, '2026-01-16', NULL, NULL);
 
 -- --------------------------------------------------------
 

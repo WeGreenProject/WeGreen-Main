@@ -59,7 +59,7 @@
                                         <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 14px;">
                                             <strong>Método de Pagamento:</strong>
                                             <?php
-                                            // Sempre mostra Stripe se não especificado
+                                            
                                             $metodo = isset($payment_method) ? $payment_method : 'Stripe (Cartão de Crédito)';
                                             echo htmlspecialchars($metodo);
                                             ?>

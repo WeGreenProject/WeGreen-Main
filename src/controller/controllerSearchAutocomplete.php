@@ -1,18 +1,24 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json; charset=utf-8');
-mb_internal_encoding('UTF-8');
-ini_set('default_charset', 'UTF-8');
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 include_once '../model/modelSearchAutocomplete.php';
 
-$func = new SearchAutocomplete();
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
 
-// op 1 - Buscar produtos por query
-if (isset($_GET['op']) && $_GET['op'] == 1) {
-    $query = isset($_GET['q']) ? trim($_GET['q']) : '';
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
+$func = new SearchAutocomplete($conn);
+
+if ($op == 1) {
+    $query = trim($_GET['q'] ?? '');
     $resp = $func->searchProdutos($query);
     echo $resp;
 }

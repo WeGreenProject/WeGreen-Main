@@ -4,14 +4,23 @@ require_once 'connection.php';
 
 class DashboardAdmin{
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
     function getDadosPlanos($ID_User,$plano){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
         $sql = "SELECT COUNT(*) AS TotalAtivos FROM Utilizadores WHERE Utilizadores.plano_id IN (2, 3);";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -32,18 +41,25 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-value'>0</div>";
                 $msg .= "</div>";
         }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getDadosPerfil($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-
-        $result = $conn->query($sql);
+        $sql = "SELECT * from utilizadores where id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -70,19 +86,24 @@ class DashboardAdmin{
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getUtilizadores($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $novos = $this->getNovosUtilizadores();
         $sql = "SELECT count(*) As TotalUtilizadores from Utilizadores,Tipo_Utilizadores where Utilizadores.tipo_utilizador_id = Tipo_Utilizadores.id AND utilizadores.tipo_utilizador_id IN (2, 3);";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -103,18 +124,26 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-value'>0</div>";
                 $msg .= "</div>";
         }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getInfoUserDropdown($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from Utilizadores where id = ".$ID_User;
-
-        $result = $conn->query($sql);
+        $novos = 0;
+        $sql = "SELECT * from Utilizadores where id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -154,30 +183,33 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-value'>Nao Encontrado!</div>";
                 $msg .= "<div class='stat-change'>+ X Novos utilizadores</div>";
         }
-        $conn->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function logout(){
-        global $conn;
+        try {
+
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
         $acao = "logout";
 
-        $stmtLog = $conn->prepare(
+        $stmtLog = $this->conn->prepare(
             "INSERT INTO logs_acesso (utilizador_id, acao, email, data_hora)
              VALUES (?, ?, ?, NOW())"
         );
 
             if (!$stmtLog) {
-                die("Erro prepare log: " . $conn->error);
+                die("Erro prepare log: " . $this->conn->error);
             }
 
         if (!$stmtLog) {
-                    die("Erro prepare log: " . $conn->error);
+                    die("Erro prepare log: " . $this->conn->error);
                 }
 
             $stmtLog->bind_param(
@@ -195,41 +227,55 @@ class DashboardAdmin{
 
         $_SESSION = array();
 
-        // Destruir o cookie de sessão se existir
+
         if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', time()-3600, '/');
         }
 
-        // Destruir a sessão
+
         session_destroy();
 
         return("Obrigado!");
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getNovosUtilizadores(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
         $sql = "SELECT COUNT(*) AS novos FROM Utilizadores WHERE data_criacao >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $novos = $row["novos"];
         }
 
+        $stmt->close();
+
         return $novos;
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getRendimentos(){
-            global $conn;
+        try {
+
             $msg = "";
             $row = "";
             $novos = $this->getNovosRendimentos();
             $sql = "SELECT Sum(rendimento.valor) AS TotalRendimentos FROM rendimento";
 
-            $result = $conn->query($sql);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -250,18 +296,25 @@ class DashboardAdmin{
                     $msg .= "<div class='stat-value'>0€</div>";
                     $msg .= "</div>";
             }
-            $conn->close();
+
+            $stmt->close();
 
             return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
         }
         function getAdminPerfil($ID_User){
-    global $conn;
+            try {
+
     $msg = "";
     $row = "";
-    $sql = "SELECT * from utilizadores where id = ".$ID_User;
-
-    $result = $conn->query($sql);
+    $sql = "SELECT * from utilizadores where id = ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $ID_User);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -280,35 +333,48 @@ class DashboardAdmin{
         $msg .= "<span class='user-role'>Admin</span>";
         $msg .= "</div>";
     }
-    $conn->close();
 
     return ($msg);
+            } catch (Exception $e) {
+                return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            }
 }
         function getNovosRendimentos(){
-        global $conn;
+            try {
+
         $msg = "";
         $row = "";
+        $novos = 0;
         $sql = "SELECT sum(rendimento.valor) NovoRendimento from rendimento where data_registo >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);";
 
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $novos = $row["NovoRendimento"];
         }
 
+        $stmt->close();
+
         return $novos;
 
+            } catch (Exception $e) {
+                return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            }
     }
     function getGastos(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
         $sql = "SELECT Sum(gastos.valor) As TotalGastos FROM gastos";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $novos = $this->getNovosGastos();
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -329,31 +395,44 @@ class DashboardAdmin{
                 $msg .= "<div class='stat-value'>0€</div>";
                 $msg .= "</div>";
         }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getNovosGastos(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
+        $novos = 0;
 
         $sql = "SELECT sum(gastos.valor) NovoGastos from Gastos where data_registo >= DATE_SUB(CURDATE(), INTERVAL 30 DAY);";
 
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $novos = $row["NovoGastos"];
         }
 
+        $stmt->close();
+
         return $novos;
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function getVendasGrafico() {
-    global $conn;
+        try {
+
     $dados1 = [];
     $dados2 = [];
     $dados3 = [];
@@ -365,14 +444,16 @@ function getVendasGrafico() {
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
 
-    // Buscar rendimentos agrupados por mês
+
     $sqlRendimentos = "SELECT YEAR(data_registo) as ano, MONTH(data_registo) as mes, SUM(valor) as total
                        FROM rendimento
                        WHERE data_registo >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
                        GROUP BY YEAR(data_registo), MONTH(data_registo)
                        ORDER BY ano, mes";
 
-    $resultRendimentos = $conn->query($sqlRendimentos);
+    $stmtRendimentos = $this->conn->prepare($sqlRendimentos);
+    $stmtRendimentos->execute();
+    $resultRendimentos = $stmtRendimentos->get_result();
     $rendimentosPorMes = [];
 
     if ($resultRendimentos && $resultRendimentos->num_rows > 0) {
@@ -383,14 +464,16 @@ function getVendasGrafico() {
         $flag = true;
     }
 
-    // Buscar gastos agrupados por mês
+
     $sqlGastos = "SELECT YEAR(data_registo) as ano, MONTH(data_registo) as mes, SUM(valor) as total
                   FROM gastos
                   WHERE data_registo >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
                   GROUP BY YEAR(data_registo), MONTH(data_registo)
                   ORDER BY ano, mes";
 
-    $resultGastos = $conn->query($sqlGastos);
+    $stmtGastos = $this->conn->prepare($sqlGastos);
+    $stmtGastos->execute();
+    $resultGastos = $stmtGastos->get_result();
     $gastosPorMes = [];
 
     if ($resultGastos && $resultGastos->num_rows > 0) {
@@ -401,7 +484,7 @@ function getVendasGrafico() {
         $flag = true;
     }
 
-    // Gerar dados dos últimos 12 meses
+
     for ($i = 11; $i >= 0; $i--) {
         $data = strtotime("-$i months");
         $mes = date('n', $data);
@@ -417,25 +500,37 @@ function getVendasGrafico() {
         $msg = "Nenhum dado encontrado.";
     }
 
+    $stmtRendimentos->close();
+    $stmtGastos->close();
+
     $resp = json_encode(array(
         "flag" => $flag,
         "msg" => $msg,
         "dados1" => $dados1,
         "dados2" => $dados2,
         "dados3" => $dados3
-    ));
+    ), JSON_UNESCAPED_UNICODE);
 
-    $conn->close();
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
     function getProdutosInvativo(){
-        global $conn;
+        try {
+
         $msg = "";
-        $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id AND produtos.ativo = 0;";
-        $result = $conn->query($sql);
+        $sql = "SELECT p.*, tp.descricao AS ProdutosNome, u.nome AS NomeAnunciante
+            FROM produtos p
+            INNER JOIN tipo_produtos tp ON p.tipo_produto_id = tp.id
+            INNER JOIN utilizadores u ON u.id = p.anunciante_id
+            WHERE p.ativo = 0
+            ORDER BY p.Produto_id DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $text = "";
         $text2 = "";
-
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -446,7 +541,6 @@ function getVendasGrafico() {
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td>".$row['stock']."</td>";
-                $msg .= "<td><a href='gestaoProdutosAdmin.php?id=".$row['Produto_id']."' class='btn-action'><i class='fas fa-eye'></i> Ver</a></td>";
                 $msg .= "</tr>";
             }
         } else {
@@ -458,22 +552,28 @@ function getVendasGrafico() {
             $msg .= "<td></td>";
             $msg .= "<td></td>";
             $msg .= "<td></td>";
-            $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function getTopTipoGrafico() {
-    global $conn;
+        try {
+
     $dados1 = [];
     $dados2 = [];
     $msg = "";
     $flag = false;
 
     $sql = "SELECT tipo_produtos.descricao As Tipo_Produto,count(*) As Vendido from vendas,tipo_produtos,produtos where produtos.produto_id = tipo_produtos.id AND produtos.produto_id = vendas.produto_id group BY tipo_produtos.descricao;";
-    $result = $conn->query($sql);
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -485,15 +585,19 @@ function getTopTipoGrafico() {
         $msg = "Nenhum Serviço encontrado.";
     }
 
+    $stmt->close();
+
     $resp = json_encode(array(
         "flag" => $flag,
         "msg" => $msg,
         "dados1" => $dados1,
         "dados2" => $dados2
-    ));
+    ), JSON_UNESCAPED_UNICODE);
 
-    $conn->close();
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 }
 ?>

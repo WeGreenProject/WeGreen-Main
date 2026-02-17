@@ -1,30 +1,43 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelArtesao.php';
-session_start();
 
-$func = new Artesao();
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
 
-if (isset($_POST['op']) && $_POST['op'] == 1) {
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new Artesao($conn);
+
+if ($op == 1) {
     $resp = $func->getFiltrosArtesaoCategoria();
     echo $resp;
 }
 
-if (isset($_POST['op']) && $_POST['op'] == 2) {
-    $resp = $func->getProdutosArtesao($_POST["categoria"],$_POST["tamanho"],$_POST["estado"]);
+if ($op == 2) {
+    $resp = $func->getProdutosArtesao($_POST["categoria"], $_POST["tamanho"], $_POST["estado"]);
     echo $resp;
 }
 
-if (isset($_POST['op']) && $_POST['op'] == 3) {
+if ($op == 3) {
     $resp = $func->getProdutoArtesaoMostrar($_POST["id"]);
     echo $resp;
 }
 
-if (isset($_POST['op']) && $_POST['op'] == 7) {
+if ($op == 7) {
     $resp = $func->getFiltrosArtesaoTamanho();
     echo $resp;
 }
 
-if (isset($_POST['op']) && $_POST['op'] == 8) {
+if ($op == 8) {
     $resp = $func->getFiltrosArtesaoEstado();
     echo $resp;
 }

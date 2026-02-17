@@ -21,7 +21,7 @@
 }
 
 .modal-view-wrapper {
-  padding: 16px 32px !important;
+  padding: 20px 32px 24px !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   flex: 1 !important;
@@ -31,12 +31,12 @@
 #productFormSwal .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 #productFormSwal .form-row-full {
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 #productFormSwal .form-col {
@@ -48,7 +48,7 @@
   font-size: 13px;
   font-weight: 600;
   color: #1e293b;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
 }
@@ -77,11 +77,23 @@
 
 #productFormSwal textarea {
   resize: vertical;
-  min-height: 55px;
+  min-height: 72px;
   font-family: inherit;
 }
 
-/* Botão de Selecionar Fotos */
+#productFormSwal .sustentabilidade-row {
+  margin-bottom: 10px;
+}
+
+#productFormSwal #comissaoInfo {
+  margin-top: 10px !important;
+  margin-bottom: 14px;
+}
+
+#productFormSwal .descricao-field {
+  margin-top: 4px;
+}
+
 #selectPhotosBtn {
   background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%) !important;
   color: #ffffff !important;
@@ -95,7 +107,6 @@
   box-shadow: 0 6px 16px rgba(60, 179, 113, 0.4) !important;
 }
 
-/* Preview de Fotos */
 .photo-preview-card {
   position: relative;
   border-radius: 12px !important;
@@ -138,7 +149,6 @@
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
 }
 
-/* Botões do Modal */
 .product-modal-view .swal2-actions {
   padding: 20px 24px !important;
   gap: 12px !important;
@@ -182,7 +192,6 @@
   border-color: #d1d5db !important;
 }
 
-/* Responsividade */
 @media (max-width: 1200px) {
   .product-modal-view {
     width: 90% !important;
@@ -208,7 +217,7 @@
     gap: 14px;
   }
 
-  /* Modal de visualização */
+  
   .modal-view-container {
     gap: 20px;
   }
@@ -260,7 +269,7 @@
     font-size: 14px;
   }
 
-  /* Modal de visualização */
+  
   .modal-view-container {
     flex-direction: column;
     gap: 16px;
@@ -378,7 +387,7 @@
     font-size: 13px !important;
   }
 
-  /* Modal de galeria */
+  
   .photo-gallery-title {
     font-size: 16px !important;
     padding: 12px 16px !important;
@@ -473,7 +482,6 @@
   gap: 12px;
 }
 
-/* Galeria de Fotos */
 .modal-gallery .gallery-main {
   width: 280px;
   height: 350px;
@@ -515,7 +523,6 @@
   transform: scale(1.05);
 }
 
-/* Info Items */
 .info-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

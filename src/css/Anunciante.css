@@ -152,7 +152,7 @@
         flex-direction: column;
     }
 
-    /* Top Navbar */
+    
     .top-navbar {
         background: #2d3748;
         border-bottom: 1px solid #4a5568;
@@ -172,7 +172,7 @@
         gap: 8px;
     }
 
-    /* Stat Card Progress Bar (dentro dos KPIs) */
+    
     .stat-progress {
         margin-top: 12px;
         width: 100%;
@@ -365,7 +365,7 @@
         transition: color 0.3s;
     }
 
-    /* User Dropdown Menu */
+    
     .user-dropdown {
         position: absolute;
         top: 60px;
@@ -474,7 +474,7 @@
         border-radius: 0 0 12px 12px;
     }
 
-    /* Páginas */
+    
     .page {
         display: none;
         padding: 30px 40px;
@@ -485,7 +485,7 @@
         display: block;
     }
 
-    /* Perfil ocupa toda a largura */
+    
     #profile.page {
         padding: 20px 0 0 0;
         overflow-y: hidden;
@@ -613,7 +613,7 @@
         font-weight: 600;
     }
 
-    /* Cards compactos para relatórios e dashboard */
+    
     .stats-grid-compact {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
@@ -742,12 +742,12 @@
         font-size: 12px;
     }
 
-    /* Grid específico para relatórios */
+    
     .charts-grid-reports {
         grid-template-columns: 3fr 7fr;
     }
 
-    /* Linha 1: Receita (30%) à esquerda e Vendas por Categoria (70%) à direita */
+    
     .chart-card-small {
         grid-column: 1;
     }
@@ -756,7 +756,7 @@
         grid-column: 2;
     }
 
-    /* Linha 2: Lucro por Produto e Margem de Lucro (mesma altura da linha 1) */
+    
     .chart-card-compact-small {
         padding: 18px;
     }
@@ -850,7 +850,7 @@
         color: #3cb371 !important;
     }
 
-    /* Botões Base */
+    
     .btn {
         display: inline-flex;
         align-items: center;
@@ -1025,7 +1025,7 @@
         }
     }
 
-    /* Modal Forms */
+    
     .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -1082,7 +1082,7 @@
         width: 100%;
     }
 
-    /* Filters */
+    
     .filters {
         margin-bottom: 20px;
         display: flex;
@@ -1116,7 +1116,7 @@
         color: #718096;
     }
 
-    /* Action Buttons */
+    
     .btn-edit {
         background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
         color: #1a202c;
@@ -1156,7 +1156,7 @@
         box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
     }
 
-    /* Status Badges */
+    
     .status-active {
         color: #38a169;
         font-weight: 600;
@@ -1174,7 +1174,7 @@
         animation: pulse 2s infinite;
     }
 
-    /* Table Styles - Padronizado para todas as tabelas */
+    
     .table-container {
         width: 100%;
         background: #ffffff;
@@ -1257,7 +1257,7 @@
         background: #f0f9f0 !important;
     }
 
-    /* Sobrepor estilos DataTables padrão */
+    
     #reportsTable tbody tr,
     #productsTable tbody tr,
     #reportsTable tbody tr td,
@@ -1327,7 +1327,7 @@
         border-color: #3cb371;
     }
 
-    /* Checkbox Styles */
+    
     #productsTable input[type="checkbox"],
     #selectAll {
         width: 20px;
@@ -1350,14 +1350,14 @@
         border-color: #3cb371;
     }
 
-    /* Product Limit Indicator */
+    
     #productLimit {
         margin-left: 20px;
         color: #718096;
         font-size: 14px;
     }
 
-    /* Close Button */
+    
     .close {
         float: right;
         cursor: pointer;
@@ -1370,14 +1370,14 @@
         color: #3cb371;
     }
 
-    /* Header Actions */
+    
     .header-actions {
         display: flex;
         align-items: center;
         gap: 12px;
     }
 
-    /* Bulk Actions Bar */
+    
     .bulk-actions {
         background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
         padding: 15px 25px;
@@ -1416,7 +1416,7 @@
         box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
     }
 
-    /* Stock Low Badge */
+    
     .stock-low {
         color: #e53e3e;
         font-weight: 600;
@@ -1434,7 +1434,7 @@
         50% { opacity: 0.5; }
     }
 
-    /* Action Buttons with Icons */
+    
     .btn-view {
         padding: 8px 12px;
         border: none;
@@ -1457,7 +1457,7 @@
         margin-right: 5px;
     }
 
-    /* Photo Preview Grid */
+    
     .photo-preview {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -1474,7 +1474,7 @@
         border: 2px solid #e2e8f0;
     }
 
-    /* Filter Improvements */
+    
     .filters {
         display: flex;
         gap: 12px;
@@ -1487,7 +1487,7 @@
         min-width: 200px;
     }
 
-    /* Header Actions Improvements */
+    
     .header-actions {
         display: flex;
         align-items: center;
@@ -1501,7 +1501,7 @@
         align-items: center;
     }
 
-    /* Clickable Table Rows */
+    
     #productsTable tbody tr {
         cursor: pointer;
         transition: background-color 0.2s ease;
@@ -1521,7 +1521,7 @@
         min-width: 180px;
     }
 
-    /* Modal de Visualização */
+    
     .swal2-popup.product-modal-view {
         border-radius: 12px !important;
         max-height: none !important;
@@ -1566,7 +1566,7 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
     }
 
-    /* Formulário dentro do SweetAlert2 */
+    
     .swal2-popup.product-modal-view form {
         width: 100%;
         display: flex;
@@ -1660,7 +1660,7 @@
         display: block;
     }
 
-    /* Botões do SweetAlert2 */
+    
     .swal2-popup.product-modal-view .swal2-actions {
         padding: 0 20px 20px 20px !important;
         margin: 0 !important;
@@ -1713,7 +1713,7 @@
         color: #ffffff !important;
     }
 
-    /* Photo Preview */
+    
     .swal2-popup.product-modal-view .photo-preview {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
@@ -1739,7 +1739,7 @@
         transform: scale(1.05);
     }
 
-    /* Responsivo */
+    
     @media (max-width: 768px) {
         .swal2-popup.product-modal-view .form-row {
             grid-template-columns: 1fr;
@@ -1761,7 +1761,7 @@
         text-align: left;
     }
 
-    /* Galeria de Fotos */
+    
     .modal-gallery {
         display: flex;
         flex-direction: column;
@@ -1811,7 +1811,7 @@
         border-color: #3cb371;
     }
 
-    /* Informações do Produto */
+    
     .modal-view-right {
         display: flex;
         flex-direction: column;
@@ -1871,16 +1871,14 @@
         margin: 0;
     }
 
-    /* Responsivo para modal */
+    
     @media (max-width: 900px) {
         .modal-view-container {
             grid-template-columns: 1fr;
         }
     }
 
-    /* ========================
-       ESTILOS DE PERFIL
-       ======================== */
+    
 
     .profile-container {
         margin-bottom: 20px;
@@ -2004,7 +2002,7 @@
         gap: 20px;
     }
 
-    /* Profile Tabs */
+    
     .profile-tabs {
         display: flex;
         gap: 0;
@@ -2072,7 +2070,7 @@
         box-shadow: 0 4px 15px rgba(60, 179, 113, 0.1);
     }
 
-    /* Plano & Ranking Card */
+    
     .plan-info-card {
         background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
         border-radius: 12px;
@@ -2211,7 +2209,7 @@
         font-weight: 600;
     }
 
-    /* Segurança Card */
+    
     .security-content {
         padding: 10px 0;
     }
@@ -2358,7 +2356,6 @@
         }
     }
 
-
         .gallery-main {
             height: 300px;
         }
@@ -2366,11 +2363,6 @@
         .modal-view-right {
             grid-template-columns: 1fr;
         }
-
-
-/* ==========================================
-   ESTILOS PARA PÁGINA DE ENCOMENDAS
-   ========================================== */
 
 #sales .filters {
     display: flex;
@@ -2555,34 +2547,6 @@
     transform: translateY(-2px);
 }
 
-/* Indicador de Urgência - REMOVIDO (não usado) */
-/* .row-urgent {
-    background: #fff5f5 !important;
-    border-left: 4px solid #e53e3e;
-}
-
-.row-urgent:hover {
-    background: #fed7d7 !important;
-} */
-
-/* Badge Novo - REMOVIDO (não usado) */
-/* .badge-new {
-    background: #3cb371;
-    color: white;
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge-danger {
-    background: #e53e3e;
-    color: white;
-}
-
-/* Transportadora Info */
 .transportadora-info {
     display: flex;
     align-items: center;
@@ -2590,7 +2554,6 @@
     color: #4a5568;
 }
 
-/* Tooltip para morada */
 .customer-info {
     cursor: help;
     position: relative;
@@ -2612,7 +2575,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para DataTables */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
     background: #3cb371 !important;
     border-color: #3cb371 !important;
@@ -2623,4 +2585,188 @@
     background: #3cb371 !important;
     border-color: #3cb371 !important;
     color: white !important;
+}
+
+td.enc-toggle {
+    width: 24px !important;
+    min-width: 24px;
+    max-width: 32px;
+    text-align: center;
+    padding: 0 4px !important;
+    cursor: pointer;
+    vertical-align: middle;
+    user-select: none;
+}
+
+.enc-toggle-icon {
+    font-size: 11px;
+    color: #b0b8c4;
+    transition: transform 0.25s ease, color 0.2s ease;
+    display: inline-block;
+}
+
+td.enc-toggle:hover .enc-toggle-icon {
+    color: #3cb371;
+}
+
+tr.dt-row-expanded > td.enc-toggle .enc-toggle-icon {
+    transform: rotate(90deg);
+    color: #3cb371;
+}
+
+tr.dt-row-expanded {
+    background: #f7fdf9 !important;
+}
+
+.enc-produto-resumo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.enc-produto-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    background: #3cb371;
+    color: white;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.enc-produto-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #2d3748;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+#encomendasTable > tbody > tr.child > td,
+#encomendasTable > tbody > tr > td[colspan] {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.enc-child-wrapper {
+    width: 100%;
+    background: #f8faf9;
+    border-left: 3px solid #3cb371;
+    margin: 0;
+}
+
+.enc-child-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.enc-child-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid #edf2f7;
+    transition: background 0.15s ease;
+    gap: 14px;
+}
+
+.enc-child-row:last-child {
+    border-bottom: none;
+}
+
+.enc-child-row:hover {
+    background: #eef7f1;
+}
+
+.enc-child-cell-img {
+    flex-shrink: 0;
+    width: 50px;
+    padding-left: 8px;
+}
+
+.enc-child-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    display: block;
+}
+
+.enc-child-cell-name {
+    flex: 1;
+    min-width: 0;
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.enc-child-cell-meta {
+    flex-shrink: 0;
+    text-align: right;
+    padding-right: 10px;
+    white-space: nowrap;
+}
+
+.enc-child-qty-tag,
+.enc-child-tax-tag,
+.enc-child-eco-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+    margin-left: 6px;
+}
+
+.enc-child-qty-tag {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.enc-child-qty-tag i {
+    color: #3cb371;
+    font-size: 11px;
+}
+
+.enc-child-tax-tag {
+    background: #fffbeb;
+    color: #b7791f;
+}
+
+.enc-child-tax-tag i {
+    color: #ecc94b;
+    font-size: 11px;
+}
+
+.enc-child-eco-tag {
+    background: #f0fff4;
+    color: #276749;
+}
+
+.enc-child-eco-tag i {
+    color: #38a169;
+    font-size: 11px;
+}
+
+.enc-child-empty {
+    padding: 16px 24px;
+    text-align: center;
+    color: #a0aec0;
+    font-style: italic;
+    font-size: 13px;
 }

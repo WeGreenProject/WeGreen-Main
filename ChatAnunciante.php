@@ -17,10 +17,11 @@ if(!isset($_SESSION['utilizador']) || ($_SESSION['tipo'] != 1 && $_SESSION['tipo
     <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/ChatCliente.css">
     <link rel="stylesheet" href="src/css/ChatAnunciante.css">
-    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+    <link rel="stylesheet" href="src/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="src/js/notifications.js"></script>
 </head>
 <body class="page-chat-cliente">
@@ -70,7 +71,7 @@ if(!isset($_SESSION['utilizador']) || ($_SESSION['tipo'] != 1 && $_SESSION['tipo
                 </div>
                 <div class="navbar-right">
                     <?php include 'src/views/notifications-widget.php'; ?>
-                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;" <?php echo (isset($_SESSION['plano']) && $_SESSION['plano'] == 3) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>>
+                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="<?php echo (isset($_SESSION['plano']) && $_SESSION['plano'] == 3) ? 'display: none;' : 'display: inline-flex;'; ?>">
                         <i class="fas fa-crown"></i> Upgrade
                     </button>
                     <div class="navbar-user" id="userMenuBtn">
@@ -146,7 +147,7 @@ if(!isset($_SESSION['utilizador']) || ($_SESSION['tipo'] != 1 && $_SESSION['tipo
                             </div>
 
                             <div class="chat-input-container" id="BotaoEscrever">
-                                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" style="display: none;">
                                 <button class="chat-attach-btn" id="attachBtn" title="Anexar imagem">
                                     <i class="fas fa-paperclip"></i>
                                 </button>
@@ -172,43 +173,5 @@ if(!isset($_SESSION['utilizador']) || ($_SESSION['tipo'] != 1 && $_SESSION['tipo
 
     <script src="src/js/ChatAnunciante.js"></script>
     <script src="src/js/alternancia.js"></script>
-    <script>
-        function logout() {
-            $.ajax({
-                url: 'src/controller/controllerPerfil.php?op=2',
-                method: 'GET'
-            }).always(function() {
-                window.location.href = 'index.html';
-            });
-        }
-
-        // Toggle do menu de usuário
-        document.getElementById('userMenuBtn')?.addEventListener('click', function() {
-            document.getElementById('userDropdown').classList.toggle('show');
-        });
-
-        window.addEventListener('click', function(e) {
-            if (!e.target.closest('#userMenuBtn') && !e.target.closest('#userDropdown')) {
-                document.getElementById('userDropdown')?.classList.remove('show');
-            }
-        });
-
-        // Verificar plano para mostrar botão Upgrade
-        function verificarPlanoUpgrade() {
-            $.post('src/controller/controllerDashboardAnunciante.php', { op: 27 }, function(resp) {
-                const dados = JSON.parse(resp);
-                if (dados && dados.plano_nome !== "Plano Profissional Eco+") {
-                    $("#upgradeBtn").show();
-                } else {
-                    $("#upgradeBtn").hide();
-                }
-            });
-        }
-
-        // Chamar verificação ao carregar
-        $(document).ready(function() {
-            verificarPlanoUpgrade();
-        });
-    </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -54,7 +55,7 @@
     </div>
 
     <script>
-      // Obter token da URL
+      
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get("token");
 
@@ -103,7 +104,7 @@
         `;
         document.getElementById("actionLinks").style.display = "block";
 
-        // Redirecionar automaticamente após 3 segundos
+        
         setTimeout(() => {
           window.location.href = "login.html";
         }, 3000);

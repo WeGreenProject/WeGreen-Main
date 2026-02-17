@@ -58,6 +58,17 @@
                                 </tr>
                             </table>
 
+                            <?php if (!empty($observacao_status ?? '')): ?>
+                            <h3 style="margin: 0 0 10px 0; color: #1f2937; font-size: 18px;">
+                                📝 Observações do Vendedor
+                            </h3>
+                            <div style="background-color: #f9fafb; border-left: 4px solid #f59e0b; padding: 15px; margin-bottom: 25px; border-radius: 4px;">
+                                <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                                    <?php echo nl2br(htmlspecialchars($observacao_status)); ?>
+                                </p>
+                            </div>
+                            <?php endif; ?>
+
                             <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 20px; margin-bottom: 25px;">
                                 <h4 style="margin: 0 0 10px 0; color: #065f46; font-size: 16px;">
                                     📦 O que acontece agora?

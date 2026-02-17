@@ -3,12 +3,21 @@ require_once 'connection.php';
 
 class Mulher {
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
 function getFiltrosMulherCategoria() {
-    global $conn;
+        try {
+
     $msg = "";
 
     $sql = "SELECT id AS ValueProduto, tipo_produtos.descricao AS NomeProduto FROM tipo_produtos,Produtos where Produtos.ativo = 1 AND tipo_produtos.id = Produtos.tipo_produto_id group by tipo_produtos.id;";
-    $result = $conn->query($sql);
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     $msg .= "<option value='-1'>Selecionar Categoria</option>";
 
@@ -20,18 +29,25 @@ function getFiltrosMulherCategoria() {
         $msg .= "<option value='1'>Sem Registos</option>";
     }
 
-    $conn->close();
+    if (isset($stmt) && $stmt) {
+        $stmt->close();
+    }
+
     return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
     function getFiltrosMulherTamanho(){
+        try {
 
-        global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT tamanho AS NomeTamanho,
-                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Mulher' ORDER BY tamanho AND Produtos.ativo = 1;";
+                tamanho AS ValueTamanho FROM Produtos WHERE genero = 'Mulher' AND Produtos.ativo = 1 ORDER BY tamanho;";
 
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         $msg .= "<option value='-1'>Selecionar Tamanho</option>";
         if ($result->num_rows > 0) {
@@ -43,22 +59,27 @@ function getFiltrosMulherCategoria() {
                 $msg .= "<option value='-1'>Selecionar Categoria...</option>";
                 $msg .= "<option value='1'>Sem Registos</option>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
 
-
-    $conn->close();
     return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
     function getFiltrosMulherEstado(){
+        try {
 
-        global $conn;
         $msg = "";
         $sql = "SELECT DISTINCT estado AS NomeEstado,
-                estado AS ValueEstado FROM Produtos WHERE genero = 'Mulher' ORDER BY estado AND Produtos.ativo = 1;";
-        $result = $conn->query($sql);
-
+                estado AS ValueEstado FROM Produtos WHERE genero = 'Mulher' AND Produtos.ativo = 1 ORDER BY estado;";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         $msg .= "<option value='-1'>Selecionar Estado.</option>";
         if ($result->num_rows > 0) {
@@ -70,39 +91,57 @@ function getFiltrosMulherCategoria() {
                 $msg .= "<option value='-1'>Selecionar Categoria...</option>";
                 $msg .= "<option value='1'>Sem Registos</option>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
 
-
-    $conn->close();
     return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 function getProdutosMulher($categoria,$tamanho,$estado){
-    global $conn;
+        try {
+
     $msg = "";
 
     $sql = "SELECT * FROM Produtos WHERE ativo = 1 AND genero='Mulher' AND designer_id IS NULL";
 
+    $params = [];
+    $types = "";
+
         if (isset($tamanho) && $tamanho != "" && $tamanho != "-1") {
-            $sql .= " AND tamanho = '$tamanho'";
+            $sql .= " AND tamanho = ?";
+            $params[] = $tamanho;
+            $types .= "s";
         }
         if (isset($estado) && $estado != "" && $estado != "-1") {
-            $sql .= " AND estado = '$estado'";
+            $sql .= " AND estado = ?";
+            $params[] = $estado;
+            $types .= "s";
         }
         if (isset($categoria) && $categoria != "" && $categoria != "-1") {
-            $sql .= " AND tipo_produto_id = '$categoria'";
+            $sql .= " AND tipo_produto_id = ?";
+            $params[] = $categoria;
+            $types .= "s";
         }
 
-    $result = $conn->query($sql);
-
+    $stmt = $this->conn->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $msg .= "<div class='col-md-3 col-sm-6'>";
             $msg .= "<div class='card border-0 shadow-sm rounded-4 h-80' style='position: relative;'>";
 
-            // Adicionar botão de favorito (apenas para clientes logados)
+
             if(isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2) {
                 $msg .= "<button class='btn-favorito' data-produto-id='".$row['Produto_id']."' onclick='toggleFavorito(".$row['Produto_id'].", this)'>";
                 $msg .= "<i class='far fa-heart'></i>";
@@ -121,35 +160,48 @@ function getProdutosMulher($categoria,$tamanho,$estado){
         $msg = "<p class='text-center text-muted'>Produto não encontrado.</p>";
     }
 
-    $conn->close();
     return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 
-
 function getProdutoMulherMostrar($ID_Produto){
-    global $conn;
-    $msg = "";
-    $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,ranking.nome As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos,utilizadores,ranking WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id AND utilizadores.ranking_id = ranking.id";
+        try {
 
-    $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = $ID_Produto";
+    $msg = "";
+    $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*,utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,COALESCE(ranking.nome, 'Sem ranking') As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos INNER JOIN utilizadores ON produtos.anunciante_id = utilizadores.id LEFT JOIN ranking ON utilizadores.ranking_id = ranking.id WHERE Produtos.Produto_id = ? AND Produtos.ativo = 1";
+
+    $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = ?";
 
     $sql3 = "SELECT Produto_id, nome, foto, marca, tamanho, estado, preco
              FROM Produtos
-             WHERE genero = (SELECT genero FROM Produtos WHERE Produto_id = $ID_Produto)
-             AND Produto_id != $ID_Produto
+             WHERE genero = (SELECT genero FROM Produtos WHERE Produto_id = ?)
+             AND Produto_id != ?
              AND ativo = 1
              LIMIT 4";
 
-    $result = $conn->query($sql);
-    $result2 = $conn->query($sql2);
-    $result3 = $conn->query($sql3);
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $ID_Produto);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $stmt2 = $this->conn->prepare($sql2);
+    $stmt2->bind_param("i", $ID_Produto);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+
+    $stmt3 = $this->conn->prepare($sql3);
+    $stmt3->bind_param("ii", $ID_Produto, $ID_Produto);
+    $stmt3->execute();
+    $result3 = $stmt3->get_result();
 
     if ($result->num_rows > 0) {
         while ($rowProduto = $result->fetch_assoc()) {
             $msg .= "<div class='col-md-6'>";
             $msg .= "<div class='card border-0 shadow-sm rounded-4 h-100' style='position: relative;'>";
 
-            // Adicionar botão de favorito na galeria
+
             if(isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2) {
                 $msg .= "<button class='btn-favorito' id='btnFavorito' data-produto-id='".$rowProduto['Produto_id']."' onclick='toggleFavorito(".$rowProduto['Produto_id'].", this)' style='position: absolute; top: 20px; right: 20px; z-index: 100;'>";
                 $msg .= "<i class='far fa-heart'></i>";
@@ -259,9 +311,10 @@ function getProdutoMulherMostrar($ID_Produto){
         $msg = "<p class='text-center text-muted'>Produto não encontrado.</p>";
     }
 
-    $conn->close();
-
     return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 }
 ?>

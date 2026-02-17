@@ -16,7 +16,6 @@ body {
   min-height: 100vh;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 280px;
   background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
@@ -173,7 +172,6 @@ body {
   justify-content: center;
 }
 
-/* USER PROFILE */
 .user-profile {
   position: absolute;
   bottom: 0;
@@ -256,7 +254,6 @@ body {
   transform: rotate(90deg);
 }
 
-/* MAIN CONTENT */
 .main-content {
   flex: 1;
   margin-left: 280px;
@@ -284,7 +281,6 @@ body {
   font-size: 16px;
 }
 
-/* TABS */
 .tabs-container {
   margin-bottom: 30px;
   display: flex;
@@ -327,7 +323,6 @@ body {
   display: block;
 }
 
-/* TABLE */
 .table-container {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -390,7 +385,6 @@ tr:last-child td {
   border: 2px solid #e2e8f0;
 }
 
-/* STATUS BADGES */
 .status-badge {
   display: inline-block;
   padding: 6px 12px;
@@ -415,7 +409,6 @@ tr:last-child td {
   color: #ef4444;
 }
 
-/* FORM */
 .form-container {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -471,7 +464,6 @@ tr:last-child td {
   box-shadow: 0 0 0 3px rgba(166, 217, 12, 0.1);
 }
 
-/* BUTTONS */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -545,7 +537,6 @@ tr:last-child td {
   box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
 }
 
-/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -587,7 +578,6 @@ tr:last-child td {
   position: relative;
 }
 
-/* Scrollbar personalizada para o modal */
 .modal-content::-webkit-scrollbar {
   width: 8px;
 }
@@ -769,7 +759,6 @@ tr:last-child td {
   box-shadow: 0 5px 20px rgba(220, 38, 38, 0.4);
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .sidebar {
     width: 80px;
@@ -796,7 +785,6 @@ tr:last-child td {
   }
 }
 
-/* ANIMATIONS */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -816,7 +804,7 @@ tr:last-child td {
     opacity: 1;
   }
 }
-/* Estado vazio do chat - Mensagem centralizada */
+
 .empty-chat-state {
   display: flex;
   flex-direction: column;
@@ -932,7 +920,6 @@ tr:last-child td {
   font-weight: 500;
 }
 
-/* Versão alternativa mais simples */
 .empty-chat-simple {
   display: flex;
   flex-direction: column;
@@ -963,7 +950,6 @@ tr:last-child td {
   color: #a0aec0;
 }
 
-/* Responsivo */
 @media (max-width: 768px) {
   .empty-chat-icon {
     width: 100px;

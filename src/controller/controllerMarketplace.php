@@ -1,25 +1,39 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
 
 include_once '../model/modelMarketplace.php';
-session_start();
 
-$func = new Marketplace();
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
 
-// op 1 - Obter todos os produtos com filtros
-if (isset($_POST['op']) && $_POST['op'] == 1) {
-    $categoria = isset($_POST["categoria"]) ? $_POST["categoria"] : null;
-    $tipoVendedor = isset($_POST["tipoVendedor"]) ? $_POST["tipoVendedor"] : null;
-    $tipoProduto = isset($_POST["tipoProduto"]) ? $_POST["tipoProduto"] : null;
-    $marca = isset($_POST["marca"]) ? $_POST["marca"] : null;
-    $precoMin = isset($_POST["precoMin"]) ? $_POST["precoMin"] : null;
-    $precoMax = isset($_POST["precoMax"]) ? $_POST["precoMax"] : null;
-    $tamanho = isset($_POST["tamanho"]) ? $_POST["tamanho"] : null;
-    $estado = isset($_POST["estado"]) ? $_POST["estado"] : null;
-    $pesquisa = isset($_POST["pesquisa"]) ? $_POST["pesquisa"] : null;
-    $ordenacao = isset($_POST["ordenacao"]) ? $_POST["ordenacao"] : 'relevant';
-    $limite = isset($_POST["limite"]) ? (int)$_POST["limite"] : null;
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new Marketplace($conn);
+
+if ($op == 1) {
+    $categoria = $_POST["categoria"] ?? null;
+    $tipoVendedor = $_POST["tipoVendedor"] ?? null;
+    $tipoProduto = $_POST["tipoProduto"] ?? null;
+    $marca = $_POST["marca"] ?? null;
+    $precoMin = $_POST["precoMin"] ?? null;
+    $precoMax = $_POST["precoMax"] ?? null;
+    $tamanho = $_POST["tamanho"] ?? null;
+    $estado = $_POST["estado"] ?? null;
+    $pesquisa = $_POST["pesquisa"] ?? null;
+    $ordenacao = $_POST["ordenacao"] ?? 'relevant';
+    $limite = $_POST["limite"] ?? null;
+    $limite = $limite ? (int)$limite : null;
+
+    $isCliente = isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2;
+    $isLoggedIn = isset($_SESSION['utilizador']);
+    $clienteId = ($isCliente && $isLoggedIn) ? (int)$_SESSION['utilizador'] : null;
 
     $resp = $func->getProdutos(
         $categoria,
@@ -32,23 +46,15 @@ if (isset($_POST['op']) && $_POST['op'] == 1) {
         $estado,
         $pesquisa,
         $ordenacao,
-        $limite
+        $limite,
+        $isCliente,
+        $isLoggedIn,
+        $clienteId
     );
-
-    // Decodificar resposta para adicionar informação de sessão
-    $respData = json_decode($resp, true);
-    if ($respData && isset($respData['success'])) {
-        // Adicionar informação se o usuário é cliente logado
-        $respData['isCliente'] = isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2;
-        $respData['isLoggedIn'] = isset($_SESSION['utilizador']);
-        echo json_encode($respData);
-    } else {
-        echo $resp;
-    }
+    echo $resp;
 }
 
-// op 2 - Obter filtros disponíveis
-if (isset($_POST['op']) && $_POST['op'] == 2) {
+if ($op == 2) {
     $resp = $func->getFiltrosDisponiveis();
     echo $resp;
 }

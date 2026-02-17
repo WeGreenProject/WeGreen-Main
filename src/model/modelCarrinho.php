@@ -4,8 +4,15 @@ require_once 'connection.php';
 
 class Carrinho {
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
     function getCarrinho($utilizador_id) {
-        global $conn;
+        try {
+
         $msg = "";
 
         if ($utilizador_id === null || $utilizador_id === '') {
@@ -28,11 +35,14 @@ class Carrinho {
                     Carrinho_Itens.quantidade
                 FROM Carrinho_Itens
                 INNER JOIN Produtos ON Carrinho_Itens.produto_id = Produtos.Produto_id
-                WHERE Carrinho_Itens.utilizador_id = '$utilizador_id'
+                WHERE Carrinho_Itens.utilizador_id = ?
                 AND Produtos.ativo = 1
                 ORDER BY Carrinho_Itens.data_adicao DESC";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $utilizador_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $msg .= "<div class='section-header'>";
@@ -74,34 +84,36 @@ class Carrinho {
         }
 
         return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function getResumoPedido() {
-        global $conn;
+        try {
+
         $msg = "";
         $subtotal = 0;
         $shipping = 5.00;
 
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-
-        $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : null;
+        $utilizador_id = $this->obterOuCriarUtilizadorTemporario();
 
         if ($utilizador_id === null || $utilizador_id === '') {
             return "";
         }
-
 
         $sql = "SELECT
                     Produtos.preco,
                     Carrinho_Itens.quantidade
                 FROM Carrinho_Itens
                 INNER JOIN Produtos ON Carrinho_Itens.produto_id = Produtos.Produto_id
-                WHERE Carrinho_Itens.utilizador_id = '$utilizador_id'
+                WHERE Carrinho_Itens.utilizador_id = ?
                 AND Produtos.ativo = 1";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $utilizador_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
@@ -140,77 +152,84 @@ class Carrinho {
         $msg .= "</div>";
 
         return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function adicionarAoCarrinho($produto_id, $quantidade = 1) {
-        global $conn;
+        try {
 
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-
-        $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : null;
+        $utilizador_id = $this->obterOuCriarUtilizadorTemporario();
 
         if ($utilizador_id === null) {
             return "Erro: Utilizador não autenticado";
         }
 
-        // Verificar se o produto existe
-        $sql_produto = "SELECT Produto_id FROM Produtos WHERE Produto_id = $produto_id AND ativo = 1";
-        $result_produto = $conn->query($sql_produto);
+        $stmt_prod = $this->conn->prepare("SELECT Produto_id, stock FROM Produtos WHERE Produto_id = ? AND ativo = 1");
+        $stmt_prod->bind_param("i", $produto_id);
+        $stmt_prod->execute();
+        $result_produto = $stmt_prod->get_result();
 
         if ($result_produto->num_rows == 0) {
             return "Erro: Produto não encontrado ou inativo";
         }
 
-        $sql = "SELECT * FROM Carrinho_Itens
-                WHERE utilizador_id = '$utilizador_id'
-                AND produto_id = $produto_id";
-        $result = $conn->query($sql);
+        $row_prod = $result_produto->fetch_assoc();
+        if ((int)$row_prod['stock'] <= 0) {
+            return "Erro: Produto esgotado";
+        }
+
+        $stmt_check = $this->conn->prepare("SELECT * FROM Carrinho_Itens WHERE utilizador_id = ? AND produto_id = ?");
+        $stmt_check->bind_param("ii", $utilizador_id, $produto_id);
+        $stmt_check->execute();
+        $result = $stmt_check->get_result();
 
         if (!$result) {
-            return "Erro: " . $conn->error;
+            return "Erro: " . $this->conn->error;
         }
 
         if ($result->num_rows > 0) {
-            $sql = "UPDATE Carrinho_Itens
-                    SET quantidade = quantidade + $quantidade
-                    WHERE utilizador_id = '$utilizador_id'
-                    AND produto_id = $produto_id";
+            $stmt_up = $this->conn->prepare("UPDATE Carrinho_Itens SET quantidade = quantidade + ? WHERE utilizador_id = ? AND produto_id = ?");
+            $stmt_up->bind_param("iii", $quantidade, $utilizador_id, $produto_id);
+            if (!$stmt_up->execute()) {
+                return "Erro: " . $this->conn->error;
+            }
         } else {
-            $sql = "INSERT INTO Carrinho_Itens (utilizador_id, produto_id, quantidade)
-                    VALUES ('$utilizador_id', $produto_id, $quantidade)";
+            $stmt_ins = $this->conn->prepare("INSERT INTO Carrinho_Itens (utilizador_id, produto_id, quantidade) VALUES (?, ?, ?)");
+            if (!$stmt_ins) {
+                return "Erro: " . $this->conn->error;
+            }
+            $stmt_ins->bind_param("iii", $utilizador_id, $produto_id, $quantidade);
+            if (!$stmt_ins->execute()) {
+                return "Erro: " . $this->conn->error;
+            }
         }
 
-        if ($conn->query($sql) === TRUE) {
-            return "Produto adicionado ao carrinho";
-        } else {
-            return "Erro: " . $conn->error;
+        return "Produto adicionado ao carrinho";
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
     function atualizarQuantidade($produto_id, $mudanca) {
-        global $conn;
+        try {
 
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-
-
-        $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : null;
+        $utilizador_id = $this->obterOuCriarUtilizadorTemporario();
 
         if ($utilizador_id === null) {
             return "Erro: Utilizador não autenticado";
         }
 
-        // Verificar stock disponível antes de aumentar
         if ($mudanca > 0) {
-            $sql_stock = "SELECT Produtos.stock, Carrinho_Itens.quantidade
+            $stmt_stock = $this->conn->prepare("SELECT Produtos.stock, Carrinho_Itens.quantidade
                           FROM Carrinho_Itens
                           INNER JOIN Produtos ON Carrinho_Itens.produto_id = Produtos.Produto_id
-                          WHERE Carrinho_Itens.utilizador_id = '$utilizador_id'
-                          AND Carrinho_Itens.produto_id = $produto_id";
-            $result_stock = $conn->query($sql_stock);
+                          WHERE Carrinho_Itens.utilizador_id = ?
+                          AND Carrinho_Itens.produto_id = ?");
+            $stmt_stock->bind_param("ii", $utilizador_id, $produto_id);
+            $stmt_stock->execute();
+            $result_stock = $stmt_stock->get_result();
 
             if ($result_stock && $result_stock->num_rows > 0) {
                 $row_stock = $result_stock->fetch_assoc();
@@ -223,120 +242,254 @@ class Carrinho {
             }
         }
 
-        $sql = "SELECT quantidade FROM Carrinho_Itens
-                WHERE utilizador_id = '$utilizador_id'
-                AND produto_id = $produto_id";
-        $result = $conn->query($sql);
+        $stmt_qty = $this->conn->prepare("SELECT quantidade FROM Carrinho_Itens WHERE utilizador_id = ? AND produto_id = ?");
+        $stmt_qty->bind_param("ii", $utilizador_id, $produto_id);
+        $stmt_qty->execute();
+        $result = $stmt_qty->get_result();
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $nova_quantidade = $row['quantidade'] + $mudanca;
 
             if ($nova_quantidade <= 0) {
-                $sql = "DELETE FROM Carrinho_Itens
-                        WHERE utilizador_id = '$utilizador_id'
-                        AND produto_id = $produto_id";
+                $stmt_del = $this->conn->prepare("DELETE FROM Carrinho_Itens WHERE utilizador_id = ? AND produto_id = ?");
+                $stmt_del->bind_param("ii", $utilizador_id, $produto_id);
+                $stmt_del->execute();
             } else {
-                $sql = "UPDATE Carrinho_Itens
-                        SET quantidade = $nova_quantidade
-                        WHERE utilizador_id = '$utilizador_id'
-                        AND produto_id = $produto_id";
+                $stmt_upd = $this->conn->prepare("UPDATE Carrinho_Itens SET quantidade = ? WHERE utilizador_id = ? AND produto_id = ?");
+                $stmt_upd->bind_param("iii", $nova_quantidade, $utilizador_id, $produto_id);
+                $stmt_upd->execute();
             }
 
-            if ($conn->query($sql) === TRUE) {
-                return "Quantidade atualizada";
-            } else {
-                return "Erro: " . $conn->error;
-            }
+            return "Quantidade atualizada";
         }
 
         return "Produto não encontrado no carrinho";
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function removerDoCarrinho($produto_id) {
-        global $conn;
+        try {
 
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-
-        $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : null;
+        $utilizador_id = $this->obterOuCriarUtilizadorTemporario();
 
         if ($utilizador_id === null) {
             return "Erro: Utilizador não autenticado";
         }
 
-        $sql = "DELETE FROM Carrinho_Itens
-                WHERE utilizador_id = '$utilizador_id'
-                AND produto_id = $produto_id";
+        $stmt = $this->conn->prepare("DELETE FROM Carrinho_Itens WHERE utilizador_id = ? AND produto_id = ?");
+        $stmt->bind_param("ii", $utilizador_id, $produto_id);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             return "Produto removido do carrinho";
         } else {
-            return "Erro: " . $conn->error;
+            return "Erro: " . $this->conn->error;
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
     function limparCarrinho() {
-        global $conn;
+        try {
 
-        if (!isset($_SESSION)) {
-            session_start();
-        }
-
-        $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : null;
+        $utilizador_id = $this->obterOuCriarUtilizadorTemporario();
 
         if ($utilizador_id === null) {
             return "Erro: Utilizador não autenticado";
         }
 
-        $sql = "DELETE FROM Carrinho_Itens WHERE utilizador_id = '$utilizador_id'";
+        $stmt = $this->conn->prepare("DELETE FROM Carrinho_Itens WHERE utilizador_id = ?");
+        $stmt->bind_param("i", $utilizador_id);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             return "Carrinho limpo com sucesso";
         } else {
-            return "Erro: " . $conn->error;
+            return "Erro: " . $this->conn->error;
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
     function transferirCarrinhoTemporario($temp_user_id, $user_id_real) {
-        global $conn;
+        try {
 
-        // Verificar se existem itens no carrinho temporário
-        $sql_check = "SELECT * FROM Carrinho_Itens WHERE utilizador_id = '$temp_user_id'";
-        $result = $conn->query($sql_check);
+        $stmt_check = $this->conn->prepare("SELECT * FROM Carrinho_Itens WHERE utilizador_id = ?");
+        $stmt_check->bind_param("i", $temp_user_id);
+        $stmt_check->execute();
+        $result = $stmt_check->get_result();
 
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $produto_id = $row['produto_id'];
                 $quantidade_temp = $row['quantidade'];
 
-                // Verificar se o produto já existe no carrinho do usuário real
-                $sql_existe = "SELECT quantidade FROM Carrinho_Itens
-                              WHERE utilizador_id = '$user_id_real' AND produto_id = $produto_id";
-                $result_existe = $conn->query($sql_existe);
+                $stmt_existe = $this->conn->prepare("SELECT quantidade FROM Carrinho_Itens WHERE utilizador_id = ? AND produto_id = ?");
+                $stmt_existe->bind_param("ii", $user_id_real, $produto_id);
+                $stmt_existe->execute();
+                $result_existe = $stmt_existe->get_result();
 
                 if ($result_existe->num_rows > 0) {
-                    // Produto já existe, somar as quantidades
                     $row_existe = $result_existe->fetch_assoc();
                     $nova_quantidade = $row_existe['quantidade'] + $quantidade_temp;
 
-                    $sql_update = "UPDATE Carrinho_Itens
-                                  SET quantidade = $nova_quantidade
-                                  WHERE utilizador_id = '$user_id_real' AND produto_id = $produto_id";
-                    $conn->query($sql_update);
+                    $stmt_update = $this->conn->prepare("UPDATE Carrinho_Itens SET quantidade = ? WHERE utilizador_id = ? AND produto_id = ?");
+                    $stmt_update->bind_param("iii", $nova_quantidade, $user_id_real, $produto_id);
+                    $stmt_update->execute();
                 } else {
-                    // Produto não existe, transferir diretamente
-                    $sql_insert = "UPDATE Carrinho_Itens
-                                  SET utilizador_id = '$user_id_real'
-                                  WHERE utilizador_id = '$temp_user_id' AND produto_id = $produto_id";
-                    $conn->query($sql_insert);
+                    $stmt_transfer = $this->conn->prepare("UPDATE Carrinho_Itens SET utilizador_id = ? WHERE utilizador_id = ? AND produto_id = ?");
+                    $stmt_transfer->bind_param("iii", $user_id_real, $temp_user_id, $produto_id);
+                    $stmt_transfer->execute();
                 }
             }
 
-            // Limpar itens restantes do carrinho temporário
-            $sql_delete = "DELETE FROM Carrinho_Itens WHERE utilizador_id = '$temp_user_id'";
-            $conn->query($sql_delete);
+            $stmt_delete = $this->conn->prepare("DELETE FROM Carrinho_Itens WHERE utilizador_id = ?");
+            $stmt_delete->bind_param("i", $temp_user_id);
+            $stmt_delete->execute();
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function gerarIdTemporarioCarrinho($seed) {
+        $hashUnsigned = (int) sprintf('%u', crc32((string) $seed));
+        $idNormalizado = $hashUnsigned % 2000000000;
+
+        if ($idNormalizado <= 0) {
+            $idNormalizado = 1;
+        }
+
+        return -1 * $idNormalizado;
+    }
+
+    function obterOuCriarUtilizadorTemporario() {
+        try {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            $utilizadorAutenticado = $_SESSION['utilizador'] ?? null;
+            if (is_numeric($utilizadorAutenticado) && (int)$utilizadorAutenticado > 0) {
+                return (int)$utilizadorAutenticado;
+            }
+
+            $utilizadorTemporario = $_SESSION['temp_user_id'] ?? null;
+            if (is_numeric($utilizadorTemporario) && (int)$utilizadorTemporario < 0) {
+                return (int)$utilizadorTemporario;
+            }
+
+            $seedSessao = session_id();
+            if (empty($seedSessao)) {
+                $seedSessao = (string) microtime(true);
+            }
+
+            $novoIdTemporario = $this->gerarIdTemporarioCarrinho($seedSessao);
+            $_SESSION['temp_user_id'] = $novoIdTemporario;
+
+            return $novoIdTemporario;
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    function aplicarCupao($codigo) {
+        try {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $stmt = $this->conn->prepare("SELECT * FROM Cupoes WHERE codigo = ? AND ativo = 1 AND data_expiracao >= CURDATE() AND (limite_uso IS NULL OR usos_atuais < limite_uso)");
+            $stmt->bind_param("s", $codigo);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $cupao = $result->fetch_assoc();
+                $_SESSION['cupao'] = $cupao;
+                return json_encode(['flag' => true, 'msg' => 'Cupão aplicado com sucesso', 'desconto' => $cupao['desconto']], JSON_UNESCAPED_UNICODE);
+            }
+            return json_encode(['flag' => false, 'msg' => 'Cupão inválido ou expirado'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['flag' => false, 'msg' => 'Erro ao aplicar cupão'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function removerCupao() {
+        try {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            unset($_SESSION['cupao']);
+            return json_encode(['flag' => true, 'msg' => 'Cupão removido com sucesso'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['flag' => false, 'msg' => 'Erro ao remover cupão'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function temProdutosNoCarrinho($utilizador_id) {
+        try {
+            if (!$utilizador_id) {
+                return json_encode(['flag' => false, 'tem_produtos' => false], JSON_UNESCAPED_UNICODE);
+            }
+            $stmt = $this->conn->prepare("SELECT COUNT(*) as total FROM Carrinho_Itens WHERE utilizador_id = ?");
+            $stmt->bind_param("i", $utilizador_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            return json_encode(['flag' => true, 'tem_produtos' => $row['total'] > 0, 'total' => $row['total']], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['flag' => false, 'tem_produtos' => false], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function getDadosCarrinhoJSON($utilizador_id) {
+        try {
+            if (!$utilizador_id) {
+                return json_encode(['flag' => false, 'produtos' => []], JSON_UNESCAPED_UNICODE);
+            }
+                $sql = "SELECT p.Produto_id, p.nome, p.preco, p.foto, p.marca, p.tamanho, p.estado, p.stock, ci.quantidade, (p.preco * ci.quantidade) AS subtotal
+                    FROM Carrinho_Itens ci
+                    INNER JOIN Produtos p ON ci.produto_id = p.Produto_id
+                    WHERE ci.utilizador_id = ? AND p.ativo = 1
+                    ORDER BY ci.data_adicao DESC";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("i", $utilizador_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $produtos = [];
+            $total = 0;
+            while ($row = $result->fetch_assoc()) {
+                $produtos[] = $row;
+                $total += $row['subtotal'];
+            }
+            return json_encode(['flag' => true, 'produtos' => $produtos, 'total' => $total], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['flag' => false, 'produtos' => []], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function getDadosUtilizadorCompleto() {
+        try {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            if (!isset($_SESSION['utilizador'])) {
+                return json_encode(['flag' => false, 'msg' => 'Utilizador não autenticado'], JSON_UNESCAPED_UNICODE);
+            }
+            $stmt = $this->conn->prepare("SELECT id, nome, email, morada, codigo_postal, telefone, foto FROM utilizadores WHERE id = ?");
+            $stmt->bind_param("i", $_SESSION['utilizador']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($result->num_rows > 0) {
+                $user = $result->fetch_assoc();
+                return json_encode(['flag' => true, 'dados' => $user], JSON_UNESCAPED_UNICODE);
+            }
+            return json_encode(['flag' => false, 'msg' => 'Utilizador não encontrado'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['flag' => false, 'msg' => 'Erro ao obter dados do utilizador'], JSON_UNESCAPED_UNICODE);
         }
     }
 

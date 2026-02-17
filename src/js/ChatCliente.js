@@ -1,4 +1,4 @@
-// ChatCliente.js - Cliente conversa com Vendedores/Anunciantes e Administradores
+
 
 let vendedorAtual = null;
 let imagemAnexada = null;
@@ -33,20 +33,20 @@ function selecionarVendedor(vendedorId, vendedorNome) {
   console.log("selecionarVendedor() chamada", vendedorId, vendedorNome);
   vendedorAtual = vendedorId;
 
-  // Atualizar header do chat
+  
   const iniciais = getIniciais(vendedorNome);
   $("#chatUserAvatar").text(iniciais);
   $("#chatUserName").text(vendedorNome);
 
-  // Mostrar input e carregar mensagens
+  
   $("#BotaoEscrever").addClass("active");
   $(".empty-chat").hide();
 
-  // Marcar conversa como ativa
+  
   $(".conversation-item").removeClass("active");
   $(`[data-vendedor-id="${vendedorId}"]`).addClass("active");
 
-  // Carregar mensagens
+  
   getConversas(vendedorId);
 
   console.log(
@@ -58,9 +58,9 @@ function selecionarVendedor(vendedorId, vendedorNome) {
 function iniciarConversaComVendedor(vendedorId) {
   console.log("iniciarConversaComVendedor() chamada", vendedorId);
 
-  // Buscar informações do vendedor
+  
   let dados = new FormData();
-  dados.append("op", 5); // Nova operação para buscar dados do vendedor
+  dados.append("op", 5); 
   dados.append("vendedorId", vendedorId);
 
   console.log("Enviando request para op=5, vendedorId:", vendedorId);
@@ -78,11 +78,11 @@ function iniciarConversaComVendedor(vendedorId) {
       console.log("Resposta recebida de op=5:", resp);
 
       if (resp.flag) {
-        // Vendedor encontrado - abrir chat
+        
         console.log("Vendedor encontrado:", resp.nome);
         selecionarVendedor(vendedorId, resp.nome);
 
-        // Mostrar mensagem de boas-vindas
+        
         Swal.fire({
           icon: "success",
           title: "Chat Iniciado",
@@ -93,7 +93,7 @@ function iniciarConversaComVendedor(vendedorId) {
           position: "top-end",
         });
 
-        // Focar no input
+        
         setTimeout(() => {
           $("#messageInput").focus();
         }, 500);
@@ -118,7 +118,7 @@ function iniciarConversaComVendedor(vendedorId) {
 function getConversas(vendedorId) {
   console.log("getConversas() chamada", vendedorId);
   let dados = new FormData();
-  dados.append("op", 2); // Buscar mensagens com vendedor específico
+  dados.append("op", 2); 
   dados.append("IdVendedor", vendedorId);
 
   $.ajax({
@@ -153,7 +153,7 @@ function enviarMensagem() {
   }
 
   let dados = new FormData();
-  dados.append("op", 3); // Enviar mensagem
+  dados.append("op", 3); 
   dados.append("IdVendedor", vendedorAtual);
   dados.append("mensagem", mensagem);
 
@@ -222,7 +222,7 @@ function pesquisarChat() {
   const termo = $("#searchInput").val().trim();
 
   let dados = new FormData();
-  dados.append("op", 4); // Pesquisar vendedores
+  dados.append("op", 4); 
   dados.append("pesquisa", termo);
 
   $.ajax({
@@ -275,14 +275,13 @@ function alerta(titulo, msg, icon) {
   });
 }
 
-// Event Listeners
 $(document).ready(function () {
   console.log("ChatCliente.js carregado");
 
-  // Carregar lista de vendedores
+  
   getSideBar();
 
-  // Verificar se veio de um produto (auto-iniciar conversa)
+  
   const urlParams = new URLSearchParams(window.location.search);
   const vendedorId = urlParams.get("vendedor");
   const produtoId = urlParams.get("produto");
@@ -292,17 +291,17 @@ $(document).ready(function () {
 
   if (vendedorId) {
     console.log("Auto-iniciando conversa com vendedor:", vendedorId);
-    // Aguardar sidebar carregar antes de iniciar
+    
     setTimeout(() => {
       iniciarConversaComVendedor(vendedorId);
-      // Limpar URL para evitar re-inicialização
+      
       window.history.replaceState({}, document.title, "ChatCliente.php");
     }, 800);
   } else {
     console.log("Nenhum vendedor especificado na URL");
   }
 
-  // Enter para enviar mensagem
+  
   $("#messageInput").on("keypress", function (e) {
     if (e.which === 13 && !e.shiftKey) {
       e.preventDefault();
@@ -310,7 +309,7 @@ $(document).ready(function () {
     }
   });
 
-  // Colar imagem (Ctrl+V)
+  
   $("#messageInput").on("paste", function (e) {
     const items = e.originalEvent.clipboardData.items;
     for (let item of items) {
@@ -323,12 +322,12 @@ $(document).ready(function () {
     }
   });
 
-  // Botão anexar
+  
   $("#attachBtn").on("click", function () {
     $("#fileInput").click();
   });
 
-  // Selecionar arquivo
+  
   $("#fileInput").on("change", function () {
     const file = this.files[0];
     if (file) {
@@ -336,37 +335,37 @@ $(document).ready(function () {
     }
   });
 
-  // Remover preview
+  
   $(document).on("click", "#removePreview", function () {
     limparPreview();
   });
 
-  // Botão enviar
+  
   $("#sendButton").on("click", function () {
     enviarMensagem();
   });
 
-  // Auto-refresh das mensagens a cada 5 segundos
+  
   setInterval(function () {
     if (vendedorAtual) {
       getConversas(vendedorAtual);
     }
   }, 5000);
 
-  // Dropdown do usuário
+  
   $("#userMenuBtn").on("click", function (e) {
     e.stopPropagation();
     $("#userDropdown").toggleClass("active");
   });
 
-  // Fechar dropdown ao clicar fora
+  
   $(document).on("click", function (e) {
     if (!$(e.target).closest(".navbar-user").length) {
       $("#userDropdown").removeClass("active");
     }
   });
 
-  // Evitar que cliques dentro do dropdown o fechem
+  
   $("#userDropdown").on("click", function (e) {
     e.stopPropagation();
   });
@@ -408,7 +407,7 @@ function showPasswordModal() {
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      // Aqui você pode fazer uma requisição AJAX para alterar a senha
+      
       alerta("Sucesso", "Senha alterada com sucesso!", "success");
       $("#userDropdown").removeClass("active");
     }

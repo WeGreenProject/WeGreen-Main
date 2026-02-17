@@ -2,24 +2,33 @@
 
 require_once 'connection.php';
 
-class PerfilAdmin{
+class AdminPerfil {
+
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
 
     function getDadosTipoPerfilAdminInical($ID_User){
-        global $conn;
+        try {
         $msg = "";
         $row = "";
-        $sql = "SELECT utilizadores.foto AS FAdmin, utilizadores.*,tipo_utilizadores.descricao AS tipoUtilizador,ranking.nome As RankNome from utilizadores,tipo_utilizadores,ranking where utilizadores.id = tipo_utilizadores.id AND ranking.id = utilizadores.ranking_id AND utilizadores.id = ".$ID_User;
 
-        $sql2 = "SELECT Count(*) As NProdutos
-                FROM produtos 
-                WHERE anunciante_id = ".$ID_User;
-    $result1 = $conn->query($sql);
-    $result2 = $conn->query($sql2);
-                        $prod = $result2->fetch_assoc(); 
+        $stmt1 = $this->conn->prepare("SELECT utilizadores.foto AS FAdmin, utilizadores.*, tipo_utilizadores.descricao AS tipoUtilizador, ranking.nome As RankNome FROM utilizadores, tipo_utilizadores, ranking WHERE utilizadores.id = tipo_utilizadores.id AND ranking.id = utilizadores.ranking_id AND utilizadores.id = ?");
+        $stmt1->bind_param("i", $ID_User);
+        $stmt1->execute();
+        $result1 = $stmt1->get_result();
+
+        $stmt2 = $this->conn->prepare("SELECT Count(*) As NProdutos FROM produtos WHERE anunciante_id = ?");
+        $stmt2->bind_param("i", $ID_User);
+        $stmt2->execute();
+        $result2 = $stmt2->get_result();
+
+        $prod = $result2->fetch_assoc();
             if ($result1->num_rows > 0) {
                 while ($row = $result1->fetch_assoc()) {
 
-                    
                     $msg  = "<div class='profile-header-card'>";
                     $msg .= "<div class='profile-avatar-large'>";
                     $msg .= "<img src='" . $row['FAdmin'] . "' alt='User Photo' id='userPhoto'>";
@@ -66,85 +75,94 @@ class PerfilAdmin{
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
-        
+
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
+
     function uploads($foto, $nome){
-    
-    $dirFisico = __DIR__ . "/../img/";
-    $dirWeb = "src/img/";  
-    $flag = false;
-    $targetBD = "";
+        try {
 
-    if(!is_dir($dirFisico)){
-        if(!mkdir($dirFisico, 0777, TRUE)){
-            die("Erro não é possível criar o diretório");
+        $dirFisico = __DIR__ . "/../img/";
+        $dirWeb = "src/img/";
+        $flag = false;
+        $targetBD = "";
+
+        if(!is_dir($dirFisico)){
+            if(!mkdir($dirFisico, 0777, TRUE)){
+                die("Erro não é possível criar o diretório");
+            }
+        }
+
+        if(isset($foto) && is_array($foto) && !empty($foto['tmp_name']) && $foto['error'] === 0){
+
+            if(is_uploaded_file($foto['tmp_name'])){
+                $fonte = $foto['tmp_name'];
+                $ficheiro = $foto['name'];
+                $end = explode(".", $ficheiro);
+                $extensao = end($end);
+
+                $nomeLimpo = preg_replace('/[^a-zA-Z0-9]/', '_', $nome);
+                $newName = "produto_" . $nomeLimpo . "_" . date("YmdHis") . "." . $extensao;
+
+                $targetFisico = $dirFisico . $newName;
+                $targetBD = $dirWeb . $newName;
+
+                $flag = move_uploaded_file($fonte, $targetFisico);
+            }
+        }
+
+        return [
+            "flag" => $flag,
+            "target" => $targetBD
+        ];
+
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
-    
-    if(isset($foto) && is_array($foto) && !empty($foto['tmp_name']) && $foto['error'] === 0){
-        file_put_contents('debug_upload.txt', "Entrou na condição de upload\n", FILE_APPEND);
-        
-        if(is_uploaded_file($foto['tmp_name'])){
-            file_put_contents('debug_upload.txt', "is_uploaded_file OK\n", FILE_APPEND);
-            $fonte = $foto['tmp_name'];
-            $ficheiro = $foto['name'];
-            $end = explode(".", $ficheiro);
-            $extensao = end($end);
-    
-            $nomeLimpo = preg_replace('/[^a-zA-Z0-9]/', '_', $nome);
-            $newName = "produto_" . $nomeLimpo . "_" . date("YmdHis") . "." . $extensao;
-    
-            $targetFisico = $dirFisico . $newName;
-            $targetBD = $dirWeb . $newName;
-    
-            $flag = move_uploaded_file($fonte, $targetFisico);
 
+    function adicionarFotoPerfil($ID_User, $foto){
+        try {
+
+        $msg = "";
+        $flag = false;
+        $resp = $this->uploads($foto, $ID_User);
+        $fotoFinal = $resp["target"];
+
+        $stmt = $this->conn->prepare("UPDATE utilizadores SET foto = ? WHERE id = ?");
+        $stmt->bind_param("si", $fotoFinal, $ID_User);
+
+        if ($stmt->execute()) {
+            $flag = true;
+            $msg = "Aprovado com Sucesso";
+        } else {
+            $msg = "Erro: " . $this->conn->error;
+        }
+
+        return json_encode(["flag" => $flag, "msg" => $msg, "target" => $fotoFinal], JSON_UNESCAPED_UNICODE);
+
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
-    
-    return json_encode(array(
-        "flag" => $flag,
-        "target" => $targetBD
-    ));
-}
-function adicionarFotoPerfil($ID_User, $foto){
-    global $conn;
-    $msg = "";
-    $flag = false;
-    $resp = $this->uploads($foto, $ID_User);
-    $resp = json_decode($resp, true);
-    $fotoFinal = $resp["target"];
-    
-    $sql = "UPDATE utilizadores 
-            SET foto = '".$fotoFinal."' 
-            WHERE id = ".$ID_User;
 
-    if ($conn->query($sql) === TRUE) {
-        $flag = true;
-        $msg = "Aprovado com Sucesso";
-    } else {
-        $msg = "Erro: " . $conn->error;
-    }
-
-    return json_encode([
-        "flag" => $flag,
-        "msg"  => $msg
-    ]);
-}
     function getDadosTipoPerfil($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare("SELECT * FROM utilizadores WHERE id = ?");
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg  = "<div class='profile-avatar'>";
                     $msg .= "<img src='" .$row["foto"]. "' alt='User Photo' id='userPhoto'>";
                     $msg .= "<span class='avatar-placeholder'></span>";
@@ -167,22 +185,27 @@ function adicionarFotoPerfil($ID_User, $foto){
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
-        
+
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
+
     function ProfileDropCard($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare("SELECT * FROM utilizadores WHERE id = ?");
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                 $msg  = "<div class='section-header'>";
                 $msg .= "<h3><i class='fas fa-user'></i> Informações Pessoais</h3>";
                 $msg .= "</div>";
@@ -215,26 +238,30 @@ function adicionarFotoPerfil($ID_User, $foto){
                 $msg .= "<button class='btn btn-primary' onclick='guardarDadosPerfil()' style='margin-top: 20px; width: 100%;'>";
                 $msg .= "<i class='fas fa-save'></i> Guardar Alterações";
                 $msg .= "</button>";
-                
+
                 }
             }
 
-        $conn->close();
-        
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
+
     function ProfileDropCard2($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare("SELECT * FROM utilizadores WHERE id = ?");
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg  .= "<div class='profile-header-card'>";
 
                     $msg .= "<div class='profile-avatar-large'>";
@@ -257,74 +284,80 @@ function adicionarFotoPerfil($ID_User, $foto){
                     $msg .= "<div class='profile-stats'>";
 
                     $msg .= "</div>";
-                    $msg .= "</div>"; 
-                    $msg .= "</div>"; 
+                    $msg .= "</div>";
+                    $msg .= "</div>";
                 }
             }
 
-        $conn->close();
-        
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
+
     function guardarDadosPerfil($nome, $email, $nif, $telefone, $morada, $ID_Utilizador){
+        try {
 
-    global $conn;
-    $flag = true;
-    $msg = "";
+        $flag = true;
+        $msg = "";
 
-    $sql = "UPDATE utilizadores 
-            SET nome = ?, 
-                email = ?, 
-                nif = ?, 
-                telefone = ?, 
-                morada = ?
-            WHERE id = ?";
+        $stmt = $this->conn->prepare("UPDATE utilizadores
+                SET nome = ?,
+                    email = ?,
+                    nif = ?,
+                    telefone = ?,
+                    morada = ?
+                WHERE id = ?");
 
-    $stmt = $conn->prepare($sql);
+        if(!$stmt){
+            return json_encode([
+                "flag" => false,
+                "msg" => "Erro na preparação: " . $this->conn->error
+            ], JSON_UNESCAPED_UNICODE);
+        }
 
-    if(!$stmt){
+        $stmt->bind_param("sssssi",
+            $nome,
+            $email,
+            $nif,
+            $telefone,
+            $morada,
+            $ID_Utilizador
+        );
+
+        if($stmt->execute()){
+            $msg = "Editado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Erro na execução: " . $stmt->error;
+        }
+
+        $stmt->close();
+
         return json_encode([
-            "flag" => false,
-            "msg" => "Erro na preparação: " . $conn->error
-        ]);
+            "flag" => $flag,
+            "msg"  => $msg
+        ], JSON_UNESCAPED_UNICODE);
+
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    $stmt->bind_param("sssssi", 
-        $nome, 
-        $email,
-        $nif, 
-        $telefone, 
-        $morada, 
-        $ID_Utilizador
-    );
-
-    if($stmt->execute()){
-        $msg = "Editado com Sucesso";
-    } else {
-        $flag = false;
-        $msg = "Erro na execução: " . $stmt->error;
-    }
-
-    $stmt->close();
-
-    return json_encode([
-        "flag" => $flag,
-        "msg"  => $msg
-    ]);
-}
-        function getDadosTipoPerfilAdminInfo($ID_User){
-        global $conn;
+    function getDadosTipoPerfilAdminInfo($ID_User){
+        try {
 
         $msg = "";
         $data = [];
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare("SELECT * FROM utilizadores WHERE id = ?");
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                 $msg .= "<div class='section-header'>";
                 $msg .= "<h3>";
                 $msg .= "<i class='fas fa-user'></i>";
@@ -345,11 +378,11 @@ function adicionarFotoPerfil($ID_User, $foto){
                 $msg .= "<div class='info-item'>";
                 $msg .= "<label>NIF</label>";
                 $msg .= "<input type='text' id='NIFadmin'>";
-                $msg .= "</div>"; 
+                $msg .= "</div>";
                 $msg .= "<div class='info-item'>";
                 $msg .= "<label>Telefone</label>";
                 $msg .= "<input type='text' id='telAdmin'>";
-                $msg .= "</div>"; 
+                $msg .= "</div>";
                 $msg .= "<div class='action-buttons' id='personalActions'>";
                 $msg .= "<button class='btn-primary' id='btnGuardar2'\">";
                 $msg .= "<i class='fas fa-save'></i> Salvar Alterações";
@@ -358,7 +391,6 @@ function adicionarFotoPerfil($ID_User, $foto){
                 $msg .= "<i class='fas fa-times'></i> Cancelar";
                 $msg .= "</button>";
                 $msg .= "</div>";
-
 
                 $data = [
                 "html"  => $msg,
@@ -381,44 +413,38 @@ function adicionarFotoPerfil($ID_User, $foto){
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        
 
-        $conn->close();
-        
-        return json_encode($data);
+        return json_encode($data, JSON_UNESCAPED_UNICODE);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
-    function guardaDadosEditProduto($nome, $email,$nif,$telefone,$ID_User){
-        
-        global $conn;
+
+    function guardaDadosEditProduto($nome, $email, $nif, $telefone, $ID_User){
+        try {
+
         $msg = "";
         $flag = true;
-        $sql = "";
 
+        $stmt = $this->conn->prepare("UPDATE utilizadores SET nome = ?, email = ?, nif = ?, telefone = ? WHERE id = ?");
+        $stmt->bind_param("ssssi", $nome, $email, $nif, $telefone, $ID_User);
 
-        $sql = "UPDATE utilizadores 
-        SET nome = '".$nome."', 
-            email = '".$email."', 
-            nif = '".$nif."', 
-            telefone = '".$telefone."' 
-            WHERE id = ".$ID_User;   
-
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Aprovado com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $stmt->error;
         }
 
-        $resp = json_encode(array(
+        return json_encode([
             "flag" => $flag,
             "msg" => $msg
-        ));
-          
-        $conn->close();
+        ], JSON_UNESCAPED_UNICODE);
 
-        return($resp);
-
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
 ?>

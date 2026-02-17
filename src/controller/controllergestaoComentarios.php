@@ -1,31 +1,54 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelgestaoComentarios.php';
-session_start();
 
-$func = new Comentarios();
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-if ($_POST['op'] == 1) {
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new GestaoComentarios($conn);
+
+if ($op == 1) {
     $resp = $func->getCards();
     echo $resp;
 }
-if ($_POST['op'] == 2) {
+
+if ($op == 2) {
     $resp = $func->getProdutos();
     echo $resp;
 }
-if ($_POST['op'] == 3) {
+
+if ($op == 3) {
     $resp = $func->getButaoNav();
     echo $resp;
 }
-if ($_POST['op'] == 4) {
+
+if ($op == 4) {
     $idProduto = $_POST['idProduto'];
     $resp = $func->getComentariosProduto($idProduto);
     echo $resp;
 }
-if ($_POST['op'] == 5) {
+
+if ($op == 5) {
     $resp = $func->getButaoReports();
     echo $resp;
 }
-if ($_POST['op'] == 6) {
+
+if ($op == 6) {
     $resp = $func->getReports();
     echo $resp;
 }

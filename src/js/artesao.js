@@ -64,7 +64,6 @@ function getFiltrosArtesaoEstado()
         console.log(msg);
         $('#estadoSelect').html(msg);
 
-
     })
     
     .fail(function( jqXHR, textStatus ) {

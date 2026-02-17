@@ -1,121 +1,101 @@
 <?php
-/**
- * Model para gestão de recuperação de password
- * Sistema WeGreen Marketplace
- *
- * Responsável por:
- * - Criar tokens de recuperação
- * - Validar tokens
- * - Atualizar passwords
- */
 
 require_once 'connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
 class PasswordReset {
 
-    /**
-     * Solicita recuperação de password
-     * Cria token e envia email
-     *
-     * @param string $email Email do utilizador
-     * @return array Resultado da operação
-     */
-    public function solicitarRecuperacao($email) {
-        global $conn;
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+    function solicitarRecuperacao($email) {
 
         $email = trim($email);
 
-        // Verificar se email existe
-        $stmt = $conn->prepare("SELECT id, nome FROM Utilizadores WHERE email = ? LIMIT 1");
+        $stmt = $this->conn->prepare("SELECT id, nome FROM Utilizadores WHERE email = ? LIMIT 1");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows === 0) {
             $stmt->close();
-            return [
+            return json_encode([
                 'flag' => false,
                 'msg' => 'Email não encontrado no sistema.'
-            ];
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $user = $result->fetch_assoc();
         $stmt->close();
 
-        // Gerar token único
         $token = bin2hex(random_bytes(32));
         $token_hash = hash('sha256', $token);
 
-        // Token expira em 1 hora
+        
         $expira_em = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-        // Obter IP e User Agent
+        
         $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
         $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
-        // Invalidar tokens anteriores deste utilizador
-        $stmt = $conn->prepare("UPDATE password_resets SET usado = 1 WHERE utilizador_id = ? AND usado = 0");
+        
+        $stmt = $this->conn->prepare("UPDATE password_resets SET usado = 1 WHERE utilizador_id = ? AND usado = 0");
         $stmt->bind_param("i", $user['id']);
         $stmt->execute();
         $stmt->close();
 
-        // Inserir novo token
-        $stmt = $conn->prepare("INSERT INTO password_resets (utilizador_id, email, token, expira_em, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
+        
+        $stmt = $this->conn->prepare("INSERT INTO password_resets (utilizador_id, email, token, expira_em, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("isssss", $user['id'], $email, $token_hash, $expira_em, $ip_address, $user_agent);
 
         if (!$stmt->execute()) {
             $stmt->close();
-            return [
+            return json_encode([
                 'flag' => false,
                 'msg' => 'Erro ao criar pedido de recuperação: ' . $stmt->error
-            ];
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $stmt->close();
 
-        // Construir link de reset
+        
         $base_url = 'http://localhost/WeGreen-Main';
         $reset_link = $base_url . '/reset_password.html?token=' . urlencode($token);
 
-        // Enviar email
+        
         try {
-            $emailService = new EmailService();
+            $emailService = new EmailService($this->conn);
             $emailEnviado = $emailService->sendResetPassword($email, $user['nome'], $reset_link);
 
             if ($emailEnviado) {
-                return [
+                return json_encode([
                     'flag' => true,
                     'msg' => 'Email de recuperação enviado! Verifique a sua caixa de entrada.'
-                ];
+                ], JSON_UNESCAPED_UNICODE);
             } else {
-                return [
+                return json_encode([
                     'flag' => false,
                     'msg' => 'Erro ao enviar email de recuperação.'
-                ];
+                ], JSON_UNESCAPED_UNICODE);
             }
         } catch (Exception $e) {
-            error_log("Erro ao enviar email de recuperação: " . $e->getMessage());
-            return [
+            return json_encode([
                 'flag' => false,
                 'msg' => 'Erro ao enviar email: ' . $e->getMessage()
-            ];
+            ], JSON_UNESCAPED_UNICODE);
         }
     }
 
-    /**
-     * Valida token de recuperação
-     *
-     * @param string $token Token a validar
-     * @return array Resultado da validação
-     */
-    public function validarToken($token) {
-        global $conn;
+    function validarToken($token) {
+        try {
 
         $token_hash = hash('sha256', $token);
         $agora = date('Y-m-d H:i:s');
 
-        $stmt = $conn->prepare("
+        $stmt = $this->conn->prepare("
             SELECT pr.id, pr.utilizador_id, pr.email, u.nome
             FROM password_resets pr
             JOIN Utilizadores u ON pr.utilizador_id = u.id
@@ -130,84 +110,92 @@ class PasswordReset {
 
         if ($result->num_rows === 0) {
             $stmt->close();
-            return [
+            return json_encode([
                 'flag' => false,
                 'msg' => 'Token inválido ou expirado.'
-            ];
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $data = $result->fetch_assoc();
         $stmt->close();
 
-        return [
+        return json_encode([
             'flag' => true,
             'msg' => 'Token válido.',
             'data' => $data
-        ];
+        ], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Redefine password usando token válido
-     *
-     * @param string $token Token de recuperação
-     * @param string $nova_password Nova password
-     * @return array Resultado da operação
-     */
-    public function redefinirPassword($token, $nova_password) {
-        global $conn;
+    function redefinirPassword($token, $nova_password) {
+        try {
 
-        // Validar token primeiro
-        $validacao = $this->validarToken($token);
+        
+        $validacao = json_decode($this->validarToken($token), true);
 
         if (!$validacao['flag']) {
-            return $validacao;
+            return json_encode($validacao, JSON_UNESCAPED_UNICODE);
         }
 
         $token_hash = hash('sha256', $token);
         $utilizador_id = $validacao['data']['utilizador_id'];
 
-        // Hash da nova password
         $password_hash = md5($nova_password);
 
-        // Atualizar password do utilizador
-        $stmt = $conn->prepare("UPDATE Utilizadores SET password = ? WHERE id = ?");
+        $stmt = $this->conn->prepare("UPDATE Utilizadores SET password = ? WHERE id = ?");
         $stmt->bind_param("si", $password_hash, $utilizador_id);
 
         if (!$stmt->execute()) {
             $stmt->close();
-            return [
+            return json_encode([
                 'flag' => false,
                 'msg' => 'Erro ao atualizar password: ' . $stmt->error
-            ];
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $stmt->close();
 
-        // Marcar token como usado
         $usado_em = date('Y-m-d H:i:s');
-        $stmt = $conn->prepare("UPDATE password_resets SET usado = 1, usado_em = ? WHERE token = ?");
+        $stmt = $this->conn->prepare("UPDATE password_resets SET usado = 1, usado_em = ? WHERE token = ?");
         $stmt->bind_param("ss", $usado_em, $token_hash);
         $stmt->execute();
         $stmt->close();
 
-        return [
+        return json_encode([
             'flag' => true,
             'msg' => 'Password redefinida com sucesso! Pode agora fazer login com a nova password.'
-        ];
+        ], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Limpa tokens expirados (manutenção)
-     * Deve ser executado periodicamente
-     *
-     * @return int Número de tokens removidos
-     */
-    public function limparTokensExpirados() {
-        global $conn;
+    function redefinirPasswordComValidacao($token, $nova_password) {
+        try {
+
+        
+        if (strlen($nova_password) < 6) {
+            return json_encode([
+                'flag' => false,
+                'msg' => 'A password deve ter pelo menos 6 caracteres.'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+
+        
+        return $this->redefinirPassword($token, $nova_password);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function limparTokensExpirados() {
+        try {
 
         $agora = date('Y-m-d H:i:s');
 
-        $stmt = $conn->prepare("DELETE FROM password_resets WHERE expira_em < ? OR usado = 1");
+        $stmt = $this->conn->prepare("DELETE FROM password_resets WHERE expira_em < ? OR usado = 1");
         $stmt->bind_param("s", $agora);
         $stmt->execute();
 
@@ -215,6 +203,9 @@ class PasswordReset {
         $stmt->close();
 
         return $removidos;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
 ?>

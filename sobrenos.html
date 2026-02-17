@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -20,582 +20,10 @@
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="src/js/searchAutocomplete.js" defer></script>
 
-    <style>
-        .container:not(.container-fluid),
-        .container-lg {
-            max-width: 1700px !important;
-        }
-
-        .nav-link.active {
-            color: #3cb371 !important;
-            border-bottom: 2px solid #3cb371;
-            padding-bottom: 8px;
-        }
-
-        :root {
-            --primary-green: #3cb371;
-            --dark-green: #2e9b5a;
-            --light-green: #e8f5e9;
-            --text-dark: #1a1a1a;
-            --text-gray: #666;
-            --bg-light: #fafafa;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #ffffff;
-            color: var(--text-dark);
-            overflow-x: hidden;
-        }
-
-        /* Navbar com fonte consistente com outras páginas */
-        .header-main,
-        .header-main .navbar,
-        .header-main .nav-link,
-        .header-main .navbar-brand,
-        .header-main .dropdown-menu {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-        }
-
-        .hero-about {
-            height: 70vh;
-            background: url('src/img/pexels-ron-lach-8396317.jpg') center/cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            position: relative;
-            margin-top: 80px;
-            margin-left: 20px;
-            margin-right: 20px;
-            border-radius: 30px;
-            overflow: hidden;
-        }
-
-        .hero-about::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            animation: pulseGlow 8s ease-in-out infinite;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 900px;
-            padding: 40px;
-            animation: fadeInUp 1s ease-out;
-        }
-
-        .hero-content h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 72px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
-            line-height: 1.1;
-        }
-
-        .hero-content .subtitle {
-            font-size: 24px;
-            font-weight: 300;
-            margin-bottom: 30px;
-            opacity: 0.95;
-            letter-spacing: 0.5px;
-        }
-
-        .scroll-indicator {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-        }
-
-        .scroll-indicator i {
-            font-size: 32px;
-            color: white;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-10px); }
-            60% { transform: translateX(-50%) translateY(-5px); }
-        }
-
-        /* About Title Section */
-        .about-title-section {
-            padding: 100px 0 60px;
-            background: white;
-            text-align: center;
-        }
-
-        .about-main-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 56px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 20px;
-        }
-
-        .about-subtitle {
-            font-size: 18px;
-            color: var(--text-gray);
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        /* Mission Section */
-        .mission-section {
-            padding: 60px 0 120px;
-            background: white;
-            position: relative;
-        }
-
-        .mission-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(to bottom, var(--light-green), transparent);
-            opacity: 0.3;
-        }
-
-        .section-title {
-            font-family: 'Poppins', sans-serif;
-            font-size: 56px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -15px;
-            left: 0;
-            width: 80px;
-            height: 4px;
-            background: var(--primary-green);
-        }
-
-        .mission-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-            margin-top: 60px;
-        }
-
-        .mission-text {
-            position: relative;
-        }
-
-        .mission-text p {
-            font-size: 18px;
-            line-height: 1.8;
-            color: var(--text-gray);
-            margin-bottom: 25px;
-        }
-
-        .mission-text .highlight {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--primary-green);
-            font-family: 'Poppins', sans-serif;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
-
-        .mission-image {
-            position: relative;
-            height: 500px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-        }
-
-        .mission-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .mission-image:hover img {
-            transform: scale(1.05);
-        }
-
-        /* Values Section */
-        .values-section {
-            padding: 120px 0;
-            background: white;
-            position: relative;
-        }
-
-        .values-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            margin-top: 60px;
-        }
-
-        .value-card {
-            background: white;
-            padding: 50px 40px;
-            border-radius: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            height: 100%;
-        }
-
-        .value-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 32px rgba(62,179,113,0.15);
-        }
-
-        .value-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 24px;
-            background: linear-gradient(135deg, #3cb371, #2e8b57);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            color: white;
-            box-shadow: 0 8px 24px rgba(62,179,113,0.3);
-        }
-
-        .value-card h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: #1a1a1a;
-        }
-
-        .value-card p {
-            font-size: 15px;
-            line-height: 1.7;
-            color: #64748b;
-        }
-
-        /* Story Section */
-        .story-section {
-            padding: 120px 0;
-            background: white;
-        }
-
-        .timeline {
-            position: relative;
-            max-width: 1000px;
-            margin: 80px auto 0;
-            padding: 0 20px;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: var(--primary-green);
-            transform: translateX(-50%);
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 80px;
-            display: flex;
-            align-items: center;
-        }
-
-        .timeline-item:nth-child(odd) {
-            flex-direction: row;
-        }
-
-        .timeline-item:nth-child(even) {
-            flex-direction: row-reverse;
-        }
-
-        .timeline-content {
-            width: calc(50% - 40px);
-            background: var(--bg-light);
-            padding: 40px;
-            border-radius: 15px;
-            position: relative;
-            opacity: 0;
-            animation: fadeInTimeline 0.8s ease-out forwards;
-        }
-
-        .timeline-item:nth-child(1) .timeline-content { animation-delay: 0.2s; }
-        .timeline-item:nth-child(2) .timeline-content { animation-delay: 0.4s; }
-        .timeline-item:nth-child(3) .timeline-content { animation-delay: 0.6s; }
-        .timeline-item:nth-child(4) .timeline-content { animation-delay: 0.8s; }
-
-        @keyframes fadeInTimeline {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .timeline-year {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 80px;
-            background: var(--primary-green);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: 700;
-            box-shadow: 0 0 0 10px white;
-        }
-
-        .timeline-content h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: var(--text-dark);
-        }
-
-        .timeline-content p {
-            font-size: 16px;
-            line-height: 1.6;
-            color: var(--text-gray);
-        }
-
-        /* Team Section */
-        .team-section {
-            padding: 120px 0;
-            background: white;
-        }
-
-        .team-section .container {
-            max-width: 1400px;
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            margin-top: 60px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .team-member {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            transition: all 0.3s ease;
-            text-align: center;
-            position: relative;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease-out forwards;
-        }
-
-        .team-member:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 32px rgba(62,179,113,0.15);
-        }
-
-        .team-member:nth-child(1) { animation-delay: 0.1s; }
-        .team-member:nth-child(2) { animation-delay: 0.2s; }
-        .team-member:nth-child(3) { animation-delay: 0.3s; }
-        .team-member:nth-child(4) { animation-delay: 0.4s; }
-
-        .team-photo {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 15px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 24px rgba(62,179,113,0.2);
-        }
-
-        .team-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-
-        .team-member:hover .team-photo img {
-            transform: scale(1.05);
-        }
-
-        .team-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(60, 179, 113, 0.95), rgba(60, 179, 113, 0.7));
-            padding: 20px;
-            transform: translateY(100%);
-            transition: transform 0.4s ease;
-        }
-
-        .team-photo:hover .team-overlay {
-            transform: translateY(0);
-        }
-
-        .team-social {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        .team-social a {
-            color: white;
-            font-size: 20px;
-            transition: all 0.3s ease;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-        }
-
-        .team-social a:hover {
-            background: white;
-            color: #3cb371;
-            transform: translateY(-3px);
-        }
-
-        .team-member h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-        }
-
-        .team-member .role {
-            font-size: 15px;
-            color: var(--primary-green);
-            font-weight: 600;
-            margin-bottom: 0;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .hero-content h1 {
-                font-size: 52px;
-            }
-
-            .mission-content {
-                grid-template-columns: 1fr;
-                gap: 50px;
-            }
-
-            .values-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .team-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .timeline::before {
-                left: 30px;
-            }
-
-            .timeline-item {
-                flex-direction: row !important;
-                padding-left: 80px;
-            }
-
-            .timeline-content {
-                width: 100%;
-            }
-
-            .timeline-year {
-                left: 30px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hero-about {
-                height: 60vh;
-            }
-
-            .hero-content h1 {
-                font-size: 38px;
-            }
-
-            .hero-content .subtitle {
-                font-size: 18px;
-            }
-
-            .section-title {
-                font-size: 36px;
-            }
-
-            .values-grid,
-            .team-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .mission-section,
-            .values-section,
-            .story-section,
-            .team-section {
-                padding: 80px 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="src/css/sobre.css">
 </head>
 <body>
     <header class="header-main text-white w-100 z-3" style="position: fixed; top: 0; left: 0; right: 0; background-color: #000000; z-index: 1030;">
@@ -630,7 +58,7 @@
                 </div>
 
                 <div class="d-flex align-items-center ms-auto gap-2">
-                    <!-- Barra de Pesquisa -->
+                    
                     <div class="search-container">
                         <form class="search-form" role="search">
                             <div class="search-input-wrapper">
@@ -640,13 +68,13 @@
                         </form>
                     </div>
 
-                    <!-- Carrinho -->
+                    
                     <a class="cart-button" href="Carrinho.html">
                         <i class="bi bi-bag-fill"></i>
                         <span class="cart-badge" id="cartCount" style="display: none;">0</span>
                     </a>
 
-                    <!-- Utilizador -->
+                    
                     <div class="nav-item dropdown user-dropdown">
                         <a class="nav-link dropdown-toggle user-avatar-btn" href="#" role="button" data-bs-toggle="dropdown">
                             <img id="FotoPerfil" src="assets/media/avatars/blank.png" class="user-avatar-img" alt="Perfil" onerror="this.src='assets/media/avatars/blank.png'">
@@ -659,14 +87,14 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
+    
     <section class="hero-about">
         <div class="scroll-indicator">
             <i class="bi bi-chevron-down"></i>
         </div>
     </section>
 
-    <!-- About Title Section -->
+    
     <section class="about-title-section">
         <div class="container">
             <h2 class="about-main-title">Sobre Nós</h2>
@@ -674,7 +102,7 @@
         </div>
     </section>
 
-    <!-- Mission Section -->
+    
     <section class="mission-section">
         <div class="container">
             <h2 class="section-title">A Nossa Missão</h2>
@@ -692,7 +120,7 @@
         </div>
     </section>
 
-    <!-- Values Section -->
+    
     <section class="values-section">
         <div class="container">
             <h2 class="section-title text-center">Os Nossos Valores</h2>
@@ -777,13 +205,13 @@
                 </div>
     </section>
 
-    <!-- Footer -->
+    
     <footer>
-        <!-- Main Footer -->
+        
         <div class="pt-5 pb-4" style="background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);">
             <div class="container">
                 <div class="row gy-4 justify-content-center text-center">
-                    <!-- Logo & Descrição -->
+                    
                     <div class="col-lg-5 col-md-6">
                         <div class="mb-3">
                             <img src="src\img\2-removebg-preview.png" alt="Wegreen" style="width: auto; height: 50px;">
@@ -794,7 +222,7 @@
                         </p>
                     </div>
 
-                    <!-- Explorar -->
+                    
                     <div class="col-lg-3 col-md-3 col-6">
                         <h5 class="fw-bold mb-3" style="color: white;">Explorar</h5>
                         <ul class="list-unstyled">
@@ -821,7 +249,7 @@
                         </ul>
                     </div>
 
-                    <!-- Suporte -->
+                    
                     <div class="col-lg-4 col-md-3 col-6">
                         <h5 class="fw-bold mb-3" style="color: white;">Suporte</h5>
                         <ul class="list-unstyled">
@@ -844,7 +272,7 @@
                     </div>
                 </div>
 
-                <!-- Stats Row -->
+                
                 <div class="row text-center align-items-center justify-content-center mt-4 pt-3">
                     <div class="col-6 col-md-3 mb-3 mb-md-0">
                         <div class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2">
@@ -886,7 +314,7 @@
             </div>
         </div>
 
-        <!-- Copyright Bar -->
+        
         <div class="py-3" style="background: #000000; border-top: 1px solid rgba(255,255,255,0.1);">
             <div class="container">
                 <div class="text-center">

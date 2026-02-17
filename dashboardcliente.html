@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 
 if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
@@ -22,6 +22,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -29,7 +30,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
 </head>
 <body>
   <div class="dashboard-container">
-        <!-- Sidebar -->
+        
         <aside class="sidebar">
             <div class="sidebar-logo">
                 <i class="fas fa-leaf"></i>
@@ -89,9 +90,9 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
             </div>
         </aside>
 
-        <!-- Conteúdo Principal -->
+        
         <main class="main-content">
-            <!-- Página Dashboard -->
+            
             <div id="page-dashboard" class="page-content">
                 <header class="dashboard-header">
                     <div class="header-title">
@@ -107,7 +108,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                 </header>
 
                 <div class="content-area">
-                    <!-- Cards de Estatísticas -->
+                    
                     <div class="stats-grid">
                         <div class="stat-card highlight">
                             <div class="stat-header">
@@ -176,7 +177,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
                         </div>
                     </div>
 
-                    <!-- Pedidos Recentes -->
+                    
                     <div class="orders-table-section">
                         <div class="table-header">
                             <h3 class="table-title">Pedidos Recentes</h3>
@@ -270,7 +271,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script>
-        // Navegação entre páginas
+        
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function(e) {
                 if(this.getAttribute('href') && this.getAttribute('href') !== '#') {
@@ -282,7 +283,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
             });
         });
 
-        // Gráfico de Gastos Mensais
+        
         const ctx1 = document.getElementById('monthlyExpensesChart');
         new Chart(ctx1, {
             type: 'bar',
@@ -325,7 +326,7 @@ if(!isset($_SESSION['tipo']) || $_SESSION['tipo'] != 2){
             }
         });
 
-        // Gráfico de Categorias
+        
         const ctx2 = document.getElementById('categoryChart');
         new Chart(ctx2, {
             type: 'doughnut',

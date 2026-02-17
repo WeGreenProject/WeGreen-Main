@@ -18,7 +18,7 @@ if($_SESSION['tipo'] != 1){
   <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="src/css/lib/datatables.css">
-  <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+  <link rel="stylesheet" href="src/css/notifications-dropdown.css">
   <script src="src/js/lib/jquery.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
@@ -26,6 +26,7 @@ if($_SESSION['tipo'] != 1){
   <script src="src/js/lib/datatables.js"></script>
   <script src="src/js/lib/select2.js"></script>
   <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
   <script src="src/js/notifications.js"></script>
 </head>
 
@@ -143,63 +144,6 @@ if($_SESSION['tipo'] != 1){
     </main>
   </div>
   <script src="src/js/logAdmin.js"></script>
-  <script>
-  // User dropdown toggle
-  const userMenuBtn = document.getElementById("userMenuBtn");
-  const userDropdown = document.getElementById("userDropdown");
-
-  if (userMenuBtn) {
-    userMenuBtn.addEventListener("click", function(e) {
-      e.stopPropagation();
-      userDropdown.classList.toggle("active");
-    });
-  }
-
-  document.addEventListener("click", function(e) {
-    if (!userMenuBtn?.contains(e.target) && !userDropdown?.contains(e.target)) {
-      userDropdown?.classList.remove("active");
-    }
-  });
-
-  // Função de logout
-  function logout() {
-    Swal.fire({
-      html: `
-                    <div style="background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%); padding: 20px; margin: -20px -20px 20px -20px; border-radius: 12px 12px 0 0; text-align: center;">
-                        <i class="fas fa-sign-out-alt" style="font-size: 48px; color: white; margin-bottom: 15px;"></i>
-                        <h2 style="margin: 0; color: white; font-size: 24px; font-weight: 700;">Terminar Sessão</h2>
-                    </div>
-                    <p style="font-size: 16px; color: #64748b; margin: 20px 0;">Tem a certeza que deseja sair da plataforma?</p>
-                `,
-      showCancelButton: true,
-      confirmButtonText: '<i class="fas fa-check"></i> Sim, sair',
-      cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-      confirmButtonColor: '#3cb371',
-      cancelButtonColor: '#6b7280',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        let dados = new FormData();
-        dados.append("op", 10);
-
-        $.ajax({
-          url: "src/controller/controllerDashboardAdmin.php",
-          method: "POST",
-          data: dados,
-          dataType: "json",
-          cache: false,
-          contentType: false,
-          processData: false,
-        }).done(function(response) {
-          if (response.success) {
-            window.location.href = "index.html";
-          }
-        }).fail(function() {
-          window.location.href = "index.html";
-        });
-      }
-    });
-  }
-  </script>
 </body>
 
 </html>

@@ -1,38 +1,32 @@
 <?php
-// Desativar exibição de erros para evitar HTML indesejado
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
 
-header('Content-Type: application/json');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-try {
-    include_once '../model/modelLogin.php';
+header('Content-Type: application/json; charset=utf-8');
 
-    $func = new Login();
+include_once '../model/modelLogin.php';
 
-    if (isset($_POST['op']) && $_POST['op'] == 1) {
-        if (!isset($_POST['email']) || !isset($_POST['password'])) {
-            echo json_encode([
-                'flag' => false,
-                'msg' => 'Email e password são obrigatórios'
-            ]);
-            exit;
-        }
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
 
-        $resp = $func->login1($_POST['email'], $_POST['password']);
-        echo $resp;
-    } else {
-        echo json_encode([
-            'flag' => false,
-            'msg' => 'Operação inválida'
-        ]);
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new Login($conn);
+
+if ($op == 1) {
+    $email = $_POST['email'] ?? null;
+    $password = $_POST['password'] ?? null;
+
+    if (!$email || !$password) {
+        echo json_encode(['flag' => false, 'msg' => 'Email e password são obrigatórios'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
-} catch (Exception $e) {
-    error_log("Erro no login: " . $e->getMessage());
-    echo json_encode([
-        'flag' => false,
-        'msg' => 'Erro interno no servidor'
-    ]);
+
+    $resp = $func->iniciarSessao($email, $password);
+    echo $resp;
 }
 ?>

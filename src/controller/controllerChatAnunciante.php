@@ -1,41 +1,64 @@
 <?php
-include_once __DIR__ . '/../model/modelChatAnunciante.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$func = new ChatAnunciante();
+header('Content-Type: application/json; charset=utf-8');
 
-// op=1: Listar clientes/admins com quem o anunciante tem conversas
-if ($_POST['op'] == 1) {
+include_once '../model/modelChatAnunciante.php';
+
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new ChatAnunciante($conn);
+
+if ($op == 1) {
     $resp = $func->getSideBar($_SESSION['utilizador']);
     echo $resp;
 }
 
-// op=2: Buscar mensagens com cliente específico
-if ($_POST['op'] == 2) {
-    if (isset($_POST['IdCliente']) && !empty($_POST['IdCliente'])) {
-        $resp = $func->getConversas($_SESSION['utilizador'], $_POST['IdCliente']);
-        echo $resp;
-    } else {
-        echo '
-        <div class="empty-chat">
-            <i class="fas fa-comments" style="font-size: 64px; color: #e0e0e0; margin-bottom: 16px;"></i>
-            <h3>Nenhuma conversa selecionada</h3>
-            <p>Escolha um cliente à esquerda para começar</p>
-        </div>
-        ';
-    }
-}
+if ($op == 2) {
+    $id_cliente = $_POST['IdCliente'] ?? null;
 
-// op=3: Enviar mensagem
-if ($_POST['op'] == 3) {
-    $resp = $func->enviarMensagem($_SESSION['utilizador'], $_POST['IdCliente'], $_POST['mensagem']);
+    if ($id_cliente && $id_cliente !== 'undefined' && !empty($id_cliente)) {
+        $resp = $func->getConversas($_SESSION['utilizador'], $id_cliente);
+    } else {
+        $resp = $func->getMensagemConversaNaoSelecionada();
+    }
     echo $resp;
 }
 
-// op=4: Pesquisar clientes
-if ($_POST['op'] == 4) {
+if ($op == 3) {
+    $anexo = null;
+    if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/webp','application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','text/plain'];
+        $maxSize = 10 * 1024 * 1024; 
+        if (in_array($_FILES['imagem']['type'], $allowedTypes) && $_FILES['imagem']['size'] <= $maxSize) {
+            $uploadDir = __DIR__ . '/../uploads/chat/';
+            if (!is_dir($uploadDir)) { mkdir($uploadDir, 0755, true); }
+            $ext = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
+            $nomeArquivo = 'chat_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+            $destino = $uploadDir . $nomeArquivo;
+            if (move_uploaded_file($_FILES['imagem']['tmp_name'], $destino)) {
+                $anexo = 'src/uploads/chat/' . $nomeArquivo;
+            }
+        }
+    }
+    $resp = $func->enviarMensagem($_SESSION['utilizador'], $_POST['IdCliente'], $_POST['mensagem'], $anexo);
+    echo $resp;
+}
+
+if ($op == 4) {
     $resp = $func->pesquisarChat($_POST['pesquisa'], $_SESSION['utilizador']);
     echo $resp;
 }

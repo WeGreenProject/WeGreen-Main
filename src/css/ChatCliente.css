@@ -1,14 +1,13 @@
-/* Chat Cliente Styles */
 
-/* Layout específico para página de chat */
+
 .page-chat-cliente .page-content {
-  height: calc(100vh - 73px); /* altura da viewport menos navbar */
+  height: calc(100vh - 73px); 
   overflow: hidden;
 }
 
 .page-chat-cliente .content-area {
   height: 100%;
-  padding: 0 !important; /* remove padding para chat ocupar tudo */
+  padding: 0 !important; 
   overflow: hidden;
 }
 
@@ -16,12 +15,52 @@
   display: flex;
   height: 100%;
   background: #ffffff;
-  border-radius: 0; /* remove border-radius para ocupar toda área */
+  border-radius: 0; 
   overflow: hidden;
-  box-shadow: none; /* remove shadow já que não tem border-radius */
+  box-shadow: none; 
 }
 
-/* Painel de Conversas */
+.page-chat-cliente {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.page-chat-cliente .dashboard-container {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.page-chat-cliente .main-content {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-chat-cliente .top-navbar {
+  flex-shrink: 0;
+}
+
+.page-chat-cliente .page-content {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  overflow: hidden;
+}
+
+.page-chat-cliente .content-area {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+.page-chat-cliente .chat-container {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .conversations-panel {
   width: 360px;
   border-right: 1px solid #e2e8f0;
@@ -162,7 +201,6 @@
   text-align: center;
 }
 
-/* Painel de Chat */
 .chat-panel {
   flex: 1;
   display: flex;
@@ -340,7 +378,6 @@
   padding: 0 8px;
 }
 
-/* Input de Chat */
 .chat-input-container {
     display: flex;
     align-items: flex-end;
@@ -457,7 +494,6 @@
   box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
 }
 
-/* Scrollbar customizada */
 .conversations-list::-webkit-scrollbar,
 .chat-messages::-webkit-scrollbar {
   width: 6px;
@@ -479,7 +515,6 @@
   background: #94a3b8;
 }
 
-/* Responsivo */
 @media (max-width: 768px) {
   .chat-container {
     flex-direction: column;

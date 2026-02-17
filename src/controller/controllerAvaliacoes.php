@@ -1,21 +1,26 @@
 <?php
-// Garantir que não há output antes do JSON
-ob_start();
 
-include_once '../model/modelAvaliacoes.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Definir header JSON
 header('Content-Type: application/json; charset=utf-8');
 
-$func = new Avaliacoes();
+include_once '../model/modelAvaliacoes.php';
 
-// Criar nova avaliação
-if (isset($_POST['op']) && $_POST['op'] == 'criarAvaliacao') {
-    // Verificar autenticação para criar avaliação
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida']);
+    exit;
+}
+
+$func = new Avaliacoes($conn);
+
+if ($op == 'criarAvaliacao') {
     if (!isset($_SESSION['utilizador'])) {
         echo json_encode(['success' => false, 'message' => 'Sessão não iniciada']);
-        exit();
+        exit;
     }
 
     $produto_id = $_POST['produto_id'] ?? null;
@@ -26,96 +31,68 @@ if (isset($_POST['op']) && $_POST['op'] == 'criarAvaliacao') {
 
     if (empty($produto_id) || empty($encomenda_codigo) || empty($avaliacao)) {
         echo json_encode(['success' => false, 'message' => 'Dados obrigatórios não fornecidos']);
-        exit();
+        exit;
     }
 
     $resp = $func->criarAvaliacao($produto_id, $utilizador_id, $encomenda_codigo, $avaliacao, $comentario);
-    echo json_encode($resp);
-    exit();
+    echo json_encode(['success' => (bool)($resp['success'] ?? false), 'message' => $resp['message'] ?? '']);
 }
 
-// Obter avaliações de um produto
-if (isset($_POST['op']) && $_POST['op'] == 'obterAvaliacoes') {
-    // Limpar qualquer output anterior ANTES de processar
-    ob_clean();
-
-    $produto_id = $_POST['produto_id'] ?? null;
-
-    error_log("=== CONTROLLER AVALIACOES ===");
-    error_log("Produto ID recebido: " . $produto_id);
-
-    if (empty($produto_id)) {
-        error_log("Erro: Produto ID vazio");
-        echo json_encode(['success' => false, 'message' => 'ID do produto não fornecido']);
-        exit();
-    }
-
-    try {
-        error_log("Chamando obterAvaliacoesProduto...");
-        $avaliacoes = $func->obterAvaliacoesProduto($produto_id);
-        error_log("Avaliações retornadas: " . count($avaliacoes));
-
-        error_log("Chamando obterEstatisticasProduto...");
-        $estatisticas = $func->obterEstatisticasProduto($produto_id);
-        error_log("Estatísticas - Total: " . $estatisticas['total'] . ", Média: " . $estatisticas['media']);
-
-        // Garantir que avaliacoes é sempre um array
-        if (!is_array($avaliacoes)) {
-            error_log("AVISO: avaliacoes não é array, convertendo...");
-            $avaliacoes = [];
-        }
-
-        // Garantir que estatisticas tem a estrutura correta
-        if (!is_array($estatisticas)) {
-            error_log("AVISO: estatisticas não é array, usando valores padrão...");
-            $estatisticas = [
-                'total' => 0,
-                'media' => 0,
-                'estrelas_5' => 0,
-                'estrelas_4' => 0,
-                'estrelas_3' => 0,
-                'estrelas_2' => 0,
-                'estrelas_1' => 0
-            ];
-        }
-
-        $response = [
-            'success' => true,
-            'avaliacoes' => $avaliacoes,
-            'estatisticas' => $estatisticas
-        ];
-
-        error_log("Enviando resposta JSON: " . json_encode($response));
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
-    } catch (Exception $e) {
-        error_log("ERRO EXCEPTION: " . $e->getMessage());
-        echo json_encode([
-            'success' => false,
-            'message' => 'Erro ao buscar avaliações: ' . $e->getMessage()
-        ]);
-    }
-    exit();
-}
-
-// Obter estatísticas de um produto
-if (isset($_POST['op']) && $_POST['op'] == 'obterEstatisticas') {
+if ($op == 'obterAvaliacoes') {
     $produto_id = $_POST['produto_id'] ?? null;
 
     if (empty($produto_id)) {
         echo json_encode(['success' => false, 'message' => 'ID do produto não fornecido']);
-        exit();
+        exit;
     }
 
+    $avaliacoes = $func->obterAvaliacoesProduto($produto_id);
     $estatisticas = $func->obterEstatisticasProduto($produto_id);
-    echo json_encode(['success' => true, 'data' => $estatisticas]);
-    exit();
+
+    if (!is_array($avaliacoes)) {
+        $avaliacoes = [];
+    }
+
+    if (!is_array($estatisticas)) {
+        $estatisticas = [
+            'total' => 0,
+            'media' => 0,
+            'estrelas_5' => 0,
+            'estrelas_4' => 0,
+            'estrelas_3' => 0,
+            'estrelas_2' => 0,
+            'estrelas_1' => 0
+        ];
+    }
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'OK',
+        'avaliacoes' => $avaliacoes,
+        'estatisticas' => $estatisticas
+    ], JSON_UNESCAPED_UNICODE);
 }
 
-// Verificar se já avaliou
-if (isset($_POST['op']) && $_POST['op'] == 'verificarAvaliacao') {
+if ($op == 'obterEstatisticas') {
+    $produto_id = $_POST['produto_id'] ?? null;
+
+    if (empty($produto_id)) {
+        echo json_encode(['success' => false, 'message' => 'ID do produto não fornecido']);
+        exit;
+    }
+
+    $resp = $func->obterEstatisticasProduto($produto_id);
+    echo json_encode([
+        'success' => true,
+        'message' => 'OK',
+        'estatisticas' => $resp
+    ], JSON_UNESCAPED_UNICODE);
+}
+
+if ($op == 'verificarAvaliacao') {
     if (!isset($_SESSION['utilizador'])) {
         echo json_encode(['success' => false, 'message' => 'Sessão não iniciada']);
-        exit();
+        exit;
     }
 
     $produto_id = $_POST['produto_id'] ?? null;
@@ -124,19 +101,21 @@ if (isset($_POST['op']) && $_POST['op'] == 'verificarAvaliacao') {
 
     if (empty($produto_id) || empty($encomenda_codigo)) {
         echo json_encode(['success' => false, 'message' => 'Dados incompletos']);
-        exit();
+        exit;
     }
 
     $avaliou = $func->verificarSeAvaliou($produto_id, $utilizador_id, $encomenda_codigo);
-    echo json_encode(['success' => true, 'avaliou' => $avaliou]);
-    exit();
+    echo json_encode([
+        'success' => true,
+        'message' => 'OK',
+        'avaliou' => $avaliou ? 1 : 0
+    ]);
 }
 
-// Obter produtos de uma encomenda para avaliar
-if (isset($_POST['op']) && $_POST['op'] == 'obterProdutosParaAvaliar') {
+if ($op == 'obterProdutosParaAvaliar') {
     if (!isset($_SESSION['utilizador'])) {
         echo json_encode(['success' => false, 'message' => 'Sessão não iniciada']);
-        exit();
+        exit;
     }
 
     $encomenda_codigo = $_POST['encomenda_codigo'] ?? null;
@@ -144,12 +123,14 @@ if (isset($_POST['op']) && $_POST['op'] == 'obterProdutosParaAvaliar') {
 
     if (empty($encomenda_codigo)) {
         echo json_encode(['success' => false, 'message' => 'Código da encomenda não fornecido']);
-        exit();
+        exit;
     }
 
-    $produtos = $func->obterProdutosParaAvaliar($encomenda_codigo, $cliente_id);
-    echo json_encode(['success' => true, 'produtos' => $produtos]);
-    exit();
+    $resp = $func->obterProdutosParaAvaliar($encomenda_codigo, $cliente_id);
+    echo json_encode([
+        'success' => true,
+        'message' => 'OK',
+        'produtos' => $resp
+    ], JSON_UNESCAPED_UNICODE);
 }
-
 ?>

@@ -693,7 +693,6 @@ img.conversation-avatar {
     display: block;
 }
 
-/* Garantir que o avatar do cabeçalho do chat também funcione com imagem */
 .chat-user-avatar img,
 img.chat-user-avatar {
     width: 50px;
@@ -704,7 +703,6 @@ img.chat-user-avatar {
     display: block;
 }
 
-/* Para os avatares nas mensagens */
 .message-avatar img,
 img.message-avatar {
     width: 40px;
@@ -716,7 +714,6 @@ img.message-avatar {
     display: block;
 }
 
-/* Ajuste para o avatar do usuário na navbar */
 .user-avatar img,
 img.user-avatar {
     width: 32px;
@@ -767,9 +764,7 @@ img.user-avatar {
             transform: translateX(0);
         }
     }
-/* Correções para prevenir movimento do layout e remover scroll externo */
 
-/* Remover scroll do body e html */
 html, body {
     overflow: hidden;
     height: 100vh;
@@ -777,14 +772,12 @@ html, body {
     padding: 0;
 }
 
-/* Container principal sem scroll */
 .container {
     display: flex;
     height: 100vh;
     overflow: hidden;
 }
 
-/* Main content sem scroll */
 .main-content {
     flex: 1;
     margin-left: 280px;
@@ -795,7 +788,6 @@ html, body {
     overflow: hidden;
 }
 
-/* Chat container fixo */
 .chat-container {
     display: flex;
     height: calc(100vh - 57px);
@@ -803,7 +795,6 @@ html, body {
     overflow: hidden;
 }
 
-/* Conversations panel com scroll próprio */
 .conversations-panel {
     width: 350px;
     background: #ffffff;
@@ -819,7 +810,6 @@ html, body {
     overflow-x: hidden;
 }
 
-/* Garantir que o chat-panel mantenha sua estrutura */
 .chat-panel {
     flex: 1;
     display: flex;
@@ -836,13 +826,11 @@ html, body {
     overflow: hidden;
 }
 
-/* Chat header fixo */
 .chat-header {
     flex-shrink: 0;
     min-height: 90px;
 }
 
-/* Área de mensagens com scroll próprio - ÚNICO SCROLL */
 .chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -855,7 +843,6 @@ html, body {
     scroll-behavior: smooth;
 }
 
-/* Input container fixo na parte inferior */
 .chat-input-container {
     flex-shrink: 0;
     padding: 20px 30px;
@@ -870,7 +857,6 @@ html, body {
     align-items: flex-end;
 }
 
-/* Prevenir que o textarea cause resize no container */
 .chat-input {
     flex: 1;
     min-height: 40px;
@@ -891,7 +877,6 @@ html, body {
     border-color: #A6D90C;
 }
 
-/* Scrollbar customizada para as mensagens */
 .chat-messages::-webkit-scrollbar {
     width: 8px;
 }
@@ -910,7 +895,6 @@ html, body {
     background: #a0aec0;
 }
 
-/* Scrollbar para conversations list */
 .conversations-list::-webkit-scrollbar {
     width: 6px;
 }
@@ -928,7 +912,6 @@ html, body {
     background: #a0aec0;
 }
 
-/* Garantir que as mensagens não causem overflow horizontal */
 .message {
     max-width: 70%;
     word-wrap: break-word;
@@ -941,7 +924,6 @@ html, body {
     max-width: 100%;
 }
 
-/* Animação suave para novas mensagens */
 @keyframes slideIn {
     from {
         opacity: 0;
@@ -957,7 +939,6 @@ html, body {
     animation: slideIn 0.3s ease-out;
 }
 
-/* Prevenir layout shift durante carregamento */
 #BotaoEscrever:empty {
     min-height: 80px;
 }
@@ -966,7 +947,6 @@ html, body {
     min-height: 200px;
 }
 
-/* Sidebar fixa sem scroll */
 .sidebar {
     width: 280px;
     background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
@@ -995,7 +975,6 @@ html, body {
     background: #718096;
 }
 
-/* Top navbar fixo */
 .top-navbar {
     background: #2d3748;
     border-bottom: 1px solid #4a5568;
@@ -1010,13 +989,11 @@ html, body {
     flex-shrink: 0;
 }
 
-/* Garantir que inputs de texto não causem scroll */
 input[type="text"],
 textarea {
     touch-action: manipulation;
 }
 
-/* Prevenir zoom no mobile */
 @media (max-width: 768px) {
     input[type="text"],
     textarea,
@@ -1024,7 +1001,7 @@ textarea {
         font-size: 16px;
     }
 }
-/* Container principal do estado vazio */
+
 .empty-chat-modern {
     display: flex;
     flex-direction: column;
@@ -1038,7 +1015,6 @@ textarea {
     background: #f8f9fa;
 }
 
-/* Animação de entrada suave */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -1050,7 +1026,6 @@ textarea {
     }
 }
 
-/* Wrapper do ícone principal */
 .chat-icon-wrapper {
     position: relative;
     margin-bottom: 35px;
@@ -1058,7 +1033,6 @@ textarea {
     height: 140px;
 }
 
-/* Círculo de fundo com pulso */
 .chat-icon-bg {
     width: 140px;
     height: 140px;
@@ -1072,7 +1046,6 @@ textarea {
     animation: pulseGlow 3s ease-in-out infinite;
 }
 
-/* Animação de pulso */
 @keyframes pulseGlow {
     0%, 100% {
         transform: translate(-50%, -50%) scale(1);
@@ -1084,7 +1057,6 @@ textarea {
     }
 }
 
-/* Círculo principal do ícone */
 .chat-icon-main {
     width: 100px;
     height: 100px;
@@ -1103,14 +1075,12 @@ textarea {
     box-shadow: 0 8px 32px rgba(166, 217, 12, 0.15);
 }
 
-/* Ícone com animação flutuante */
 .chat-icon-main i {
     font-size: 50px;
     color: #A6D90C;
     animation: float 3s ease-in-out infinite;
 }
 
-/* Animação flutuante */
 @keyframes float {
     0%, 100% {
         transform: translateY(0px);
@@ -1120,7 +1090,6 @@ textarea {
     }
 }
 
-/* Título principal */
 .empty-title {
     font-size: 26px;
     font-weight: 700;
@@ -1130,7 +1099,6 @@ textarea {
     line-height: 1.2;
 }
 
-/* Subtítulo/descrição */
 .empty-subtitle {
     font-size: 16px;
     color: #718096;
@@ -1140,7 +1108,6 @@ textarea {
     font-weight: 400;
 }
 
-/* Grid de ações rápidas */
 .quick-actions {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1150,7 +1117,6 @@ textarea {
     margin: 0 auto;
 }
 
-/* Card individual de ação */
 .action-card {
     background: #ffffff;
     padding: 28px 20px;
@@ -1162,7 +1128,6 @@ textarea {
     overflow: hidden;
 }
 
-/* Barra superior animada do card */
 .action-card::before {
     content: '';
     position: absolute;
@@ -1176,7 +1141,6 @@ textarea {
     transition: transform 0.4s ease;
 }
 
-/* Hover do card */
 .action-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
@@ -1187,7 +1151,6 @@ textarea {
     transform: scaleX(1);
 }
 
-/* Container do ícone do card */
 .action-icon {
     width: 56px;
     height: 56px;
@@ -1206,7 +1169,6 @@ textarea {
     box-shadow: 0 8px 20px rgba(166, 217, 12, 0.3);
 }
 
-/* Ícone dentro do card */
 .action-icon i {
     font-size: 24px;
     color: #A6D90C;
@@ -1218,7 +1180,6 @@ textarea {
     transform: scale(1.1);
 }
 
-/* Título do card */
 .action-title {
     font-size: 15px;
     font-weight: 600;
@@ -1231,7 +1192,6 @@ textarea {
     color: #A6D90C;
 }
 
-/* Descrição do card */
 .action-desc {
     font-size: 13px;
     color: #718096;

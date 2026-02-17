@@ -1,59 +1,87 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelChatAdmin.php';
-session_start();
 
-$func = new ChatAdmin();
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-if ($_POST['op'] == 1) {
-    $resp = $func->getSideBar();
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new ChatAdmin($conn);
+
+if ($op == 1) {
+    $resp = $func->getSideBar($_SESSION['utilizador']);
     echo $resp;
 }
-if ($_POST['op'] == 2) {
+
+if ($op == 2) {
     $resp = $func->getFaixa($_POST["IdUtilizador"]);
     echo $resp;
 }
-if ($_POST['op'] == 3) {
+
+if ($op == 3) {
     $resp = $func->getFaixa($_POST["IdUtilizador"]);
     echo $resp;
 }
-if ($_POST['op'] == 4) {
-    if (isset($_POST['IdUtilizador']) && $_POST['IdUtilizador'] !== 'undefined' && !empty($_POST['IdUtilizador'])) {
-        $resp = $func->getConversas($_POST['IdUtilizador'], $_SESSION['utilizador']);
-        echo $resp;
+
+if ($op == 4) {
+    $id_utilizador = $_POST['IdUtilizador'] ?? null;
+
+    if ($id_utilizador && $id_utilizador !== 'undefined' && !empty($id_utilizador)) {
+        $resp = $func->getConversas($id_utilizador, $_SESSION['utilizador']);
     } else {
-        echo '
-        <div class="empty-chat-modern">
-            <div class="chat-icon-wrapper">
-                <div class="chat-icon-bg"></div>
-                <div class="chat-icon-main">
-                    <i class="fas fa-comments"></i>
-                </div>
-            </div>
-            
-            <h3 class="empty-title">Nenhuma conversa selecionada</h3>
-            <p class="empty-subtitle">
-                Escolha uma conversa da lista ao lado para visualizar as mensagens e começar a responder aos seus clientes
-            </p>
-            
-            </div>
-        </div>
-        ';
+        $resp = $func->getMensagemConversaNaoSelecionada();
     }
+    echo $resp;
 }
-if ($_POST['op'] == 5) {
+
+if ($op == 5) {
     $resp = $func->getBotao($_POST["IdUtilizador"]);
     echo $resp;
 }
-if ($_POST['op'] == 6) {
-    $resp = $func->ConsumidorRes($_SESSION["utilizador"],$_POST["IdUtilizador"],$_POST["mensagem"]);
+
+if ($op == 6) {
+    $anexo = null;
+    if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = ['image/jpeg','image/jpg','image/png','image/gif','image/webp','application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document','application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','text/plain'];
+        $maxSize = 10 * 1024 * 1024; 
+        if (in_array($_FILES['imagem']['type'], $allowedTypes) && $_FILES['imagem']['size'] <= $maxSize) {
+            $uploadDir = __DIR__ . '/../uploads/chat/';
+            if (!is_dir($uploadDir)) { mkdir($uploadDir, 0755, true); }
+            $ext = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
+            $nomeArquivo = 'chat_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+            $destino = $uploadDir . $nomeArquivo;
+            if (move_uploaded_file($_FILES['imagem']['tmp_name'], $destino)) {
+                $anexo = 'src/uploads/chat/' . $nomeArquivo;
+            }
+        }
+    }
+    $resp = $func->ConsumidorRes($_SESSION["utilizador"], $_POST["IdUtilizador"], $_POST["mensagem"], $anexo);
     echo $resp;
 }
-if ($_POST['op'] == 7) {
-    $resp = $func->pesquisarChat($_POST["pesquisa"],$_SESSION['utilizador']);
+
+if ($op == 7) {
+    $resp = $func->pesquisarChat($_POST["pesquisa"], $_SESSION['utilizador']);
     echo $resp;
 }
-if ($_POST['op'] == 8) {
-    $resp = $func->getInativos();
+
+if ($op == 8) {
+    
+    
+    $resp = json_encode(['success' => false, 'message' => 'Função não implementada'], JSON_UNESCAPED_UNICODE);
     echo $resp;
 }
 ?>

@@ -1,72 +1,56 @@
 <?php
-/**
- * Controller para gestão de recuperação de password
- * Sistema WeGreen Marketplace
- */
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
 
 include_once '../model/modelPasswordReset.php';
 
-header('Content-Type: application/json');
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
 
-$passwordReset = new PasswordReset();
-
-// Operação 1: Solicitar recuperação de password
-if (isset($_POST['op']) && $_POST['op'] == 1) {
-    if (empty($_POST['email'])) {
-        echo json_encode([
-            'flag' => false,
-            'msg' => 'Por favor, insira o seu email.'
-        ]);
-        exit;
-    }
-    
-    $resp = $passwordReset->solicitarRecuperacao($_POST['email']);
-    echo json_encode($resp);
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-// Operação 2: Validar token
-if (isset($_POST['op']) && $_POST['op'] == 2) {
-    if (empty($_POST['token'])) {
-        echo json_encode([
-            'flag' => false,
-            'msg' => 'Token não fornecido.'
-        ]);
+$func = new PasswordReset($conn);
+
+if ($op == 1) {
+    $email = $_POST['email'] ?? null;
+
+    if (!$email || empty($email)) {
+        echo json_encode(['flag' => false, 'msg' => 'Por favor, insira o seu email.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    
-    $resp = $passwordReset->validarToken($_POST['token']);
-    echo json_encode($resp);
-    exit;
+
+    $resp = $func->solicitarRecuperacao($email);
+    echo $resp;
 }
 
-// Operação 3: Redefinir password
-if (isset($_POST['op']) && $_POST['op'] == 3) {
-    if (empty($_POST['token']) || empty($_POST['nova_password'])) {
-        echo json_encode([
-            'flag' => false,
-            'msg' => 'Token ou password não fornecidos.'
-        ]);
+if ($op == 2) {
+    $token = $_POST['token'] ?? null;
+
+    if (!$token || empty($token)) {
+        echo json_encode(['flag' => false, 'msg' => 'Token não fornecido.'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    
-    // Validar força da password
-    if (strlen($_POST['nova_password']) < 6) {
-        echo json_encode([
-            'flag' => false,
-            'msg' => 'A password deve ter pelo menos 6 caracteres.'
-        ]);
-        exit;
-    }
-    
-    $resp = $passwordReset->redefinirPassword($_POST['token'], $_POST['nova_password']);
-    echo json_encode($resp);
-    exit;
+
+    $resp = $func->validarToken($token);
+    echo $resp;
 }
 
-// Operação inválida
-echo json_encode([
-    'flag' => false,
-    'msg' => 'Operação inválida.'
-]);
+if ($op == 3) {
+    $token = $_POST['token'] ?? null;
+    $nova_password = $_POST['nova_password'] ?? null;
+
+    if (!$token || !$nova_password) {
+        echo json_encode(['flag' => false, 'msg' => 'Token ou password não fornecidos.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $resp = $func->redefinirPasswordComValidacao($token, $nova_password);
+    echo $resp;
+}
 ?>

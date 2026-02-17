@@ -1,44 +1,83 @@
 <?php
 require_once 'connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
+require_once __DIR__ . '/../services/RankingService.php';
 
 class SucessoCarrinho {
 
-    function processarPagamentoStripe($session_id, $utilizador_id) {
-        global $conn;
+    private $conn;
 
-        // Log para debug
-        error_log("=== PROCESSANDO PAGAMENTO STRIPE ===");
-        error_log("Session ID: " . $session_id);
-        error_log("Utilizador ID: " . $utilizador_id);
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+
+    private function getTaxaComissaoPorProduto($produtoId) {
+        $sql = "SELECT sustentavel, tipo_material FROM Produtos WHERE Produto_id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return 0.06;
+        }
+        $stmt->bind_param("i", $produtoId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+
+        if (!$row || !(int)$row['sustentavel']) {
+            return 0.06;
+        }
+
+        $material = $row['tipo_material'] ?? '';
+        $taxas = [
+            '100_reciclavel' => 0.04,
+            '70_reciclavel'  => 0.05,
+            '50_reciclavel'  => 0.05,
+            '30_reciclavel'  => 0.06
+        ];
+        return $taxas[$material] ?? 0.06;
+    }
+
+    private function getRastreioTipoPorAnunciante($anuncianteId) {
+        $sql = "SELECT p.rastreio_tipo
+                FROM Utilizadores u
+                LEFT JOIN Planos p ON u.plano_id = p.id
+                WHERE u.id = ?
+                LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return 'Básico';
+        }
+
+        $stmt->bind_param("i", $anuncianteId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+
+        return !empty($row['rastreio_tipo']) ? $row['rastreio_tipo'] : 'Básico';
+    }
+
+    function processarPagamentoStripe($session_id, $utilizador_id) {
+        try {
 
         require_once __DIR__ . '/../vendor/autoload.php';
         \Stripe\Stripe::setApiKey('sk_test_51SAniYBgsjq4eGslagm3l86yXwCOicwq02ABZ54SCT7e8p9HiOTdciQcB3hQXxN4i6hVwlxohVvbtzQXEoPhg7yd009a6ubA3l');
 
-        // Iniciar transação do banco de dados
-        $conn->begin_transaction();
-        error_log("✓ Transação do banco iniciada");
+        $this->conn->begin_transaction();
 
         try {
-            // Recuperar sessão do Stripe
             $session = \Stripe\Checkout\Session::retrieve($session_id);
-            error_log("Stripe Session Status: " . $session->payment_status);
 
-            // Verificar pagamento
             if ($session->payment_status !== 'paid') {
-                error_log("ERRO: Pagamento não confirmado. Status: " . $session->payment_status);
-                $conn->rollback();
+                $this->conn->rollback();
                 return false;
             }
 
-            error_log("Pagamento confirmado! Processando encomenda...");
-
-            // Extrair dados do pagamento Stripe
             $payment_intent_id = $session->payment_intent ?? '';
-            $payment_method = 'card'; // padrão
+            $payment_method = 'card';
             $payment_status = $session->payment_status;
 
-            // Obter método de pagamento real
             if ($payment_intent_id) {
                 $payment_intent = \Stripe\PaymentIntent::retrieve($payment_intent_id);
                 $payment_method_details = $payment_intent->charges->data[0]->payment_method_details ?? null;
@@ -47,51 +86,38 @@ class SucessoCarrinho {
                 }
             }
 
-            // Extrair e validar transportadora_id
             $transportadora_id_raw = $session->metadata->transportadora_id ?? null;
 
-            // Mapear opções de envio (1-5) para transportadoras reais (1=CTT, 2=DPD)
-            // 1 = CTT Standard → 1 (CTT)
-            // 2 = CTT Pickup → 1 (CTT)
-            // 3 = DPD Standard → 2 (DPD)
-            // 4 = DPD Pickup → 2 (DPD)
-            // 5 = Entrega em Casa → 1 (CTT)
 
             $mapeamento_transportadoras = [
-                '1' => 1, // CTT Standard
-                '2' => 1, // CTT Pickup
-                '3' => 2, // DPD Standard
-                '4' => 2, // DPD Pickup
-                '5' => 1, // Entrega em Casa (CTT)
+                '1' => 1,
+                '2' => 1,
+                '3' => 2,
+                '4' => 2,
+                '5' => 1,
             ];
 
             if (empty($transportadora_id_raw)) {
-                $transportadora_id = 1; // CTT por padrão
+                $transportadora_id = 1;
                 $tipo_entrega = 'domicilio';
-                error_log("⚠️ Transportadora vazia. Usando CTT (1) domicílio como padrão.");
             } else {
                 $opcao_envio = strval($transportadora_id_raw);
                 $transportadora_id = $mapeamento_transportadoras[$opcao_envio] ?? 1;
 
-                // Determinar tipo de entrega baseado na opção
-                // 2 = CTT Pickup, 4 = DPD Pickup
+
                 $tipo_entrega = (in_array($opcao_envio, ['2', '4'])) ? 'ponto_recolha' : 'domicilio';
 
-                error_log("✓ Opção de envio: $opcao_envio → Transportadora: $transportadora_id, Tipo: $tipo_entrega");
             }
 
-            // Extrair dados do ponto de recolha (se aplicável)
             $ponto_recolha_id = $session->metadata->pickup_point_id ?? null;
             $nome_ponto_recolha = $session->metadata->pickup_point_name ?? null;
             $morada_ponto_recolha = $session->metadata->pickup_point_address ?? null;
 
-            // Construir nome completo do destinatário
             $nome_destinatario = trim(
                 $session->metadata->shipping_firstName . ' ' .
                 $session->metadata->shipping_lastName
             );
 
-            // Construir morada completa de envio (para entrega ao domicílio)
             $morada_completa = trim(
                 $nome_destinatario . ', ' .
                 $session->metadata->shipping_address1 . ' ' .
@@ -101,7 +127,7 @@ class SucessoCarrinho {
                 $session->metadata->shipping_state
             );
 
-            // Morada antiga (compatibilidade)
+
             $morada = trim(
                 $session->metadata->shipping_address1 . ' ' .
                 $session->metadata->shipping_address2 . ', ' .
@@ -110,10 +136,11 @@ class SucessoCarrinho {
                 $session->metadata->shipping_state
             );
 
-            // Se morada estiver vazia, buscar do perfil do utilizador
             if (empty($morada) || empty($morada_completa)) {
-                $sql_user = "SELECT nome, morada FROM Utilizadores WHERE id = $utilizador_id LIMIT 1";
-                $result_user = $conn->query($sql_user);
+                $stmt_user = $this->conn->prepare("SELECT nome, morada FROM Utilizadores WHERE id = ? LIMIT 1");
+                $stmt_user->bind_param("i", $utilizador_id);
+                $stmt_user->execute();
+                $result_user = $stmt_user->get_result();
 
                 if ($result_user && $result_user->num_rows > 0) {
                     $user_data = $result_user->fetch_assoc();
@@ -123,29 +150,26 @@ class SucessoCarrinho {
                 }
             }
 
-            // Buscar produtos do carrinho
-            $sql = "SELECT ci.produto_id, ci.quantidade, p.preco, p.nome, p.anunciante_id, p.foto
+            $stmt_cart = $this->conn->prepare("SELECT ci.produto_id, ci.quantidade, p.preco, p.nome, p.anunciante_id, p.foto
                     FROM Carrinho_Itens ci
                     INNER JOIN Produtos p ON ci.produto_id = p.Produto_id
-                    WHERE ci.utilizador_id = $utilizador_id AND p.ativo = 1";
-
-            $result = $conn->query($sql);
-            error_log("Produtos no carrinho: " . $result->num_rows);
+                    WHERE ci.utilizador_id = ? AND p.ativo = 1");
+            $stmt_cart->bind_param("i", $utilizador_id);
+            $stmt_cart->execute();
+            $result = $stmt_cart->get_result();
 
             if ($result->num_rows > 0) {
-                // Gerar código ÚNICO da encomenda (1 código para todos os produtos)
+
                 do {
                     $codigo_encomenda = 'WG' . time() . rand(10000, 99999) . substr(uniqid(), -4);
-                    $check_sql = "SELECT id FROM Encomendas WHERE codigo_encomenda = '" . $conn->real_escape_string($codigo_encomenda) . "' LIMIT 1";
-                    $check_result = $conn->query($check_sql);
+                    $stmt_check = $this->conn->prepare("SELECT id FROM Encomendas WHERE codigo_encomenda = ? LIMIT 1");
+                    $stmt_check->bind_param("s", $codigo_encomenda);
+                    $stmt_check->execute();
+                    $check_result = $stmt_check->get_result();
                 } while ($check_result && $check_result->num_rows > 0);
 
-                error_log("✓ Código único da encomenda: $codigo_encomenda");
-
-                // Gerar código de confirmação de receção
                 $codigo_confirmacao = 'CONF-' . strtoupper(substr(md5(uniqid($codigo_encomenda, true)), 0, 6));
 
-                // Calcular prazo estimado de entrega
                 $dias_prazo = ($transportadora_id == 2) ? 2 : 4;
                 $prazo_estimado = date('Y-m-d', strtotime("+{$dias_prazo} days"));
 
@@ -156,7 +180,6 @@ class SucessoCarrinho {
                 $primeiro_produto_id = null;
                 $primeiro_anunciante_id = null;
 
-                // Coletar todos os produtos primeiro
                 while ($row = $result->fetch_assoc()) {
                     if ($primeiro_produto_id === null) {
                         $primeiro_produto_id = $row['produto_id'];
@@ -172,8 +195,10 @@ class SucessoCarrinho {
                     );
                 }
 
-                // Criar UMA ÚNICA ENCOMENDA (sem anunciante_id - relação via tabela Vendas)
-                $sql_encomenda = "INSERT INTO Encomendas (
+                $plano_rastreio = $this->getRastreioTipoPorAnunciante((int)$primeiro_anunciante_id);
+
+
+                $stmt_encomenda = $this->conn->prepare("INSERT INTO Encomendas (
                     codigo_encomenda, payment_id, payment_method, payment_status,
                     cliente_id, transportadora_id, produto_id,
                     data_envio, morada, tipo_entrega, ponto_recolha_id,
@@ -181,27 +206,29 @@ class SucessoCarrinho {
                     nome_destinatario, estado, plano_rastreio,
                     codigo_confirmacao_recepcao, prazo_estimado_entrega, lembrete_confirmacao_enviado
                 ) VALUES (
-                    '$codigo_encomenda', '$payment_intent_id', '$payment_method', '$payment_status',
+                    ?, ?, ?, ?,
+                    ?, ?, ?,
+                    NOW(), ?, ?, ?,
+                    ?, ?, ?,
+                    ?, 'Pendente', ?,
+                    ?, ?, 0
+                )");
+                $stmt_encomenda->bind_param(
+                    "ssssiiissssssssss",
+                    $codigo_encomenda, $payment_intent_id, $payment_method, $payment_status,
                     $utilizador_id, $transportadora_id, $primeiro_produto_id,
-                    NOW(), '" . $conn->real_escape_string($morada) . "', '$tipo_entrega', " . ($ponto_recolha_id ? "'" . $conn->real_escape_string($ponto_recolha_id) . "'" : "NULL") . ",
-                    " . ($nome_ponto_recolha ? "'" . $conn->real_escape_string($nome_ponto_recolha) . "'" : "NULL") . ",
-                    " . ($morada_ponto_recolha ? "'" . $conn->real_escape_string($morada_ponto_recolha) . "'" : "NULL") . ",
-                    '" . $conn->real_escape_string($morada_completa) . "',
-                    '" . $conn->real_escape_string($nome_destinatario) . "',
-                    'Pendente', 'Básico',
-                    '$codigo_confirmacao', '$prazo_estimado', 0
-                )";
+                    $morada, $tipo_entrega, $ponto_recolha_id,
+                    $nome_ponto_recolha, $morada_ponto_recolha, $morada_completa,
+                    $nome_destinatario, $plano_rastreio,
+                    $codigo_confirmacao, $prazo_estimado
+                );
 
-                if (!$conn->query($sql_encomenda)) {
-                    error_log("❌ ERRO ao inserir encomenda: " . $conn->error);
-                    error_log("SQL: " . $sql_encomenda);
-                    throw new Exception("Erro ao criar encomenda: " . $conn->error);
+                if (!$stmt_encomenda->execute()) {
+                    throw new Exception("Erro ao criar encomenda: " . $stmt_encomenda->error);
                 }
 
-                $encomenda_id = $conn->insert_id;
-                error_log("✓ Encomenda única criada: ID=$encomenda_id, Código=$codigo_encomenda");
+                $encomenda_id = $this->conn->insert_id;
 
-                // Criar VENDAS para cada produto
                 foreach ($produtos_array as $produto) {
                     $produto_id = $produto['produto_id'];
                     $quantidade = $produto['quantidade'];
@@ -209,42 +236,66 @@ class SucessoCarrinho {
                     $anunciante_id = $produto['anunciante_id'];
 
                     $valor_total = $preco * $quantidade;
-                    $lucro = $valor_total * 0.06;
+                    $taxa_comissao = $this->getTaxaComissaoPorProduto((int)$produto_id);
+                    $lucro = $valor_total * $taxa_comissao;
 
-                    $sql_venda = "INSERT INTO Vendas (encomenda_id, stripe_session_id, anunciante_id, produto_id, quantidade, valor, lucro, data_venda)
-                                  VALUES ($encomenda_id, '$session_id', $anunciante_id, $produto_id, $quantidade, $valor_total, $lucro, NOW())";
+                    $stmt_venda = $this->conn->prepare("INSERT INTO Vendas (encomenda_id, stripe_session_id, anunciante_id, produto_id, quantidade, valor, lucro, data_venda)
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+                    $stmt_venda->bind_param("isiiidd", $encomenda_id, $session_id, $anunciante_id, $produto_id, $quantidade, $valor_total, $lucro);
 
-                    if (!$conn->query($sql_venda)) {
-                        error_log("❌ ERRO ao inserir venda: " . $conn->error);
-                        throw new Exception("Erro ao criar venda: " . $conn->error);
+                    if (!$stmt_venda->execute()) {
+                        throw new Exception("Erro ao criar venda: " . $stmt_venda->error);
                     }
 
-                    error_log("✓ Venda criada: Produto ID=$produto_id, Qtd=$quantidade, Valor=€$valor_total");
-
-                    // Registrar rendimento por anunciante
                     $descricao_rend = "Comissão venda - Encomenda $codigo_encomenda - Produto #$produto_id";
-                    $sql_rendimento = "INSERT INTO Rendimento (valor, anunciante_id, descricao, data_registo)
-                                       VALUES ($lucro, $anunciante_id, '$descricao_rend', NOW())";
-                    $conn->query($sql_rendimento);
+                    $stmt_rend = $this->conn->prepare("INSERT INTO Rendimento (valor, anunciante_id, descricao, data_registo)
+                                       VALUES (?, ?, ?, NOW())");
+                    $stmt_rend->bind_param("dis", $lucro, $anunciante_id, $descricao_rend);
+                    $stmt_rend->execute();
+
+
+                    try {
+                        $rankingService = new RankingService($this->conn);
+                        $rankingService->adicionarPontosVenda((int)$anunciante_id);
+                    } catch (Exception $rankEx) {
+                    }
+
+
+                    $stmt_stock = $this->conn->prepare("UPDATE Produtos SET stock = GREATEST(0, stock - ?) WHERE Produto_id = ?");
+                    $stmt_stock->bind_param("ii", $quantidade, $produto_id);
+                    $stmt_stock->execute();
+                    $stmt_stock->close();
+
+
+                    $stmt_check_stock = $this->conn->prepare("SELECT stock FROM Produtos WHERE Produto_id = ? LIMIT 1");
+                    $stmt_check_stock->bind_param("i", $produto_id);
+                    $stmt_check_stock->execute();
+                    $row_stock = $stmt_check_stock->get_result()->fetch_assoc();
+                    $stmt_check_stock->close();
+
+
+                    if ($row_stock && (int)$row_stock['stock'] <= 0) {
+                        $stmt_deactivate = $this->conn->prepare("UPDATE Produtos SET ativo = 0 WHERE Produto_id = ?");
+                        $stmt_deactivate->bind_param("i", $produto_id);
+                        $stmt_deactivate->execute();
+                        $stmt_deactivate->close();
+                    }
+
                 }
 
-                // Inserir histórico UMA VEZ para a encomenda
                 $descricao = "Encomenda criada - Aguardando confirmação";
-                $sql_historico = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao, data_atualizacao)
-                                  VALUES ($encomenda_id, 'Pendente', '$descricao', NOW())";
-                $conn->query($sql_historico);
+                $stmt_hist = $this->conn->prepare("INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao, data_atualizacao)
+                                  VALUES (?, 'Pendente', ?, NOW())");
+                $stmt_hist->bind_param("is", $encomenda_id, $descricao);
+                $stmt_hist->execute();
 
-                // Limpar carrinho UMA VEZ
-                $sql_delete = "DELETE FROM Carrinho_Itens WHERE utilizador_id = $utilizador_id";
-                if ($conn->query($sql_delete)) {
-                    error_log("✓ Carrinho limpo: removidos " . $conn->affected_rows . " itens");
+                $stmt_del = $this->conn->prepare("DELETE FROM Carrinho_Itens WHERE utilizador_id = ?");
+                $stmt_del->bind_param("i", $utilizador_id);
+                if ($stmt_del->execute()) {
                 }
 
-                // COMMIT da transação - garantir que tudo foi salvo
-                $conn->commit();
-                error_log("✓ Transação do banco confirmada (COMMIT)");
+                $this->conn->commit();
 
-                // Enviar emails de notificação com dados completos de entrega
                 $dadosEntrega = [
                     'tipo_entrega' => $tipo_entrega,
                     'ponto_recolha_id' => $ponto_recolha_id,
@@ -256,7 +307,7 @@ class SucessoCarrinho {
                     'prazo_estimado_entrega' => $prazo_estimado
                 ];
 
-                // Tentar enviar emails, mas não falhar o checkout se houver erro
+
                 try {
                     $this->enviarEmailsConfirmacao(
                         $utilizador_id,
@@ -269,14 +320,10 @@ class SucessoCarrinho {
                         $produtos_nomes,
                         $dadosEntrega
                     );
-                    error_log("✓ Emails de confirmação enviados com sucesso");
                 } catch (Exception $e) {
-                    error_log("⚠️ AVISO: Falha ao enviar emails (checkout continua): " . $e->getMessage());
-                    // Não bloquear o processo - a encomenda já foi criada
+
                 }
 
-                // Retornar resultado
-                error_log("Encomenda processada com sucesso! Código: " . $codigo_encomenda);
                 return array(
                     'sucesso' => true,
                     'codigo_encomenda' => $codigo_encomenda,
@@ -285,32 +332,27 @@ class SucessoCarrinho {
                     'produtos_detalhes' => $produtos_detalhes
                 );
             } else {
-                error_log("ERRO: Carrinho vazio! Nenhum produto encontrado.");
-                $conn->rollback();
+                $this->conn->rollback();
             }
 
-            $conn->rollback();
+            $this->conn->rollback();
             return false;
 
         } catch (Exception $e) {
-            // Rollback em caso de erro
-            $conn->rollback();
-            error_log("ERRO CRÍTICO ao processar pagamento: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
+            $this->conn->rollback();
             return false;
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
-    /**
-     * Enviar emails de confirmação de encomenda ao cliente e ao anunciante
-     */
+
     private function enviarEmailsConfirmacao($cliente_id, $codigo_encomenda, $anunciante_id, $payment_method, $transportadora_id, $morada, $total, $produtos_nomes, $dadosEntrega = []) {
-        global $conn;
 
         try {
-            $emailService = new EmailService();
+            $emailService = new EmailService($this->conn);
 
-            // Obter nome da transportadora
             $transportadoras = [
                 1 => 'CTT - Correios de Portugal',
                 2 => 'DPD - Entrega Rápida',
@@ -320,15 +362,15 @@ class SucessoCarrinho {
             ];
             $transportadora = $transportadoras[$transportadora_id] ?? 'CTT';
 
-            // Buscar produtos completos para o template
-            $sql_produtos = "SELECT p.nome, p.preco, p.foto, 1 as quantidade
+            $stmt_produtos = $this->conn->prepare("SELECT p.nome, p.preco, p.foto, 1 as quantidade
                             FROM Encomendas e
                             INNER JOIN Produtos p ON e.produto_id = p.Produto_id
-                            WHERE e.codigo_encomenda = '$codigo_encomenda'";
-
-            $result_produtos = $conn->query($sql_produtos);
+                            WHERE e.codigo_encomenda = ?");
+            $stmt_produtos->bind_param("s", $codigo_encomenda);
+            $stmt_produtos->execute();
+            $result_produtos = $stmt_produtos->get_result();
             $produtos_array = [];
-            $inline_images = []; // Array para imagens inline (CID)
+            $inline_images = [];
 
             if ($result_produtos && $result_produtos->num_rows > 0) {
                 $index = 1;
@@ -336,21 +378,17 @@ class SucessoCarrinho {
                     $foto_path = $prod['foto'];
                     $cid = "produto_$index";
 
-                    // Processar caminho da foto para inline image
                     if (!empty($foto_path)) {
-                        // Remover possível prefixo duplicado
                         $foto_path = str_replace('src/img/', '', $foto_path);
                         $foto_path = str_replace('src\\img\\', '', $foto_path);
 
-                        // Construir caminho absoluto
                         $absolute_path = __DIR__ . '/../../src/img/' . $foto_path;
 
-                        // Verificar se arquivo existe
                         if (file_exists($absolute_path)) {
                             $inline_images[$cid] = $absolute_path;
-                            $foto_url = "cid:$cid"; // Usar Content-ID para inline
+                            $foto_url = "cid:$cid";
                         } else {
-                            // Fallback para placeholder
+
                             $foto_url = "cid:placeholder";
                             $inline_images['placeholder'] = __DIR__ . '/../../assets/media/products/placeholder.jpg';
                         }
@@ -364,57 +402,59 @@ class SucessoCarrinho {
                         'preco' => $prod['preco'],
                         'quantidade' => $prod['quantidade'],
                         'subtotal' => $prod['preco'] * $prod['quantidade'],
-                        'foto' => $foto_url // CID format
+                        'foto' => $foto_url
                     ];
 
                     $index++;
                 }
             }
 
-            // Gerar URL do mapa estático
             $morada_para_mapa = ($dadosEntrega['tipo_entrega'] ?? 'domicilio') === 'ponto_recolha'
                 ? ($dadosEntrega['morada_ponto_recolha'] ?? $morada)
                 : ($dadosEntrega['morada_completa'] ?? $morada);
 
             $mapa_url = $this->gerarMapaEstatico($morada_para_mapa);
 
-            // Dados para o email do cliente
             $dadosCliente = [
                 'codigo_encomenda' => $codigo_encomenda,
                 'data_encomenda' => date('Y-m-d H:i:s'),
-                'payment_method' => 'Stripe (Cartão de Crédito)', // Sempre Stripe
+                'payment_method' => 'Stripe (Cartão de Crédito)',
                 'transportadora' => $transportadora,
                 'morada' => $morada,
                 'total' => $total,
                 'produtos' => $produtos_array,
-                // Novos campos de entrega
                 'tipo_entrega' => $dadosEntrega['tipo_entrega'] ?? 'domicilio',
                 'nome_ponto_recolha' => $dadosEntrega['nome_ponto_recolha'] ?? null,
                 'morada_ponto_recolha' => $dadosEntrega['morada_ponto_recolha'] ?? null,
                 'morada_completa' => $dadosEntrega['morada_completa'] ?? $morada,
                 'nome_destinatario' => $dadosEntrega['nome_destinatario'] ?? 'Cliente',
-                'mapa_url' => $mapa_url // URL do mapa estático
+                'mapa_url' => $mapa_url
             ];
 
-            // Enviar email ao cliente com imagens inline
             $emailService->sendFromTemplate(
                 $cliente_id,
                 'confirmacao_encomenda',
                 $dadosCliente,
                 'cliente',
-                $inline_images // Array de imagens inline
+                $inline_images
             );
 
-            // Obter dados do cliente para email do anunciante
-            $sql_cliente = "SELECT nome, email FROM Utilizadores WHERE id = $cliente_id LIMIT 1";
-            $result_cliente = $conn->query($sql_cliente);
+            $stmt_cliente = $this->conn->prepare("SELECT nome, email FROM Utilizadores WHERE id = ? LIMIT 1");
+            $stmt_cliente->bind_param("i", $cliente_id);
+            $stmt_cliente->execute();
+            $result_cliente = $stmt_cliente->get_result();
             $cliente = $result_cliente->fetch_assoc();
 
-            // Calcular valores financeiros
-            $comissao = $total * 0.06;
-            $lucro_liquido = $total - $comissao;
 
-            // Dados para o email do anunciante
+            $comissao = 0;
+            foreach ($produtos_array as $prod_email) {
+                $val_prod = $prod_email['preco'] * $prod_email['quantidade'];
+                $taxa_prod = $this->getTaxaComissaoPorProduto((int)$prod_email['produto_id']);
+                $comissao += $val_prod * $taxa_prod;
+            }
+            $lucro_liquido = $total - $comissao;
+            $taxaComissaoMedia = $total > 0 ? ($comissao / $total) : 0.06;
+
             $dadosAnunciante = [
                 'codigo_encomenda' => $codigo_encomenda,
                 'data_encomenda' => date('Y-m-d H:i:s'),
@@ -427,8 +467,8 @@ class SucessoCarrinho {
                 'produtos' => $produtos_array,
                 'valor_bruto' => $total,
                 'comissao' => $comissao,
+                'taxa_comissao_percent' => round($taxaComissaoMedia * 100, 2),
                 'lucro_liquido' => $lucro_liquido,
-                // Dados de entrega
                 'tipo_entrega' => $dadosEntrega['tipo_entrega'] ?? 'domicilio',
                 'nome_ponto_recolha' => $dadosEntrega['nome_ponto_recolha'] ?? null,
                 'morada_ponto_recolha' => $dadosEntrega['morada_ponto_recolha'] ?? null,
@@ -436,7 +476,6 @@ class SucessoCarrinho {
                 'nome_destinatario' => $dadosEntrega['nome_destinatario'] ?? $cliente['nome']
             ];
 
-            // Enviar email ao anunciante com imagens inline
             $emailService->sendFromTemplate(
                 $anunciante_id,
                 'nova_encomenda_anunciante',
@@ -446,28 +485,23 @@ class SucessoCarrinho {
             );
 
         } catch (Exception $e) {
-            error_log("Erro ao enviar emails de confirmação: " . $e->getMessage());
-            // Não falhar o processo se o email falhar
+
         }
     }
 
-    /**
-     * Gera URL de mapa estático usando OpenStreetMap (gratuito, sem API key)
-     *
-     * @param string $morada Morada para geocodificar
-     * @return string URL do mapa estático ou string vazia se falhar
-     */
+
     private function gerarMapaEstatico($morada) {
-        // Limpar e codificar morada
+        try {
+
         $morada_clean = trim($morada);
         if (empty($morada_clean)) {
             return '';
         }
 
-        // Fazer geocoding usando Nominatim (OpenStreetMap - gratuito)
+
         $nominatim_url = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($morada_clean) . '&countrycodes=pt&limit=1';
 
-        // Configurar headers para Nominatim (requer User-Agent)
+
         $context = stream_context_create([
             'http' => [
                 'header' => "User-Agent: WeGreen-Marketplace/1.0\r\n"
@@ -475,26 +509,23 @@ class SucessoCarrinho {
         ]);
 
         try {
-            // Obter coordenadas
             $response = @file_get_contents($nominatim_url, false, $context);
 
             if ($response === false) {
-                error_log("Erro ao geocodificar morada: $morada_clean");
                 return '';
             }
 
             $data = json_decode($response, true);
 
             if (empty($data) || !isset($data[0]['lat']) || !isset($data[0]['lon'])) {
-                error_log("Coordenadas não encontradas para: $morada_clean");
                 return '';
             }
 
             $lat = $data[0]['lat'];
             $lon = $data[0]['lon'];
 
-            // Gerar URL de mapa estático usando StaticMap.org (gratuito, sem API key)
-            // Documentação: https://staticmap.org/
+
+
             $zoom = 15;
             $width = 600;
             $height = 300;
@@ -509,8 +540,10 @@ class SucessoCarrinho {
             return $mapa_url;
 
         } catch (Exception $e) {
-            error_log("Erro ao gerar mapa estático: " . $e->getMessage());
             return '';
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 }

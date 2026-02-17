@@ -1,10 +1,18 @@
 <?php
 require_once 'connection.php';
+require_once __DIR__ . '/../services/RankingService.php';
 
 class Encomendas {
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
     function listarPorCliente($cliente_id) {
-        global $conn;
+        try {
+
         $encomendas = [];
 
         $sql = "SELECT
@@ -37,18 +45,29 @@ class Encomendas {
                 FROM encomendas e
                 LEFT JOIN devolucoes d ON e.id = d.encomenda_id
                     AND d.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')
-                WHERE e.cliente_id = $cliente_id
-                ORDER BY e.data_envio DESC";
+                WHERE e.cliente_id = ?
+                ORDER BY e.data_envio DESC, e.id DESC";
 
-        $result = $conn->query($sql);
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("i", $cliente_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
-                // Obter nome da transportadora
+
                 $transportadora = $this->obterTransportadora($row['id']);
                 $row['transportadora'] = $transportadora;
 
-                // Obter lista detalhada de produtos
+                $resumoAvaliacoes = $this->obterResumoAvaliacoesEncomenda($row['codigo_encomenda'], $cliente_id);
+                $totalProdutosAvaliaveis = (int)($resumoAvaliacoes['total_produtos_avaliaveis'] ?? 0);
+                $totalProdutosAvaliados = (int)($resumoAvaliacoes['total_produtos_avaliados'] ?? 0);
+
+                $row['total_produtos_avaliaveis'] = $totalProdutosAvaliaveis;
+                $row['total_produtos_avaliados'] = $totalProdutosAvaliados;
+                $row['encomenda_totalmente_avaliada'] = ($totalProdutosAvaliaveis > 0 && $totalProdutosAvaliados >= $totalProdutosAvaliaveis) ? 1 : 0;
+
+
                 $row['produtos_lista'] = $this->obterListaProdutos($row['id']);
                 $row['num_produtos'] = count($row['produtos_lista']);
 
@@ -56,11 +75,18 @@ class Encomendas {
             }
         }
 
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
+
         return $encomendas;
+        } catch (Exception $e) {
+            return [];
+        }
     }
 
     private function obterListaProdutos($encomenda_id) {
-        global $conn;
+        try {
 
         $sql = "SELECT
                     p.Produto_id,
@@ -70,9 +96,12 @@ class Encomendas {
                     v.valor
                 FROM vendas v
                 INNER JOIN produtos p ON v.produto_id = p.Produto_id
-                WHERE v.encomenda_id = $encomenda_id";
+            WHERE v.encomenda_id = ?";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $encomenda_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $produtos = [];
 
         if ($result && $result->num_rows > 0) {
@@ -81,11 +110,68 @@ class Encomendas {
             }
         }
 
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
+
         return $produtos;
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    private function obterResumoAvaliacoesEncomenda($codigo_encomenda, $cliente_id) {
+        try {
+            $sql = "SELECT
+                        COUNT(DISTINCT v.produto_id) as total_produtos_avaliaveis,
+                        COUNT(DISTINCT a.produto_id) as total_produtos_avaliados
+                    FROM encomendas e
+                    INNER JOIN vendas v ON e.id = v.encomenda_id
+                    LEFT JOIN avaliacoes_produtos a ON a.produto_id = v.produto_id
+                        AND a.encomenda_codigo = e.codigo_encomenda
+                        AND a.utilizador_id = ?
+                    WHERE e.codigo_encomenda = ?
+                    AND e.cliente_id = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                return [
+                    'total_produtos_avaliaveis' => 0,
+                    'total_produtos_avaliados' => 0
+                ];
+            }
+
+            $stmt->bind_param("isi", $cliente_id, $codigo_encomenda, $cliente_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result && $result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $stmt->close();
+                return [
+                    'total_produtos_avaliaveis' => (int)($row['total_produtos_avaliaveis'] ?? 0),
+                    'total_produtos_avaliados' => (int)($row['total_produtos_avaliados'] ?? 0)
+                ];
+            }
+
+            if (isset($stmt) && $stmt) {
+                $stmt->close();
+            }
+
+            return [
+                'total_produtos_avaliaveis' => 0,
+                'total_produtos_avaliados' => 0
+            ];
+        } catch (Exception $e) {
+            return [
+                'total_produtos_avaliaveis' => 0,
+                'total_produtos_avaliados' => 0
+            ];
+        }
     }
 
     function obterDetalhes($codigo_encomenda, $cliente_id) {
-        global $conn;
+        try {
 
         $sql = "SELECT
                     e.*,
@@ -93,19 +179,21 @@ class Encomendas {
                     u.email as cliente_email
                 FROM encomendas e
                 LEFT JOIN Utilizadores u ON e.cliente_id = u.id
-                WHERE e.codigo_encomenda = '$codigo_encomenda'
-                AND e.cliente_id = $cliente_id
+            WHERE e.codigo_encomenda = ?
+            AND e.cliente_id = ?
                 LIMIT 1";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("si", $codigo_encomenda, $cliente_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $encomenda = $result->fetch_assoc();
 
-            // Buscar transportadora
             $encomenda['transportadora'] = $this->obterTransportadora($encomenda['id']);
 
-            // Adicionar campos de entrega se não existirem
+
             if (!isset($encomenda['tipo_entrega'])) {
                 $encomenda['tipo_entrega'] = 'domicilio';
             }
@@ -113,33 +201,42 @@ class Encomendas {
                 $encomenda['morada_completa'] = $encomenda['morada'];
             }
 
-            // Buscar produtos da encomenda (HTML para compatibilidade)
+
             $encomenda['produtos_detalhes'] = $this->obterProdutosEncomenda($codigo_encomenda);
 
-            // Buscar lista detalhada de produtos (array para PDFs e faturas)
+
             $encomenda['produtos_lista'] = $this->obterListaProdutos($encomenda['id']);
 
-            // Calcular total
             $encomenda['total'] = $this->calcularTotal($codigo_encomenda);
 
             return $encomenda;
         }
 
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
+
         return false;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     private function obterTransportadora($encomenda_id) {
-        global $conn;
+        try {
 
-        // Assumindo que existe relação com transportadora_id
-        $sql = "SELECT transportadora_id FROM encomendas WHERE id = $encomenda_id LIMIT 1";
-        $result = $conn->query($sql);
+
+        $sql = "SELECT transportadora_id FROM encomendas WHERE id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $encomenda_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $transportadora_id = $row['transportadora_id'];
 
-            // Mapear IDs para nomes (conforme carrinho.js)
+
             $transportadoras = [
                 1 => 'CTT - Correios de Portugal',
                 2 => 'CTT - Ponto de Recolha',
@@ -152,10 +249,13 @@ class Encomendas {
         }
 
         return 'N/A';
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     private function obterProdutosEncomenda($codigo_encomenda) {
-        global $conn;
+        try {
 
         $sql = "SELECT
                     p.nome,
@@ -166,9 +266,12 @@ class Encomendas {
                 FROM encomendas e
                 INNER JOIN vendas v ON e.id = v.encomenda_id
                 INNER JOIN produtos p ON v.produto_id = p.Produto_id
-                WHERE e.codigo_encomenda = '$codigo_encomenda'";
+            WHERE e.codigo_encomenda = ?";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("s", $codigo_encomenda);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         $html = '<table style="width: 100%; border-collapse: collapse;">';
         $html .= '<tr style="background: #f5f5f5; font-weight: bold;">';
@@ -189,43 +292,183 @@ class Encomendas {
 
         $html .= '</table>';
 
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
+
         return $html;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     private function calcularTotal($codigo_encomenda) {
-        global $conn;
+        try {
 
         $sql = "SELECT SUM(v.valor) as total
                 FROM encomendas e
                 INNER JOIN vendas v ON e.id = v.encomenda_id
-                WHERE e.codigo_encomenda = '$codigo_encomenda'";
+            WHERE e.codigo_encomenda = ?";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("s", $codigo_encomenda);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            return $row['total'] ?? 0;
+            $total = $row['total'] ?? 0;
+            $stmt->close();
+            return $total;
+        }
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
         }
 
         return 0;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function cancelar($codigo_encomenda, $cliente_id) {
-        global $conn;
+        try {
 
-        $sql = "UPDATE encomendas
+        $stmt = $this->conn->prepare("UPDATE encomendas
                 SET estado = 'Cancelada'
-                WHERE codigo_encomenda = '$codigo_encomenda'
-                AND cliente_id = $cliente_id
-                AND estado IN ('Pendente', 'Processando')";
+                WHERE codigo_encomenda = ?
+                AND cliente_id = ?
+                AND estado IN ('Pendente', 'Processando', 'Em Processamento')");
+        $stmt->bind_param("si", $codigo_encomenda, $cliente_id);
+        $stmt->execute();
 
-        $result = $conn->query($sql);
+        if ($stmt->affected_rows > 0) {
 
-        return $result;
+            try {
+                $rankingService = new RankingService($this->conn);
+                $stmtAnunc = $this->conn->prepare("SELECT DISTINCT v.anunciante_id FROM Vendas v INNER JOIN Encomendas e ON v.encomenda_id = e.id WHERE e.codigo_encomenda = ?");
+                $stmtAnunc->bind_param("s", $codigo_encomenda);
+                $stmtAnunc->execute();
+                $resultAnunc = $stmtAnunc->get_result();
+                while ($rowAnunc = $resultAnunc->fetch_assoc()) {
+                    $rankingService->removerPontosCancelamento((int)$rowAnunc['anunciante_id']);
+                }
+                $stmtAnunc->close();
+            } catch (Exception $rankEx) {
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Encomenda cancelada com sucesso'
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => 'Esta encomenda não pode ser cancelada'
+        ];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => 'Erro interno do servidor'];
+        }
+    }
+
+    function confirmarRececao($codigo_confirmacao, $cliente_id, $ip = null) {
+        try {
+            $codigo = strtoupper(trim((string)$codigo_confirmacao));
+
+            if ($codigo === '') {
+                return [
+                    'success' => false,
+                    'message' => 'Código de confirmação inválido'
+                ];
+            }
+
+            $sql = "SELECT id, estado
+                    FROM encomendas
+                    WHERE codigo_confirmacao_recepcao = ?
+                    AND cliente_id = ?
+                    LIMIT 1";
+
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bind_param("si", $codigo, $cliente_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if (!$result || $result->num_rows === 0) {
+                if (isset($stmt) && $stmt) {
+                    $stmt->close();
+                }
+
+                return [
+                    'success' => false,
+                    'message' => 'Código inválido ou não pertence à sua conta'
+                ];
+            }
+
+            $encomenda = $result->fetch_assoc();
+            if (isset($stmt) && $stmt) {
+                $stmt->close();
+            }
+
+            $estado = strtolower(trim((string)($encomenda['estado'] ?? '')));
+            if ($estado === 'entregue') {
+                return [
+                    'success' => false,
+                    'message' => 'Esta encomenda já foi confirmada anteriormente'
+                ];
+            }
+
+            $sqlUpdate = "UPDATE encomendas
+                          SET estado = 'Entregue',
+                              data_confirmacao_recepcao = NOW(),
+                              ip_confirmacao = ?
+                          WHERE id = ?
+                          AND cliente_id = ?";
+
+            $ipConfirmacao = $ip ? (string)$ip : '';
+            $stmtUpdate = $this->conn->prepare($sqlUpdate);
+            $stmtUpdate->bind_param("sii", $ipConfirmacao, $encomenda['id'], $cliente_id);
+            $stmtUpdate->execute();
+
+            if ($stmtUpdate->affected_rows <= 0) {
+                if (isset($stmtUpdate) && $stmtUpdate) {
+                    $stmtUpdate->close();
+                }
+
+                return [
+                    'success' => false,
+                    'message' => 'Não foi possível confirmar a receção'
+                ];
+            }
+
+            if (isset($stmtUpdate) && $stmtUpdate) {
+                $stmtUpdate->close();
+            }
+
+            $sqlHist = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao, data_atualizacao)
+                        VALUES (?, 'Entregue', 'Entrega confirmada pelo cliente', NOW())";
+            $stmtHist = $this->conn->prepare($sqlHist);
+            if ($stmtHist) {
+                $stmtHist->bind_param("i", $encomenda['id']);
+                $stmtHist->execute();
+                $stmtHist->close();
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Receção confirmada com sucesso'
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Erro interno do servidor'
+            ];
+        }
     }
 
     function obterEstatisticas($cliente_id) {
-        global $conn;
+        try {
 
         $stats = [
             'total' => 0,
@@ -243,29 +486,109 @@ class Encomendas {
                     SUM(CASE WHEN estado = 'enviado' THEN 1 ELSE 0 END) as enviadas,
                     SUM(CASE WHEN estado = 'entregue' THEN 1 ELSE 0 END) as entregues
                 FROM encomendas
-                WHERE cliente_id = $cliente_id";
+            WHERE cliente_id = ?";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $cliente_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
             $stats = array_merge($stats, $row);
         }
 
-        // Calcular valor total gasto
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
+
         $sql2 = "SELECT SUM(p.preco) as valor_total
                 FROM encomendas e
                 INNER JOIN Produtos p ON e.produto_id = p.Produto_id
-                WHERE e.cliente_id = $cliente_id";
+            WHERE e.cliente_id = ?";
 
-        $result2 = $conn->query($sql2);
+        $stmt2 = $this->conn->prepare($sql2);
+        $stmt2->bind_param("i", $cliente_id);
+        $stmt2->execute();
+        $result2 = $stmt2->get_result();
 
         if ($result2 && $result2->num_rows > 0) {
             $row2 = $result2->fetch_assoc();
             $stats['valor_total'] = $row2['valor_total'] ?? 0;
         }
 
+        if (isset($stmt2) && $stmt2) {
+            $stmt2->close();
+        }
+
         return $stats;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function gerarFaturaPDF($codigo_encomenda, $cliente_id) {
+        try {
+            $stmt = $this->conn->prepare("SELECT e.*, u.nome AS cliente_nome, u.email, u.morada AS cliente_morada, u.nif
+                FROM Encomendas e
+                INNER JOIN utilizadores u ON e.cliente_id = u.id
+                WHERE e.codigo_encomenda = ? AND e.cliente_id = ?");
+            $stmt->bind_param("si", $codigo_encomenda, $cliente_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 0) {
+                return ['success' => false, 'message' => 'Encomenda não encontrada'];
+            }
+
+            $encomenda = $result->fetch_assoc();
+
+            $stmt_prod = $this->conn->prepare("SELECT v.quantidade, v.preco_unitario, p.nome AS produto_nome
+                FROM Vendas v
+                INNER JOIN Produtos p ON v.produto_id = p.Produto_id
+                WHERE v.codigo_encomenda = ?");
+            $stmt_prod->bind_param("s", $codigo_encomenda);
+            $stmt_prod->execute();
+            $result_prod = $stmt_prod->get_result();
+
+            $produtos = [];
+            $total = 0;
+            while ($row = $result_prod->fetch_assoc()) {
+                $subtotal = $row['preco_unitario'] * $row['quantidade'];
+                $row['subtotal'] = $subtotal;
+                $produtos[] = $row;
+                $total += $subtotal;
+            }
+
+            $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Fatura ' . htmlspecialchars($codigo_encomenda) . '</title>';
+            $html .= '<style>body{font-family:Arial,sans-serif;margin:40px;color:#333}';
+            $html .= '.header{text-align:center;border-bottom:2px solid #3cb371;padding-bottom:20px;margin-bottom:30px}';
+            $html .= '.header h1{color:#3cb371;margin:0}table{width:100%;border-collapse:collapse;margin:20px 0}';
+            $html .= 'th,td{padding:10px;text-align:left;border-bottom:1px solid #ddd}th{background:#f5f5f5}';
+            $html .= '.total{text-align:right;font-size:18px;font-weight:bold;margin-top:20px}</style></head><body>';
+            $html .= '<div class="header"><h1>WeGreen</h1><p>Fatura</p></div>';
+            $html .= '<p><strong>Código:</strong> ' . htmlspecialchars($codigo_encomenda) . '</p>';
+            $html .= '<p><strong>Cliente:</strong> ' . htmlspecialchars($encomenda['cliente_nome']) . '</p>';
+            $html .= '<p><strong>Email:</strong> ' . htmlspecialchars($encomenda['email']) . '</p>';
+            if (!empty($encomenda['nif'])) {
+                $html .= '<p><strong>NIF:</strong> ' . htmlspecialchars($encomenda['nif']) . '</p>';
+            }
+            $html .= '<p><strong>Data:</strong> ' . htmlspecialchars($encomenda['data_encomenda'] ?? date('Y-m-d')) . '</p>';
+            $html .= '<table><thead><tr><th>Produto</th><th>Qtd</th><th>Preço Unit.</th><th>Subtotal</th></tr></thead><tbody>';
+            foreach ($produtos as $p) {
+                $html .= '<tr><td>' . htmlspecialchars($p['produto_nome']) . '</td>';
+                $html .= '<td>' . $p['quantidade'] . '</td>';
+                $html .= '<td>' . number_format($p['preco_unitario'], 2, ',', '.') . '€</td>';
+                $html .= '<td>' . number_format($p['subtotal'], 2, ',', '.') . '€</td></tr>';
+            }
+            $html .= '</tbody></table>';
+            $html .= '<div class="total">Total: ' . number_format($total, 2, ',', '.') . '€</div>';
+            $html .= '</body></html>';
+
+            return ['success' => true, 'content' => $html];
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => 'Erro ao gerar fatura'];
+        }
     }
 }
 ?>

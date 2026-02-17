@@ -24,14 +24,11 @@ function getProdutoMostrar() {
       console.log(msg);
       $("#ProdutoInfo").html(msg);
 
-      // Adicionar evento ao botão de comprar
       $(".btnComprarAgora").on("click", function () {
         const produtoId = $(this).data("id");
         comprarAgora(produtoId);
       });
 
-      // Aguardar um pouco para garantir que o DOM está completamente atualizado
-      // antes de carregar as avaliações
       setTimeout(function () {
         console.log(
           "✅ HTML do produto carregado, iniciando carregamento de avaliações...",
@@ -46,23 +43,31 @@ function getProdutoMostrar() {
 }
 
 function ErrorSession() {
-  Swal.fire({
-    icon: "warning",
-    title: '<span style="color: #2e8b57;">Inicie Sessão</span>',
-    html: '<p style="color: #64748b; font-size: 15px;">É necessário iniciar sessão para conversar com o vendedor!</p>',
-    showCancelButton: true,
-    confirmButtonText: '<i class="fas fa-sign-in-alt"></i> Ir para Login',
-    cancelButtonText: "Cancelar",
-    confirmButtonColor: "#3cb371",
-    cancelButtonColor: "#6c757d",
-    customClass: {
-      popup: "swal-custom-popup",
-      confirmButton: "swal-confirm-green",
-      cancelButton: "swal-cancel",
-    },
-    buttonsStyling: true,
-    reverseButtons: true,
-  }).then((result) => {
+  const modal =
+    typeof showModernConfirmModal === "function"
+      ? showModernConfirmModal(
+          "Inicie Sessão",
+          "É necessário iniciar sessão para conversar com o vendedor!",
+          {
+            confirmText: '<i class="fas fa-sign-in-alt"></i> Ir para Login',
+            icon: "fa-sign-in-alt",
+            iconBg:
+              "background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);",
+          },
+        )
+      : Swal.fire({
+          icon: "warning",
+          title: "Inicie Sessão",
+          text: "É necessário iniciar sessão para conversar com o vendedor!",
+          showCancelButton: true,
+          confirmButtonText: "Ir para Login",
+          cancelButtonText: "Cancelar",
+          confirmButtonColor: "#3cb371",
+          cancelButtonColor: "#6c757d",
+          reverseButtons: true,
+        });
+
+  modal.then((result) => {
     if (result.isConfirmed) {
       window.location.href = "login.html";
     }
@@ -70,17 +75,18 @@ function ErrorSession() {
 }
 
 function ErrorSession2() {
-  Swal.fire({
-    icon: "info",
-    title: '<span style="color: #2e8b57;">Ação Inválida</span>',
-    html: '<p style="color: #64748b; font-size: 15px;">Não pode iniciar uma conversa consigo mesmo!</p>',
-    confirmButtonText: "Entendi",
-    confirmButtonColor: "#3cb371",
-    customClass: {
-      popup: "swal-custom-popup",
-      confirmButton: "swal-confirm-green",
-    },
-  });
+  if (typeof showModernInfoModal === "function") {
+    showModernInfoModal(
+      "Ação Inválida",
+      "Não pode iniciar uma conversa consigo mesmo!",
+    );
+  } else {
+    Swal.fire(
+      "Ação Inválida",
+      "Não pode iniciar uma conversa consigo mesmo!",
+      "info",
+    );
+  }
 }
 
 function comprarAgora(produtoId) {
@@ -92,39 +98,44 @@ function comprarAgora(produtoId) {
     url: "src/controller/controllerCarrinho.php",
     method: "POST",
     data: dados,
+    dataType: "json",
     contentType: false,
     processData: false,
   })
     .done(function (response) {
       console.log("Resposta do servidor:", response);
 
-      if (response.includes("Erro")) {
-        Swal.fire({
-          title: "Erro!",
-          text: response,
-          icon: "error",
-          confirmButtonColor: "#d33",
-          confirmButtonText: "OK",
-        });
+      if (!response || response.flag !== true) {
+        const msg =
+          (response && response.msg) ||
+          "Não foi possível adicionar o produto ao carrinho";
+
+        if (typeof showModernErrorModal === "function") {
+          showModernErrorModal("Erro", msg);
+        } else {
+          Swal.fire("Erro", msg, "error");
+        }
       } else {
-        Swal.fire({
-          title: "Sucesso!",
-          text: "Produto adicionado ao carrinho",
-          icon: "success",
-          confirmButtonColor: "#28a745",
-          confirmButtonText: "OK",
-        });
+        if (typeof showModernSuccessModal === "function") {
+          showModernSuccessModal("Sucesso!", "Produto adicionado ao carrinho");
+        } else {
+          Swal.fire("Sucesso!", "Produto adicionado ao carrinho", "success");
+        }
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
       console.error("Erro AJAX:", textStatus, errorThrown);
-      Swal.fire({
-        title: "Erro!",
-        text: "Não foi possível adicionar o produto ao carrinho",
-        icon: "error",
-        confirmButtonColor: "#d33",
-        confirmButtonText: "OK",
-      });
+
+      let msg = "Não foi possível adicionar o produto ao carrinho";
+      if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.msg) {
+        msg = jqXHR.responseJSON.msg;
+      }
+
+      if (typeof showModernErrorModal === "function") {
+        showModernErrorModal("Erro", msg);
+      } else {
+        Swal.fire("Erro", msg, "error");
+      }
     });
 }
 
@@ -141,13 +152,10 @@ function alerta(titulo, msg, icon) {
 $(function () {
   getProdutoMostrar();
 
-  // As avaliações agora são carregadas dentro de getProdutoMostrar()
-  // após o HTML ser inserido no DOM
+  
+  
 });
 
-/**
- * Carregar avaliações do produto
- */
 function carregarAvaliacoes(produtoId) {
   console.log("🔍 Carregando avaliações para produto ID:", produtoId);
 
@@ -159,7 +167,7 @@ function carregarAvaliacoes(produtoId) {
       produto_id: produtoId,
     },
     dataType: "json",
-    cache: false, // Desabilitar cache
+    cache: false, 
     success: function (response) {
       console.log("✅ Resposta recebida:", response);
 
@@ -167,7 +175,7 @@ function carregarAvaliacoes(produtoId) {
         console.log("📊 Avaliações:", response.avaliacoes);
         console.log("📈 Estatísticas:", response.estatisticas);
 
-        // Verificar se os dados são válidos
+        
         if (!response.avaliacoes || !response.estatisticas) {
           console.error("❌ Dados de avaliações inválidos na resposta");
           $("#ListaAvaliacoes").html(
@@ -195,9 +203,6 @@ function carregarAvaliacoes(produtoId) {
   });
 }
 
-/**
- * Renderizar avaliações na página com paginação
- */
 let avaliacoesGlobal = [];
 let paginaAtual = 1;
 const avaliacoesPorPagina = 3;
@@ -205,7 +210,7 @@ const avaliacoesPorPagina = 3;
 function renderizarAvaliacoes(avaliacoes, estatisticas) {
   console.log("🎨 Iniciando renderização de avaliações...");
 
-  // Verificar se os elementos necessários existem no DOM
+  
   if (!$("#MediaAvaliacoes").length) {
     console.error("❌ Elemento #MediaAvaliacoes não encontrado no DOM");
     return;
@@ -219,21 +224,21 @@ function renderizarAvaliacoes(avaliacoes, estatisticas) {
     return;
   }
 
-  // Guardar avaliações globalmente para paginação
+  
   avaliacoesGlobal = avaliacoes;
 
-  // Atualizar média no header
+  
   const starsHtml = gerarEstrelasHtml(estatisticas.media, "small");
   $("#MediaAvaliacoes .stars-display").html(starsHtml);
   $("#MediaAvaliacoes .rating-text").text(estatisticas.media.toFixed(1));
   $("#MediaAvaliacoes .total-reviews").text(`(${estatisticas.total})`);
   console.log("✅ Média atualizada:", estatisticas.media);
 
-  // Renderizar barras de estatísticas
+  
   renderizarBarrasEstatisticas(estatisticas);
   console.log("✅ Barras de estatísticas renderizadas");
 
-  // Renderizar lista de avaliações com paginação
+  
   if (avaliacoes.length === 0) {
     $("#ListaAvaliacoes").html(`
       <div class="text-center py-3" style="color: #888;">
@@ -246,14 +251,11 @@ function renderizarAvaliacoes(avaliacoes, estatisticas) {
     return;
   }
 
-  // Renderizar primeira página
+  
   console.log(`✅ Renderizando ${avaliacoes.length} avaliação(ões)...`);
   renderizarPagina(1);
 }
 
-/**
- * Renderizar uma página específica de avaliações
- */
 function renderizarPagina(numeroPagina) {
   paginaAtual = numeroPagina;
 
@@ -311,13 +313,10 @@ function renderizarPagina(numeroPagina) {
   html += "</div>";
   $("#ListaAvaliacoes").html(html);
 
-  // Renderizar controles de paginação
+  
   renderizarPaginacao();
 }
 
-/**
- * Renderizar controles de paginação
- */
 function renderizarPaginacao() {
   const totalPaginas = Math.ceil(avaliacoesGlobal.length / avaliacoesPorPagina);
 
@@ -329,7 +328,7 @@ function renderizarPaginacao() {
   let html =
     '<div class="d-flex align-items-center justify-content-center gap-2">';
 
-  // Botão Anterior
+  
   const anteriorDisabled = paginaAtual === 1;
   html += `
     <button
@@ -353,7 +352,7 @@ function renderizarPaginacao() {
     </button>
   `;
 
-  // Números das páginas
+  
   html += '<div class="d-flex gap-2">';
   for (let i = 1; i <= totalPaginas; i++) {
     const ativo = i === paginaAtual;
@@ -383,7 +382,7 @@ function renderizarPaginacao() {
   }
   html += "</div>";
 
-  // Botão Próximo
+  
   const proximoDisabled = paginaAtual === totalPaginas;
   html += `
     <button
@@ -411,9 +410,6 @@ function renderizarPaginacao() {
   $("#PaginacaoAvaliacoes").html(html);
 }
 
-/**
- * Renderizar barras de estatísticas de estrelas
- */
 function renderizarBarrasEstatisticas(stats) {
   let html = "";
 
@@ -439,9 +435,6 @@ function renderizarBarrasEstatisticas(stats) {
   $("#barrasEstrelas").html(html);
 }
 
-/**
- * Gerar HTML de estrelas baseado na avaliação
- */
 function gerarEstrelasHtml(rating, size = "normal") {
   const sizeClass =
     size === "small" ? "star-small" : size === "mini" ? "star-mini" : "";
@@ -465,9 +458,6 @@ function gerarEstrelasHtml(rating, size = "normal") {
   return html;
 }
 
-/**
- * Escapar HTML para prevenir XSS
- */
 function escapeHtml(text) {
   const map = {
     "&": "&amp;",

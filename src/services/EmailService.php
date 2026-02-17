@@ -9,39 +9,53 @@ require_once __DIR__ . '/../model/modelNotificacoes.php';
 class EmailService {
     private $mailer;
     private $config;
+    private $conn;
     private $modelNotificacoes;
 
-    /**
-     * Construtor - Inicializa PHPMailer com configurações do Brevo
-     */
-    public function __construct() {
+    private $assuntos = [
+        'confirmacao_encomenda' => 'Confirmação de Encomenda - WeGreen',
+        'nova_encomenda_anunciante' => 'Nova Encomenda Recebida - WeGreen',
+        'encomenda_enviada' => 'Encomenda Enviada - WeGreen',
+        'encomenda_entregue' => 'Encomenda Entregue - WeGreen',
+        'confirmacao_recepcao' => 'Obrigado por Confirmar a Entrega - WeGreen',
+        'boas_vindas' => 'Bem-vindo ao WeGreen',
+        'reset_password' => 'Recuperação de Password - WeGreen',
+        'verificacao_email' => 'Verificação de Email - WeGreen',
+        'conta_criada_admin' => 'A sua conta WeGreen foi criada',
+        'devolucao_solicitada' => 'Pedido de Devolução Registado - WeGreen',
+        'devolucao_aprovada' => 'Devolução Aprovada - WeGreen',
+        'devolucao_rejeitada' => 'Devolução Não Aprovada - WeGreen',
+        'devolucao_enviada' => 'Cliente Enviou Produto - WeGreen',
+        'devolucao_recebida' => 'Produto Recebido - Reembolso em Processamento - WeGreen',
+        'reembolso_processado' => 'Reembolso Processado - WeGreen',
+        'nova_devolucao_anunciante' => 'Nova Devolução Solicitada - WeGreen',
+        'status_processando' => 'Encomenda em Processamento - WeGreen',
+        'status_enviado' => 'Encomenda Enviada - WeGreen',
+        'status_entregue' => 'Encomenda Entregue - WeGreen',
+        'cancelamento' => 'Encomenda Cancelada - WeGreen',
+        'encomendas_pendentes_urgentes' => 'Encomendas Pendentes Urgentes - WeGreen',
+        'plano_expirado' => 'O seu Plano Expirou - WeGreen'
+    ];
+
+    public function __construct($conn) {
         try {
             $this->config = require __DIR__ . '/../config/email_config.php';
-            $this->modelNotificacoes = new Notificacoes();
-            $this->setupMailer();
+            $this->conn = $conn;
+            $this->modelNotificacoes = new Notificacoes($conn);
+            $this->configurarMailer();
         } catch (\Exception $e) {
-            error_log("AVISO: Falha ao inicializar EmailService: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
-            // Não lançar exceção - permitir que o objeto seja criado mesmo com erro
             $this->mailer = null;
         }
     }
 
-    /**
-     * Configura o PHPMailer com as credenciais do Brevo
-     */
-    private function setupMailer() {
+    private function configurarMailer() {
         try {
-            error_log("EmailService: Inicializando PHPMailer...");
-
             if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
                 throw new \Exception("Classe PHPMailer não encontrada! Verifique o autoload.");
             }
 
             $this->mailer = new PHPMailer(true);
-            error_log("EmailService: PHPMailer criado com sucesso");
 
-            // Configurações do servidor SMTP
             $this->mailer->isSMTP();
             $this->mailer->Host       = $this->config['smtp']['host'];
             $this->mailer->SMTPAuth   = $this->config['smtp']['auth'];
@@ -52,8 +66,7 @@ class EmailService {
             $this->mailer->CharSet    = $this->config['options']['charset'];
             $this->mailer->Timeout    = $this->config['options']['timeout'];
 
-            // Configurações adicionais para melhor entregabilidade
-            $this->mailer->SMTPKeepAlive = false; // Fechar conexão após envio
+            $this->mailer->SMTPKeepAlive = false;
             $this->mailer->SMTPOptions = [
                 'ssl' => [
                     'verify_peer' => false,
@@ -62,39 +75,51 @@ class EmailService {
                 ]
             ];
 
-            // Debug desativado para produção (mude para 2 se precisar testar)
             $this->mailer->SMTPDebug = 0;
 
-            // Configurar remetente padrão
             $this->mailer->setFrom(
                 $this->config['from']['email'],
                 $this->config['from']['name']
             );
 
-            error_log("EmailService: Configuração SMTP completa");
-
         } catch (\Exception $e) {
-            error_log("Erro ao configurar EmailService: " . $e->getMessage());
             throw $e;
         }
     }
 
-    public function send($to, $subject, $body, $altBody = '') {
-        // Verificar se o mailer foi inicializado
-        if ($this->mailer === null) {
-            error_log("AVISO: EmailService não inicializado. Email não será enviado para: {$to}");
+    private function obterUrlBase() {
+        return $this->config['base_url'] ?? 'http://localhost/WeGreen-Main';
+    }
+
+    private function renderizarTemplate($nomeTemplate, $dados) {
+        $caminhoTemplate = $this->config['templates']['base_path'] . $nomeTemplate . '.php';
+
+        if (!file_exists($caminhoTemplate)) {
             return false;
         }
 
-        $attempts = 0;
-        $maxAttempts = $this->config['limits']['retry_attempts'];
+        extract($dados);
 
-        while ($attempts < $maxAttempts) {
+        ob_start();
+        include $caminhoTemplate;
+        return ob_get_clean();
+    }
+
+    private function obterAssunto($template) {
+        return $this->assuntos[$template] ?? 'Notificação WeGreen';
+    }
+
+    public function enviar($to, $subject, $body, $altBody = '') {
+        if ($this->mailer === null) {
+            return false;
+        }
+
+        $tentativas = 0;
+        $maxTentativas = $this->config['limits']['retry_attempts'];
+
+        while ($tentativas < $maxTentativas) {
             try {
-                // Reset para permitir múltiplos envios
                 $this->mailer->clearAddresses();
-                // NÃO limpar attachments aqui - pode ter imagens inline anexadas antes!
-                // $this->mailer->clearAttachments();
 
                 $this->mailer->addAddress($to);
                 $this->mailer->addReplyTo('suporte@wegreen.pt', 'Suporte WeGreen');
@@ -106,21 +131,16 @@ class EmailService {
                 $result = $this->mailer->send();
 
                 if ($result) {
-                    // Limpar attachments APÓS envio bem-sucedido
                     $this->mailer->clearAttachments();
                     return true;
                 }
 
             } catch (\Exception $e) {
-                $attempts++;
-                error_log("Tentativa {$attempts} falhou ao enviar email para {$to}: " . $e->getMessage());
+                $tentativas++;
 
-                // Mostrar erro no output também
-                echo "<div style='background:#f8d7da;padding:10px;margin:5px 0;border-left:4px solid #dc3545;'>";
-                echo "<strong>Erro (tentativa {$attempts}/{$maxAttempts}):</strong> " . htmlspecialchars($e->getMessage());
-                echo "</div>";
+                error_log("EmailService: Erro ao enviar email (tentativa {$tentativas}/{$maxTentativas}): " . $e->getMessage());
 
-                if ($attempts < $maxAttempts) {
+                if ($tentativas < $maxTentativas) {
                     sleep($this->config['limits']['retry_delay']);
                 }
             }
@@ -129,210 +149,126 @@ class EmailService {
         return false;
     }
 
-    public function addEmbeddedImage($path, $cid) {
-        // Verificar se o mailer foi inicializado
+    public function adicionarImagemEmbutida($path, $cid) {
         if ($this->mailer === null) {
-            error_log("AVISO: Mailer não inicializado. Não é possível anexar imagem.");
             return false;
         }
-        
+
         try {
             return $this->mailer->addEmbeddedImage($path, $cid);
         } catch (\Exception $e) {
-            error_log("Erro ao anexar imagem inline: " . $e->getMessage());
             return false;
         }
     }
 
-    public function sendFromTemplate($utilizador_id, $template, $data, $tipo = 'cliente', $inlineImages = []) {
-        // Verificar se o mailer foi inicializado
+    public function enviarPorTemplate($utilizador_id, $template, $dados, $tipo = 'cliente', $imagensInline = []) {
         if ($this->mailer === null) {
-            error_log("AVISO: EmailService não inicializado. Email não será enviado. Template: {$template}");
             return false;
         }
-        
-        global $conn;
 
-        // Obter email do utilizador
-        $tabela = ($tipo === 'anunciante') ? 'Utilizadores' : 'Utilizadores';
-        $sql = "SELECT email, nome FROM $tabela WHERE id = $utilizador_id LIMIT 1";
-        $result = $conn->query($sql);
+        $sql = "SELECT email, nome FROM Utilizadores WHERE id = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $utilizador_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows === 0) {
-            error_log("Utilizador não encontrado: ID {$utilizador_id}");
+            $stmt->close();
             return false;
         }
 
         $user = $result->fetch_assoc();
+        $stmt->close();
         $to = $user['email'];
 
-        // Determinar subject baseado no template
-        $subjects = [
-            'confirmacao_encomenda' => 'Confirmação de Encomenda - WeGreen',
-            'nova_encomenda_anunciante' => 'Nova Encomenda Recebida - WeGreen',
-            'encomenda_enviada' => 'Encomenda Enviada - WeGreen',
-            'encomenda_entregue' => 'Encomenda Entregue - WeGreen',
-            'boas_vindas' => 'Bem-vindo ao WeGreen',
-            'reset_password' => 'Recuperação de Password - WeGreen',
-            'verificacao_email' => 'Verificação de Email - WeGreen',
-            'conta_criada_admin' => 'A sua conta WeGreen foi criada',
-            // Novos templates de devoluções
-            'devolucao_solicitada' => 'Pedido de Devolução Registado - WeGreen',
-            'devolucao_aprovada' => 'Devolução Aprovada - WeGreen',
-            'devolucao_rejeitada' => 'Devolução Não Aprovada - WeGreen',
-            'reembolso_processado' => 'Reembolso Processado - WeGreen',
-            'nova_devolucao_anunciante' => 'Nova Devolução Solicitada - WeGreen'
-        ];
+        $subject = $this->obterAssunto($template);
 
-        $subject = $subjects[$template] ?? 'Notificação WeGreen';
-
-        // Construir caminho do template
-        $templatePath = $template . '.php';
-        $templateFullPath = $this->config['templates']['base_path'] . $templatePath;
-
-        if (!file_exists($templateFullPath)) {
-            error_log("Template não encontrado: {$templateFullPath}");
+        $htmlBody = $this->renderizarTemplate($template, $dados);
+        if ($htmlBody === false) {
             return false;
         }
 
-        // Extrair variáveis para o template
-        extract($data);
-
-        // Capturar output do template
-        ob_start();
-        include $templateFullPath;
-        $htmlBody = ob_get_clean();
-
-        // Anexar imagens inline ANTES de enviar
-        foreach ($inlineImages as $cid => $filePath) {
+        foreach ($imagensInline as $cid => $filePath) {
             if (file_exists($filePath)) {
-                $this->addEmbeddedImage($filePath, $cid);
-            } else {
-                error_log("Imagem inline não encontrada: $filePath");
+                $this->adicionarImagemEmbutida($filePath, $cid);
             }
         }
 
-        return $this->send($to, $subject, $htmlBody);
+        return $this->enviar($to, $subject, $htmlBody);
     }
 
-    public function sendBoasVindas($email, $nome, $data_criacao = null) {
-        $subject = 'Bem-vindo ao WeGreen';
+    public function enviarBoasVindas($email, $nome, $data_criacao = null) {
+        $subject = $this->obterAssunto('boas_vindas');
+        $baseUrl = $this->obterUrlBase();
 
-        // Dados para o template
-        $data = [
+        $dados = [
             'nome_utilizador' => $nome,
             'email_utilizador' => $email,
             'data_criacao' => $data_criacao ?? date('Y-m-d'),
-            'url_login' => 'http://localhost/WeGreen-Main/login.html'
+            'url_login' => $baseUrl . '/login.html'
         ];
 
-        // Carregar template
-        $templatePath = $this->config['templates']['base_path'] . 'boas_vindas.php';
-
-        if (!file_exists($templatePath)) {
-            error_log("Template de boas-vindas não encontrado: {$templatePath}");
+        $htmlBody = $this->renderizarTemplate('boas_vindas', $dados);
+        if ($htmlBody === false) {
             return false;
         }
 
-        // Extrair variáveis para o template
-        extract($data);
-
-        // Capturar output do template
-        ob_start();
-        include $templatePath;
-        $htmlBody = ob_get_clean();
-
-        return $this->send($email, $subject, $htmlBody);
+        return $this->enviar($email, $subject, $htmlBody);
     }
 
-    public function sendVerificacaoEmail($email, $nome, $link_verificacao) {
-        $subject = 'Verificação de Email - WeGreen';
+    public function enviarVerificacaoEmail($email, $nome, $link_verificacao) {
+        $subject = $this->obterAssunto('verificacao_email');
 
-        // Dados para o template
-        $data = [
+        $dados = [
             'nome_utilizador' => $nome,
             'link_verificacao' => $link_verificacao
         ];
 
-        // Carregar template
-        $templatePath = $this->config['templates']['base_path'] . 'verificacao_email.php';
-
-        if (!file_exists($templatePath)) {
-            error_log("Template de verificação de email não encontrado: {$templatePath}");
+        $htmlBody = $this->renderizarTemplate('verificacao_email', $dados);
+        if ($htmlBody === false) {
             return false;
         }
 
-        // Extrair variáveis para o template
-        extract($data);
-
-        // Capturar output do template
-        ob_start();
-        include $templatePath;
-        $htmlBody = ob_get_clean();
-
-        return $this->send($email, $subject, $htmlBody);
+        return $this->enviar($email, $subject, $htmlBody);
     }
 
-    public function sendResetPassword($email, $nome, $reset_link) {
-        $subject = ' Recuperação de Password - WeGreen';
+    public function enviarResetPassword($email, $nome, $reset_link) {
+        $subject = $this->obterAssunto('reset_password');
 
-        // Dados para o template
-        $data = [
+        $dados = [
             'nome_utilizador' => $nome,
             'reset_link' => $reset_link
         ];
 
-        // Carregar template
-        $templatePath = $this->config['templates']['base_path'] . 'reset_password.php';
-
-        if (!file_exists($templatePath)) {
-            error_log("Template de reset password não encontrado: {$templatePath}");
+        $htmlBody = $this->renderizarTemplate('reset_password', $dados);
+        if ($htmlBody === false) {
             return false;
         }
 
-        // Extrair variáveis para o template
-        extract($data);
-
-        // Capturar output do template
-        ob_start();
-        include $templatePath;
-        $htmlBody = ob_get_clean();
-
-        return $this->send($email, $subject, $htmlBody);
+        return $this->enviar($email, $subject, $htmlBody);
     }
 
-    public function sendContaCriadaAdmin($email, $nome, $password_temporaria, $tipo_utilizador = 2) {
-        $subject = 'A sua conta WeGreen foi criada';
+    public function enviarContaCriadaAdmin($email, $nome, $password_temporaria, $tipo_utilizador = 2) {
+        $subject = $this->obterAssunto('conta_criada_admin');
+        $baseUrl = $this->obterUrlBase();
 
-        // Dados para o template
-        $data = [
+        $dados = [
             'nome_utilizador' => $nome,
             'email_utilizador' => $email,
             'password_temporaria' => $password_temporaria,
             'tipo_utilizador' => $tipo_utilizador,
-            'url_login' => 'http://localhost/WeGreen-Main/login.html'
+            'url_login' => $baseUrl . '/login.html'
         ];
 
-        // Carregar template
-        $templatePath = $this->config['templates']['base_path'] . 'conta_criada_admin.php';
-
-        if (!file_exists($templatePath)) {
-            error_log("Template de conta criada por admin não encontrado: {$templatePath}");
+        $htmlBody = $this->renderizarTemplate('conta_criada_admin', $dados);
+        if ($htmlBody === false) {
             return false;
         }
 
-        // Extrair variáveis para o template
-        extract($data);
-
-        // Capturar output do template
-        ob_start();
-        include $templatePath;
-        $htmlBody = ob_get_clean();
-
-        return $this->send($email, $subject, $htmlBody);
+        return $this->enviar($email, $subject, $htmlBody);
     }
 
-    public function sendTestEmail($to) {
+    public function enviarEmailTeste($to) {
         $subject = 'Teste de Configuração - WeGreen';
         $body = '
             <html>
@@ -349,72 +285,31 @@ class EmailService {
             </html>
         ';
 
-        return $this->send($to, $subject, $body);
+        return $this->enviar($to, $subject, $body);
     }
 
-    public function enviarEmail($email, $template, $data, $utilizador_id = null, $tipo = 'cliente') {
-        // Verificar preferências do utilizador se ID foi fornecido
+    public function enviarEmail($email, $template, $dados, $utilizador_id = null, $tipo = 'cliente') {
         if ($utilizador_id) {
             $podeEnviar = $this->modelNotificacoes->verificarPreferencias($utilizador_id, $tipo, $template);
 
             if (!$podeEnviar) {
-                error_log("Email de tipo '{$template}' bloqueado pelas preferências do utilizador ID {$utilizador_id}");
-                return false; // Usuário desativou este tipo de notificação
+                return false;
             }
         }
 
-        // Determinar subject baseado no template
-        $subjects = [
-            'confirmacao_encomenda' => 'Confirmação de Encomenda - WeGreen',
-            'nova_encomenda_anunciante' => 'Nova Encomenda Recebida - WeGreen',
-            'status_processando' => 'Encomenda em Processamento - WeGreen',
-            'status_enviado' => 'Encomenda Enviada - WeGreen',
-            'status_entregue' => 'Encomenda Entregue - WeGreen',
-            'cancelamento' => 'Encomenda Cancelada - WeGreen',
-            'encomendas_pendentes_urgentes' => 'Encomendas Pendentes Urgentes - WeGreen',
-            'boas_vindas' => 'Bem-vindo ao WeGreen',
-            'reset_password' => 'Recuperação de Password - WeGreen',
-            'verificacao_email' => 'Verificação de Email - WeGreen',
-            'conta_criada_admin' => 'A sua conta WeGreen foi criada',
-            // Templates de devoluções
-            'devolucao_solicitada' => 'Pedido de Devolução Registado - WeGreen',
-            'devolucao_aprovada' => 'Devolução Aprovada - WeGreen',
-            'devolucao_rejeitada' => 'Devolução Não Aprovada - WeGreen',
-            'devolucao_enviada' => 'Cliente Enviou Produto - WeGreen',
-            'devolucao_recebida' => 'Produto Recebido - Reembolso em Processamento - WeGreen',
-            'reembolso_processado' => 'Reembolso Processado - WeGreen',
-            'nova_devolucao_anunciante' => 'Nova Devolução Solicitada - WeGreen',
-            // Template confirmação receção encomenda
-            'confirmacao_recepcao' => 'Obrigado por Confirmar a Entrega - WeGreen'
-        ];
+        $subject = $this->obterAssunto($template);
 
-        $subject = $subjects[$template] ?? 'Notificação WeGreen';
-
-        // Construir caminho do template
-        $templatePath = $template . '.php';
-        $templateFullPath = $this->config['templates']['base_path'] . $templatePath;
-
-        if (!file_exists($templateFullPath)) {
-            error_log("Template não encontrado: {$templateFullPath}");
+        $htmlBody = $this->renderizarTemplate($template, $dados);
+        if ($htmlBody === false) {
             return false;
         }
 
-        // Extrair variáveis para o template
-        extract($data);
-
-        // Capturar output do template
-        ob_start();
-        include $templateFullPath;
-        $htmlBody = ob_get_clean();
-
-        // Enviar email
-        return $this->send($email, $subject, $htmlBody);
+        return $this->enviar($email, $subject, $htmlBody);
     }
 
-    /**
-     * Enviar email de alteração de status de encomenda
-     */
     public function enviarEmailStatusEncomenda($cliente_email, $cliente_nome, $codigo_encomenda, $novo_status, $codigo_rastreio = null) {
+        $baseUrl = $this->obterUrlBase();
+
         $status_texto = [
             'Pendente' => 'Pendente de Processamento',
             'Processando' => 'Em Processamento',
@@ -457,29 +352,27 @@ class EmailService {
                     <p style='color: #6b7280; margin-top: 25px; font-size: 15px; line-height: 1.6;'>Pode acompanhar o estado da sua encomenda na sua conta WeGreen.</p>
 
                     <div style='text-align: center; margin-top: 30px;'>
-                        <a href='http://localhost/WeGreen-Main/minhasEncomendas.php' style='background-color: #A6D90C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px;'>Ver Minhas Encomendas</a>
+                        <a href='{$baseUrl}/minhasEncomendas.php' style='background-color: #A6D90C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px;'>Ver Minhas Encomendas</a>
                     </div>
                 </div>
 
                 <div style='background-color: #f3f4f6; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;'>
-                    <p style='color: #6b7280; font-size: 12px; margin: 0;'>© 2026 WeGreen. Todos os direitos reservados.</p>
+                    <p style='color: #6b7280; font-size: 12px; margin: 0;'> 2026 WeGreen. Todos os direitos reservados.</p>
                     <p style='color: #9ca3af; font-size: 11px; margin: 5px 0 0 0;'>Este é um email automático, por favor não responda.</p>
                 </div>
             </div>
         ";
 
         $subject = "Encomenda #{$codigo_encomenda} - {$status_texto[$novo_status]}";
-        return $this->send($cliente_email, $subject, $htmlBody);
+        return $this->enviar($cliente_email, $subject, $htmlBody);
     }
 
-    /**
-     * Enviar email de devolução aprovada/rejeitada
-     */
     public function enviarEmailDevolucao($cliente_email, $cliente_nome, $codigo_devolucao, $status, $notas_anunciante = null) {
+        $baseUrl = $this->obterUrlBase();
+
         $aprovado = $status === 'aprovada';
         $cor_status = $aprovado ? '#10b981' : '#ef4444';
-        $texto_status = $aprovado ? 'APROVADA ✓' : 'REJEITADA ✗';
-        $emoji_status = $aprovado ? '✅' : '❌';
+        $texto_status = $aprovado ? 'APROVADA ' : 'REJEITADA ';
 
         $instrucoes_html = '';
         if ($aprovado) {
@@ -488,13 +381,13 @@ class EmailService {
                     <h3 style='color: #065f46; margin: 0 0 15px 0; font-size: 16px;'> Próximos Passos</h3>
                     <div style='color: #065f46;'>
                         <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
-                            <span style='position: absolute; left: 0;'>1️</span> Embale o produto com segurança
+                            <span style='position: absolute; left: 0;'>1</span> Embale o produto com segurança
                         </p>
                         <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
-                            <span style='position: absolute; left: 0;'>2️</span> Aguarde instruções de envio na sua conta
+                            <span style='position: absolute; left: 0;'>2</span> Aguarde instruções de envio na sua conta
                         </p>
                         <p style='margin: 8px 0; padding-left: 20px; position: relative;'>
-                            <span style='position: absolute; left: 0;'>3️</span> O reembolso será processado após recebermos o produto
+                            <span style='position: absolute; left: 0;'>3</span> O reembolso será processado após recebermos o produto
                         </p>
                     </div>
                 </div>
@@ -514,7 +407,7 @@ class EmailService {
         $htmlBody = "
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;'>
                 <div style='background: linear-gradient(135deg, #A6D90C 0%, #8ab80a 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;'>
-                    <h1 style='color: white; margin: 0; font-size: 32px;' WeGreen</h1>
+                    <h1 style='color: white; margin: 0; font-size: 32px;'>WeGreen</h1>
                     <p style='color: white; margin: 10px 0 0 0; font-size: 14px;'>Moda Sustentável</p>
                 </div>
 
@@ -533,18 +426,50 @@ class EmailService {
                     {$instrucoes_html}
 
                     <div style='text-align: center; margin-top: 30px;'>
-                        <a href='http://localhost/WeGreen-Main/DashboardCliente.php' style='background-color: #A6D90C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px;'>Ver Minhas Devoluções</a>
+                        <a href='{$baseUrl}/DashboardCliente.php' style='background-color: #A6D90C; color: white; padding: 14px 35px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; font-size: 15px;'>Ver Minhas Devoluções</a>
                     </div>
                 </div>
 
                 <div style='background-color: #f3f4f6; padding: 20px; text-align: center; border-radius: 0 0 10px 10px;'>
-                    <p style='color: #6b7280; font-size: 12px; margin: 0;'>© 2026 WeGreen. Todos os direitos reservados.</p>
+                    <p style='color: #6b7280; font-size: 12px; margin: 0;'> 2026 WeGreen. Todos os direitos reservados.</p>
                     <p style='color: #9ca3af; font-size: 11px; margin: 5px 0 0 0;'>Este é um email automático, por favor não responda.</p>
                 </div>
             </div>
         ";
 
         $subject = "Devolução #{$codigo_devolucao} - " . ($aprovado ? "Aprovada" : "Rejeitada");
-        return $this->send($cliente_email, $subject, $htmlBody);
+        return $this->enviar($cliente_email, $subject, $htmlBody);
+    }
+
+    public function send($to, $subject, $body, $altBody = '') {
+        return $this->enviar($to, $subject, $body, $altBody);
+    }
+
+    public function addEmbeddedImage($path, $cid) {
+        return $this->adicionarImagemEmbutida($path, $cid);
+    }
+
+    public function sendFromTemplate($utilizador_id, $template, $data, $tipo = 'cliente', $inlineImages = []) {
+        return $this->enviarPorTemplate($utilizador_id, $template, $data, $tipo, $inlineImages);
+    }
+
+    public function sendBoasVindas($email, $nome, $data_criacao = null) {
+        return $this->enviarBoasVindas($email, $nome, $data_criacao);
+    }
+
+    public function sendVerificacaoEmail($email, $nome, $link_verificacao) {
+        return $this->enviarVerificacaoEmail($email, $nome, $link_verificacao);
+    }
+
+    public function sendResetPassword($email, $nome, $reset_link) {
+        return $this->enviarResetPassword($email, $nome, $reset_link);
+    }
+
+    public function sendContaCriadaAdmin($email, $nome, $password_temporaria, $tipo_utilizador = 2) {
+        return $this->enviarContaCriadaAdmin($email, $nome, $password_temporaria, $tipo_utilizador);
+    }
+
+    public function sendTestEmail($to) {
+        return $this->enviarEmailTeste($to);
     }
 }

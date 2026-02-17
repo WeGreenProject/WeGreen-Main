@@ -4,12 +4,19 @@ require_once 'connection.php';
 
 class ChatAnunciante {
 
-    // Listar clientes e admins com quem o anunciante tem conversas
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+    
     function getSideBar($anuncianteId) {
-        global $conn;
+        try {
+
         $msg = "";
 
-        // Buscar clientes e admins com quem o anunciante já conversou
+        
         $sql = "SELECT DISTINCT
             u.id AS IdCliente,
             u.nome,
@@ -35,7 +42,7 @@ class ChatAnunciante {
         )
         ORDER BY m.created_at DESC";
 
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("iiii", $anuncianteId, $anuncianteId, $anuncianteId, $anuncianteId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -76,14 +83,18 @@ class ChatAnunciante {
 
         $stmt->close();
         return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    // Buscar mensagens com cliente específico
+    
     function getConversas($anuncianteId, $clienteId) {
-        global $conn;
+        try {
+
         $msg = "";
 
-        // Buscar fotos dos participantes
+        
         $fotoAnunciante = $this->getFotoUsuario($anuncianteId);
         $fotoCliente = $this->getFotoUsuario($clienteId);
         $nomeAnunciante = $this->getNomeUsuario($anuncianteId);
@@ -92,9 +103,10 @@ class ChatAnunciante {
         $inicialAnunciante = $this->getIniciais($nomeAnunciante);
         $inicialCliente = $this->getIniciais($nomeCliente);
 
-        // Buscar todas as mensagens entre anunciante e cliente
+        
         $sql = "SELECT
             m.mensagem,
+            m.anexo,
             m.remetente_id,
             m.created_at
         FROM MensagensAdmin m
@@ -105,7 +117,7 @@ class ChatAnunciante {
         )
         ORDER BY m.created_at ASC";
 
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("iiii", $anuncianteId, $clienteId, $clienteId, $anuncianteId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -115,8 +127,10 @@ class ChatAnunciante {
                 $hora = date("H:i", strtotime($row['created_at']));
                 $isMensagemEnviada = ($row['remetente_id'] == $anuncianteId);
 
+                $anexoHtml = $this->renderAnexo($row['anexo']);
+
                 if ($isMensagemEnviada) {
-                    // Mensagem enviada pelo anunciante
+                    
                     $msg .= "<div class='message sent'>";
                     if (!empty($fotoAnunciante)) {
                         $msg .= "<div class='message-avatar'><img src='".$fotoAnunciante."' alt='Anunciante'></div>";
@@ -124,12 +138,15 @@ class ChatAnunciante {
                         $msg .= "<div class='message-avatar'>".$inicialAnunciante."</div>";
                     }
                     $msg .= "<div class='message-content'>";
-                    $msg .= "<div class='message-bubble'>".$row['mensagem']."</div>";
+                    $msg .= "<div class='message-bubble'>";
+                    if (!empty($row['mensagem'])) { $msg .= htmlspecialchars($row['mensagem']); }
+                    $msg .= $anexoHtml;
+                    $msg .= "</div>";
                     $msg .= "<div class='message-time'>".$hora."</div>";
                     $msg .= "</div>";
                     $msg .= "</div>";
                 } else {
-                    // Mensagem recebida do cliente
+                    
                     $msg .= "<div class='message'>";
                     if (!empty($fotoCliente)) {
                         $msg .= "<div class='message-avatar'><img src='".$fotoCliente."' alt='Cliente'></div>";
@@ -137,7 +154,10 @@ class ChatAnunciante {
                         $msg .= "<div class='message-avatar'>".$inicialCliente."</div>";
                     }
                     $msg .= "<div class='message-content'>";
-                    $msg .= "<div class='message-bubble'>".$row['mensagem']."</div>";
+                    $msg .= "<div class='message-bubble'>";
+                    if (!empty($row['mensagem'])) { $msg .= htmlspecialchars($row['mensagem']); }
+                    $msg .= $anexoHtml;
+                    $msg .= "</div>";
                     $msg .= "<div class='message-time'>".$hora."</div>";
                     $msg .= "</div>";
                     $msg .= "</div>";
@@ -153,24 +173,27 @@ class ChatAnunciante {
 
         $stmt->close();
         return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    // Enviar mensagem
-    function enviarMensagem($anuncianteId, $clienteId, $mensagem) {
-        global $conn;
+    
+    function enviarMensagem($anuncianteId, $clienteId, $mensagem, $anexo = null) {
+        try {
 
         $mensagem = trim($mensagem);
 
-        if (empty($mensagem)) {
+        if (empty($mensagem) && empty($anexo)) {
             return json_encode([
                 "flag" => false,
                 "msg" => "Mensagem vazia"
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
-        $sql = "INSERT INTO MensagensAdmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iis", $anuncianteId, $clienteId, $mensagem);
+        $sql = "INSERT INTO MensagensAdmin (remetente_id, destinatario_id, mensagem, anexo) VALUES (?, ?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("iiss", $anuncianteId, $clienteId, $mensagem, $anexo);
 
         if ($stmt->execute()) {
             $flag = true;
@@ -185,12 +208,16 @@ class ChatAnunciante {
         return json_encode([
             "flag" => $flag,
             "msg" => $msg
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    // Pesquisar clientes
+    
     function pesquisarChat($pesquisa, $anuncianteId) {
-        global $conn;
+        try {
+
         $msg = "";
 
         $searchTerm = "%".$pesquisa."%";
@@ -221,7 +248,7 @@ class ChatAnunciante {
         )
         ORDER BY m.created_at DESC";
 
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("iisii", $anuncianteId, $anuncianteId, $searchTerm, $anuncianteId, $anuncianteId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -261,13 +288,37 @@ class ChatAnunciante {
 
         $stmt->close();
         return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    // Funções auxiliares
+    
+    private function renderAnexo($anexo) {
+        if (empty($anexo)) return '';
+        $ext = strtolower(pathinfo($anexo, PATHINFO_EXTENSION));
+        $imageExts = ['jpg','jpeg','png','gif','webp'];
+        $html = '';
+        if (in_array($ext, $imageExts)) {
+            $html .= "<div class='chat-anexo chat-anexo-imagem'>";
+            $html .= "<a href='".$anexo."' target='_blank'><img src='".$anexo."' alt='Imagem anexada' style='max-width:250px; max-height:200px; border-radius:8px; margin-top:6px; cursor:pointer;'></a>";
+            $html .= "</div>";
+        } else {
+            $nomeOriginal = basename($anexo);
+            $html .= "<div class='chat-anexo chat-anexo-ficheiro' style='margin-top:6px;'>";
+            $html .= "<a href='".$anexo."' target='_blank' download style='display:inline-flex; align-items:center; gap:6px; padding:8px 12px; background:rgba(60,179,113,0.1); border-radius:8px; color:#2d6a4f; text-decoration:none; font-size:13px;'>";
+            $html .= "<i class='fas fa-file-download'></i> ".$nomeOriginal;
+            $html .= "</a>";
+            $html .= "</div>";
+        }
+        return $html;
+    }
+
     private function getFotoUsuario($userId) {
-        global $conn;
+        try {
+
         $sql = "SELECT foto FROM Utilizadores WHERE id = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -280,12 +331,16 @@ class ChatAnunciante {
 
         $stmt->close();
         return "";
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     private function getNomeUsuario($userId) {
-        global $conn;
+        try {
+
         $sql = "SELECT nome FROM Utilizadores WHERE id = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -298,9 +353,13 @@ class ChatAnunciante {
 
         $stmt->close();
         return "Usuário";
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     private function getIniciais($nome) {
+        try {
         if (empty($nome)) return "U";
 
         $palavras = explode(' ', trim($nome));
@@ -314,6 +373,18 @@ class ChatAnunciante {
         }
 
         return !empty($iniciais) ? $iniciais : "U";
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
-}
+    
+    function getMensagemConversaNaoSelecionada() {
+        return '
+        <div class="empty-chat">
+            <i class="fas fa-comments" style="font-size: 64px; color: #e0e0e0; margin-bottom: 16px;"></i>
+            <h3>Nenhuma conversa selecionada</h3>
+            <p>Escolha um cliente à esquerda para começar</p>
+        </div>
+        ';
+    }}
 ?>

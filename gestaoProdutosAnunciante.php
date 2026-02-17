@@ -2,6 +2,8 @@
 session_start();
 
 if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
+
+$user_plano_id = (int)($_SESSION['plano'] ?? 1);
 ?>
 
 <!DOCTYPE html>
@@ -18,13 +20,14 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     <link rel="stylesheet" href="src/css/modalProduto.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
-    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+    <link rel="stylesheet" href="src/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script src="src/js/notifications.js"></script>
@@ -76,7 +79,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                 </div>
                 <div class="navbar-right">
                     <?php include 'src/views/notifications-widget.php'; ?>
-                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="display: none;" <?php echo (isset($_SESSION['plano']) && $_SESSION['plano'] == 3) ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''; ?>>
+                    <button class="btn-upgrade-navbar" id="upgradeBtn" onclick="window.location.href='planos.php'" style="<?php echo (isset($_SESSION['plano']) && $_SESSION['plano'] == 3) ? 'display: none;' : 'display: inline-flex;'; ?>">
                         <i class="fas fa-crown"></i> Upgrade
                     </button>
                     <div class="navbar-user" id="userMenuBtn">
@@ -127,7 +130,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
                             </button>
                         </div>
                         <div class="actions-right">
-                            <button id="exportProductsBtn" class="btn-export-pdf">
+                            <button id="exportProductsBtn" class="btn-export-pdf" style="display:none;">
                                 <i class="fas fa-file-pdf"></i>
                                 <span>Exportar PDF</span>
                             </button>
@@ -227,11 +230,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
         </main>
     </div>
 
-    <script>
-        $(document).ready(function() {
-            initProductsPage();
-        });
-    </script>
+    <script src="src/js/gestaoProdutosAnunciante.js"></script>
     <script src="src/js/alternancia.js"></script>
 </body>
 <?php

@@ -2,22 +2,33 @@
 
 require_once 'connection.php';
 
-class Comentarios{
+class GestaoComentarios {
+
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
 
     function getCards(){
-        global $conn;
+        try {
 
         $sqlComentarios = "SELECT COUNT(*) AS TotalComents FROM avaliacoes_produtos";
-        $result = $conn->query($sqlComentarios);
+        $stmtComentarios = $this->conn->prepare($sqlComentarios);
+        $stmtComentarios->execute();
+        $result = $stmtComentarios->get_result();
         $rowComents = $result->fetch_assoc();
 
         $sqlProdutos = "SELECT COUNT(*) AS NProdutos FROM produtos WHERE ativo = 1";
-        $result = $conn->query($sqlProdutos);
+        $stmtProdutos = $this->conn->prepare($sqlProdutos);
+        $stmtProdutos->execute();
+        $result = $stmtProdutos->get_result();
         $rowProdutos = $result->fetch_assoc();
 
-
         $sqlDenuncias = "SELECT COUNT(*) AS denuncias FROM denuncias";
-        $result = $conn->query($sqlDenuncias);
+        $stmtDenuncias = $this->conn->prepare($sqlDenuncias);
+        $stmtDenuncias->execute();
+        $result = $stmtDenuncias->get_result();
         $row = $result->fetch_assoc();
 
         $msg  = "<div class='stat-card-compact'>";
@@ -50,91 +61,134 @@ class Comentarios{
         $msg .= "  </div>";
         $msg .= "</div>";
 
-        $conn->close();
+        $stmtComentarios->close();
+        $stmtProdutos->close();
+        $stmtDenuncias->close();
+
         return $msg;
+        } catch (\Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getButaoNav(){
-        global $conn;
+        try {
+
         $sqlProdutos = "SELECT COUNT(DISTINCT produto_id) AS TotalProdutosComComentarios FROM avaliacoes_produtos;";
-        $result = $conn->query($sqlProdutos);
+        $stmt = $this->conn->prepare($sqlProdutos);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rowProdutos = $result->fetch_assoc();
-        $conn->close();
+
+        $stmt->close();
+
         return $rowProdutos["TotalProdutosComComentarios"];
+        } catch (\Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getButaoReports(){
-        global $conn;
+        try {
+
         $sqlDenuncias = "SELECT COUNT(*) AS Total FROM denuncias;";
-        $result = $conn->query($sqlDenuncias);
+        $stmt = $this->conn->prepare($sqlDenuncias);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $rowDenuncias = $result->fetch_assoc();
-        $conn->close();
+
+        $stmt->close();
+
         return $rowDenuncias["Total"];
+        } catch (\Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getProdutos(){
-            global $conn;
+        try {
+
         $msg = "";
-        $sql = "SELECT *, avaliacoes_produtos.id As IdProd,produtos.produto_id As IDProduto,produtos.nome AS NomeProd, produtos.foto As ProdFoto,produtos.data_criacao As ProdData  from avaliacoes_produtos,produtos,utilizadores where produtos.produto_id = avaliacoes_produtos.produto_id group by avaliacoes_produtos.produto_id;";
-        $result = $conn->query($sql);
+        $sql = "SELECT
+                    ap.produto_id AS IDProduto,
+                    MIN(ap.id) AS IdProd,
+                    COALESCE(NULLIF(TRIM(p.nome), ''), NULLIF(TRIM(p.descricao), ''), CONCAT('Produto #', ap.produto_id)) AS NomeProd,
+                    p.foto AS ProdFoto,
+                    p.preco,
+                    MAX(ap.data_criacao) AS ProdData,
+                    ROUND(AVG(ap.avaliacao), 1) AS AvaliacaoMedia
+                FROM avaliacoes_produtos ap
+                INNER JOIN produtos p ON p.produto_id = ap.produto_id
+                GROUP BY ap.produto_id, p.nome, p.descricao, p.foto, p.preco
+                ORDER BY MAX(ap.id) DESC";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $text = "";
         $text2 = "";
-
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['IdProd']."</th>";
                 $msg .= "<td><img src=".$row['ProdFoto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
-                $msg .= "<td>".$row['NomeProd']."</td>";
-                $msg .= "<td>".$row['preco']."€</td>";
-                $msg .= "<td>".$row['avaliacao']."</td>";
+                $msg .= "<td>".htmlspecialchars($row['NomeProd'], ENT_QUOTES, 'UTF-8')."</td>";
+                $msg .= "<td>".($row['preco'] !== null ? $row['preco']."€" : "—")."</td>";
+                $msg .= "<td>".$row['AvaliacaoMedia']."</td>";
                 $msg .= "<td>".$row['ProdData']."</td>";
                 $msg .= "<td><button class='btn-icon' onclick='getComentariosModal(".$row['IDProduto'].")'><i class='fas fa-eye'></i> Ver</button></td>";
                 $msg .= "</tr>";
             }
         } else {
             $msg .= "<tr>";
-            $msg .= "<td>Sem Registos</td>";
-            $msg .= "<th scope='row'></th>";
-            $msg .= "<td></td>";
-            $msg .= "<td></td>";
-            $msg .= "<td></td>";
-            $msg .= "<td></td>";
-            $msg .= "<td></td>";
-            $msg .= "<td></td>";
+            $msg .= "<td colspan='7'>Sem Registos</td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
+        } catch (\Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
         function getComentariosModal($idProduto){
-        global $conn;
+            try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT * FROM avaliacoes_produtos WHERE produto_id = ".$idProduto.";";
-        $result = $conn->query($sql);
+        $sql = "SELECT * FROM avaliacoes_produtos WHERE produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $idProduto);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
         }
 
-        $conn->close();
+        $stmt->close();
 
-        return (json_encode($row));
+        return (json_encode($row, JSON_UNESCAPED_UNICODE));
 
+            } catch (\Exception $e) {
+                return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            }
     }
 
     function getComentariosProduto($idProduto){
-        global $conn;
+        try {
+
         $msg = "";
 
         $sql = "SELECT ap.*, u.nome AS nome_utilizador, u.email, p.nome AS nome_produto
                 FROM avaliacoes_produtos ap
                 LEFT JOIN utilizadores u ON ap.utilizador_id = u.id
                 LEFT JOIN produtos p ON ap.produto_id = p.produto_id
-                WHERE ap.produto_id = ".$idProduto."
+                WHERE ap.produto_id = ?
                 ORDER BY ap.id DESC";
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $idProduto);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $msg .= "<div class='comentarios-list'>";
@@ -161,19 +215,25 @@ class Comentarios{
             $msg .= "<p>Nenhum comentário encontrado para este produto.</p>";
         }
 
-        $conn->close();
+        $stmt->close();
+
         return $msg;
+        } catch (\Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function getReports(){
-            global $conn;
+        try {
+
         $msg = "";
         $sql = "SELECT denuncias.*,u1.nome AS nome_denunciante,u2.nome AS nome_denunciado FROM denuncias, utilizadores u1, utilizadores u2
         WHERE u1.id = denuncias.denunciante_id AND u2.id = denuncias.denunciado_id;";
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $text = "";
         $text2 = "";
-
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -208,9 +268,13 @@ class Comentarios{
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
+        } catch (\Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
 

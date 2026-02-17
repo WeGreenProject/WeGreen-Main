@@ -3,5 +3,10 @@
 require_once 'connection.php';
 
 class Anunciante {
-    function anunciante1()
+
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
 }

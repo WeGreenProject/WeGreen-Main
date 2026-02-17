@@ -1,0 +1,124 @@
+
+.container:not(.container-fluid),
+.container-lg {
+  max-width: 1700px !important;
+}
+
+#produtosTabs .nav-link:not(.active) {
+  background: transparent !important;
+  color: #3cb371 !important;
+}
+
+#produtosTabs .nav-link:not(.active):hover {
+  background: rgba(62, 179, 113, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+#produtosTabs .nav-link.active {
+  background: #3cb371 !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(62, 179, 113, 0.3);
+}
+
+.tab-pane {
+  animation: fadeIn 0.4s ease-in;
+}
+
+.index-product-link {
+  display: block;
+  height: 100%;
+}
+
+.produto-card-homepage {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.produto-card-homepage:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(60, 179, 113, 0.15);
+}
+
+.produto-card-homepage-media {
+  position: relative;
+  width: 100%;
+  padding-top: 78%;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.produto-card-homepage-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.produto-card-homepage:hover .produto-card-homepage-img {
+  transform: scale(1.05);
+}
+
+.produto-card-homepage-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.produto-card-homepage-title {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  min-height: 48px;
+}
+
+.produto-card-homepage-vendor {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.produto-card-homepage-vendor i {
+  color: #3cb371;
+}
+
+.produto-card-homepage-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.produto-card-homepage-price {
+  color: #3cb371;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

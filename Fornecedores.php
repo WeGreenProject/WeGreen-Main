@@ -1,7 +1,7 @@
 <?php
     session_start();
 
-    if($_SESSION['tipo'] == 1){ 
+    if($_SESSION['tipo'] == 1){
 ?>
 <!DOCTYPE html>
 <html lang="pt">
@@ -21,6 +21,7 @@
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
 </head>
 
 <body>
@@ -232,17 +233,13 @@
         </div>
     </div>
     <script src="src/js/fornecedor.js"></script>
-    <?php 
+    <?php
 }else{
     echo "sem permissão!";
 }
 
 ?>
-    <script>
-    document.querySelector('.close-btn').addEventListener('click', function() {
-        document.getElementById('supplierModal').style.display = 'none';
-    });
-    </script>
+    <script src="src/js/Fornecedores.js"></script>
 </body>
 
 </html>

@@ -1,112 +1,99 @@
 <?php
-session_start();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelNotificacoes.php';
 
-$func = new Notificacoes();
-
-// Verificar se utilizador está autenticado
 if (!isset($_SESSION['utilizador'])) {
-    echo json_encode(['success' => false, 'message' => 'Não autenticado']);
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$user_id = $_SESSION['utilizador'];
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
 
-// op=1: Obter preferências
-if ($_GET['op'] == 1 || $_POST['op'] == 1) {
-    $preferencias = $func->getPreferencias($user_id, $_SESSION['tipo'] == 2 ? 'cliente' : 'anunciante');
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new Notificacoes($conn);
+
+if ($op == 1) {
+    $preferencias = $func->getPreferencias($_SESSION['utilizador'], $_SESSION['tipo'] == 2 ? 'cliente' : 'anunciante');
 
     if ($preferencias) {
         echo json_encode([
             'success' => true,
             'preferencias' => $preferencias
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode([
             'success' => false,
             'message' => 'Erro ao obter preferências'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     }
 }
 
-// op=2: Salvar preferências
-if ($_POST['op'] == 2) {
-    $preferencias = [];
-
-    // Preferências de Cliente
-    if (isset($_POST['email_confirmacao'])) {
-        $preferencias['email_confirmacao'] = intval($_POST['email_confirmacao']);
-    }
-    if (isset($_POST['email_processando'])) {
-        $preferencias['email_processando'] = intval($_POST['email_processando']);
-    }
-    if (isset($_POST['email_enviado'])) {
-        $preferencias['email_enviado'] = intval($_POST['email_enviado']);
-    }
-    if (isset($_POST['email_entregue'])) {
-        $preferencias['email_entregue'] = intval($_POST['email_entregue']);
-    }
-    if (isset($_POST['email_cancelamento'])) {
-        $preferencias['email_cancelamento'] = intval($_POST['email_cancelamento']);
-    }
-
-    // Preferências de Anunciante
-    if (isset($_POST['email_novas_encomendas_anunciante'])) {
-        $preferencias['email_novas_encomendas_anunciante'] = intval($_POST['email_novas_encomendas_anunciante']);
-    }
-    if (isset($_POST['email_encomendas_urgentes'])) {
-        $preferencias['email_encomendas_urgentes'] = intval($_POST['email_encomendas_urgentes']);
-    }
-
+if ($op == 2) {
     $tipo_user = $_SESSION['tipo'] == 2 ? 'cliente' : 'anunciante';
-    $resultado = $func->atualizarPreferencias($user_id, $tipo_user, $preferencias);
+    $preferencias = [
+        'email_encomendas' => isset($_POST['email_encomendas']) ? 1 : 0,
+        'email_promocoes' => isset($_POST['email_promocoes']) ? 1 : 0,
+        'email_newsletter' => isset($_POST['email_newsletter']) ? 1 : 0,
+        'notif_encomendas' => isset($_POST['notif_encomendas']) ? 1 : 0,
+        'notif_mensagens' => isset($_POST['notif_mensagens']) ? 1 : 0,
+        'notif_promocoes' => isset($_POST['notif_promocoes']) ? 1 : 0
+    ];
+    $resp = $func->atualizarPreferencias($_SESSION['utilizador'], $tipo_user, $preferencias);
 
-    if ($resultado) {
+    if ($resp) {
         echo json_encode([
             'success' => true,
             'message' => 'Preferências atualizadas com sucesso!'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode([
             'success' => false,
             'message' => 'Erro ao atualizar preferências'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     }
 }
 
-// op=3: Desativar todas
-if ($_POST['op'] == 3) {
+if ($op == 3) {
     $tipo_user = $_SESSION['tipo'] == 2 ? 'cliente' : 'anunciante';
-    $resultado = $func->desativarTodasNotificacoes($user_id, $tipo_user);
+    $resp = $func->desativarTodasNotificacoes($_SESSION['utilizador'], $tipo_user);
 
-    if ($resultado) {
+    if ($resp) {
         echo json_encode([
             'success' => true,
             'message' => 'Todas as notificações foram desativadas'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode([
             'success' => false,
             'message' => 'Erro ao desativar notificações'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     }
 }
 
-// op=4: Ativar todas
-if ($_POST['op'] == 4) {
+if ($op == 4) {
     $tipo_user = $_SESSION['tipo'] == 2 ? 'cliente' : 'anunciante';
-    $resultado = $func->ativarTodasNotificacoes($user_id, $tipo_user);
+    $resp = $func->ativarTodasNotificacoes($_SESSION['utilizador'], $tipo_user);
 
-    if ($resultado) {
+    if ($resp) {
         echo json_encode([
             'success' => true,
             'message' => 'Todas as notificações foram ativadas'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode([
             'success' => false,
             'message' => 'Erro ao ativar notificações'
-        ]);
+        ], JSON_UNESCAPED_UNICODE);
     }
 }
 ?>

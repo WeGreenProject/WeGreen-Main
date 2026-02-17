@@ -1,50 +1,143 @@
-.wg-title { 
-        font-size: 3.2rem; 
-        font-weight: 800; 
-        letter-spacing: -1px; 
-    }
+.wg-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
 
-    .wg-subtitle { 
-        font-size: 1.25rem; 
-        color: #555; 
-    }
+.wg-subtitle {
+  font-size: 1.25rem;
+  color: #555;
+}
 
-    .wg-btn { 
-        background: #90c207; 
-        color: black; 
-        border: 0; 
-        padding: 18px 20px; 
-        font-size: 1rem; 
-        font-weight: 700; 
-        border-radius: 16px; 
-        transition: 0.25s ease; 
-    }
+.wg-btn {
+  background: #90c207;
+  color: black;
+  border: 0;
+  padding: 18px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 16px;
+  transition: 0.25s ease;
+}
 
-    .wg-btn:hover { 
-        opacity: .85; 
-        transform: translateY(-2px); 
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    }
+.wg-btn:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
 
-    .wg-card { 
-        border-radius: 22px; 
-        padding: 40px; 
-        background: #fff; 
-        border: 1px solid #eee; 
-        box-shadow: 0 8px 25px rgba(0,0,0,0.06); 
-        transition: 0.3s ease; 
-    }
+.wg-card {
+  border-radius: 22px;
+  padding: 40px;
+  background: #fff;
+  border: 1px solid #eee;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  transition: 0.3s ease;
+}
 
-    .wg-card:hover { 
-        transform: translateY(-6px); 
-        box-shadow: 0 20px 40px rgba(0,0,0,0.12); 
-    }
+.wg-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
 
-    .wg-card h4 { 
-        font-weight: 800; 
-        margin-bottom: 1rem; 
-    }
+.wg-card h4 {
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
 
-    .wg-card ul li { 
-        font-size: 1.05rem; 
-    }
+.wg-card ul li {
+  font-size: 1.05rem;
+}
+
+.contact-form-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 60px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #3cb371;
+  box-shadow: 0 0 0 0.2rem rgba(60, 179, 113, 0.25);
+}
+
+.btn-submit-wegreen {
+  background-color: #3cb371;
+  border: none;
+  color: white;
+  padding: 12px 40px;
+  font-weight: 600;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.btn-submit-wegreen:hover {
+  background-color: #2d8a59;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
+}
+
+.container:not(.container-fluid),
+.container-lg {
+  max-width: 1700px !important;
+}
+
+.form-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #3cb371 0%, #2d8a59 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.3rem;
+  margin: 0 auto 20px;
+}
+
+.accordion-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px !important;
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+}
+
+.accordion-item:hover {
+  box-shadow: 0 4px 16px rgba(62, 179, 113, 0.1);
+  border-color: #3cb371;
+}
+
+.accordion-button {
+  font-weight: 600;
+  color: #1a1a1a;
+  padding: 18px 24px;
+  border-radius: 12px !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #f0fdf4;
+  color: #2e8b57;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: #3cb371;
+}
+
+.accordion-body {
+  padding: 24px;
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.nav-link.active {
+  color: #3cb371 !important;
+  border-bottom: 2px solid #3cb371;
+  padding-bottom: 8px;
+}

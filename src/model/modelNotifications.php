@@ -1,32 +1,78 @@
 <?php
-require_once __DIR__ . '/../../connection.php';
+require_once 'connection.php';
 
-class ModelNotifications {
+class Notifications {
+
     private $conn;
 
-    public function __construct() {
-        global $conn;
+    public function __construct($conn) {
         $this->conn = $conn;
-        if (!$this->conn) {
-            error_log("[ModelNotifications] ERRO: Falha na conexão com banco de dados");
-            throw new Exception("Falha na conexão com banco de dados");
-        }
-        error_log("[ModelNotifications] Conexão estabelecida com sucesso");
     }
 
-    /**
-     * Contar notificações pendentes para o anunciante
-     * - Encomendas pendentes (não processadas)
-     * - Devoluções solicitadas
-     *
-     * @param int $anunciante_id
-     * @return int
-     */
-    public function contarNotificacoesAnunciante($anunciante_id) {
-        error_log("[ModelNotifications] contarNotificacoesAnunciante - ID: $anunciante_id");
+    private function normalizarTipoNotificacao($tipo_notificacao) {
+        $tipo = (string)$tipo_notificacao;
+
+        if ($tipo === 'stock_baixo' || $tipo === 'stock_esgotado' || $tipo === 'produto_rejeitado') {
+            return 'produto';
+        }
+
+        if (in_array($tipo, ['encomenda', 'devolucao', 'utilizador', 'produto'], true)) {
+            return $tipo;
+        }
+
+        return 'produto';
+    }
+
+    function contarNotificacoesPorTipoJson($utilizador_id, $tipo_utilizador) {
+        try {
+        $count = $this->contarNotificacoesPorTipo($utilizador_id, $tipo_utilizador);
+        return json_encode(['flag' => true, 'msg' => 'OK', 'count' => $count], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function listarNotificacoesPorTipoJson($utilizador_id, $tipo_utilizador) {
+        try {
+        $notificacoes = $this->listarNotificacoesPorTipo($utilizador_id, $tipo_utilizador);
+        return json_encode(['flag' => true, 'msg' => 'OK', 'count' => count($notificacoes), 'notificacoes' => $notificacoes], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function listarTodasNotificacoesPorTipoJson($utilizador_id, $tipo_utilizador) {
+        try {
+        $notificacoes = $this->listarTodasNotificacoesPorTipo($utilizador_id, $tipo_utilizador);
+        return json_encode(['flag' => true, 'msg' => 'OK', 'count' => count($notificacoes), 'notificacoes' => $notificacoes], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function marcarComoLidaJson($utilizador_id, $tipo_notificacao, $referencia_id) {
+        try {
+        $resultado = $this->marcarComoLida($utilizador_id, $tipo_notificacao, $referencia_id);
+        return json_encode(['flag' => $resultado, 'msg' => $resultado ? 'Marcada com sucesso' : 'Erro ao marcar'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function marcarTodasComoLidasJson($utilizador_id, $tipo_utilizador) {
+        try {
+        $resultado = $this->marcarTodasComoLidas($utilizador_id, $tipo_utilizador);
+        return json_encode(['flag' => $resultado, 'msg' => $resultado ? 'Marcadas com sucesso' : 'Erro ao marcar'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+    function contarNotificacoesAnunciante($anunciante_id) {
+        try {
+
         $count = 0;
 
-        // 1. Contar encomendas pendentes (excluindo lidas)
+        
         $sql_encomendas = "SELECT COUNT(*) as total
                           FROM Encomendas e
                           INNER JOIN produtos p ON e.produto_id = p.Produto_id
@@ -37,7 +83,6 @@ class ModelNotifications {
 
         $stmt = $this->conn->prepare($sql_encomendas);
         if (!$stmt) {
-            error_log("[ModelNotifications] ERRO prepare encomendas: " . $this->conn->error);
             return 0;
         }
         $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
@@ -45,20 +90,18 @@ class ModelNotifications {
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         $encomendas_count = (int)$row['total'];
-        error_log("[ModelNotifications] Encomendas pendentes: $encomendas_count");
         $count += $encomendas_count;
 
-        // 2. Contar devoluções solicitadas e enviadas (excluindo lidas)
+        
         $sql_devolucoes = "SELECT COUNT(*) as total
                           FROM devolucoes d
                           LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
                           WHERE d.anunciante_id = ?
-                          AND d.estado IN ('solicitada', 'enviada')
+                          AND d.estado IN ('solicitada', 'produto_enviado')
                           AND nl.id IS NULL";
 
         $stmt = $this->conn->prepare($sql_devolucoes);
         if (!$stmt) {
-            error_log("[ModelNotifications] ERRO prepare devolucoes: " . $this->conn->error);
             return $count;
         }
         $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
@@ -66,27 +109,73 @@ class ModelNotifications {
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         $devolucoes_count = (int)$row['total'];
-        error_log("[ModelNotifications] Devoluções (solicitadas e enviadas): $devolucoes_count");
         $count += $devolucoes_count;
 
-        error_log("[ModelNotifications] Total notificações anunciante: $count");
+        
+        $sql_stock = "SELECT COUNT(*) as total
+                      FROM Produtos p
+                      INNER JOIN Utilizadores u ON p.anunciante_id = u.id
+                      LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'stock_baixo') AND nl.referencia_id = p.Produto_id)
+                      WHERE p.anunciante_id = ?
+                      AND p.stock > 0 AND p.stock <= 5
+                      AND u.plano_id >= 2
+                      AND nl.id IS NULL";
+
+        $stmt = $this->conn->prepare($sql_stock);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $count += (int)$row['total'];
+        }
+
+        
+        $sql_esgotados = "SELECT COUNT(*) as total
+                          FROM Produtos p
+                          LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'stock_esgotado') AND nl.referencia_id = p.Produto_id)
+                          WHERE p.anunciante_id = ?
+                          AND p.stock = 0
+                          AND nl.id IS NULL";
+
+        $stmt = $this->conn->prepare($sql_esgotados);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $count += (int)$row['total'];
+        }
+
+        
+        $sql_rejeitados = "SELECT COUNT(*) as total
+                          FROM Produtos p
+                          LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'produto_rejeitado') AND nl.referencia_id = p.Produto_id)
+                          WHERE p.anunciante_id = ?
+                          AND p.ativo = 2
+                          AND nl.id IS NULL";
+
+        $stmt = $this->conn->prepare($sql_rejeitados);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $count += (int)$row['total'];
+        }
+
         return $count;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Listar notificações detalhadas para o anunciante
-     *
-     * @param int $anunciante_id
-     * @return array
-     */
-    public function listarNotificacoesAnunciante($anunciante_id) {
-        error_log("[ModelNotifications] === INÍCIO listarNotificacoesAnunciante ===");
-        error_log("[ModelNotifications] Anunciante ID: $anunciante_id");
-        error_log("[ModelNotifications] Conexão ativa: " . ($this->conn ? 'SIM' : 'NÃO'));
+    function listarNotificacoesAnunciante($anunciante_id) {
+        try {
 
         $notificacoes = [];
 
-        // 1. Encomendas pendentes
+        
         $sql_encomendas = "SELECT
                             e.id,
                             e.codigo_encomenda,
@@ -104,22 +193,17 @@ class ModelNotifications {
                           ORDER BY e.data_envio DESC
                           LIMIT 5";
 
-        error_log("[ModelNotifications] Query Encomendas preparada");
         $stmt = $this->conn->prepare($sql_encomendas);
         if (!$stmt) {
-            error_log("[ModelNotifications] ERRO prepare listar encomendas: " . $this->conn->error);
-            error_log("[ModelNotifications] SQL: $sql_encomendas");
             return $notificacoes;
         }
         $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
-        error_log("[ModelNotifications] Executando query encomendas...");
         $stmt->execute();
         $result = $stmt->get_result();
 
         $encomendas_encontradas = 0;
         while ($row = $result->fetch_assoc()) {
             $encomendas_encontradas++;
-            error_log("[ModelNotifications] Encomenda encontrada: ID=" . $row['id'] . ", Código=" . $row['codigo_encomenda']);
             $notificacoes[] = [
                 'tipo' => 'encomenda',
                 'id' => $row['id'],
@@ -130,9 +214,8 @@ class ModelNotifications {
                 'lida' => false
             ];
         }
-        error_log("[ModelNotifications] Encomendas listadas: $encomendas_encontradas");
 
-        // 2. Devoluções (solicitadas e enviadas)
+        
         $sql_devolucoes = "SELECT
                             d.id,
                             d.codigo_devolucao,
@@ -146,35 +229,29 @@ class ModelNotifications {
                           LEFT JOIN Utilizadores u ON d.cliente_id = u.id
                           LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
                           WHERE d.anunciante_id = ?
-                          AND d.estado IN ('solicitada', 'enviada')
+                          AND d.estado IN ('solicitada', 'produto_enviado')
                           AND nl.id IS NULL
                           ORDER BY d.data_solicitacao DESC
                           LIMIT 10";
 
-        error_log("[ModelNotifications] Query Devoluções preparada");
         $stmt = $this->conn->prepare($sql_devolucoes);
         if (!$stmt) {
-            error_log("[ModelNotifications] ERRO prepare listar devoluções: " . $this->conn->error);
-            error_log("[ModelNotifications] SQL: $sql_devolucoes");
-            error_log("[ModelNotifications] Retornando com " . count($notificacoes) . " notificações (só encomendas)");
             return $notificacoes;
         }
         $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
-        error_log("[ModelNotifications] Executando query devoluções...");
         $stmt->execute();
         $result = $stmt->get_result();
 
         $devolucoes_encontradas = 0;
         while ($row = $result->fetch_assoc()) {
             $devolucoes_encontradas++;
-            error_log("[ModelNotifications] Devolução encontrada: ID=" . $row['id'] . ", Código=" . $row['codigo_devolucao'] . ", Estado=" . $row['estado']);
-            $icone = '📦';
+            $icone = 'fa-undo';
             $titulo = 'Devolução Solicitada';
             $mensagem = 'Devolução #' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
 
-            // Personalizar para estado "enviada"
-            if ($row['estado'] === 'enviada') {
-                $icone = '🚚';
+            
+            if ($row['estado'] === 'produto_enviado') {
+                $icone = 'fa-shipping-fast';
                 $titulo = 'Produto Enviado';
                 $mensagem .= ' - Cliente enviou o produto.';
                 if (!empty($row['codigo_rastreio'])) {
@@ -194,35 +271,132 @@ class ModelNotifications {
                 'lida' => false
             ];
         }
-        error_log("[ModelNotifications] Devoluções listadas: $devolucoes_encontradas");
 
-        // Ordenar por data
+        
+        $sql_stock = "SELECT
+                        p.Produto_id as id,
+                        p.nome as produto_nome,
+                        p.stock,
+                        p.data_criacao
+                      FROM Produtos p
+                      INNER JOIN Utilizadores u ON p.anunciante_id = u.id
+                      LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'stock_baixo') AND nl.referencia_id = p.Produto_id)
+                      WHERE p.anunciante_id = ?
+                      AND p.stock > 0 AND p.stock <= 5
+                      AND u.plano_id >= 2
+                      AND nl.id IS NULL
+                      ORDER BY p.stock ASC
+                      LIMIT 5";
+
+        $stmt = $this->conn->prepare($sql_stock);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $notificacoes[] = [
+                    'tipo' => 'stock_baixo',
+                    'id' => $row['id'],
+                    'icone' => 'fa-exclamation-triangle',
+                    'titulo' => 'Stock Baixo',
+                    'mensagem' => $row['produto_nome'] . ' — apenas ' . $row['stock'] . ' unidade(s) em stock.',
+                    'data' => $row['data_criacao'],
+                    'link' => 'gestaoProdutosAnunciante.php',
+                    'lida' => false
+                ];
+            }
+        }
+
+        
+        $sql_esgotados = "SELECT
+                            p.Produto_id as id,
+                            p.nome as produto_nome,
+                            p.data_criacao
+                          FROM Produtos p
+                          LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'stock_esgotado') AND nl.referencia_id = p.Produto_id)
+                          WHERE p.anunciante_id = ?
+                          AND p.stock = 0
+                          AND nl.id IS NULL
+                          ORDER BY p.data_criacao DESC
+                          LIMIT 5";
+
+        $stmt = $this->conn->prepare($sql_esgotados);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $notificacoes[] = [
+                    'tipo' => 'stock_esgotado',
+                    'id' => $row['id'],
+                    'icone' => 'fa-times-circle',
+                    'titulo' => 'Produto Esgotado',
+                    'mensagem' => $row['produto_nome'] . ' — sem stock. Produto removido do marketplace.',
+                    'data' => $row['data_criacao'],
+                    'link' => 'gestaoProdutosAnunciante.php',
+                    'lida' => false
+                ];
+            }
+        }
+
+        
+        $sql_rejeitados = "SELECT
+                            p.Produto_id as id,
+                            p.nome as produto_nome,
+                            p.motivo_rejeicao,
+                            p.data_criacao
+                          FROM Produtos p
+                          LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'produto_rejeitado') AND nl.referencia_id = p.Produto_id)
+                          WHERE p.anunciante_id = ?
+                          AND p.ativo = 2
+                          AND nl.id IS NULL
+                          ORDER BY p.data_criacao DESC
+                          LIMIT 5";
+
+        $stmt = $this->conn->prepare($sql_rejeitados);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $motivo = !empty($row['motivo_rejeicao']) ? ' Motivo: ' . $row['motivo_rejeicao'] : '';
+                $notificacoes[] = [
+                    'tipo' => 'produto_rejeitado',
+                    'id' => $row['id'],
+                    'icone' => 'fa-times-circle',
+                    'titulo' => 'Produto Rejeitado',
+                    'mensagem' => $row['produto_nome'] . ' foi rejeitado.' . $motivo,
+                    'data' => $row['data_criacao'],
+                    'link' => 'gestaoProdutosAnunciante.php',
+                    'lida' => false
+                ];
+            }
+        }
+
+        
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
 
         $total_notificacoes = count($notificacoes);
-        error_log("[ModelNotifications] Total após merge e sort: $total_notificacoes");
 
         $final = array_slice($notificacoes, 0, 10);
-        error_log("[ModelNotifications] Total após array_slice(0,10): " . count($final));
-        error_log("[ModelNotifications] === FIM listarNotificacoesAnunciante ===");
 
         return $final;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Contar notificações pendentes para o cliente
-     * - Atualizações de encomendas
-     * - Devoluções aprovadas/rejeitadas
-     *
-     * @param int $cliente_id
-     * @return int
-     */
-    public function contarNotificacoesCliente($cliente_id) {
+    function contarNotificacoesCliente($cliente_id) {
+        try {
+
         $count = 0;
 
-        // 1. Encomendas com atualizações recentes (últimas 7 dias) - excluindo lidas
+        
         $sql = "SELECT COUNT(*) as total
                 FROM Encomendas e
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'encomenda' AND nl.referencia_id = e.id)
@@ -238,12 +412,12 @@ class ModelNotifications {
         $row = $result->fetch_assoc();
         $count += (int)$row['total'];
 
-        // 2. Devoluções aprovadas/enviadas/recebidas/rejeitadas/reembolsadas (últimas 14 dias) - excluindo lidas
+        
         $sql = "SELECT COUNT(*) as total
                 FROM devolucoes d
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
                 WHERE d.cliente_id = ?
-                AND d.estado IN ('aprovada', 'enviada', 'recebida', 'rejeitada', 'reembolsada')
+                AND d.estado IN ('aprovada', 'produto_enviado', 'produto_recebido', 'rejeitada', 'reembolsada')
                 AND DATE(d.data_solicitacao) >= DATE_SUB(CURDATE(), INTERVAL 14 DAY)
                 AND nl.id IS NULL";
 
@@ -255,18 +429,17 @@ class ModelNotifications {
         $count += (int)$row['total'];
 
         return $count;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Listar notificações detalhadas para o cliente
-     *
-     * @param int $cliente_id
-     * @return array
-     */
-    public function listarNotificacoesCliente($cliente_id) {
+    function listarNotificacoesCliente($cliente_id) {
+        try {
+
         $notificacoes = [];
 
-        // 1. Encomendas recentes (excluindo lidas)
+        
         $sql = "SELECT
                     e.id,
                     e.codigo_encomenda,
@@ -289,14 +462,14 @@ class ModelNotifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $icone = '📦';
+            $icone = 'fa-shopping-bag';
             $titulo = 'Encomenda ' . $row['estado'];
 
             if ($row['estado'] == 'Enviado') {
-                $icone = '🚚';
+                $icone = 'fa-shipping-fast';
                 $titulo = 'Encomenda Enviada';
             } elseif ($row['estado'] == 'Entregue') {
-                $icone = '✅';
+                $icone = 'fa-check-circle';
                 $titulo = 'Encomenda Entregue';
             }
 
@@ -307,12 +480,12 @@ class ModelNotifications {
                 'titulo' => $titulo,
                 'mensagem' => '#' . $row['codigo_encomenda'] . ' - ' . $row['produto_nome'],
                 'data' => $row['data_envio'],
-                'link' => 'minhasEncomendas.php',
+                'link' => 'minhasEncomendas.php?encomenda=' . rawurlencode($row['codigo_encomenda']),
                 'lida' => false
             ];
         }
 
-        // 2. Devoluções recentes (excluindo lidas)
+        
         $sql = "SELECT
                     d.id,
                     d.codigo_devolucao,
@@ -326,7 +499,7 @@ class ModelNotifications {
                 INNER JOIN produtos p ON d.produto_id = p.Produto_id
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
                 WHERE d.cliente_id = ?
-                AND d.estado IN ('aprovada', 'enviada', 'recebida', 'rejeitada', 'reembolsada')
+                AND d.estado IN ('aprovada', 'produto_enviado', 'produto_recebido', 'rejeitada', 'reembolsada')
                 AND DATE(d.data_solicitacao) >= DATE_SUB(CURDATE(), INTERVAL 14 DAY)
                 AND nl.id IS NULL
                 ORDER BY d.data_solicitacao DESC
@@ -338,37 +511,31 @@ class ModelNotifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $icone = '📦';
+            $icone = 'fa-undo';
             $titulo = 'Devolução ' . ucfirst($row['estado']);
             $mensagem = '#' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
 
-            // Personalizar ícone e mensagem por estado
-            switch($row['estado']) {
-                case 'aprovada':
-                    $icone = '✅';
-                    $titulo = 'Devolução Aprovada';
-                    $mensagem .= ' - Por favor, envie o produto e confirme no sistema.';
-                    break;
-                case 'enviada':
-                    $icone = '🚚';
-                    $titulo = 'Devolução Enviada';
-                    $mensagem .= ' - Aguardando confirmação do vendedor.';
-                    break;
-                case 'recebida':
-                    $icone = '✅';
-                    $titulo = 'Produto Recebido';
-                    $mensagem .= ' - Reembolso será processado em 5-10 dias úteis.';
-                    break;
-                case 'rejeitada':
-                    $icone = '❌';
-                    $titulo = 'Devolução Rejeitada';
-                    $mensagem .= !empty($row['notas_anunciante']) ? ' - ' . $row['notas_anunciante'] : '';
-                    break;
-                case 'reembolsada':
-                    $icone = '💰';
-                    $titulo = 'Reembolso Processado';
-                    $mensagem .= ' - Reembolso concluído!';
-                    break;
+            
+            if ($row['estado'] === 'aprovada') {
+                $icone = 'fa-check-circle';
+                $titulo = 'Devolução Aprovada';
+                $mensagem .= ' - Por favor, envie o produto e confirme no sistema.';
+            } elseif ($row['estado'] === 'produto_enviado') {
+                $icone = 'fa-shipping-fast';
+                $titulo = 'Devolução Enviada';
+                $mensagem .= ' - Aguardando confirmação do vendedor.';
+            } elseif ($row['estado'] === 'produto_recebido') {
+                $icone = 'fa-box-open';
+                $titulo = 'Produto Recebido';
+                $mensagem .= ' - Reembolso será processado em 5-10 dias úteis.';
+            } elseif ($row['estado'] === 'rejeitada') {
+                $icone = 'fa-times-circle';
+                $titulo = 'Devolução Rejeitada';
+                $mensagem .= !empty($row['notas_anunciante']) ? ' - ' . $row['notas_anunciante'] : '';
+            } elseif ($row['estado'] === 'reembolsada') {
+                $icone = 'fa-euro-sign';
+                $titulo = 'Reembolso Processado';
+                $mensagem .= ' - Reembolso concluído!';
             }
 
             $notificacoes[] = [
@@ -383,26 +550,70 @@ class ModelNotifications {
             ];
         }
 
-        // Ordenar por data
+        
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
 
         return array_slice($notificacoes, 0, 10);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Contar notificações para admin
-     * - Novos utilizadores
-     * - Produtos pendentes
-     *
-     * @param int $utilizador_id
-     * @return int
-     */
-    public function contarNotificacoesAdmin($utilizador_id) {
+    function contarNotificacoesPorTipo($utilizador_id, $tipo_utilizador) {
+        try {
+
+        if ($tipo_utilizador == 1) {
+            return $this->contarNotificacoesAdmin($utilizador_id);
+        } elseif ($tipo_utilizador == 2) {
+            return $this->contarNotificacoesCliente($utilizador_id);
+        } elseif ($tipo_utilizador == 3) {
+            return $this->contarNotificacoesAnunciante($utilizador_id);
+        }
+        return 0;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function listarNotificacoesPorTipo($utilizador_id, $tipo_utilizador) {
+        try {
+
+        if ($tipo_utilizador == 1) {
+            return $this->listarNotificacoesAdmin($utilizador_id);
+        } elseif ($tipo_utilizador == 2) {
+            return $this->listarNotificacoesCliente($utilizador_id);
+        } elseif ($tipo_utilizador == 3) {
+            return $this->listarNotificacoesAnunciante($utilizador_id);
+        }
+        return [];
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+    function listarTodasNotificacoesPorTipo($utilizador_id, $tipo_utilizador) {
+        try {
+
+        if ($tipo_utilizador == 1) {
+            return $this->listarTodasNotificacoesAdmin($utilizador_id);
+        } elseif ($tipo_utilizador == 2) {
+            return $this->listarTodasNotificacoesCliente($utilizador_id);
+        } elseif ($tipo_utilizador == 3) {
+            return $this->listarTodasNotificacoesAnunciante($utilizador_id);
+        }
+        return [];
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function contarNotificacoesAdmin($utilizador_id) {
+        try {
+
         $count = 0;
 
-        // 1. Utilizadores não verificados - excluindo lidos
+        
         $sql = "SELECT COUNT(*) as total
                 FROM Utilizadores u
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'utilizador' AND nl.referencia_id = u.id)
@@ -416,11 +627,12 @@ class ModelNotifications {
         $row = $result->fetch_assoc();
         $count += (int)$row['total'];
 
-        // 2. Produtos inativos - excluindo lidos
+        
         $sql = "SELECT COUNT(*) as total
                 FROM produtos p
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'produto' AND nl.referencia_id = p.Produto_id)
                 WHERE p.ativo = 0
+            AND p.motivo_rejeicao = 'PENDENTE_REVISAO_ANUNCIANTE'
                 AND nl.id IS NULL";
 
         $stmt = $this->conn->prepare($sql);
@@ -431,18 +643,17 @@ class ModelNotifications {
         $count += (int)$row['total'];
 
         return $count;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Listar notificações para admin
-     *
-     * @param int $utilizador_id
-     * @return array
-     */
-    public function listarNotificacoesAdmin($utilizador_id) {
+    function listarNotificacoesAdmin($utilizador_id) {
+        try {
+
         $notificacoes = [];
 
-        // 1. Utilizadores não verificados (excluindo lidos)
+        
         $sql = "SELECT
                     u.id,
                     u.nome,
@@ -467,7 +678,7 @@ class ModelNotifications {
             $notificacoes[] = [
                 'tipo' => 'utilizador',
                 'id' => $row['id'],
-                'icone' => '👤',
+                'icone' => 'fa-user',
                 'titulo' => 'Novo ' . $tipo_texto,
                 'mensagem' => $row['nome'] . ' - ' . $row['email'],
                 'data' => $row['data_criacao'],
@@ -476,7 +687,7 @@ class ModelNotifications {
             ];
         }
 
-        // 2. Produtos inativos (excluindo lidos)
+        
         $sql = "SELECT
                     p.Produto_id,
                     p.nome,
@@ -486,6 +697,7 @@ class ModelNotifications {
                 INNER JOIN Utilizadores u ON p.anunciante_id = u.id
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'produto' AND nl.referencia_id = p.Produto_id)
                 WHERE p.ativo = 0
+            AND p.motivo_rejeicao = 'PENDENTE_REVISAO_ANUNCIANTE'
                 AND nl.id IS NULL
                 ORDER BY p.data_criacao DESC
                 LIMIT 10";
@@ -499,107 +711,84 @@ class ModelNotifications {
             $notificacoes[] = [
                 'tipo' => 'produto',
                 'id' => $row['Produto_id'],
-                'icone' => '📦',
-                'titulo' => 'Produto Inativo',
-                'mensagem' => $row['nome'] . ' - ' . $row['anunciante_nome'],
+                'icone' => 'fa-box',
+                'titulo' => 'Produto Alterado',
+                'mensagem' => $row['nome'] . ' foi alterado por ' . $row['anunciante_nome'],
                 'data' => $row['data_criacao'],
                 'link' => 'gestaoProdutosAdmin.php',
                 'lida' => false
             ];
         }
 
-        // Ordenar por data
+        
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
 
         return array_slice($notificacoes, 0, 10);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Marcar notificação como lida
-     *
-     * @param int $utilizador_id
-     * @param string $tipo_notificacao
-     * @param int $referencia_id
-     * @return bool
-     */
-    public function marcarComoLida($utilizador_id, $tipo_notificacao, $referencia_id) {
+    function marcarComoLida($utilizador_id, $tipo_notificacao, $referencia_id) {
+        try {
+
+        $tipo_notificacao_normalizado = $this->normalizarTipoNotificacao($tipo_notificacao);
+
         $sql = "INSERT INTO notificacoes_lidas (utilizador_id, tipo_notificacao, referencia_id)
                 VALUES (?, ?, ?)
                 ON DUPLICATE KEY UPDATE data_leitura = CURRENT_TIMESTAMP";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param('isi', $utilizador_id, $tipo_notificacao, $referencia_id);
+        $stmt->bind_param('isi', $utilizador_id, $tipo_notificacao_normalizado, $referencia_id);
 
         if ($stmt->execute()) {
-            error_log("[ModelNotifications] Notificação marcada como lida: user=$utilizador_id, tipo=$tipo_notificacao, ref=$referencia_id");
             return true;
         }
 
-        error_log("[ModelNotifications] ERRO ao marcar como lida: " . $stmt->error);
         return false;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Marcar todas como lidas
-     *
-     * @param int $utilizador_id
-     * @param int $tipo_utilizador
-     * @return bool
-     */
-    public function marcarTodasComoLidas($utilizador_id, $tipo_utilizador) {
-        error_log("[ModelNotifications] === INÍCIO marcarTodasComoLidas ===");
-        error_log("[ModelNotifications] User ID: $utilizador_id, Tipo: $tipo_utilizador");
+    
+    function marcarTodasComoLidas($utilizador_id, $tipo_utilizador) {
+        try {
 
-        // Buscar todas as notificações atuais e marcar como lidas
-        $notificacoes = [];
+        
+        
+        $notificacoes = $this->listarTodasNotificacoesPorTipo($utilizador_id, $tipo_utilizador);
 
-        switch($tipo_utilizador) {
-            case 1:
-                error_log("[ModelNotifications] Buscando notificações Admin...");
-                $notificacoes = $this->listarNotificacoesAdmin($utilizador_id);
-                break;
-            case 2:
-                error_log("[ModelNotifications] Buscando notificações Cliente...");
-                $notificacoes = $this->listarNotificacoesCliente($utilizador_id);
-                break;
-            case 3:
-                error_log("[ModelNotifications] Buscando notificações Anunciante...");
-                $notificacoes = $this->listarNotificacoesAnunciante($utilizador_id);
-                break;
+        if (!is_array($notificacoes)) {
+            return false;
         }
 
-        error_log("[ModelNotifications] Total notificações encontradas: " . count($notificacoes));
-
-        $marcadas = 0;
         foreach ($notificacoes as $notif) {
-            error_log("[ModelNotifications] Marcando: tipo=" . $notif['tipo'] . ", id=" . $notif['id']);
-            $resultado = $this->marcarComoLida($utilizador_id, $notif['tipo'], $notif['id']);
-            if ($resultado) {
-                $marcadas++;
-            } else {
-                error_log("[ModelNotifications] FALHA ao marcar: tipo=" . $notif['tipo'] . ", id=" . $notif['id']);
+            if (!empty($notif['lida'])) {
+                continue;
             }
-        }
 
-        error_log("[ModelNotifications] Total marcadas: $marcadas de " . count($notificacoes));
-        error_log("[ModelNotifications] === FIM marcarTodasComoLidas ===");
+            if (!isset($notif['tipo'], $notif['id'])) {
+                continue;
+            }
+
+            $this->marcarComoLida($utilizador_id, $notif['tipo'], (int)$notif['id']);
+        }
 
         return true;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Listar TODAS as notificações do cliente (incluindo lidas)
-     * Para a página de histórico
-     *
-     * @param int $cliente_id
-     * @return array
-     */
-    public function listarTodasNotificacoesCliente($cliente_id) {
+    function listarTodasNotificacoesCliente($cliente_id) {
+        try {
+
         $notificacoes = [];
 
-        // 1. Encomendas (últimos 30 dias)
+        
         $sql = "SELECT
                     e.id,
                     e.codigo_encomenda,
@@ -621,14 +810,14 @@ class ModelNotifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $icone = '📦';
+            $icone = 'fa-shopping-bag';
             $titulo = 'Encomenda ' . $row['estado'];
 
             if ($row['estado'] == 'Enviado') {
-                $icone = '🚚';
+                $icone = 'fa-shipping-fast';
                 $titulo = 'Encomenda Enviada';
             } elseif ($row['estado'] == 'Entregue') {
-                $icone = '✅';
+                $icone = 'fa-check-circle';
                 $titulo = 'Encomenda Entregue';
             }
 
@@ -639,12 +828,12 @@ class ModelNotifications {
                 'titulo' => $titulo,
                 'mensagem' => '#' . $row['codigo_encomenda'] . ' - ' . $row['produto_nome'],
                 'data' => $row['data_envio'],
-                'link' => 'minhasEncomendas.php',
+                'link' => 'minhasEncomendas.php?encomenda=' . rawurlencode($row['codigo_encomenda']),
                 'lida' => (bool)$row['lida']
             ];
         }
 
-        // 2. Devoluções (últimos 30 dias)
+        
         $sql = "SELECT
                     d.id,
                     d.codigo_devolucao,
@@ -657,7 +846,7 @@ class ModelNotifications {
                 INNER JOIN produtos p ON d.produto_id = p.Produto_id
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
                 WHERE d.cliente_id = ?
-                AND d.estado IN ('aprovada', 'enviada', 'recebida', 'rejeitada', 'reembolsada')
+                AND d.estado IN ('aprovada', 'produto_enviado', 'produto_recebido', 'rejeitada', 'reembolsada')
                 AND DATE(d.data_solicitacao) >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
                 ORDER BY d.data_solicitacao DESC
                 LIMIT 50";
@@ -668,37 +857,31 @@ class ModelNotifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            $icone = '📦';
+            $icone = 'fa-undo';
             $titulo = 'Devolução ' . ucfirst($row['estado']);
             $mensagem = '#' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
 
-            // Personalizar ícone e mensagem por estado
-            switch($row['estado']) {
-                case 'aprovada':
-                    $icone = '✅';
-                    $titulo = 'Devolução Aprovada';
-                    $mensagem .= ' - Por favor, envie o produto e confirme no sistema.';
-                    break;
-                case 'enviada':
-                    $icone = '🚚';
-                    $titulo = 'Devolução Enviada';
-                    $mensagem .= ' - Aguardando confirmação do vendedor.';
-                    break;
-                case 'recebida':
-                    $icone = '✅';
-                    $titulo = 'Produto Recebido';
-                    $mensagem .= ' - Reembolso será processado em 5-10 dias úteis.';
-                    break;
-                case 'rejeitada':
-                    $icone = '❌';
-                    $titulo = 'Devolução Rejeitada';
-                    $mensagem .= !empty($row['notas_anunciante']) ? ' - ' . $row['notas_anunciante'] : '';
-                    break;
-                case 'reembolsada':
-                    $icone = '💰';
-                    $titulo = 'Reembolso Processado';
-                    $mensagem .= ' - Reembolso concluído!';
-                    break;
+            
+            if ($row['estado'] === 'aprovada') {
+                $icone = 'fa-check-circle';
+                $titulo = 'Devolução Aprovada';
+                $mensagem .= ' - Por favor, envie o produto e confirme no sistema.';
+            } elseif ($row['estado'] === 'produto_enviado') {
+                $icone = 'fa-shipping-fast';
+                $titulo = 'Devolução Enviada';
+                $mensagem .= ' - Aguardando confirmação do vendedor.';
+            } elseif ($row['estado'] === 'produto_recebido') {
+                $icone = 'fa-box-open';
+                $titulo = 'Produto Recebido';
+                $mensagem .= ' - Reembolso será processado em 5-10 dias úteis.';
+            } elseif ($row['estado'] === 'rejeitada') {
+                $icone = 'fa-times-circle';
+                $titulo = 'Devolução Rejeitada';
+                $mensagem .= !empty($row['notas_anunciante']) ? ' - ' . $row['notas_anunciante'] : '';
+            } elseif ($row['estado'] === 'reembolsada') {
+                $icone = 'fa-euro-sign';
+                $titulo = 'Reembolso Processado';
+                $mensagem .= ' - Reembolso concluído!';
             }
 
             $notificacoes[] = [
@@ -706,31 +889,30 @@ class ModelNotifications {
                 'id' => $row['id'],
                 'icone' => $icone,
                 'titulo' => $titulo,
-                'mensagem' => '#' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'],
+                'mensagem' => $mensagem,
                 'data' => $row['data_solicitacao'],
                 'link' => 'minhasEncomendas.php?tab=devolucoes',
                 'lida' => (bool)$row['lida']
             ];
         }
 
-        // Ordenar por data
+        
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
 
         return $notificacoes;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Listar TODAS as notificações do anunciante (incluindo lidas)
-     *
-     * @param int $anunciante_id
-     * @return array
-     */
-    public function listarTodasNotificacoesAnunciante($anunciante_id) {
+    function listarTodasNotificacoesAnunciante($anunciante_id) {
+        try {
+
         $notificacoes = [];
 
-        // 1. Encomendas (últimos 30 dias)
+        
         $sql = "SELECT
                     e.id,
                     e.codigo_encomenda,
@@ -757,7 +939,7 @@ class ModelNotifications {
             $notificacoes[] = [
                 'tipo' => 'encomenda',
                 'id' => $row['id'],
-                'icone' => '📦',
+                'icone' => 'fa-shopping-bag',
                 'titulo' => 'Encomenda ' . $row['estado'],
                 'mensagem' => 'Encomenda #' . $row['codigo_encomenda'] . ' - ' . $row['produto_nome'],
                 'data' => $row['data_envio'],
@@ -766,7 +948,7 @@ class ModelNotifications {
             ];
         }
 
-        // 2. Devoluções (últimos 30 dias)
+        
         $sql = "SELECT
                     d.id,
                     d.codigo_devolucao,
@@ -788,35 +970,28 @@ class ModelNotifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            // Personalizar por estado
-            $icone = '↩️';
+            
+            $icone = 'fa-undo';
             $titulo = 'Devolução ' . ucfirst($row['estado']);
 
-            switch($row['estado']) {
-                case 'solicitada':
-                    $icone = '📦';
-                    $titulo = 'Devolução Solicitada';
-                    break;
-                case 'aprovada':
-                    $icone = '✅';
-                    $titulo = 'Devolução Aprovada';
-                    break;
-                case 'enviada':
-                    $icone = '🚚';
-                    $titulo = 'Produto Enviado pelo Cliente';
-                    break;
-                case 'recebida':
-                    $icone = '✅';
-                    $titulo = 'Produto Recebido';
-                    break;
-                case 'rejeitada':
-                    $icone = '❌';
-                    $titulo = 'Devolução Rejeitada';
-                    break;
-                case 'reembolsada':
-                    $icone = '💰';
-                    $titulo = 'Reembolso Processado';
-                    break;
+            if ($row['estado'] === 'solicitada') {
+                $icone = 'fa-undo';
+                $titulo = 'Devolução Solicitada';
+            } elseif ($row['estado'] === 'aprovada') {
+                $icone = 'fa-check-circle';
+                $titulo = 'Devolução Aprovada';
+            } elseif ($row['estado'] === 'produto_enviado') {
+                $icone = 'fa-shipping-fast';
+                $titulo = 'Produto Enviado pelo Cliente';
+            } elseif ($row['estado'] === 'produto_recebido') {
+                $icone = 'fa-box-open';
+                $titulo = 'Produto Recebido';
+            } elseif ($row['estado'] === 'rejeitada') {
+                $icone = 'fa-times-circle';
+                $titulo = 'Devolução Rejeitada';
+            } elseif ($row['estado'] === 'reembolsada') {
+                $icone = 'fa-euro-sign';
+                $titulo = 'Reembolso Processado';
             }
 
             $notificacoes[] = [
@@ -831,23 +1006,127 @@ class ModelNotifications {
             ];
         }
 
+        
+        $sql = "SELECT
+                    p.Produto_id as id,
+                    p.nome as produto_nome,
+                    p.motivo_rejeicao,
+                    p.data_criacao,
+                    CASE WHEN nl.id IS NOT NULL THEN 1 ELSE 0 END as lida
+                FROM produtos p
+                LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'produto_rejeitado') AND nl.referencia_id = p.Produto_id)
+                WHERE p.anunciante_id = ?
+                AND p.ativo = 2
+                ORDER BY p.data_criacao DESC
+                LIMIT 50";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+            $mensagem = 'O produto "' . $row['produto_nome'] . '" foi rejeitado.';
+            if (!empty($row['motivo_rejeicao'])) {
+                $mensagem .= ' Motivo: ' . $row['motivo_rejeicao'];
+            }
+            $notificacoes[] = [
+                'tipo' => 'produto_rejeitado',
+                'id' => $row['id'],
+                'icone' => 'fa-times-circle',
+                'titulo' => 'Produto Rejeitado',
+                'mensagem' => $mensagem,
+                'data' => $row['data_criacao'],
+                'link' => 'gestaoProdutosAnunciante.php',
+                'lida' => (bool)$row['lida']
+            ];
+        }
+
+        
+        $sql = "SELECT
+                    p.Produto_id as id,
+                    p.nome as produto_nome,
+                    p.stock,
+                    p.data_criacao,
+                    CASE WHEN nl.id IS NOT NULL THEN 1 ELSE 0 END as lida
+                FROM produtos p
+                INNER JOIN Utilizadores u ON p.anunciante_id = u.id
+                LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'stock_baixo') AND nl.referencia_id = p.Produto_id)
+                WHERE p.anunciante_id = ?
+                AND u.plano_id >= 2
+                AND p.stock > 0 AND p.stock <= 5
+                ORDER BY p.stock ASC, p.data_criacao DESC
+                LIMIT 50";
+
+        $stmt = $this->conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $notificacoes[] = [
+                    'tipo' => 'stock_baixo',
+                    'id' => $row['id'],
+                    'icone' => 'fa-exclamation-triangle',
+                    'titulo' => 'Stock Baixo',
+                    'mensagem' => $row['produto_nome'] . ' — apenas ' . $row['stock'] . ' unidade(s) em stock.',
+                    'data' => $row['data_criacao'],
+                    'link' => 'gestaoProdutosAnunciante.php',
+                    'lida' => (bool)$row['lida']
+                ];
+            }
+        }
+
+        
+        $sql = "SELECT
+                    p.Produto_id as id,
+                    p.nome as produto_nome,
+                    p.data_criacao,
+                    CASE WHEN nl.id IS NOT NULL THEN 1 ELSE 0 END as lida
+                FROM produtos p
+                LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'stock_esgotado') AND nl.referencia_id = p.Produto_id)
+                WHERE p.anunciante_id = ?
+                AND p.stock = 0
+                ORDER BY p.data_criacao DESC
+                LIMIT 50";
+
+        $stmt = $this->conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param('ii', $anunciante_id, $anunciante_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($row = $result->fetch_assoc()) {
+                $notificacoes[] = [
+                    'tipo' => 'stock_esgotado',
+                    'id' => $row['id'],
+                    'icone' => 'fa-times-circle',
+                    'titulo' => 'Produto Esgotado',
+                    'mensagem' => $row['produto_nome'] . ' — sem stock. Produto removido do marketplace.',
+                    'data' => $row['data_criacao'],
+                    'link' => 'gestaoProdutosAnunciante.php',
+                    'lida' => (bool)$row['lida']
+                ];
+            }
+        }
+
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
 
         return $notificacoes;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    /**
-     * Listar TODAS as notificações do admin (incluindo lidas)
-     *
-     * @param int $utilizador_id
-     * @return array
-     */
-    public function listarTodasNotificacoesAdmin($utilizador_id) {
+    function listarTodasNotificacoesAdmin($utilizador_id) {
+        try {
+
         $notificacoes = [];
 
-        // Utilizadores não verificados (todos)
+        
         $sql = "SELECT
                     u.id,
                     u.nome,
@@ -869,7 +1148,7 @@ class ModelNotifications {
             $notificacoes[] = [
                 'tipo' => 'utilizador',
                 'id' => $row['id'],
-                'icone' => '👤',
+                'icone' => 'fa-user',
                 'titulo' => 'Novo Utilizador',
                 'mensagem' => $row['nome'] . ' (' . $row['email'] . ') - Aguarda verificação',
                 'data' => $row['data_criacao'],
@@ -878,7 +1157,7 @@ class ModelNotifications {
             ];
         }
 
-        // Produtos inativos (últimos 30 dias)
+        
         $sql = "SELECT
                     p.Produto_id,
                     p.nome,
@@ -889,6 +1168,7 @@ class ModelNotifications {
                 INNER JOIN Utilizadores u ON p.anunciante_id = u.id
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'produto' AND nl.referencia_id = p.Produto_id)
                 WHERE p.ativo = 0
+            AND p.motivo_rejeicao = 'PENDENTE_REVISAO_ANUNCIANTE'
                 ORDER BY p.data_criacao DESC
                 LIMIT 50";
 
@@ -901,9 +1181,9 @@ class ModelNotifications {
             $notificacoes[] = [
                 'tipo' => 'produto',
                 'id' => $row['Produto_id'],
-                'icone' => '📦',
-                'titulo' => 'Produto Inativo',
-                'mensagem' => $row['nome'] . ' - ' . $row['anunciante_nome'],
+                'icone' => 'fa-box',
+                'titulo' => 'Produto Alterado',
+                'mensagem' => $row['nome'] . ' foi alterado por ' . $row['anunciante_nome'],
                 'data' => $row['data_criacao'],
                 'link' => 'gestaoProdutosAdmin.php',
                 'lida' => (bool)$row['lida']
@@ -915,6 +1195,9 @@ class ModelNotifications {
         });
 
         return $notificacoes;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
 ?>

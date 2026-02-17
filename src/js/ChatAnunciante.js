@@ -1,11 +1,11 @@
-// ChatAnunciante.js - Anunciante conversa com Clientes e Administradores
+
 
 let clienteAtual = null;
 let imagemAnexada = null;
 
 function getSideBar() {
   let dados = new FormData();
-  dados.append("op", 1); // Listar clientes/admins com quem o anunciante tem conversas
+  dados.append("op", 1); 
 
   console.log("getSideBar() chamada");
 
@@ -33,20 +33,20 @@ function selecionarCliente(clienteId, clienteNome) {
   console.log("selecionarCliente() chamada", clienteId, clienteNome);
   clienteAtual = clienteId;
 
-  // Atualizar header do chat
+  
   const iniciais = getIniciais(clienteNome);
   $("#chatUserAvatar").text(iniciais);
   $("#chatUserName").text(clienteNome);
 
-  // Mostrar input e carregar mensagens
+  
   $("#BotaoEscrever").addClass("active");
   $(".empty-chat").hide();
 
-  // Marcar conversa como ativa
+  
   $(".conversation-item").removeClass("active");
   $(`[data-cliente-id="${clienteId}"]`).addClass("active");
 
-  // Carregar mensagens
+  
   getConversas(clienteId);
 
   console.log(
@@ -58,7 +58,7 @@ function selecionarCliente(clienteId, clienteNome) {
 function getConversas(clienteId) {
   console.log("getConversas() chamada", clienteId);
   let dados = new FormData();
-  dados.append("op", 2); // Buscar mensagens com cliente específico
+  dados.append("op", 2); 
   dados.append("IdCliente", clienteId);
 
   $.ajax({
@@ -93,7 +93,7 @@ function enviarMensagem() {
   }
 
   let dados = new FormData();
-  dados.append("op", 3); // Enviar mensagem
+  dados.append("op", 3); 
   dados.append("IdCliente", clienteAtual);
   dados.append("mensagem", mensagem);
 
@@ -162,7 +162,7 @@ function pesquisarChat() {
   const termo = $("#searchInput").val().trim();
 
   let dados = new FormData();
-  dados.append("op", 4); // Pesquisar clientes
+  dados.append("op", 4); 
   dados.append("pesquisa", termo);
 
   $.ajax({
@@ -215,12 +215,11 @@ function alerta(titulo, msg, icon) {
   });
 }
 
-// Event Listeners
 $(document).ready(function () {
-  // Carregar lista de clientes
+  
   getSideBar();
 
-  // Enter para enviar mensagem
+  
   $("#messageInput").on("keypress", function (e) {
     if (e.which === 13 && !e.shiftKey) {
       e.preventDefault();
@@ -228,7 +227,7 @@ $(document).ready(function () {
     }
   });
 
-  // Colar imagem (Ctrl+V)
+  
   $("#messageInput").on("paste", function (e) {
     const items = e.originalEvent.clipboardData.items;
     for (let item of items) {
@@ -241,12 +240,12 @@ $(document).ready(function () {
     }
   });
 
-  // Botão anexar
+  
   $("#attachBtn").on("click", function () {
     $("#fileInput").click();
   });
 
-  // Selecionar arquivo
+  
   $("#fileInput").on("change", function () {
     const file = this.files[0];
     if (file) {
@@ -254,42 +253,42 @@ $(document).ready(function () {
     }
   });
 
-  // Remover preview
+  
   $(document).on("click", "#removePreview", function () {
     limparPreview();
   });
 
-  // Botão enviar
+  
   $("#sendButton, #sendBtn").on("click", function () {
     enviarMensagem();
   });
 
-  // Auto-refresh das mensagens a cada 5 segundos
+  
   setInterval(function () {
     if (clienteAtual) {
       getConversas(clienteAtual);
     }
   }, 5000);
 
-  // Dropdown do usuário
+  
   $("#userMenuBtn").on("click", function (e) {
     e.stopPropagation();
     $("#userDropdown").toggleClass("active");
   });
 
-  // Fechar dropdown ao clicar fora
+  
   $(document).on("click", function (e) {
     if (!$(e.target).closest(".navbar-user").length) {
       $("#userDropdown").removeClass("active");
     }
   });
 
-  // Evitar que cliques dentro do dropdown o fechem
+  
   $("#userDropdown").on("click", function (e) {
     e.stopPropagation();
   });
 
-  // Pesquisa de conversas
+  
   $("#searchInput").on("input", function () {
     pesquisarChat();
   });
@@ -331,7 +330,7 @@ function showPasswordModal() {
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      // Aqui você pode fazer uma requisição AJAX para alterar a senha
+      
       alerta("Sucesso", "Senha alterada com sucesso!", "success");
       $("#userDropdown").removeClass("active");
     }

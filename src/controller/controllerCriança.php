@@ -1,28 +1,44 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelCriança.php';
-session_start();
 
-$func = new Criança();
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
 
-if ($_POST['op'] == 1) {
-    $resp = $func->getProdutosCriança($_POST["categoria"],$_POST["tamanho"],$_POST["estado"]);
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new Criança($conn);
+
+if ($op == 1) {
+    $resp = $func->getProdutosCriança($_POST["categoria"], $_POST["tamanho"], $_POST["estado"]);
     echo $resp;
 }
-if ($_POST['op'] == 2) {
+
+if ($op == 2) {
     $resp = $func->getProdutoCriançaMostrar($_POST["id"]);
     echo $resp;
 }
-if ($_POST['op'] == 3) {
+
+if ($op == 3) {
     $resp = $func->getFiltrosCriancaCategoria();
     echo $resp;
 }
-if ($_POST['op'] == 4) {
+
+if ($op == 4) {
     $resp = $func->getFiltrosCriancaTamanho();
     echo $resp;
 }
-if ($_POST['op'] == 5) {
+
+if ($op == 5) {
     $resp = $func->getFiltrosCriancaEstado();
     echo $resp;
 }
-
 ?>

@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
@@ -23,466 +23,13 @@
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/searchAutocomplete.js" defer></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <style>
-      body {
-        background-color: #f8f9fa;
-        padding-top: 80px;
-        overflow-x: hidden;
-      }
-
-      html {
-        overflow-x: hidden;
-      }
-
-      .nav-link.active {
-        color: #3cb371 !important;
-        border-bottom: 2px solid #3cb371;
-        padding-bottom: 8px;
-      }
-
-      .marketplace-container {
-        max-width: 1700px;
-        margin: 0 auto;
-        padding: 30px 20px;
-        overflow-x: hidden;
-      }
-
-      .row {
-        margin-left: 0;
-        margin-right: 0;
-      }
-
-      .col-lg-3,
-      .col-lg-9 {
-        padding-left: 12px;
-        padding-right: 12px;
-      }
-
-      .filters-sidebar {
-        background: white;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        height: auto;
-      }
-
-      .filter-section {
-        margin-bottom: 28px;
-        padding-bottom: 24px;
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      .filter-section:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-      }
-
-      .filter-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 14px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .filter-title i {
-        color: #3cb371;
-        font-size: 16px;
-      }
-
-      .filter-option {
-        display: flex;
-        align-items: center;
-        padding: 8px 0;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .filter-option:hover {
-        padding-left: 4px;
-      }
-
-      .filter-option input[type="checkbox"],
-      .filter-option input[type="radio"] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-        accent-color: #3cb371;
-      }
-
-      .filter-option label {
-        margin-left: 10px;
-        cursor: pointer;
-        font-size: 14px;
-        color: #4b5563;
-        flex: 1;
-      }
-
-      .filter-option label:hover {
-        color: #3cb371;
-      }
-
-      .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 24px;
-      }
-
-      .product-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-        transition: all 0.3s ease;
-        cursor: pointer;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-      }
-
-      .product-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-      }
-
-      .product-image {
-        width: 100%;
-        height: 320px;
-        object-fit: cover;
-        background: #f5f5f5;
-      }
-
-      .product-info {
-        padding: 18px;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .product-name {
-        font-size: 15px;
-        font-weight: 600;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-
-      .product-seller {
-        font-size: 13px;
-        color: #6b7280;
-        margin-bottom: 8px;
-      }
-
-      .product-price {
-        font-size: 22px;
-        font-weight: 700;
-        color: #3cb371;
-        margin-bottom: 8px;
-      }
-
-      .product-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        background: rgba(60, 179, 113, 0.95);
-        color: white;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .product-badge.designer {
-        background: rgba(139, 69, 19, 0.95);
-      }
-
-      .btn-favorite {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.95);
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-
-      .btn-favorite:hover {
-        background: #fff;
-        transform: scale(1.1);
-      }
-
-      .btn-favorite i {
-        color: #dc2626;
-        font-size: 18px;
-      }
-
-      .marketplace-header {
-        background: white;
-        padding: 30px;
-        border-radius: 16px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-      }
-
-      .marketplace-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 8px;
-      }
-
-      .marketplace-subtitle {
-        font-size: 15px;
-        color: #6b7280;
-      }
-
-      .results-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-
-      .results-count {
-        font-size: 14px;
-        color: #6b7280;
-      }
-
-      .sort-select {
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-size: 14px;
-        cursor: pointer;
-      }
-
-      .btn-clear-filters {
-        width: 100%;
-        background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s;
-      }
-
-      .btn-clear-filters:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(60, 179, 113, 0.3);
-      }
-
-      .price-range {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-      }
-
-      .price-input {
-        width: 100%;
-        max-width: 145px;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 8px 10px;
-        font-size: 13px;
-      }
-
-      /* Hero Banner */
-      .marketplace-hero {
-        background: linear-gradient(135deg, #2e8b57 0%, #3cb371 100%);
-        padding: 40px 40px;
-        margin-bottom: 20px;
-        border-radius: 16px;
-        position: relative;
-        overflow: hidden;
-        width: 100%;
-      }
-
-      .marketplace-hero::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(
-          circle,
-          rgba(255, 255, 255, 0.1) 0%,
-          transparent 70%
-        );
-        border-radius: 50%;
-      }
-
-      .hero-content {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        color: white;
-      }
-
-      .hero-content h1 {
-        font-size: 36px;
-        font-weight: 700;
-        margin-bottom: 10px;
-      }
-
-      .hero-content p {
-        font-size: 16px;
-        opacity: 0.95;
-        margin-bottom: 0;
-      }
-
-      /* Active Filters Chips */
-      .active-filters {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 8px;
-        min-height: 0;
-      }
-
-      .filter-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #f0fdf4;
-        color: #166534;
-        padding: 8px 14px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 500;
-        border: 1px solid #bbf7d0;
-        transition: all 0.2s;
-      }
-
-      .filter-chip:hover {
-        background: #dcfce7;
-      }
-
-      .filter-chip i {
-        cursor: pointer;
-        font-size: 14px;
-      }
-
-      .filter-chip i:hover {
-        color: #dc2626;
-      }
-
-      /* View Toggle */
-      .view-toggle {
-        display: flex;
-        gap: 8px;
-        background: #f3f4f6;
-        padding: 4px;
-        border-radius: 10px;
-      }
-
-      .view-toggle button {
-        background: transparent;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        color: #6b7280;
-      }
-
-      .view-toggle button.active {
-        background: white;
-        color: #3cb371;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      .view-toggle button:hover:not(.active) {
-        color: #3cb371;
-      }
-
-      /* List View */
-      .products-grid.list-view {
-        grid-template-columns: 1fr;
-      }
-
-      .products-grid.list-view .product-card {
-        display: flex;
-        flex-direction: row;
-      }
-
-      .products-grid.list-view .product-image {
-        width: 280px;
-        height: 280px;
-        flex-shrink: 0;
-      }
-
-      .products-grid.list-view .product-info {
-        flex: 1;
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-
-      /* Mobile Filters */
-      .mobile-filters-toggle {
-        display: none;
-        width: 100%;
-        background: #3cb371;
-        color: white;
-        border: none;
-        padding: 14px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 15px;
-        margin-bottom: 10px;
-        cursor: pointer;
-      }
-
-      @media (max-width: 991px) {
-        .mobile-filters-toggle {
-          display: block;
-        }
-
-        .filters-sidebar {
-          display: none;
-        }
-
-        .products-grid.list-view .product-card {
-          flex-direction: column;
-        }
-
-        .products-grid.list-view .product-image {
-          width: 100%;
-          height: 320px;
-        }
-
-        .marketplace-hero {
-          padding: 40px 20px;
-        }
-
-        .hero-content h1 {
-          font-size: 32px;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="src/css/marketplace.css" />
   </head>
   <body>
-    <!-- Header -->
+    
     <header
       class="header-main text-white w-100 z-3"
       style="
@@ -546,7 +93,7 @@
           </div>
 
           <div class="d-flex align-items-center ms-auto gap-2">
-            <!-- Barra de Pesquisa -->
+            
             <div class="search-container">
               <form class="search-form" role="search">
                 <div class="search-input-wrapper">
@@ -554,14 +101,14 @@
                   <input
                     class="search-input"
                     type="search"
-                    placeholder="Pesquisar produtos..."
+                    placeholder="Pesquisar produtos ou vendedor..."
                     id="searchInput"
                   />
                 </div>
               </form>
             </div>
 
-            <!-- Carrinho -->
+            
             <a class="cart-button" href="Carrinho.html">
               <i class="bi bi-bag-fill"></i>
               <span class="cart-badge" id="cartCount" style="display: none"
@@ -569,7 +116,7 @@
               >
             </a>
 
-            <!-- Utilizador -->
+            
             <div class="nav-item dropdown user-dropdown">
               <a
                 class="nav-link dropdown-toggle user-avatar-btn"
@@ -596,12 +143,12 @@
       </div>
     </header>
 
-    <!-- Conteúdo Principal -->
+    
     <div
       class="marketplace-container"
       style="margin-top: 10px; padding-top: 10px"
     >
-      <!-- Hero Banner -->
+      
       <div class="marketplace-hero">
         <div class="hero-content">
           <h1>Moda Sustentável para Todos</h1>
@@ -613,10 +160,10 @@
       </div>
 
       <div class="row">
-        <!-- Sidebar de Filtros -->
+        
         <div class="col-lg-3">
           <div class="filters-sidebar">
-            <!-- Categoria -->
+            
             <div class="filter-section">
               <div class="filter-title">
                 <i class="bi bi-tag"></i>
@@ -661,7 +208,7 @@
               </div>
             </div>
 
-            <!-- Tipo de Vendedor -->
+            
             <div class="filter-section">
               <div class="filter-title">
                 <i class="bi bi-person-badge"></i>
@@ -685,7 +232,7 @@
               </div>
             </div>
 
-            <!-- Tipo de Produto -->
+            
             <div class="filter-section">
               <div class="filter-title">
                 <i class="bi bi-shirt"></i>
@@ -717,7 +264,7 @@
               </div>
             </div>
 
-            <!-- Preço -->
+            
             <div class="filter-section">
               <div class="filter-title">
                 <i class="bi bi-currency-euro"></i>
@@ -743,7 +290,7 @@
               </div>
             </div>
 
-            <!-- Tamanho -->
+            
             <div class="filter-section">
               <div class="filter-title">
                 <i class="bi bi-rulers"></i>
@@ -783,7 +330,7 @@
               </div>
             </div>
 
-            <!-- Estado -->
+            
             <div class="filter-section">
               <div class="filter-title">
                 <i class="bi bi-star"></i>
@@ -809,9 +356,9 @@
           </div>
         </div>
 
-        <!-- Grid de Produtos -->
+        
         <div class="col-lg-9">
-          <!-- Mobile Filters Toggle -->
+          
           <button
             class="mobile-filters-toggle"
             data-bs-toggle="offcanvas"
@@ -820,9 +367,9 @@
             <i class="bi bi-funnel me-2"></i>Filtros
           </button>
 
-          <!-- Active Filters -->
+          
           <div class="active-filters" id="activeFilters">
-            <!-- Chips de filtros ativos serão adicionados aqui via JavaScript -->
+            
           </div>
 
           <div class="results-info">
@@ -852,13 +399,13 @@
           </div>
 
           <div class="products-grid" id="productsGrid">
-            <!-- Produtos carregados via JavaScript -->
+            
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Mobile Filters Offcanvas -->
+    
     <div
       class="offcanvas offcanvas-start"
       tabindex="-1"
@@ -881,7 +428,7 @@
           class="filters-sidebar"
           style="display: block; box-shadow: none; padding: 0"
         >
-          <!-- Categoria -->
+          
           <div class="filter-section">
             <div class="filter-title">
               <i class="bi bi-tag"></i>
@@ -926,7 +473,7 @@
             </div>
           </div>
 
-          <!-- Tipo de Vendedor -->
+          
           <div class="filter-section">
             <div class="filter-title">
               <i class="bi bi-person-badge"></i>
@@ -973,16 +520,16 @@
       </div>
     </div>
 
-    <!-- Footer -->
+    
     <footer style="margin-top: 80px">
-      <!-- Main Footer -->
+      
       <div
         class="pt-5 pb-4"
         style="background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%)"
       >
         <div class="container">
           <div class="row gy-4 justify-content-center text-center">
-            <!-- Logo & Descrição -->
+            
             <div class="col-lg-5 col-md-6">
               <div class="mb-3">
                 <img
@@ -998,7 +545,7 @@
               </p>
             </div>
 
-            <!-- Explorar -->
+            
             <div class="col-lg-3 col-md-3 col-6">
               <h5 class="fw-bold mb-3" style="color: white">Explorar</h5>
               <ul class="list-unstyled">
@@ -1085,7 +632,7 @@
               </ul>
             </div>
 
-            <!-- Suporte -->
+            
             <div class="col-lg-4 col-md-3 col-6">
               <h5 class="fw-bold mb-3" style="color: white">Suporte</h5>
               <ul class="list-unstyled">
@@ -1153,7 +700,7 @@
             </div>
           </div>
 
-          <!-- Stats Row -->
+          
           <div
             class="row text-center align-items-center justify-content-center mt-4 pt-3"
           >
@@ -1269,7 +816,7 @@
         </div>
       </div>
 
-      <!-- Copyright Bar -->
+      
       <div
         class="py-3"
         style="
@@ -1289,7 +836,7 @@
     </footer>
 
     <script>
-      // Toggle between grid and list view
+      
       function toggleView(view) {
         const grid = document.getElementById("productsGrid");
         const gridBtn = document.getElementById("gridView");
@@ -1306,7 +853,7 @@
         }
       }
 
-      // Add active filter chip
+      
       function addFilterChip(label, value, type) {
         const container = document.getElementById("activeFilters");
         const chip = document.createElement("div");
@@ -1320,17 +867,17 @@
         container.appendChild(chip);
       }
 
-      // Remove filter chip
+      
       function removeFilterChip(element, value, type) {
         element.parentElement.remove();
-        // Uncheck corresponding filter
+        
         const input = document.querySelector(`input[value="${value}"]`);
         if (input) input.checked = false;
-        // Trigger filter update if marketplace.js is loaded
+        
         if (typeof applyFilters === "function") applyFilters();
       }
 
-      // Monitor filter changes to add/remove chips
+      
       document.addEventListener("DOMContentLoaded", function () {
         const filterInputs = document.querySelectorAll(
           '.filter-option input[type="checkbox"]',
