@@ -15,10 +15,11 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
     <link rel="stylesheet" href="src/css/DashboardCliente.css">
     <link rel="stylesheet" href="src/css/ChatCliente.css">
-    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+    <link rel="stylesheet" href="src/css/notifications-dropdown.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="src/js/notifications.js"></script>
 </head>
 <body class="page-chat-cliente">
@@ -134,7 +135,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
                             </div>
 
                             <div class="chat-input-container" id="BotaoEscrever">
-                                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                                <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" style="display: none;">
                                 <button class="chat-attach-btn" id="attachBtn" title="Anexar imagem">
                                     <i class="fas fa-paperclip"></i>
                                 </button>
@@ -159,15 +160,5 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
     </div>
 
     <script src="src/js/ChatCliente.js"></script>
-    <script>
-        function logout() {
-            $.ajax({
-                url: 'src/controller/controllerPerfil.php?op=2',
-                method: 'GET'
-            }).always(function() {
-                window.location.href = 'index.html';
-            });
-        }
-    </script>
 </body>
 </html>

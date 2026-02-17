@@ -1,10 +1,16 @@
 <?php
-require_once __DIR__ . '/connection.php';
+require_once 'connection.php';
 
 class SearchAutocomplete {
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
     function searchProdutos($query) {
-        global $conn;
+        try {
 
         if (strlen($query) < 2) {
             return json_encode(['success' => true, 'produtos' => []], JSON_UNESCAPED_UNICODE);
@@ -18,6 +24,10 @@ class SearchAutocomplete {
                     p.genero
                 FROM Produtos p
                 WHERE p.ativo = 1
+                AND p.anunciante_id IS NOT NULL
+                AND p.nome != ''
+                AND p.preco IS NOT NULL
+                AND p.stock > 0
                 AND (
                     p.nome LIKE CONCAT('%', ?, '%')
                     OR p.marca LIKE CONCAT('%', ?, '%')
@@ -26,7 +36,7 @@ class SearchAutocomplete {
                 ORDER BY p.nome ASC
                 LIMIT 8";
 
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param('sss', $query, $query, $query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -50,6 +60,9 @@ class SearchAutocomplete {
             'success' => true,
             'produtos' => $produtos
         ], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor']);
+        }
     }
 }
 ?>

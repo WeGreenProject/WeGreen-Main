@@ -1,7 +1,7 @@
 <?php
-// Verificar se o utilizador está autenticado
+
 if(!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
-    return; // Não mostrar notificações se não estiver autenticado
+    return; 
 }
 ?>
 
@@ -26,7 +26,7 @@ if(!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
         </div>
     </div>
     <?php
-    // Não mostrar "Ver Todas" se já estiver na página de notificações
+    
     $current_page = basename($_SERVER['PHP_SELF']);
     if ($current_page !== 'notificacoes.php'):
     ?>

@@ -2,13 +2,11 @@
 require 'src/vendor/autoload.php';
 session_start();
 
-// Verificar se está autenticado
 if(!isset($_SESSION['tipo']) || ($_SESSION['tipo'] != 1 && $_SESSION['tipo'] != 2 && $_SESSION['tipo'] != 3)){
     header('Location: login.html');
     exit;
 }
 
-// Verificar se o plano foi especificado
 if(!isset($_GET['plan']) || empty($_GET['plan'])){
     header('Location: planos.php');
     exit;
@@ -17,32 +15,30 @@ if(!isset($_GET['plan']) || empty($_GET['plan'])){
 \Stripe\Stripe::setApiKey('sk_test_51SAniYBgsjq4eGslagm3l86yXwCOicwq02ABZ54SCT7e8p9HiOTdciQcB3hQXxN4i6hVwlxohVvbtzQXEoPhg7yd009a6ubA3l');
 
 $planId = intval($_GET['plan']);
-$utilizador_id = $_SESSION['utilizador']; // ID do utilizador na sessão
+$utilizador_id = $_SESSION['utilizador']; 
 $userEmail = $_SESSION['email'] ?? '';
 
-// Definir os planos (mesmo array do planos.php)
 $plans = [
     1 => [
         'id' => 1,
         'name' => 'Plano Essencial Verde',
         'price' => 0,
-        'price_id' => null // Plano gratuito não precisa de Stripe
+        'price_id' => null 
     ],
     2 => [
         'id' => 2,
         'name' => 'Plano Crescimento Circular',
         'price' => 25.00,
-        'price_id' => 'price_crescimento' // Você precisará criar este Price ID no Stripe Dashboard
+        'price_id' => 'price_crescimento' 
     ],
     3 => [
         'id' => 3,
         'name' => 'Plano Profissional Eco+',
         'price' => 70.00,
-        'price_id' => 'price_premium' // Você precisará criar este Price ID no Stripe Dashboard
+        'price_id' => 'price_premium' 
     ]
 ];
 
-// Verificar se o plano existe
 if(!isset($plans[$planId])){
     header('Location: planos.php');
     exit;
@@ -50,17 +46,15 @@ if(!isset($plans[$planId])){
 
 $selectedPlan = $plans[$planId];
 
-// Se for plano gratuito, redirecionar de volta
 if($selectedPlan['price'] == 0){
     header('Location: planos.php');
     exit;
 }
 
-// Criar sessão de checkout do Stripe para subscrição
 try {
     $sessionData = [
         'payment_method_types' => ['card'],
-        'mode' => 'subscription', // Modo subscrição ao invés de payment
+        'mode' => 'subscription', 
         'line_items' => [[
             'price_data' => [
                 'currency' => 'eur',
@@ -68,10 +62,10 @@ try {
                     'name' => $selectedPlan['name'],
                     'description' => 'Subscrição mensal - WeGreen',
                 ],
-                'unit_amount' => intval(round($selectedPlan['price'] * 100)), // Converter para centavos
+                'unit_amount' => intval(round($selectedPlan['price'] * 100)), 
                 'recurring' => [
                     'interval' => 'month',
-                    'interval_count' => 1, // 1 mês = ~30 dias
+                    'interval_count' => 1, 
                 ],
             ],
             'quantity' => 1,
@@ -96,12 +90,12 @@ try {
 
     $session = \Stripe\Checkout\Session::create($sessionData);
 
-    // Redirecionar para o Stripe Checkout
+    
     header("Location: " . $session->url);
     exit;
 
 } catch(\Stripe\Exception\ApiErrorException $e) {
-    // Erro na criação da sessão Stripe
+    
     $_SESSION['erro_stripe'] = $e->getMessage();
     header('Location: planos.php?erro=stripe');
     exit;

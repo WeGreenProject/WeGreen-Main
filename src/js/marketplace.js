@@ -1,8 +1,8 @@
 $(document).ready(function () {
-  // Carregar produtos ao iniciar
+  
   loadProducts();
 
-  // Event listeners para filtros
+  
   $('input[type="checkbox"], input[type="radio"]').on("change", function () {
     loadProducts();
   });
@@ -26,7 +26,8 @@ $(document).ready(function () {
   );
 });
 
-// Função debounce para evitar múltiplas chamadas
+let marketplaceIsCliente = false;
+
 function debounce(func, wait) {
   let timeout;
   return function executedFunction(...args) {
@@ -39,52 +40,51 @@ function debounce(func, wait) {
   };
 }
 
-// Função para carregar produtos
 function loadProducts() {
-  // Obter filtros selecionados
+  
   const categoria = $('input[name="category"]:checked').val();
 
-  // Tipo de vendedor
+  
   const tipoVendedor = [];
   $('input[id^="seller-"]:checked').each(function () {
     tipoVendedor.push($(this).val());
   });
 
-  // Tipo de produto
+  
   const tipoProduto = [];
   $('input[id^="prod-"]:checked').each(function () {
     tipoProduto.push($(this).val());
   });
 
-  // Marcas
+  
   const marcas = [];
   $('input[id^="brand-"]:checked').each(function () {
     marcas.push($(this).val());
   });
 
-  // Tamanhos
+  
   const tamanhos = [];
   $('input[id^="size-"]:checked').each(function () {
     tamanhos.push($(this).val());
   });
 
-  // Estados
+  
   const estados = [];
   $('input[id^="cond-"]:checked').each(function () {
     estados.push($(this).val());
   });
 
-  // Preço
+  
   const precoMin = $("#priceMin").val();
   const precoMax = $("#priceMax").val();
 
-  // Pesquisa
+  
   const pesquisa = $("#searchInput").val();
 
-  // Ordenação
+  
   const ordenacao = $("#sortSelect").val();
 
-  // Fazer requisição AJAX
+  
   $.ajax({
     url: "src/controller/controllerMarketplace.php",
     method: "POST",
@@ -105,9 +105,11 @@ function loadProducts() {
     success: function (response) {
       console.log("Resposta recebida:", response);
       if (response.success) {
+        marketplaceIsCliente = response.isCliente === true;
         displayProducts(response.produtos, response.isCliente);
         updateResultsCount(response.total);
       } else {
+        marketplaceIsCliente = false;
         console.error("Erro no response:", response.error || response);
         const errorMsg = response.error || "Erro ao carregar produtos";
         $("#productsGrid").html(`
@@ -121,6 +123,7 @@ function loadProducts() {
       }
     },
     error: function (xhr, status, error) {
+      marketplaceIsCliente = false;
       console.error("Erro AJAX:", { xhr, status, error });
       console.error("Response Text:", xhr.responseText);
       $("#productsGrid").html(`
@@ -136,7 +139,6 @@ function loadProducts() {
   });
 }
 
-// Função para exibir produtos
 function displayProducts(produtos, isCliente = false) {
   const grid = $("#productsGrid");
 
@@ -153,14 +155,20 @@ function displayProducts(produtos, isCliente = false) {
 
   let html = "";
   produtos.forEach((produto) => {
-    const badgeClass = produto.tipo_vendedor === "designer" ? "designer" : "";
-    const badgeText = produto.tipo_vendedor === "designer" ? "DESIGNER" : "";
+    let badgeClass = produto.tipo_vendedor === "designer" ? "designer" : "";
+    let badgeText = produto.tipo_vendedor === "designer" ? "DESIGNER" : "";
+
+    
+    if (Number(produto.plano_id) === 3) {
+      badgeClass = "premium";
+      badgeText = "\u2B50 PREMIUM";
+    }
 
     const imageUrl = produto.foto
       ? produto.foto
       : "assets/media/products/placeholder.jpg";
 
-    // Botão de favoritos só aparece se for cliente logado
+    
     const favoritoBtn = isCliente
       ? `<button class="btn-favorite" onclick="event.stopPropagation(); addToFavorites(${produto.id})">
                     <i class="far fa-heart"></i>
@@ -179,6 +187,9 @@ function displayProducts(produtos, isCliente = false) {
                         <i class="bi bi-person me-1"></i>${produto.nome_vendedor}
                     </div>
                     <div class="product-price">€${produto.preco.toFixed(2)}</div>
+            <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart(${produto.id})">
+              <i class="bi bi-bag-plus-fill me-1"></i>Adicionar ao Carrinho
+            </button>
                 </div>
             </div>
         `;
@@ -187,41 +198,122 @@ function displayProducts(produtos, isCliente = false) {
   grid.html(html);
 }
 
-// Função para atualizar contador de resultados
+function addToCart(productId) {
+  $.ajax({
+    url: "src/controller/controllerCarrinho.php",
+    method: "POST",
+    data: {
+      op: 7,
+      produto_id: productId,
+    },
+    dataType: "json",
+    success: function (response) {
+      if (!response || response.flag !== true) {
+        const msg =
+          (response && response.msg) ||
+          "Não foi possível adicionar o produto ao carrinho";
+
+        if (typeof showModernErrorModal === "function") {
+          showModernErrorModal("Erro", msg);
+        } else {
+          Swal.fire("Erro", msg, "error");
+        }
+        return;
+      }
+
+      if (typeof showModernSuccessModal === "function") {
+        showModernSuccessModal("Sucesso!", "Produto adicionado ao carrinho");
+      } else {
+        Swal.fire("Sucesso!", "Produto adicionado ao carrinho", "success");
+      }
+    },
+    error: function (jqXHR) {
+      let msg = "Não foi possível adicionar o produto ao carrinho";
+      if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.msg) {
+        msg = jqXHR.responseJSON.msg;
+      }
+
+      if (typeof showModernErrorModal === "function") {
+        showModernErrorModal("Erro", msg);
+      } else {
+        Swal.fire("Erro", msg, "error");
+      }
+    },
+  });
+}
+
 function updateResultsCount(total) {
   const text = total === 1 ? "produto encontrado" : "produtos encontrados";
   $("#resultsCount").text(`${total} ${text}`);
 }
 
-// Função para limpar todos os filtros
 function clearAllFilters() {
-  // Limpar categorias
+  
   $("#cat-all").prop("checked", true);
 
-  // Limpar checkboxes
+  
   $('input[type="checkbox"]').prop("checked", false);
 
-  // Limpar preços
+  
   $("#priceMin").val("");
   $("#priceMax").val("");
 
-  // Limpar pesquisa
+  
   $("#searchInput").val("");
 
-  // Recarregar produtos
+  
   loadProducts();
 
-  Swal.fire({
-    icon: "success",
-    title: "Filtros Limpos",
-    text: "Todos os filtros foram removidos",
-    timer: 1500,
-    showConfirmButton: false,
-  });
+  if (typeof showModernSuccessModal === "function") {
+    showModernSuccessModal(
+      "Filtros Limpos",
+      "Todos os filtros foram removidos",
+      {
+        timer: 1500,
+      },
+    );
+  } else {
+    Swal.fire({
+      icon: "success",
+      title: "Filtros Limpos",
+      text: "Todos os filtros foram removidos",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  }
 }
 
-// Função para adicionar aos favoritos
 function addToFavorites(productId) {
+  if (!marketplaceIsCliente) {
+    const modalFn =
+      typeof showModernConfirmModal === "function"
+        ? showModernConfirmModal(
+            "Login Necessário",
+            "Apenas clientes autenticados podem adicionar favoritos.",
+            {
+              confirmText: '<i class="fas fa-sign-in-alt"></i> Ir para Login',
+              icon: "fa-user-lock",
+              iconBg:
+                "background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);",
+            },
+          )
+        : Swal.fire({
+            icon: "info",
+            title: "Login Necessário",
+            text: "Apenas clientes autenticados podem adicionar favoritos.",
+            confirmButtonText: "Ir para Login",
+            showCancelButton: true,
+            cancelButtonText: "Cancelar",
+          });
+
+    modalFn.then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "login.html";
+      }
+    });
+    return;
+  }
+
   $.ajax({
     url: "src/controller/controllerFavoritos.php",
     method: "POST",
@@ -232,28 +324,58 @@ function addToFavorites(productId) {
     dataType: "json",
     success: function (response) {
       if (response.success) {
-        Swal.fire({
-          icon: "success",
-          title: "Adicionado aos Favoritos!",
-          timer: 1500,
-          showConfirmButton: false,
-        });
+        if (typeof showModernSuccessModal === "function") {
+          showModernSuccessModal(
+            "Adicionado aos Favoritos!",
+            "Produto guardado com sucesso.",
+            {
+              timer: 1500,
+            },
+          );
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "Adicionado aos Favoritos!",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        }
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Erro",
-          text: response.message || "Não foi possível adicionar aos favoritos",
-        });
+        const msg =
+          response.message || "Não foi possível adicionar aos favoritos";
+        if (typeof showModernErrorModal === "function") {
+          showModernErrorModal("Erro", msg);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Erro",
+            text: msg,
+          });
+        }
       }
     },
     error: function () {
-      Swal.fire({
-        icon: "info",
-        title: "Login Necessário",
-        text: "Precisas de fazer login para adicionar favoritos",
-        confirmButtonText: "Ir para Login",
-        showCancelButton: true,
-      }).then((result) => {
+      const modalFn =
+        typeof showModernConfirmModal === "function"
+          ? showModernConfirmModal(
+              "Login Necessário",
+              "Precisas de fazer login para adicionar favoritos.",
+              {
+                confirmText: '<i class="fas fa-sign-in-alt"></i> Ir para Login',
+                icon: "fa-user-lock",
+                iconBg:
+                  "background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);",
+              },
+            )
+          : Swal.fire({
+              icon: "info",
+              title: "Login Necessário",
+              text: "Precisas de fazer login para adicionar favoritos",
+              confirmButtonText: "Ir para Login",
+              showCancelButton: true,
+            });
+
+      modalFn.then((result) => {
         if (result.isConfirmed) {
           window.location.href = "login.html";
         }

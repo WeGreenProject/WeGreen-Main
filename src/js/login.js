@@ -18,13 +18,13 @@ function login1() {
       if (obj.flag) {
         alerta2(obj.msg);
 
-        // Verificar se tem perfil duplo
+        
         if (obj.perfil_duplo) {
           setTimeout(function () {
             window.location.href = "escolherConta.php";
           }, 1500);
         } else {
-          // Verificar se existe parâmetro redirect na URL
+          
           const urlParams = new URLSearchParams(window.location.search);
           const redirectUrl = urlParams.get("redirect");
 
@@ -32,25 +32,25 @@ function login1() {
             if (redirectUrl) {
               window.location.href = redirectUrl;
             } else {
-              // Redirecionar baseado no tipo de utilizador
+              
               if (obj.tipo_utilizador == 1) {
-                // Admin
+                
                 window.location.href = "DashboardAdmin.php";
               } else if (obj.tipo_utilizador == 3) {
-                // Anunciante
+                
                 window.location.href = "DashboardAnunciante.php";
               } else if (obj.tipo_utilizador == 2) {
-                // Cliente
+                
                 window.location.href = "DashboardCliente.php";
               } else {
-                // Default
+                
                 window.location.href = "index.html";
               }
             }
           }, 2000);
         }
       } else {
-        // Verificar se é erro de email não verificado
+        
         if (obj.email_nao_verificado) {
           Swal.fire({
             icon: "warning",
@@ -152,7 +152,6 @@ function alerta(titulo, msg, icon) {
   });
 }
 
-// Toggle password visibility
 document.addEventListener("DOMContentLoaded", function () {
   const togglePassword = document.querySelector(".toggle-password");
   const passwordInput = document.querySelector("#passwordLogin");
@@ -163,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
         passwordInput.getAttribute("type") === "password" ? "text" : "password";
       passwordInput.setAttribute("type", type);
 
-      // Toggle icon
+      
       const icon = this.querySelector("i");
       icon.classList.toggle("fa-eye");
       icon.classList.toggle("fa-eye-slash");

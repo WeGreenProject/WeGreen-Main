@@ -2,15 +2,43 @@
 
 require_once 'connection.php';
 
-class Lucros{
+class GestaoLucros {
+
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+    private function normalizeDateTime($value) {
+        $value = trim((string)$value);
+        if ($value === '') {
+            return date('Y-m-d H:i:s');
+        }
+
+        $value = str_replace('T', ' ', $value);
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+            return $value . ' ' . date('H:i:s');
+        }
+
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $value)) {
+            return $value . ':00';
+        }
+
+        return $value;
+    }
 
     function getCardsReceitas(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT (SELECT SUM(valor) FROM rendimento) AS total_rendimentos FROM rendimento LIMIT 1;";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -29,19 +57,26 @@ class Lucros{
                     $msg .= "<div class='stat-value'>0€</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function getCardsDespesas(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT (SELECT SUM(valor) FROM gastos) AS total_gastos FROM gastos LIMIT 1;";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -60,19 +95,26 @@ class Lucros{
                     $msg .= "<div class='stat-value'>0€</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function getCardsLucro(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT (SELECT SUM(valor) FROM rendimento) AS total_rendimentos,(SELECT SUM(valor) FROM gastos) AS total_gastos FROM rendimento, gastos LIMIT 1;";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -93,19 +135,26 @@ class Lucros{
                     $msg .= "<div class='stat-value'>0€</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function getCardsMargem(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT (SELECT SUM(valor) FROM rendimento) AS total_rendimentos,(SELECT SUM(valor) FROM gastos) AS total_gastos FROM rendimento, gastos LIMIT 1;";
 
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -133,18 +182,25 @@ class Lucros{
                     $msg .= "<div class='stat-value'>0%</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
 function getGastos(){
-    global $conn;
+        try {
+
     $msg = "";
 
-    $sql = "SELECT * FROM gastos ORDER BY data_registo DESC;";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM gastos ORDER BY id DESC;";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
@@ -159,89 +215,77 @@ function getGastos(){
     } else {
         $msg .= "<tr><td colspan='5' style='text-align:center;'>Sem Registos</td></tr>";
     }
-    $conn->close();
-
-    return ($msg);
-}
-function removerGastos($ID_Gasto){
-        global $conn;
-        $msg = "";
-        $flag = true;
-
-        $sql = "DELETE FROM Gastos WHERE id = ".$ID_Gasto;
-
-        if ($conn->query($sql) === TRUE) {
-            $msg = "Removido com Sucesso";
-        } else {
-            $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
-        }
-
-        $resp = json_encode(array(
-            "flag" => $flag,
-            "msg" => $msg
-        ));
-
-        $conn->close();
-
-        return($resp);
-    }
-    function removerRendimentos($ID_Rendimento){
-        global $conn;
-        $msg = "";
-        $flag = true;
-
-        $sql = "DELETE FROM Rendimento WHERE id = ".$ID_Rendimento;
-
-        if ($conn->query($sql) === TRUE) {
-            $msg = "Removido com Sucesso";
-        } else {
-            $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
-        }
-
-        $resp = json_encode(array(
-            "flag" => $flag,
-            "msg" => $msg
-        ));
-
-        $conn->close();
-
-        return($resp);
-    }
-    function registaGastos($descricao,$Valor, $Data){
-    global $conn;
-    $msg = "";
-    $flag = false;
-    $anunciante_id = 1;
-    $stmt = $conn->prepare("INSERT INTO gastos (descricao,anunciante_id,Valor, data_registo) VALUES (?, ?,?,?)");
-    $stmt->bind_param("sids", $descricao, $anunciante_id, $Valor, $Data);
-
-    if($stmt->execute()){
-        $msg = "Registado com sucesso!";
-        $flag = true;
-    } else {
-        $msg = "Erro ao registar: " . $stmt->error;
-        $flag = false;
-    }
-
-    $resp = json_encode([
-        "flag" => $flag,
-        "msg" => $msg
-    ]);
 
     $stmt->close();
-    $conn->close();
 
-    return $resp;
+    return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
-function registaRendimentos($descricao, $valor, $data){
-    global $conn;
-    $anunciante_id = 1;
-    $stmt = $conn->prepare(
-        "INSERT INTO rendimento (descricao,anunciante_id,Valor, data_registo) VALUES (?, ?,?,?)");
+function removerGastos($ID_Gasto){
+        try {
 
-    $stmt->bind_param("sids", $descricao, $anunciante_id, $valor, $data);
+        $msg = "";
+        $flag = true;
+
+        $sql = "DELETE FROM Gastos WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Gasto);
+
+        if ($stmt->execute()) {
+            $msg = "Removido com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ), JSON_UNESCAPED_UNICODE);
+
+        return($resp);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+    function removerRendimentos($ID_Rendimento){
+        try {
+
+        $msg = "";
+        $flag = true;
+
+        $sql = "DELETE FROM Rendimento WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Rendimento);
+
+        if ($stmt->execute()) {
+            $msg = "Removido com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ), JSON_UNESCAPED_UNICODE);
+
+        return($resp);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+    function registaGastos($anunciante_id, $descricao, $Valor, $Data){
+        try {
+
+    $msg = "";
+    $flag = false;
+    $anunciante_id = (int)$anunciante_id;
+    $dataNormalizada = $this->normalizeDateTime($Data);
+    $stmt = $this->conn->prepare("INSERT INTO gastos (descricao,anunciante_id,Valor, data_registo) VALUES (?, ?,?,?)");
+    $stmt->bind_param("sids", $descricao, $anunciante_id, $Valor, $dataNormalizada);
 
     if($stmt->execute()){
         $msg = "Registado com sucesso!";
@@ -254,16 +298,52 @@ function registaRendimentos($descricao, $valor, $data){
     $resp = json_encode([
         "flag" => $flag,
         "msg" => $msg
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
+
+    $stmt->close();
 
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+}
+function registaRendimentos($anunciante_id, $descricao, $valor, $data){
+        try {
+
+    $anunciante_id = (int)$anunciante_id;
+    $dataNormalizada = $this->normalizeDateTime($data);
+    $stmt = $this->conn->prepare(
+        "INSERT INTO rendimento (descricao,anunciante_id,Valor, data_registo) VALUES (?, ?,?,?)");
+
+    $stmt->bind_param("sids", $descricao, $anunciante_id, $valor, $dataNormalizada);
+
+    if($stmt->execute()){
+        $msg = "Registado com sucesso!";
+        $flag = true;
+    } else {
+        $msg = "Erro ao registar: " . $stmt->error;
+        $flag = false;
+    }
+
+    $resp = json_encode([
+        "flag" => $flag,
+        "msg" => $msg
+    ], JSON_UNESCAPED_UNICODE);
+
+    return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 function getRendimentos(){
-    global $conn;
+        try {
+
     $msg = "";
 
-    $sql = "SELECT * FROM rendimento ORDER BY data_registo DESC;";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM rendimento ORDER BY id DESC;";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
@@ -278,16 +358,19 @@ function getRendimentos(){
     } else {
         $msg .= "<tr><td colspan='5' style='text-align:center;'>Sem Registos</td></tr>";
     }
-    $conn->close();
 
     return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 
 public function editarGasto($id, $descricao, $valor, $data) {
-    global $conn;
+        try {
 
-    $stmt = $conn->prepare("UPDATE gastos SET descricao=?, valor=?, data_registo=? WHERE id=?");
-    $stmt->bind_param("sdsi", $descricao, $valor, $data, $id);
+    $dataNormalizada = $this->normalizeDateTime($data);
+    $stmt = $this->conn->prepare("UPDATE gastos SET descricao=?, valor=?, data_registo=? WHERE id=?");
+    $stmt->bind_param("sdsi", $descricao, $valor, $dataNormalizada, $id);
 
     if($stmt->execute()) {
         $msg = "Gasto atualizado com sucesso!";
@@ -300,17 +383,23 @@ public function editarGasto($id, $descricao, $valor, $data) {
     $resp = json_encode([
         "flag" => $flag,
         "msg" => $msg
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
 
     $stmt->close();
+    $stmt->close();
+
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 
 public function editarRendimento($id, $descricao, $valor, $data) {
-    global $conn;
+        try {
 
-    $stmt = $conn->prepare("UPDATE rendimento SET descricao=?, valor=?, data_registo=? WHERE id=?");
-    $stmt->bind_param("sdsi", $descricao, $valor, $data, $id);
+    $dataNormalizada = $this->normalizeDateTime($data);
+    $stmt = $this->conn->prepare("UPDATE rendimento SET descricao=?, valor=?, data_registo=? WHERE id=?");
+    $stmt->bind_param("sdsi", $descricao, $valor, $dataNormalizada, $id);
 
     if($stmt->execute()) {
         $msg = "Rendimento atualizado com sucesso!";
@@ -323,14 +412,18 @@ public function editarRendimento($id, $descricao, $valor, $data) {
     $resp = json_encode([
         "flag" => $flag,
         "msg" => $msg
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
 
     $stmt->close();
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 
     function GraficoReceita() {
-    global $conn;
+        try {
+
     $dados1 = [];
     $dados2 = [];
     $dados3 = [];
@@ -341,7 +434,6 @@ public function editarRendimento($id, $descricao, $valor, $data) {
         "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
-
 
     $sql = "SELECT
     ano,
@@ -370,10 +462,9 @@ FROM (
 GROUP BY ano, mes
 ORDER BY ano DESC, mes DESC;";
 
-
-
-
-    $result = $conn->query($sql);
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -392,13 +483,20 @@ ORDER BY ano DESC, mes DESC;";
         "msg" => $msg,
         "dados1" => $dados1,
         "dados2" => $dados2
-    ));
+    ), JSON_UNESCAPED_UNICODE);
 
-    $conn->close();
+    if (isset($stmt) && $stmt) {
+        $stmt->close();
+    }
+
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 function getTransicoes(){
-        global $conn;
+        try {
+
         $msg = "";
         $sql = "SELECT
     'Rendimento' AS tipo_transacao,
@@ -436,11 +534,11 @@ JOIN Utilizadores u ON v.anunciante_id = u.id
 
 ORDER BY data DESC;";
 
-
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $text = "";
         $text2 = "";
-
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -476,20 +574,25 @@ ORDER BY data DESC;";
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        $stmt->close();
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function removerGastosEmMassa($ids){
-        global $conn;
+        try {
+
         $msg = "";
         $flag = true;
         $removidos = 0;
 
         foreach($ids as $id) {
             $sql = "DELETE FROM gastos WHERE id = ?";
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->bind_param("i", $id);
 
             if ($stmt->execute()) {
@@ -509,20 +612,24 @@ ORDER BY data DESC;";
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function removerRendimentosEmMassa($ids){
-        global $conn;
+        try {
+
         $msg = "";
         $flag = true;
         $removidos = 0;
 
         foreach($ids as $id) {
             $sql = "DELETE FROM rendimento WHERE id = ?";
-            $stmt = $conn->prepare($sql);
+            $stmt = $this->conn->prepare($sql);
             $stmt->bind_param("i", $id);
 
             if ($stmt->execute()) {
@@ -542,9 +649,12 @@ ORDER BY data DESC;";
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
 }

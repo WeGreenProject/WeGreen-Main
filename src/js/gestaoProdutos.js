@@ -44,14 +44,14 @@ function getTopTipoGrafico() {
             {
               data: response.dados2,
               backgroundColor: [
-                "#3cb371", // Verde principal
-                "#2d3748", // Cinza escuro
-                "#2e8b57", // Verde escuro
-                "#1a202c", // Preto suave
-                "#90c896", // Verde claro
-                "#4a5568", // Cinza médio
-                "#22c55e", // Verde brilhante
-                "#374151", // Cinza slate
+                "#3cb371", 
+                "#2d3748", 
+                "#2e8b57", 
+                "#1a202c", 
+                "#90c896", 
+                "#4a5568", 
+                "#22c55e", 
+                "#374151", 
               ],
               borderColor: "#ffffff",
               borderWidth: 4,
@@ -123,14 +123,14 @@ function getProdutoVendidos() {
             {
               data: response.dados2,
               backgroundColor: [
-                "#2e8b57", // Verde escuro
-                "#374151", // Cinza slate
-                "#3cb371", // Verde principal
-                "#1f2937", // Cinza muito escuro
-                "#90c896", // Verde claro
-                "#4b5563", // Cinza médio
-                "#22c55e", // Verde brilhante
-                "#2d3748", // Cinza escuro
+                "#2e8b57", 
+                "#374151", 
+                "#3cb371", 
+                "#1f2937", 
+                "#90c896", 
+                "#4b5563", 
+                "#22c55e", 
+                "#2d3748", 
               ],
               borderColor: "#ffffff",
               borderWidth: 4,
@@ -532,9 +532,8 @@ function alerta3(Produto_id) {
   });
 }
 
-// Modal de Verificação de Produto (Aprovar/Rejeitar)
 function abrirModalVerificacao(dados) {
-  // Buscar fotos do produto
+  
   let fotosHTML =
     '<div style="display: flex; align-items: center; justify-content: center; height: 400px;"><p style="color: #64748b;">Carregando fotos...</p></div>';
 

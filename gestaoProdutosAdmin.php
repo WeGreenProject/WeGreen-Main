@@ -18,114 +18,16 @@ if($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 3){
     <link rel="stylesheet" href="src/css/modalProduto.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
-    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+    <link rel="stylesheet" href="src/css/notifications-dropdown.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="src/js/notifications.js"></script>
-    <style>
-    /* Status badges simplificados */
-    .status-badge {
-        display: inline-block;
-        padding: 5px 12px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-
-    /* Badge ATIVO - Verde */
-    .badge-ativo {
-        background-color: #d1fae5;
-        color: #065f46;
-    }
-
-    /* Badge INATIVO - Laranja */
-    .badge-inativo {
-        background-color: #fed7aa;
-        color: #92400e;
-    }
-
-    /* Badge REJEITADO - Vermelho */
-    .badge-rejeitado {
-        background-color: #fecaca;
-        color: #991b1b;
-    }
-
-    /* Botões de editar/ação nas tabelas */
-    .btn-edit,
-    .btn-action-table {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
-        color: #ffffff;
-        box-shadow: 0 2px 6px rgba(60, 179, 113, 0.3);
-        text-decoration: none;
-    }
-
-    .btn-edit:hover,
-    .btn-action-table:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(60, 179, 113, 0.5);
-        color: #ffffff;
-        background: linear-gradient(135deg, #2e8b57 0%, #22a05e 100%);
-    }
-
-    .btn-edit i,
-    .btn-action-table i {
-        color: #ffffff;
-        font-size: 14px;
-    }
-
-    .btn-edit:hover i,
-    .btn-action-table:hover i {
-        color: #ffffff;
-    }
-
-    /* Desativar botão */
-    .btn-desativar {
-        padding: 8px 12px;
-        border: none;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-        color: #3cb371;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    }
-
-    .btn-desativar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
-        color: #2e8b57;
-    }
-
-    .btn-desativar i {
-        color: #3cb371;
-    }
-
-    .btn-desativar:hover i {
-        color: #2e8b57;
-    }
-    </style>
+    <link rel="stylesheet" href="src/css/gestaoProdutosAdmin.css">
 </head>
 
 <body>
@@ -272,21 +174,13 @@ if($_SESSION['tipo'] == 1 || $_SESSION['tipo'] == 3){
                 </div>
             </div>
 
-
-
     </div>
     </main>
     </div>
 
     <script src="src/js/Adminstrador.js"></script>
     <script src="src/js/gestaoProdutos.js"></script>
-    <script>
-        // Override do getInfoUserDropdown para manter o HTML correto da página
-        function getInfoUserDropdown() {
-            // Não fazer nada - o HTML já está correto na página
-            console.log('Dropdown já configurado no HTML');
-        }
-    </script>
+    <script src="src/js/gestaoProdutosAdmin.js"></script>
 </body>
 
 </html>

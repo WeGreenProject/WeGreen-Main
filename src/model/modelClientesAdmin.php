@@ -2,14 +2,23 @@
 
 require_once 'connection.php';
 
-class ClienteAdmin{
+class ClientesAdmin {
+
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
 
     function getClientes($ID_Utilizador){
-        global $conn;
-        $msg = "";
-        $sql = "SELECT utilizadores.*,Tipo_utilizadores.descricao As TipoUtilizadores from utilizadores,Tipo_utilizadores where tipo_utilizadores.id = utilizadores.tipo_utilizador_id AND utilizadores.id != ".$ID_Utilizador;
-        $result = $conn->query($sql);
+        try {
 
+        $msg = "";
+        $sql = "SELECT utilizadores.*,Tipo_utilizadores.descricao As TipoUtilizadores from utilizadores,Tipo_utilizadores where tipo_utilizadores.id = utilizadores.tipo_utilizador_id AND utilizadores.id != ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Utilizador);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -50,94 +59,100 @@ class ClienteAdmin{
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getDadosCliente($ID_Utilizador){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT * FROM utilizadores WHERE id =".$ID_Utilizador;
-        $result = $conn->query($sql);
+        $sql = "SELECT * FROM utilizadores WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Utilizador);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
         }
 
-        $conn->close();
+        return (json_encode($row, JSON_UNESCAPED_UNICODE));
 
-        return (json_encode($row));
-
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function guardaEditCliente($nome, $email, $telefone, $tipo,$nif,$plano,$rank,$ID_Utilizador){
+        try {
 
-        global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
+        $sql = "UPDATE utilizadores SET nome = ?, email = ?, telefone = ?, tipo_utilizador_id = ?, plano_id = ?, nif = ?, ranking_id = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("sssissii", $nome, $email, $telefone, $tipo, $plano, $nif, $rank, $ID_Utilizador);
 
-        $sql = "UPDATE utilizadores SET nome = '".$nome."', email = '".$email."',telefone = '".$telefone."',tipo_utilizador_id = '".$tipo."',plano_id = '".$plano."',nif = '".$nif."',ranking_id = '".$rank."' WHERE id =".$ID_Utilizador;
-
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Editado com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function registaClientes($nome, $email, $telefone, $tipo, $nif, $password, $foto){
-    global $conn;
+        try {
+
     $msg = "";
     $flag = true;
     $sql = "";
 
-    // Guardar password em texto claro para enviar por email (apenas para o email)
     $password_temporaria = $password;
-    $password_hash = md5($password); // Encriptar para guardar na BD
+    $password_hash = md5($password);
 
     $resp = $this->uploads($foto, $nome);
     $resp = json_decode($resp, TRUE);
 
     if($resp['flag']){
         $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password, foto) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("sssisss", $nome, $email, $telefone, $tipo, $nif, $password_hash, $resp['target']);
     } else {
         $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("sssiss", $nome, $email, $telefone, $tipo, $nif, $password_hash);
     }
 
     if ($stmt->execute()) {
         $msg = "Cliente registado com sucesso!";
 
-        // Enviar email com credenciais de acesso
         try {
             require_once __DIR__ . '/../services/EmailService.php';
-            $emailService = new EmailService();
+            $emailService = new EmailService($this->conn);
             $emailEnviado = $emailService->sendContaCriadaAdmin($email, $nome, $password_temporaria, $tipo);
 
             if ($emailEnviado) {
                 $msg .= " Email enviado com as credenciais de acesso.";
             } else {
                 $msg .= " Aviso: Email não foi enviado.";
-                error_log("Email de conta criada não foi enviado para {$email}");
             }
         } catch (Exception $e) {
-            error_log("Erro ao enviar email de conta criada: " . $e->getMessage());
             $msg .= " Aviso: Erro ao enviar email.";
         }
     } else {
@@ -149,36 +164,42 @@ class ClienteAdmin{
     $resp = json_encode(array(
         "flag" => $flag,
         "msg" => $msg
-    ));
-
-    $conn->close();
+    ), JSON_UNESCAPED_UNICODE);
 
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
     function removerClientes($ID_Cliente){
-        global $conn;
+        try {
+
         $msg = "";
         $flag = true;
 
-        $sql = "DELETE FROM utilizadores WHERE id = ".$ID_Cliente;
+        $sql = "DELETE FROM utilizadores WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Cliente);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Removido com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function uploads($foto, $nome){
+        try {
 
     $dirFisico = __DIR__ . "/../img/";
     $dirWeb = "src/img/";
@@ -215,10 +236,14 @@ function uploads($foto, $nome){
     return json_encode(array(
         "flag" => $flag,
         "target" => $targetBD
-    ));
+    ), JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
     function getCardUtilizadores(){
-        global $conn;
+        try {
+
         $msg = "";
         $sql = "        SELECT
             COUNT(*) AS total,
@@ -226,8 +251,9 @@ function uploads($foto, $nome){
             SUM(tipo_utilizador_id = 3) AS anunciantes,
             SUM(tipo_utilizador_id = 1) AS admins
         FROM utilizadores;";
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -313,32 +339,42 @@ function uploads($foto, $nome){
                                 </div>
                             </div>';
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function removerFornecedores($ID_Fornecedores){
-        global $conn;
+        try {
+
         $msg = "";
         $flag = true;
 
-        $sql = "DELETE FROM Fornecedores WHERE id = ".$ID_Fornecedores;
+        $sql = "DELETE FROM Fornecedores WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Fornecedores);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Removido com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
 }

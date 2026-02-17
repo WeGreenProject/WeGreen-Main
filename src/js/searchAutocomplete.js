@@ -1,9 +1,9 @@
-// Autocomplete de pesquisa global
+
 (function () {
   let debounceTimer;
   let currentFocus = -1;
 
-  // Criar dropdown de sugestões
+  
   function createAutocompleteDropdown() {
     const searchContainer = document.querySelector(".search-container");
     if (!searchContainer || document.getElementById("autocomplete-list"))
@@ -15,7 +15,7 @@
     searchContainer.appendChild(dropdown);
   }
 
-  // Mostrar sugestões
+  
   function showSuggestions(produtos) {
     const dropdown = document.getElementById("autocomplete-list");
     if (!dropdown) return;
@@ -54,13 +54,13 @@
     dropdown.style.display = "block";
   }
 
-  // Remover classe active
+  
   function removeActiveClass() {
     const items = document.querySelectorAll(".autocomplete-item");
     items.forEach((item) => item.classList.remove("autocomplete-active"));
   }
 
-  // Adicionar classe active
+  
   function addActiveClass(items) {
     if (!items || items.length === 0) return;
     removeActiveClass();
@@ -69,7 +69,7 @@
     items[currentFocus].classList.add("autocomplete-active");
   }
 
-  // Buscar produtos
+  
   function searchProducts(query) {
     if (query.length < 2) {
       const dropdown = document.getElementById("autocomplete-list");
@@ -77,7 +77,7 @@
       return;
     }
 
-    // Usar jQuery se disponível, senão usar fetch
+    
     if (typeof $ !== "undefined") {
       $.ajax({
         url: "src/controller/controllerSearchAutocomplete.php",
@@ -112,14 +112,14 @@
     }
   }
 
-  // Inicializar autocomplete
+  
   function initAutocomplete() {
     const searchInput = document.getElementById("searchInput");
     if (!searchInput) return;
 
     createAutocompleteDropdown();
 
-    // Event listener para input
+    
     searchInput.addEventListener("input", function () {
       const query = this.value.trim();
       clearTimeout(debounceTimer);
@@ -128,7 +128,7 @@
       }, 300);
     });
 
-    // Navegação por teclado
+    
     searchInput.addEventListener("keydown", function (e) {
       const dropdown = document.getElementById("autocomplete-list");
       if (!dropdown) return;
@@ -136,29 +136,29 @@
       const items = dropdown.querySelectorAll(".autocomplete-item");
 
       if (e.keyCode === 40) {
-        // Seta para baixo
+        
         e.preventDefault();
         currentFocus++;
         addActiveClass(items);
       } else if (e.keyCode === 38) {
-        // Seta para cima
+        
         e.preventDefault();
         currentFocus--;
         addActiveClass(items);
       } else if (e.keyCode === 13) {
-        // Enter
+        
         e.preventDefault();
         if (currentFocus > -1 && items[currentFocus]) {
           items[currentFocus].click();
         }
       } else if (e.keyCode === 27) {
-        // ESC
+        
         dropdown.style.display = "none";
         currentFocus = -1;
       }
     });
 
-    // Fechar dropdown ao clicar fora
+    
     document.addEventListener("click", function (e) {
       const dropdown = document.getElementById("autocomplete-list");
       if (
@@ -171,7 +171,7 @@
       }
     });
 
-    // Mostrar dropdown ao focar no input se já houver texto
+    
     searchInput.addEventListener("focus", function () {
       if (this.value.trim().length >= 2) {
         searchProducts(this.value.trim());
@@ -179,7 +179,7 @@
     });
   }
 
-  // Inicializar quando o DOM estiver pronto
+  
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initAutocomplete);
   } else {

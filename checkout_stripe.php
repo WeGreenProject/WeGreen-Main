@@ -3,12 +3,15 @@ require 'src/vendor/autoload.php';
 session_start();
 require_once 'src/model/modelCheckout.php';
 
+if (!isset($conn) || !($conn instanceof mysqli)) {
+    require_once 'connection.php';
+}
+
 \Stripe\Stripe::setApiKey('sk_test_51SAniYBgsjq4eGslagm3l86yXwCOicwq02ABZ54SCT7e8p9HiOTdciQcB3hQXxN4i6hVwlxohVvbtzQXEoPhg7yd009a6ubA3l');
 
-$func = new Checkout();
+$func = new Checkout($conn);
 $utilizador_id = isset($_SESSION['utilizador']) ? $_SESSION['utilizador'] : 1;
 
-// Get shipping and transportadora data from POST
 $transportadoraId = isset($_POST['transportadora_id']) ? $_POST['transportadora_id'] : null;
 $shippingData = [
     'firstName' => isset($_POST['firstName']) ? $_POST['firstName'] : '',
@@ -20,7 +23,6 @@ $shippingData = [
     'state' => isset($_POST['state']) ? $_POST['state'] : ''
 ];
 
-// Get pickup point data from POST (se transportadora for CTT/DPD com pickup)
 $pickupPointData = [
     'pickup_point_id' => isset($_POST['pickup_point_id']) ? $_POST['pickup_point_id'] : '',
     'pickup_point_name' => isset($_POST['pickup_point_name']) ? $_POST['pickup_point_name'] : '',
@@ -51,37 +53,35 @@ foreach ($produtos as $produto) {
     ];
 }
 
-// Adicionar custo de envio baseado na transportadora selecionada
 $shippingCost = 0;
 $shippingName = '';
 
 switch ($transportadoraId) {
-    case '1': // CTT Standard
-        $shippingCost = 250; // €2.50
+    case '1': 
+        $shippingCost = 250; 
         $shippingName = 'Envio CTT Standard';
         break;
-    case '2': // CTT Pickup
-        $shippingCost = 250; // €2.50
+    case '2': 
+        $shippingCost = 250; 
         $shippingName = 'Envio CTT Pickup - ' . ($pickupPointData['pickup_point_name'] ?? 'Ponto de Recolha');
         break;
-    case '3': // DPD Standard
-        $shippingCost = 250; // €2.50
+    case '3': 
+        $shippingCost = 250; 
         $shippingName = 'Envio DPD Standard';
         break;
-    case '4': // DPD Pickup
-        $shippingCost = 250; // €2.50
+    case '4': 
+        $shippingCost = 250; 
         $shippingName = 'Envio DPD Pickup - ' . ($pickupPointData['pickup_point_name'] ?? 'Ponto de Recolha');
         break;
-    case '5': // Entrega em Casa
-        $shippingCost = 500; // €5.00
+    case '5': 
+        $shippingCost = 500; 
         $shippingName = 'Entrega em Casa';
         break;
     default:
-        $shippingCost = 250; // €2.50 (padrão)
+        $shippingCost = 250; 
         $shippingName = 'Envio Standard';
 }
 
-// Adicionar o envio como um item separado
 if ($shippingCost > 0) {
     $line_items[] = [
         'price_data' => [
@@ -97,7 +97,7 @@ if ($shippingCost > 0) {
 
 $discounts = [];
 if (isset($_SESSION['cupao_desconto']) && $_SESSION['cupao_desconto'] > 0) {
-    // Criar cupom no Stripe
+    
     $coupon = \Stripe\Coupon::create([
         'percent_off' => $_SESSION['cupao_desconto'],
         'duration' => 'once',
@@ -125,13 +125,12 @@ $sessionData = [
         'shipping_zipCode' => $shippingData['zipCode'],
         'shipping_city' => $shippingData['city'],
         'shipping_state' => $shippingData['state'],
-        // Dados do ponto de recolha (se aplicável)
+        
         'pickup_point_id' => $pickupPointData['pickup_point_id'],
         'pickup_point_name' => $pickupPointData['pickup_point_name'],
         'pickup_point_address' => $pickupPointData['pickup_point_address']
     ]
 ];
-
 
 if (!empty($discounts)) {
     $sessionData['discounts'] = $discounts;

@@ -1,5 +1,5 @@
 function registaUser() {
-  // Validações
+  
   const nome = $("#nome").val().trim();
   const apelido = $("#apelido").val().trim();
   const email = $("#email").val().trim();
@@ -36,7 +36,7 @@ function registaUser() {
     return;
   }
 
-  // Validar NIF (apenas números e 9 dígitos)
+  
   if (nif && !/^\d{9}$/.test(nif)) {
     alerta(
       "Atenção",
@@ -139,7 +139,6 @@ function togglePassword(fieldId) {
   }
 }
 
-// Handle select label animation
 document.addEventListener("DOMContentLoaded", function () {
   const selectElement = document.querySelector("#tipoUtilizador");
 

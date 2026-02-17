@@ -220,7 +220,6 @@ body {
   border: 2px solid #2d3748;
 }
 
-/* NAVBAR USER - CORRIGIDO */
 .navbar-user {
   display: flex;
   align-items: center;
@@ -243,7 +242,6 @@ body {
   color: #1a202c;
 }
 
-/* USER AVATAR - CORRIGIDO (removida duplicação) */
 .user-avatar {
   margin-right: 15px;
   width: 32px;
@@ -629,7 +627,6 @@ body {
   margin-bottom: 30px;
 }
 
-/* Tabela de Produtos */
 .ProdutosInativosTable {
   width: 100%;
   border-collapse: collapse;
@@ -705,7 +702,6 @@ body {
   }
 }
 
-/* Estilos para botões de ação */
 .btn-info {
   background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);
   color: white;
@@ -731,7 +727,7 @@ body {
 .btn-info i {
   font-size: 12px;
 }
-/* Estilos específicos para comentários */
+
 .status-badge.badge-warning {
     background-color: #fef3c7;
     color: #92400e;

@@ -20,12 +20,13 @@ if($_SESSION['tipo'] == 1){
     <link rel="stylesheet" href="src/css/gestaoComentariosAdmin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
-    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+    <link rel="stylesheet" href="src/css/notifications-dropdown.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="src/js/notifications.js"></script>
 </head>
@@ -158,11 +159,11 @@ if($_SESSION['tipo'] == 1){
                                 </label>
                                 <select id="filterAvaliacaoComentarios" class="filter-select">
                                     <option value="">Todas</option>
-                                    <option value="5">5 Estrelas</option>
-                                    <option value="4">4 Estrelas</option>
-                                    <option value="3">3 Estrelas</option>
-                                    <option value="2">2 Estrelas</option>
-                                    <option value="1">1 Estrela</option>
+                                    <option value="5">5 estrelas</option>
+                                    <option value="4">4+ estrelas</option>
+                                    <option value="3">3+ estrelas</option>
+                                    <option value="2">2+ estrelas</option>
+                                    <option value="1">1+ estrela</option>
                                 </select>
                             </div>
                             <div class="filter-item">
@@ -357,33 +358,6 @@ if($_SESSION['tipo'] == 1){
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="src/js/Adminstrador.js"></script>
 <script src="src/js/gestaoComentarios.js"></script>
-<script>
-// Override do getInfoUserDropdown para manter o HTML correto da página
-function getInfoUserDropdown() {
-    // Não fazer nada - o HTML já está correto na página
-    console.log('Dropdown já configurado no HTML');
-}
-
-// ========== Funcionalidade das Tabs ==========
-document.addEventListener('DOMContentLoaded', function() {
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const targetTab = this.getAttribute('data-tab');
-
-            // Remove active class from all buttons and contents
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabContents.forEach(content => content.classList.remove('active'));
-
-            // Add active class to clicked button and corresponding content
-            this.classList.add('active');
-            document.getElementById('tab-' + targetTab).classList.add('active');
-        });
-    });
-});
-</script>
 
 </html>
 

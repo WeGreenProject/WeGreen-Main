@@ -1,7 +1,4 @@
-/* ==========================================================================
-   GESTÃO DE COMENTÁRIOS & REPORTS - ADMIN
-   Design Moderno e Profissional
-   ========================================================================== */
+
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
@@ -30,9 +27,6 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-/* =============================================
-   Tab Navigation - Sistema de Abas
-   ============================================= */
 .tab-navigation {
   display: flex;
   gap: 12px;
@@ -121,7 +115,6 @@
   }
 }
 
-/* Tab Content */
 .tab-content {
   display: none;
 }
@@ -142,9 +135,6 @@
   }
 }
 
-/* =============================================
-   Filters Card - Filtros Modernos
-   ============================================= */
 .filters-card {
   background: white;
   border-radius: 16px;
@@ -240,9 +230,6 @@
   transform: translateY(-1px);
 }
 
-/* =============================================
-   Bulk Actions Bar - Ações em Massa
-   ============================================= */
 .bulk-actions-bar {
   background: linear-gradient(135deg, var(--gray-800), var(--gray-900));
   color: white;
@@ -320,9 +307,6 @@
   background: var(--gray-800);
 }
 
-/* =============================================
-   Table Card - Tabela Moderna
-   ============================================= */
 .table-card {
   background: white;
   border-radius: 16px;
@@ -399,7 +383,6 @@
   border-bottom: none;
 }
 
-/* Checkbox estilizado */
 .modern-table input[type="checkbox"] {
   width: 18px;
   height: 18px;
@@ -407,14 +390,12 @@
   accent-color: var(--primary-green);
 }
 
-/* Estrelas de avaliação */
 .stars {
   color: #fbbf24;
   font-size: 1.125rem;
   letter-spacing: 2px;
 }
 
-/* Comentário truncado */
 .comentario-truncado {
   max-width: 300px;
   white-space: nowrap;
@@ -424,7 +405,6 @@
   color: var(--gray-600);
 }
 
-/* Status Badges - Badges de Estado */
 .status-badge {
   display: inline-flex;
   align-items: center;
@@ -466,7 +446,6 @@
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-/* Action Buttons - Botões de Ação */
 .action-buttons {
   display: flex;
   gap: 8px;
@@ -533,9 +512,6 @@
   color: white;
 }
 
-/* =============================================
-   Modal - Janela Modal
-   ============================================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -619,7 +595,6 @@
   overflow-y: auto;
 }
 
-/* Scrollbar personalizada */
 .modal-body::-webkit-scrollbar {
   width: 8px;
 }
@@ -638,9 +613,6 @@
   background: var(--gray-400);
 }
 
-/* =============================================
-   Responsividade
-   ============================================= */
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);

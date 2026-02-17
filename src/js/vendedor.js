@@ -16,7 +16,7 @@ function getVendedor() {
   })
     .done(function (msg) {
       $("#PerfilVendedora").html(msg);
-      // Carregar produtos DEPOIS que o perfil estiver carregado
+      
       getProdutosVendedora();
     })
     .fail(function (jqXHR, textStatus) {
@@ -48,14 +48,13 @@ function getProdutosVendedora() {
     });
 }
 
-// Filtros de produtos
 $(document).on("change", "#filtroEstado, #filtroOrdenacao", function () {
   const estado = $("#filtroEstado").val();
   const ordenacao = $("#filtroOrdenacao").val();
 
   let produtos = $(".produto-item").toArray();
 
-  // Filtrar por estado
+  
   produtos.forEach((produto) => {
     const produtoEstado = $(produto).data("estado");
     if (estado === "" || produtoEstado === estado) {
@@ -65,7 +64,7 @@ $(document).on("change", "#filtroEstado, #filtroOrdenacao", function () {
     }
   });
 
-  // Ordenar
+  
   produtos = $(".produto-item:visible").toArray();
   produtos.sort((a, b) => {
     if (ordenacao === "preco_asc") {
@@ -77,11 +76,11 @@ $(document).on("change", "#filtroEstado, #filtroOrdenacao", function () {
     }
   });
 
-  // Reorganizar no DOM
+  
   $("#produtos-grid").html(produtos);
 });
 
 $(function () {
   getVendedor();
-  // getProdutosVendedora() agora é chamado dentro de getVendedor()
+  
 });

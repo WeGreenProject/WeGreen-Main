@@ -1,30 +1,53 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelProdutosAdmin.php';
-session_start();
 
-$func = new ProdutosAdmin();
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-if ($_POST['op'] == 1) {
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new ProdutosAdmin($conn);
+
+if ($op == 1) {
     $resp = $func->getDadosPerfil($_SESSION['utilizador']);
     echo $resp;
 }
-if ($_POST['op'] == 2) {
+
+if ($op == 2) {
     $resp = $func->getProdutosAprovar($_POST['estado']);
     echo $resp;
 }
-if ($_POST['op'] == 3) {
+
+if ($op == 3) {
     $resp = $func->getProdutosPendentes();
     echo $resp;
 }
-if ($_POST['op'] == 4) {
+
+if ($op == 4) {
     $resp = $func->getProdutosAprovado();
     echo $resp;
 }
-if ($_POST['op'] == 5) {
+
+if ($op == 5) {
     $resp = $func->getProdutosRejeitado();
     echo $resp;
 }
-if ($_POST['op'] == 6) {
+
+if ($op == 6) {
     $resp = $func->getFiltro();
     echo $resp;
 }

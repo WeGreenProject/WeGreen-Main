@@ -16,7 +16,7 @@
             min-height: 100vh;
         }
 
-        /* SIDEBAR */
+        
         .sidebar {
             width: 280px;
             background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
@@ -137,7 +137,7 @@
             justify-content: center;
         }
 
-        /* USER PROFILE */
+        
         .user-profile {
             position: absolute;
             bottom: 0;
@@ -220,7 +220,7 @@
             transform: rotate(90deg);
         }
 
-        /* MAIN CONTENT */
+        
         .main-content {
             flex: 1;
             margin-left: 280px;
@@ -243,7 +243,7 @@
             font-size: 16px;
         }
 
-        /* ACTION BAR */
+        
         .action-bar {
             display: flex;
             justify-content: space-between;
@@ -306,7 +306,7 @@
             box-shadow: 0 6px 20px rgba(166, 217, 12, 0.4);
         }
 
-        /* TABLE */
+        
         .table-container {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -353,7 +353,7 @@
             border-bottom: none;
         }
 
-        /* SUPPLIER INFO */
+        
         .supplier-info {
             display: flex;
             align-items: center;
@@ -390,7 +390,7 @@
             color: #718096;
         }
 
-        /* ACTION BUTTONS */
+        
         .action-buttons {
             display: flex;
             gap: 8px;
@@ -429,7 +429,7 @@
             box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
         }
 
-        /* MODAL */
+        
         .modal {
             display: none;
             position: fixed;
@@ -501,7 +501,7 @@
             transform: rotate(90deg);
         }
 
-        /* FORM */
+        
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -549,7 +549,7 @@
             cursor: not-allowed;
         }
 
-        /* RESPONSIVE */
+        
         @media (max-width: 768px) {
             .sidebar {
                 width: 80px;
@@ -580,7 +580,7 @@
             }
         }
 
-        /* ANIMATIONS */
+        
         @keyframes fadeIn {
             from {
                 opacity: 0;

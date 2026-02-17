@@ -20,7 +20,6 @@ function getProdutosCriança() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoCriançaVenda").html(msg);
     })
 
@@ -53,7 +52,6 @@ function getProdutoCriançaMostrar() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoInfo").html(msg);
 
       $(".btnComprarAgora").on("click", function () {
@@ -79,35 +77,28 @@ function getProdutoCriançaMostrar() {
       processData: false,
     })
       .done(function (response) {
-        console.log("Resposta do servidor:", response);
-
-        if (response.includes("Erro")) {
-          Swal.fire({
-            title: "Erro!",
-            text: response,
-            icon: "error",
-            confirmButtonColor: "#d33",
-            confirmButtonText: "OK",
-          });
+        let obj = response;
+        if (typeof response === "string") {
+          try {
+            obj = JSON.parse(response);
+          } catch (e) {
+            obj = null;
+          }
+        }
+        if (obj && obj.flag === false) {
+          showModernErrorModal(
+            "Erro!",
+            obj.msg || "Não foi possível adicionar o produto ao carrinho",
+          );
         } else {
-          Swal.fire({
-            title: "Sucesso!",
-            text: "Produto adicionado ao carrinho",
-            icon: "success",
-            confirmButtonColor: "#28a745",
-            confirmButtonText: "OK",
-          });
+          showModernSuccessModal("Sucesso!", "Produto adicionado ao carrinho");
         }
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
-        console.error("Erro AJAX:", textStatus, errorThrown);
-        Swal.fire({
-          title: "Erro!",
-          text: "Não foi possível adicionar o produto ao carrinho",
-          icon: "error",
-          confirmButtonColor: "#d33",
-          confirmButtonText: "OK",
-        });
+        showModernErrorModal(
+          "Erro!",
+          "Não foi possível adicionar o produto ao carrinho",
+        );
       });
   }
 }
@@ -125,7 +116,6 @@ function getFiltrosCriancaCategoria() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#CategoriaSelect").html(msg);
     })
 
@@ -147,7 +137,6 @@ function getFiltrosCriancaTamanho() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#tamanhoSelect").html(msg);
     })
 
@@ -169,7 +158,6 @@ function getFiltrosCriancaEstado() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#estadoSelect").html(msg);
     })
 
@@ -178,39 +166,61 @@ function getFiltrosCriancaEstado() {
     });
 }
 function ErrorSession() {
-  Swal.fire({
-    icon: "warning",
-    title: '<span style="color: #2e8b57;">Inicie Sessão</span>',
-    html: '<p style="color: #64748b; font-size: 15px;">É necessário iniciar sessão para conversar com o vendedor!</p>',
-    showCancelButton: true,
-    confirmButtonText: '<i class="fas fa-sign-in-alt"></i> Ir para Login',
-    cancelButtonText: "Cancelar",
-    confirmButtonColor: "#3cb371",
-    cancelButtonColor: "#6c757d",
-    reverseButtons: true,
-  }).then((result) => {
+  const modal =
+    typeof showModernConfirmModal === "function"
+      ? showModernConfirmModal(
+          "Inicie Sessão",
+          "É necessário iniciar sessão para conversar com o vendedor!",
+          {
+            confirmText: '<i class="fas fa-sign-in-alt"></i> Ir para Login',
+            icon: "fa-sign-in-alt",
+            iconBg:
+              "background: linear-gradient(135deg, #3cb371 0%, #2e8b57 100%);",
+          },
+        )
+      : Swal.fire({
+          icon: "warning",
+          title: "Inicie Sessão",
+          text: "É necessário iniciar sessão para conversar com o vendedor!",
+          showCancelButton: true,
+          confirmButtonText: "Ir para Login",
+          cancelButtonText: "Cancelar",
+          confirmButtonColor: "#3cb371",
+          cancelButtonColor: "#6c757d",
+        });
+
+  modal.then((result) => {
     if (result.isConfirmed) {
       window.location.href = "login.html";
     }
   });
 }
 function ErrorSession2() {
-  Swal.fire({
-    icon: "info",
-    title: '<span style="color: #2e8b57;">Ação Inválida</span>',
-    html: '<p style="color: #64748b; font-size: 15px;">Não pode iniciar uma conversa consigo mesmo!</p>',
-    confirmButtonText: "Entendi",
-    confirmButtonColor: "#3cb371",
-  });
+  if (typeof showModernInfoModal === "function") {
+    showModernInfoModal(
+      "Ação Inválida",
+      "Não pode iniciar uma conversa consigo mesmo!",
+    );
+  } else {
+    Swal.fire(
+      "Ação Inválida",
+      "Não pode iniciar uma conversa consigo mesmo!",
+      "info",
+    );
+  }
 }
 function alerta(titulo, msg, icon) {
-  Swal.fire({
-    position: "center",
-    icon: icon,
-    title: titulo,
-    text: msg,
-    showConfirmButton: true,
-  });
+  if (icon === "success") {
+    showModernSuccessModal(titulo, msg);
+  } else if (icon === "error") {
+    showModernErrorModal(titulo, msg);
+  } else if (icon === "warning") {
+    showModernWarningModal(titulo, msg);
+  } else if (icon === "info") {
+    showModernInfoModal(titulo, msg);
+  } else {
+    showModernWarningModal(titulo, msg);
+  }
 }
 $(function () {
   getProdutoCriançaMostrar();

@@ -24,7 +24,6 @@
   border-color: #3cb371;
 }
 
-/* Estilos da Navegação - NAVBAR PRETO COM TEXTO BRANCO */
 .header-main {
   top: 0 !important;
   background-color: #000000 !important;
@@ -51,7 +50,6 @@
   color: #000000 !important;
 }
 
-/* Ícone do carrinho em branco */
 .header-main .bi-bag {
   color: #ffffff !important;
   font-size: 1.5rem;
@@ -95,9 +93,6 @@
   }
 }
 
-/* ========== Header Moderno - Barra de Pesquisa, Carrinho e Utilizador ========== */
-
-/* Container da Pesquisa */
 .search-container {
   position: relative;
   margin-right: 15px;
@@ -143,7 +138,6 @@
   pointer-events: none;
 }
 
-/* Botão do Carrinho */
 .cart-button {
   position: relative;
   display: flex;
@@ -185,7 +179,6 @@
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
 }
 
-/* Dropdown do Utilizador */
 .user-dropdown {
   margin-left: 8px;
 }
@@ -246,7 +239,6 @@
   color: #3cb371;
 }
 
-/* Responsivo */
 @media (max-width: 991px) {
   .search-input {
     width: 200px;
@@ -296,7 +288,6 @@
   color: var(--wegreen-dark);
 }
 
-/* Estilos do Carrossel (Hero Section) - ARREDONDADO */
 #heroCarousel {
   border-radius: 24px;
   overflow: hidden;
@@ -374,7 +365,6 @@
   border-color: #90ee90;
 }
 
-/* Estilos da Navegação - NAVBAR BRANCO COM TEXTO PRETO */
 .header-main {
   top: 3.5rem;
   background-color: #ffffff !important;
@@ -401,7 +391,6 @@
   color: #000000 !important;
 }
 
-/* Ícone do carrinho em verde lima */
 .header-main .bi-bag {
   color: #9acd32 !important;
   font-size: 1.5rem;
@@ -459,7 +448,6 @@
   color: var(--wegreen-dark);
 }
 
-/* Estilos do Carrossel (Hero Section) - ARREDONDADO */
 #heroCarousel {
   border-radius: 24px;
   overflow: hidden;
@@ -511,7 +499,6 @@
     brightness(120%);
 }
 
-/* ======= A NOSSA ESSÊNCIA SECTION - CARDS COMO NA IMAGEM ======= */
 #essencia {
   background-color: #f8f9fa;
   padding: 80px 20px;
@@ -532,7 +519,6 @@
   margin-bottom: 3rem;
 }
 
-/* Cards da essência */
 .card-essencia {
   background-color: #ffffff;
   border-radius: 16px;
@@ -548,7 +534,6 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-/* Wrapper do ícone com fundo colorido */
 .icon-wrapper {
   width: 56px;
   height: 56px;
@@ -566,7 +551,6 @@
   transform: scale(1.05);
 }
 
-/* Ícones */
 .icon-essencia {
   width: 28px;
   height: 28px;
@@ -574,7 +558,6 @@
     brightness(95%) contrast(86%);
 }
 
-/* Títulos dos cards */
 .card-essencia h4 {
   color: #000000;
   font-size: 1.25rem;
@@ -583,7 +566,6 @@
   letter-spacing: 0;
 }
 
-/* Texto descritivo */
 .card-essencia p {
   color: #6c757d;
   font-size: 0.95rem;
@@ -599,7 +581,6 @@
   color: #414429;
 }
 
-/* FAQ Section */
 #faq {
   background-color: #fdfdfb;
 }

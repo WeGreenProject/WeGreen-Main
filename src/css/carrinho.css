@@ -20,7 +20,6 @@ body {
   padding: 0 40px;
 }
 
-/* Header */
 .checkout-header {
   background: #ffffff;
   border-bottom: 1px solid #e0e0e0;
@@ -31,7 +30,6 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Estilos do dropdown de perfil (compatível com index.html) */
 .nav-link {
   color: #2c3e50 !important;
 }
@@ -142,7 +140,6 @@ body {
   font-weight: 700;
 }
 
-/* Main Checkout Container */
 .checkout-container {
   padding: 50px 0 80px;
   min-height: calc(100vh - 80px);
@@ -157,7 +154,6 @@ body {
   text-align: center;
 }
 
-/* Steps Progress Horizontal */
 .steps-progress-container {
   display: flex;
   justify-content: space-between;
@@ -235,7 +231,6 @@ body {
   color: #2a9d5f;
 }
 
-/* Checkout Steps */
 .checkout-step {
   display: none;
   margin-bottom: 30px;
@@ -275,7 +270,6 @@ body {
   color: #000000;
 }
 
-/* Cart Items in Step 1 */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -421,7 +415,6 @@ body {
   font-size: 18px;
 }
 
-/* Empty Cart */
 .empty-cart {
   text-align: center;
   padding: 60px 20px;
@@ -461,7 +454,6 @@ body {
   box-shadow: 0 4px 12px rgba(60, 179, 113, 0.3);
 }
 
-/* Botão desabilitado */
 .btn-primary.disabled-btn,
 .btn-primary:disabled {
   background: #cccccc !important;
@@ -479,7 +471,6 @@ body {
   box-shadow: none !important;
 }
 
-/* Form Elements */
 .form-label {
   font-weight: 600;
   font-size: 14px;
@@ -559,11 +550,10 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Summary Sidebar */
 .summary-sidebar {
   position: sticky;
   top: 20px;
-  /* Removido max-height e overflow-y para eliminar scroll */
+  
 }
 
 .summary-card {
@@ -655,7 +645,6 @@ body {
   font-size: 13px;
 }
 
-/* Coupon Section */
 .AplicarCupao {
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
@@ -705,7 +694,6 @@ body {
   background: #32a05f;
 }
 
-/* Trust Footer */
 .trust-footer {
   background: #3cb371;
   color: white;
@@ -738,7 +726,6 @@ body {
   opacity: 0.9;
 }
 
-/* Responsive */
 @media (max-width: 991px) {
   .summary-sidebar {
     position: static;
@@ -791,9 +778,6 @@ body {
   }
 }
 
-/* ==================== STEPS STYLES FROM carrinho-steps.css ==================== */
-
-/* Transportadora Cards */
 .transportadora-options {
   display: flex;
   flex-direction: column;
@@ -938,7 +922,6 @@ body {
   display: block;
 }
 
-/* Review Sections */
 .info-section,
 .review-section {
   padding: 20px;
@@ -962,8 +945,6 @@ body {
 .review-section h3 i {
   color: #3cb371;
 }
-
-/* ==================== PICKUP POINT MAP STYLES ==================== */
 
 .pickup-map-container {
   margin-top: 25px;
@@ -1112,7 +1093,6 @@ body {
   transform: scale(1.05);
 }
 
-/* Custom Leaflet Marker */
 .custom-pickup-marker {
   background: transparent;
   border: none;
@@ -1129,7 +1109,6 @@ body {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* Popup Styles */
 .pickup-popup {
   text-align: center;
   padding: 10px;
@@ -1174,7 +1153,6 @@ body {
   transform: scale(1.05);
 }
 
-/* Responsive para o mapa */
 @media (max-width: 768px) {
   .pickup-map {
     height: 300px;
@@ -1185,9 +1163,6 @@ body {
   }
 }
 
-/* ==================== LEAFLET CUSTOMIZATION ==================== */
-
-/* Marcador verde customizado */
 .custom-leaflet-marker {
   background: transparent;
   border: none;
@@ -1204,7 +1179,6 @@ body {
   transform: scale(1.1);
 }
 
-/* Marcador azul do usuário */
 .custom-user-marker {
   background: transparent;
   border: none;
@@ -1227,7 +1201,6 @@ body {
   }
 }
 
-/* Popup customizado Leaflet */
 .custom-leaflet-popup .leaflet-popup-content-wrapper {
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
@@ -1299,7 +1272,6 @@ body {
   font-size: 18px;
 }
 
-/* Estilo do header do mapa */
 .pickup-header {
   margin-bottom: 20px;
   text-align: center;
@@ -1311,7 +1283,6 @@ body {
   margin-top: 5px;
 }
 
-/* Distância nos cards */
 .pickup-point-info .distance {
   color: #3cb371;
   font-weight: 600;
@@ -1323,9 +1294,7 @@ body {
   line-height: 1.8;
   color: #2c3e50;
 }
-/* ============ ESTILOS DE ESTADO DOS STEPS ============ */
 
-/* Step completado */
 .checkout-step.completed-step .step-number {
   background: #2a9d5f !important;
   border-color: #2a9d5f !important;
@@ -1351,7 +1320,6 @@ body {
   display: none;
 }
 
-/* Step ativo */
 .checkout-step.active-step .step-number {
   background: linear-gradient(135deg, #3cb371 0%, #2ecc71 100%) !important;
   border-color: #3cb371 !important;
@@ -1373,7 +1341,6 @@ body {
   color: #3cb371;
 }
 
-/* Step futuro/upcoming */
 .checkout-step.upcoming-step .step-number {
   background: #f5f7fa !important;
   border-color: #d1dae3 !important;
@@ -1390,7 +1357,6 @@ body {
   color: #6c757d;
 }
 
-/* Animação de pulse para step ativo */
 @keyframes pulse {
   0%,
   100% {
@@ -1401,7 +1367,6 @@ body {
   }
 }
 
-/* Animação de fadeIn */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1413,7 +1378,6 @@ body {
   }
 }
 
-/* Animação de slideIn para conteúdo ativo */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -1428,4 +1392,14 @@ body {
 .checkout-step {
   margin-bottom: 20px;
   transition: all 0.3s ease;
+}
+
+body {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.container:not(.container-fluid),
+.container-lg {
+  max-width: 1700px !important;
 }

@@ -1,40 +1,21 @@
-/*
- * DashboardAdmin.css - Overrides específicos para Dashboard do Administrador
- * Reutiliza estilos base de DashboardCliente.css
- * Apenas customizações únicas para contexto administrativo
- */
 
-/* ============================================
-   VARIÁVEIS ESPECÍFICAS DO ADMIN
-   ============================================ */
+
 :root {
-  /* Mantém verde primário do sistema WeGreen */
+  
   --admin-primary: #3cb371;
   --admin-primary-dark: #2e8b57;
 
-  /* Accent colors para badges/estados específicos do admin */
+  
   --admin-warning: #f59e0b;
   --admin-danger: #ef4444;
   --admin-info: #3b82f6;
 }
 
-/* ============================================
-   SIDEBAR - Badge de Identificação Admin
-   ============================================ */
-/* Badge ADMIN removido para manter subtítulo original "Painel do Administrador" */
-
-/* ============================================
-   NAVBAR - Role Badge
-   ============================================ */
 .navbar-user .user-role {
   font-weight: 600;
   color: var(--admin-primary);
 }
 
-/* ============================================
-   STAT CARDS - Indicadores Específicos
-   ============================================ */
-/* Highlight especial para métricas críticas de admin */
 .stat-card-compact[id*="Utilizadores"] .stat-icon {
   background: linear-gradient(135deg, var(--admin-info) 0%, #2563eb 100%);
 }
@@ -43,15 +24,6 @@
   background: linear-gradient(135deg, var(--admin-warning) 0%, #d97706 100%);
 }
 
-/* ============================================
-   TABELAS - Usa estilos do DashboardAnunciante.css
-   ============================================ */
-/* Estilos aplicados via classes .display e .table-container */
-/* Definidos em DashboardAnunciante.css (já importado) */
-
-/* ============================================
-   BOTÕES DE AÇÃO ADMIN
-   ============================================ */
 .btn-approve {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
@@ -86,16 +58,10 @@
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
 }
 
-/* ============================================
-   CHARTS - Títulos com Verde Admin
-   ============================================ */
 .chart-card .chart-header h3 {
   color: var(--admin-primary) !important;
 }
 
-/* ============================================
-   PRODUCTS GRID (se usado em outras páginas)
-   ============================================ */
 .products-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -172,9 +138,6 @@
   color: var(--admin-primary);
 }
 
-/* ============================================
-   ACTION BAR
-   ============================================ */
 .action-bar {
   display: flex;
   justify-content: space-between;
@@ -206,9 +169,6 @@
   box-shadow: 0 6px 16px rgba(60, 179, 113, 0.4);
 }
 
-/* ============================================
-   BTN-ACTION - Botão com background preto e ícone verde
-   ============================================ */
 .btn-action {
   padding: 8px 12px;
   border: none;
@@ -241,9 +201,6 @@
   color: #2e8b57;
 }
 
-/* ============================================
-   RESPONSIVE - Mantém comportamento do base
-   ============================================ */
 @media (max-width: 768px) {
   .sidebar-logo .logo-text p::after {
     display: block;

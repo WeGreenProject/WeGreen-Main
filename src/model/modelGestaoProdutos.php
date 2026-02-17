@@ -1,18 +1,27 @@
 <?php
 
 require_once 'connection.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
-class Vendas{
+class GestaoProdutos {
+
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
 
     function getMeusProdutos($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
-        $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id = ".$ID_User;
+        $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id = ?";
         $text = "";
         $text2 = "";
-        $result = $conn->query($sql);
-
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -53,18 +62,22 @@ class Vendas{
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getInativos(){
-        global $conn;
+        try {
+
         $msg = "";
         $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id AND produtos.ativo = 0;";
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
         $text = "";
         $text2 = "";
-
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -92,7 +105,13 @@ class Vendas{
                 $msg .= "<td>".$row['genero']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
-                $msg .= "<td><button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto'><i class='fas fa-search'></i> Verificar</button></td>";
+
+                if (!empty($row['motivo_rejeicao']) && $row['motivo_rejeicao'] === 'AGUARDAR_RESPOSTA_ANUNCIANTE') {
+                    $msg .= "<td><button class='btn-edit' disabled title='A aguardar resposta do anunciante' style='opacity:0.6;cursor:not-allowed;'><i class='fas fa-hourglass-half'></i> A aguardar anunciante</button></td>";
+                } else {
+                    $msg .= "<td><button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto'><i class='fas fa-search'></i> Verificar</button></td>";
+                }
+
                 $msg .= "</tr>";
             }
         } else {
@@ -107,53 +126,70 @@ class Vendas{
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getDadosProduto($ID_Produto){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT Produtos.*,Tipo_Produtos.id As Valuecategoria,utilizadores.nome As vendedor FROM Produtos,Tipo_Produtos,Utilizadores WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = Produtos.anunciante_id AND Produto_id =".$ID_Produto;
-        $result = $conn->query($sql);
+        $sql = "SELECT Produtos.*,Tipo_Produtos.id As Valuecategoria,utilizadores.nome As vendedor FROM Produtos,Tipo_Produtos,Utilizadores WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = Produtos.anunciante_id AND Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Produto);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
         }
 
-        $conn->close();
+        return (json_encode($row, JSON_UNESCAPED_UNICODE));
 
-        return (json_encode($row));
-
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getDadosInativos($ID_Produto){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT Produtos.*,Tipo_Produtos.id As Valuecategoria,utilizadores.nome As vendedor FROM Produtos,Tipo_Produtos,Utilizadores WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = Produtos.anunciante_id AND Produto_id =".$ID_Produto;
-        $result = $conn->query($sql);
+        $sql = "SELECT Produtos.*,Tipo_Produtos.id As Valuecategoria,utilizadores.nome As vendedor FROM Produtos,Tipo_Produtos,Utilizadores WHERE Produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = Produtos.anunciante_id AND Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Produto);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
         }
 
-        $conn->close();
+        return (json_encode($row, JSON_UNESCAPED_UNICODE));
 
-        return (json_encode($row));
-
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getProdutos(){
-        global $conn;
+        try {
+
         $msg = "";
         $sql = "SELECT produtos.*,Tipo_Produtos.descricao As ProdutosNome, Utilizadores.nome  As NomeAnunciante from produtos,Tipo_Produtos,Utilizadores where produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = produtos.anunciante_id AND produtos.anunciante_id;";
         $text = "";
         $text2 = "";
-        $result = $conn->query($sql);
-
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -183,8 +219,23 @@ class Vendas{
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
                 $msg .= "<td>".$row['marca']."</td>";
                 $msg .= "<td>";
-                $msg .= "<button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto' style='margin-bottom: 8px;'><i class='fas fa-search'></i> Verificar</button><br>";
-                $msg .= "<button class='btn-desativar' onclick='getDesativacao(".$row['Produto_id'].")' title='Desativar Produto'><i class='fas fa-times-circle'></i> Desativar</button>";
+
+                if ($row['ativo'] == 0) {
+                    if (!empty($row['motivo_rejeicao']) && $row['motivo_rejeicao'] === 'AGUARDAR_RESPOSTA_ANUNCIANTE') {
+                        $msg .= "<button class='btn-edit' disabled title='A aguardar resposta do anunciante' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;'><i class='fas fa-hourglass-half'></i> A aguardar anunciante</button><br>";
+                    } else {
+                        $msg .= "<button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto' style='margin-bottom: 8px;'><i class='fas fa-search'></i> Verificar</button><br>";
+                    }
+                } elseif ($row['ativo'] == 1) {
+                    $msg .= "<button class='btn-edit' disabled title='Produto já aprovado' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;'><i class='fas fa-check-circle'></i> Aprovado</button><br>";
+                } else {
+                    $msg .= "<button class='btn-edit' disabled title='Produto rejeitado' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;background:#dc2626;'><i class='fas fa-times-circle'></i> Rejeitado</button><br>";
+                }
+                if ($row['ativo'] == 1) {
+                    $msg .= "<button class='btn-desativar' onclick='getDesativacao(".$row['Produto_id'].")' title='Desativar Produto'><i class='fas fa-times-circle'></i> Desativar</button>";
+                } else {
+                    $msg .= "<button class='btn-desativar' disabled title='Produto já inativo ou rejeitado' style='opacity:0.6;cursor:not-allowed;'><i class='fas fa-times-circle'></i> Desativar</button>";
+                }
                 $msg .= "</td>";
                 $msg .= "</tr>";
             }
@@ -198,16 +249,24 @@ class Vendas{
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getListaVendedores(){
-        global $conn;
+        try {
+
         $msg = "";
         $sql = "SELECT utilizadores.nome As NomeUtilizadores ,utilizadores.id As ValueUtilizador FROM utilizadores,Tipo_utilizadores where Tipo_utilizadores.id = utilizadores.tipo_utilizador_id AND Tipo_utilizadores.id IN (1, 3);";
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         $msg .= "<option value='-1'>Selecionar cliente...</option>";
         if ($result->num_rows > 0) {
@@ -219,121 +278,241 @@ class Vendas{
                 $msg .= "<option value='-1'>Selecionar cliente...</option>";
                 $msg .= "<option value='1'>Sem Registos</option>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getDesativacao($Produto_id){
+        try {
 
-        global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
-
         $sql = "UPDATE Produtos
-                SET ativo = 0
-                WHERE Produto_id = " . $Produto_id;
+            SET ativo = 0,
+                motivo_rejeicao = 'AGUARDAR_RESPOSTA_ANUNCIANTE'
+                WHERE Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $Produto_id);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Desativado com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
-    function rejeitaEditProduto($Produto_id){
+    function rejeitaEditProduto($Produto_id, $motivo_rejeicao = ''){
+        try {
 
-        global $conn;
         $msg = "";
         $flag = true;
-        $sql = "";
 
+
+        $sqlDados = "SELECT p.nome AS nome_produto, u.email, u.nome AS nome_anunciante
+                     FROM Produtos p
+                     INNER JOIN Utilizadores u ON p.anunciante_id = u.id
+                     WHERE p.Produto_id = ?";
+        $stmtDados = $this->conn->prepare($sqlDados);
+        $stmtDados->bind_param("i", $Produto_id);
+        $stmtDados->execute();
+        $resultDados = $stmtDados->get_result();
+        $dadosAnunciante = $resultDados->fetch_assoc();
 
         $sql = "UPDATE Produtos
-        SET ativo = 2 WHERE Produto_id = ".$Produto_id;
+        SET ativo = 2, motivo_rejeicao = ? WHERE Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("si", $motivo_rejeicao, $Produto_id);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Rejeitado com Sucesso";
+
+
+            if ($dadosAnunciante && !empty($dadosAnunciante['email'])) {
+                $this->enviarEmailRejeicaoProduto(
+                    $dadosAnunciante['email'],
+                    $dadosAnunciante['nome_anunciante'],
+                    $dadosAnunciante['nome_produto'],
+                    $Produto_id,
+                    $motivo_rejeicao
+                );
+            }
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function aprovarProduto($Produto_id){
+        try {
+        $msg = "";
+        $flag = true;
+
+        $sql = "UPDATE Produtos SET ativo = 1, motivo_rejeicao = NULL WHERE Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $Produto_id);
+
+        if ($stmt->execute()) {
+            $msg = "Produto aprovado com sucesso";
+        } else {
+            $flag = false;
+            $msg = "Erro ao aprovar produto";
+        }
+
+        return json_encode(array("flag" => $flag, "msg" => $msg), JSON_UNESCAPED_UNICODE);
+
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    private function enviarEmailRejeicaoProduto($email, $nomeAnunciante, $nomeProduto, $produtoId, $motivo) {
+        try {
+            $emailService = new EmailService($this->conn);
+            $subject = "WeGreen - Produto Rejeitado: " . $nomeProduto;
+
+            $htmlBody = '
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { font-family: "Inter", "Segoe UI", Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 0; }
+                    .container { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); overflow: hidden; }
+                    .header { background: linear-gradient(135deg, #2e8b57, #3cb371); padding: 30px; text-align: center; }
+                    .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
+                    .content { padding: 30px; }
+                    .content h2 { color: #1f2937; font-size: 20px; margin-top: 0; }
+                    .content p { color: #4b5563; line-height: 1.6; }
+                    .reason-box { background: #fef2f2; border-left: 4px solid #dc2626; padding: 15px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+                    .reason-box strong { color: #dc2626; }
+                    .reason-box p { color: #374151; margin: 8px 0 0 0; }
+                    .product-info { background: #f9fafb; padding: 15px; border-radius: 8px; margin: 15px 0; }
+                    .product-info span { color: #6b7280; font-size: 14px; }
+                    .product-info strong { color: #1f2937; }
+                    .btn { display: inline-block; padding: 12px 24px; background: #2e8b57; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 15px; }
+                    .footer { text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>WeGreen</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Produto Rejeitado</h2>
+                        <p>Olá <strong>' . htmlspecialchars($nomeAnunciante) . '</strong>,</p>
+                        <p>Informamos que o seu produto foi analisado pela nossa equipa e, infelizmente, não foi aprovado.</p>
+                        <div class="product-info">
+                            <span>Produto:</span><br>
+                            <strong>' . htmlspecialchars($nomeProduto) . '</strong> (ID: ' . $produtoId . ')
+                        </div>
+                        <div class="reason-box">
+                            <strong>Motivo da Rejeição:</strong>
+                            <p>' . htmlspecialchars($motivo ?: 'Sem motivo especificado.') . '</p>
+                        </div>
+                        <p>Pode editar o produto e submetê-lo novamente para aprovação.</p>
+                        <a href="https://wegreen.pt/gestaoProdutosAnunciante.php" class="btn">Gerir Produtos</a>
+                    </div>
+                    <div class="footer">
+                        <p>&copy; ' . date('Y') . ' WeGreen. Todos os direitos reservados.</p>
+                    </div>
+                </div>
+            </body>
+            </html>';
+
+            $emailService->send($email, $subject, $htmlBody);
+        } catch (Exception $e) {
+        }
     }
     function guardaEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
+        try {
 
-        global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
-
         $sql = "UPDATE Produtos
-        SET nome = '".$nome."',
-            tipo_produto_id = '".$categoria."',
-            marca = '".$marca."',
-            tamanho = '".$tamanho."',
-            preco = '".$preco."',
-            genero = '".$genero."',
-            anunciante_id = '".$vendedor."',
+        SET nome = ?,
+            tipo_produto_id = ?,
+            marca = ?,
+            tamanho = ?,
+            preco = ?,
+            genero = ?,
+            anunciante_id = ?,
             ativo = 1
-        WHERE Produto_id = ".$Produto_id;
+        WHERE Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("sissdsii", $nome, $categoria, $marca, $tamanho, $preco, $genero, $vendedor, $Produto_id);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Aprovado com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function adicionarProdutos($listaVendedor, $listaCategoria, $nomeprod, $estadoprod, $quantidade, $preco, $marca, $tamanho, $selectestado, $foto){
+        try {
 
-    global $conn;
     $msg = "";
     $flag = true;
     $sql = "";
+    $genero = $selectestado;
+    $descricao = $nomeprod;
+    $ativo = 1;
 
     $resp = $this->uploads($foto, $nomeprod);
     $resp = json_decode($resp, TRUE);
 
     if($resp['flag']){
 $sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, genero,anunciante_id, marca, tamanho, estado, descricao, ativo, stock) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("sdssissssii", $listaCategoria, $preco, $resp['target'], $genero,$listaVendedor, $marca, $tamanho, $estadoprod, $descricao, $ativo,$quantidade);
     } else {
         $sql = "INSERT INTO Produtos (tipo_produto_id, preco, anunciante_id, marca, tamanho, estado, nome, ativo, genero, descricao)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, 'Descrição do produto')";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("sdssssss", $listaCategoria, $preco, $listaVendedor, $marca, $tamanho, $estadoprod, $nomeprod, $selectestado);
     }
 
@@ -348,19 +527,23 @@ $sql = "INSERT INTO Produtos (tipo_produto_id, preco, foto, genero,anunciante_id
     $resp = json_encode(array(
         "flag" => $flag,
         "msg" => $msg
-    ));
-
-    $conn->close();
+    ), JSON_UNESCAPED_UNICODE);
 
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 function getDadosPerfil($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-
-        $result = $conn->query($sql);
+        $sql = "SELECT * from utilizadores where id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -387,12 +570,15 @@ function getDadosPerfil($ID_User){
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function uploads($foto, $nome){
+        try {
 
     $dirFisico = __DIR__ . "/../img/";
     $dirWeb = "src/img/";
@@ -429,53 +615,61 @@ function uploads($foto, $nome){
     return json_encode(array(
         "flag" => $flag,
         "target" => $targetBD
-    ));
+    ), JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 
     function guardaDadosEditProduto($nome, $categoria, $marca, $tamanho,$preco,$genero,$vendedor,$Produto_id){
+        try {
 
-        global $conn;
         $msg = "";
         $flag = true;
         $sql = "";
 
-
         $sql = "UPDATE Produtos
-        SET nome = '".$nome."',
-            tipo_produto_id = '".$categoria."',
-            marca = '".$marca."',
-            tamanho = '".$tamanho."',
-            preco = '".$preco."',
-            genero = '".$genero."',
-            anunciante_id = '".$vendedor."'
-        WHERE Produto_id = ".$Produto_id;
+        SET nome = ?,
+            tipo_produto_id = ?,
+            marca = ?,
+            tamanho = ?,
+            preco = ?,
+            genero = ?,
+            anunciante_id = ?
+        WHERE Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("sissdsii", $nome, $categoria, $marca, $tamanho, $preco, $genero, $vendedor, $Produto_id);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Aprovado com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
-    function getFotosSection($Produto_id)
-    {
-        global $conn;
+    function getFotosSection($Produto_id) {
+        try {
+
         $msg = "";
         $Produto_id = intval($Produto_id);
 
-        // Buscar foto principal do produto
-        $sqlMain = "SELECT foto FROM produtos WHERE Produto_id = ".$Produto_id;
-        $resultMain = $conn->query($sqlMain);
+
+        $sqlMain = "SELECT foto FROM produtos WHERE Produto_id = ?";
+        $stmtMain = $this->conn->prepare($sqlMain);
+        $stmtMain->bind_param("i", $Produto_id);
+        $stmtMain->execute();
+        $resultMain = $stmtMain->get_result();
         $fotoPrincipal = "";
 
         if ($resultMain && $resultMain->num_rows > 0) {
@@ -483,22 +677,25 @@ function uploads($foto, $nome){
             $fotoPrincipal = $rowMain['foto'];
         }
 
-        // Buscar fotos adicionais
-        $sql = "SELECT * FROM produto_fotos WHERE produto_id = ".$Produto_id;
-        $result = $conn->query($sql);
 
-        // Criar carrossel Bootstrap
+        $sql = "SELECT * FROM produto_fotos WHERE produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $Produto_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+
         $msg .= "<div id='productGalleryVerify' class='carousel slide' data-bs-ride='carousel' style='max-width: 100%; margin: 0 auto;'>";
         $msg .= "<div class='carousel-inner rounded-4 shadow-sm'>";
 
-        // Primeira imagem (foto principal) - sempre ativa
+
         if (!empty($fotoPrincipal)) {
             $msg .= "<div class='carousel-item active'>";
             $msg .= "<img src='".$fotoPrincipal."' class='d-block w-100 rounded-4' style='height: 400px; object-fit: cover;' alt='Foto Principal'>";
             $msg .= "</div>";
         }
 
-        // Fotos adicionais
+
         if ($result && $result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
                 $msg .= "<div class='carousel-item'>";
@@ -507,7 +704,7 @@ function uploads($foto, $nome){
             }
         }
 
-        // Se não houver fotos, mostrar placeholder
+
         if (empty($fotoPrincipal) && (!$result || $result->num_rows == 0)) {
             $msg .= "<div class='carousel-item active'>";
             $msg .= "<div class='d-flex align-items-center justify-content-center' style='height: 400px; background: #f3f4f6; border-radius: 12px;'>";
@@ -517,9 +714,9 @@ function uploads($foto, $nome){
             $msg .= "</div></div></div>";
         }
 
-        $msg .= "</div>"; // Fim carousel-inner
+        $msg .= "</div>";
 
-        // Controles do carrossel (apenas se houver mais de uma foto)
+
         $totalFotos = ($result ? $result->num_rows : 0) + (!empty($fotoPrincipal) ? 1 : 0);
         if ($totalFotos > 1) {
             $msg .= "<button class='carousel-control-prev' type='button' data-bs-target='#productGalleryVerify' data-bs-slide='prev'>";
@@ -532,17 +729,28 @@ function uploads($foto, $nome){
             $msg .= "</button>";
         }
 
-        $msg .= "</div>"; // Fim carousel
+        $msg .= "</div>";
 
-        $conn->close();
+        if (isset($stmtMain) && $stmtMain) {
+            $stmtMain->close();
+        }
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
+
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getListaCategoria(){
-        global $conn;
+        try {
+
         $msg = "";
         $sql = "SELECT tipo_produtos.descricao As NomeProduto ,tipo_produtos.id As ValueProduto FROM tipo_produtos;";
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         $msg .= "<option value='-1'>Selecionar Categoria...</option>";
         if ($result->num_rows > 0) {
@@ -554,12 +762,18 @@ function uploads($foto, $nome){
                 $msg .= "<option value='-1'>Selecionar Categoria...</option>";
                 $msg .= "<option value='1'>Sem Registos</option>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getTopTipoGrafico() {
-    global $conn;
+        try {
     $dados1 = [];
     $dados2 = [];
     $msg = "";
@@ -573,7 +787,9 @@ function uploads($foto, $nome){
         utilizadores,produtos where utilizadores.id = produtos.anunciante_id
         GROUP BY
         utilizadores.id, utilizadores.nome;";
-    $result = $conn->query($sql);
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -590,13 +806,20 @@ function uploads($foto, $nome){
         "msg" => $msg,
         "dados1" => $dados1,
         "dados2" => $dados2
-    ));
+    ), JSON_UNESCAPED_UNICODE);
 
-    $conn->close();
+    if (isset($stmt) && $stmt) {
+        $stmt->close();
+    }
+
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
     function getProdutoVendidos() {
-    global $conn;
+        try {
+
     $dados1 = [];
     $dados2 = [];
     $msg = "";
@@ -604,7 +827,9 @@ function uploads($foto, $nome){
 
     $sql = "SELECT Utilizadores.nome AS Anunciante_Nome, SUM(Vendas.quantidade) AS Produtos_Vendidos FROM Vendas,Utilizadores where Utilizadores.id = Vendas.anunciante_id
     GROUP BY Utilizadores.id, Utilizadores.nome;";
-    $result = $conn->query($sql);
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -621,10 +846,16 @@ function uploads($foto, $nome){
         "msg" => $msg,
         "dados1" => $dados1,
         "dados2" => $dados2
-    ));
+    ), JSON_UNESCAPED_UNICODE);
 
-    $conn->close();
+    if (isset($stmt) && $stmt) {
+        $stmt->close();
+    }
+
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 }
 ?>

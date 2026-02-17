@@ -17,12 +17,13 @@ if($_SESSION['tipo'] == 1){
     <link rel="stylesheet" href="src/css/DashboardAdmin.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="src/css/lib/datatables.css">
     <link rel="stylesheet" href="src/css/lib/select2.css">
-    <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+    <link rel="stylesheet" href="src/css/notifications-dropdown.css">
 
     <script src="src/js/lib/jquery.js"></script>
     <script src="src/js/lib/datatables.js"></script>
     <script src="src/js/lib/select2.js"></script>
     <script src="src/js/lib/sweatalert.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="src/js/notifications.js"></script>
 </head>
@@ -157,7 +158,6 @@ if($_SESSION['tipo'] == 1){
                                     <th><i class="fas fa-box"></i> Categoria</th>
                                     <th><i class="fas fa-euro-sign"></i> Preço</th>
                                     <th><i class="fas fa-warehouse"></i> Stock</th>
-                                    <th><i class="fas fa-cog"></i> Ação</th>
                                 </tr>
                             </thead>
                             <tbody id="ProdutosInativosBody">
@@ -205,13 +205,7 @@ if($_SESSION['tipo'] == 1){
     </div>
 
     <script src="src/js/Adminstrador.js"></script>
-    <script>
-        // Override do getInfoUserDropdown para manter o HTML correto da página
-        function getInfoUserDropdown() {
-            // Não fazer nada - o HTML já está correto na página
-            console.log('Dropdown já configurado no HTML');
-        }
-    </script>
+    <script src="src/js/DashboardAdmin.js"></script>
 </body>
 </html>
 <?php

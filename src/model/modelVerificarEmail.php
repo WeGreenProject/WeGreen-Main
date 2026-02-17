@@ -1,21 +1,20 @@
 <?php
-/**
- * Model para verificação de email
- */
 
 require_once 'connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
 class VerificarEmail {
 
-    /**
-     * Verifica o token de email
-     */
-    public function verificarToken($token) {
-        global $conn;
+    private $conn;
 
-        // Buscar utilizador com este token
-        $stmt = $conn->prepare("
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+    function verificarToken($token) {
+        try {
+
+        $stmt = $this->conn->prepare("
             SELECT id, nome, apelido, email, email_verificado, token_expira_em
             FROM Utilizadores
             WHERE token_verificacao = ?
@@ -30,21 +29,20 @@ class VerificarEmail {
             return json_encode([
                 'flag' => false,
                 'msg' => 'Token de verificação inválido ou já utilizado.'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $user = $result->fetch_assoc();
         $stmt->close();
 
-        // Verificar se já está verificado
         if ($user['email_verificado'] == 1) {
             return json_encode([
                 'flag' => false,
                 'msg' => 'Este email já foi verificado anteriormente.'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
-        // Verificar se token expirou (24 horas)
+        
         $agora = new DateTime();
         $expira = new DateTime($user['token_expira_em']);
 
@@ -52,11 +50,10 @@ class VerificarEmail {
             return json_encode([
                 'flag' => false,
                 'msg' => 'O link de verificação expirou. Por favor, solicite um novo email de verificação.'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
-        // Marcar email como verificado
-        $stmt = $conn->prepare("
+        $stmt = $this->conn->prepare("
             UPDATE Utilizadores
             SET email_verificado = 1,
                 token_verificacao = NULL,
@@ -70,24 +67,23 @@ class VerificarEmail {
             return json_encode([
                 'flag' => true,
                 'msg' => 'Email verificado com sucesso! A sua conta está agora ativa.'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         } else {
             $stmt->close();
             return json_encode([
                 'flag' => false,
                 'msg' => 'Erro ao verificar email. Tente novamente.'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
-    /**
-     * Reenvia email de verificação
-     */
-    public function reenviarVerificacao($email) {
-        global $conn;
+    
+    function reenviarVerificacao($email) {
 
-        // Buscar utilizador
-        $stmt = $conn->prepare("
+        $stmt = $this->conn->prepare("
             SELECT id, nome, apelido, email, email_verificado
             FROM Utilizadores
             WHERE email = ?
@@ -102,26 +98,23 @@ class VerificarEmail {
             return json_encode([
                 'flag' => false,
                 'msg' => 'Email não encontrado no sistema.'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $user = $result->fetch_assoc();
         $stmt->close();
 
-        // Verificar se já está verificado
         if ($user['email_verificado'] == 1) {
             return json_encode([
                 'flag' => false,
                 'msg' => 'Este email já está verificado. Pode fazer login normalmente.'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
-        // Gerar novo token
         $token = bin2hex(random_bytes(32));
         $expira_em = date('Y-m-d H:i:s', strtotime('+24 hours'));
 
-        // Atualizar token
-        $stmt = $conn->prepare("
+        $stmt = $this->conn->prepare("
             UPDATE Utilizadores
             SET token_verificacao = ?,
                 token_expira_em = ?
@@ -131,9 +124,8 @@ class VerificarEmail {
         $stmt->execute();
         $stmt->close();
 
-        // Enviar email
         try {
-            $emailService = new EmailService();
+            $emailService = new EmailService($this->conn);
             $nomeCompleto = $user['nome'] . ' ' . $user['apelido'];
             $link_verificacao = 'http://localhost/WeGreen-Main/verificar_email.html?token=' . urlencode($token);
 
@@ -143,19 +135,18 @@ class VerificarEmail {
                 return json_encode([
                     'flag' => true,
                     'msg' => 'Email de verificação reenviado! Verifique a sua caixa de entrada.'
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
             } else {
                 return json_encode([
                     'flag' => false,
                     'msg' => 'Erro ao enviar email de verificação.'
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
             }
         } catch (Exception $e) {
-            error_log("Erro ao reenviar email de verificação: " . $e->getMessage());
             return json_encode([
                 'flag' => false,
                 'msg' => 'Erro ao enviar email: ' . $e->getMessage()
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
     }
 }

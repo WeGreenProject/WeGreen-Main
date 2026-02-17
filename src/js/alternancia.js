@@ -1,7 +1,20 @@
+function parseAlternanciaResponse(payload) {
+  if (typeof payload === "string") {
+    try {
+      return JSON.parse(payload);
+    } catch (e) {
+      console.error("Resposta inválida em alternância:", payload, e);
+      return null;
+    }
+  }
+  return payload;
+}
+
 function verificarContaAlternativa() {
   $.post("src/controller/controllerPerfil.php", { op: 12 }, function (resp) {
     try {
-      const dados = JSON.parse(resp);
+      const dados = parseAlternanciaResponse(resp);
+      if (!dados) return;
       if (dados.existe) {
         $("#btnAlternarConta").show();
         $("#textoAlternar").text("Alternar para " + dados.nome_tipo);
@@ -14,7 +27,6 @@ function verificarContaAlternativa() {
   });
 }
 
-// Alternar entre contas
 function verificarEAlternarConta() {
   Swal.fire({
     title: "Alternar Conta?",
@@ -27,21 +39,26 @@ function verificarEAlternarConta() {
     cancelButtonText: "Cancelar",
   }).then((result) => {
     if (result.isConfirmed) {
-      // Descobrir tipo alvo (se é 2, vai para 3 e vice-versa)
+      
       $.post(
         "src/controller/controllerPerfil.php",
         { op: 12 },
         function (resp) {
           try {
-            const dados = JSON.parse(resp);
+            const dados = parseAlternanciaResponse(resp);
+            if (!dados) return;
             if (dados.existe) {
-              // Fazer alternância
+              
               $.post(
                 "src/controller/controllerPerfil.php",
                 { op: 15, tipoAlvo: dados.tipo },
                 function (resposta) {
                   try {
-                    const resultado = JSON.parse(resposta);
+                    const resultado = parseAlternanciaResponse(resposta);
+                    if (!resultado) {
+                      Swal.fire("Erro", "Erro ao processar resposta", "error");
+                      return;
+                    }
                     if (resultado.success) {
                       Swal.fire({
                         icon: "success",
@@ -58,7 +75,7 @@ function verificarEAlternarConta() {
                   } catch (e) {
                     Swal.fire("Erro", "Erro ao processar resposta", "error");
                   }
-                }
+                },
               ).fail(function () {
                 Swal.fire("Erro", "Erro ao alternar conta", "error");
               });
@@ -66,7 +83,7 @@ function verificarEAlternarConta() {
           } catch (e) {
             Swal.fire("Erro", "Erro ao processar dados", "error");
           }
-        }
+        },
       ).fail(function () {
         Swal.fire("Erro", "Erro ao verificar conta", "error");
       });
@@ -74,9 +91,8 @@ function verificarEAlternarConta() {
   });
 }
 
-// Chamar ao carregar a página
 $(document).ready(function () {
-  // Verificar se existe botão de alternância antes de verificar
+  
   if ($("#btnAlternarConta").length > 0) {
     verificarContaAlternativa();
   }

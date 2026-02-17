@@ -4,17 +4,26 @@ require_once 'connection.php';
 
 class Fornecedor{
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
     function getDadosPerfil($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-        
-        $result = $conn->query($sql);
+        $sql = "SELECT * from utilizadores where id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    
+
                     $msg  = "<div class='profile-avatar'>";
                     $msg .= "<img src='" .$row["foto"]. "' alt='User Photo' id='userPhoto'>";
                     $msg .= "<span class='avatar-placeholder'></span>";
@@ -37,17 +46,21 @@ class Fornecedor{
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
-        
+
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
         function getListaCategoria(){
-        global $conn;
+            try {
+
         $msg = "";
         $sql = "SELECT tipo_produtos.descricao As NomeProduto ,tipo_produtos.id As ValueProduto FROM tipo_produtos;";
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         $msg .= "<option value='-1'>Selecionar Categoria...</option>";
         if ($result->num_rows > 0) {
@@ -59,16 +72,24 @@ class Fornecedor{
                 $msg .= "<option value='-1'>Selecionar Categoria...</option>";
                 $msg .= "<option value='1'>Sem Registos</option>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+            } catch (Exception $e) {
+                return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            }
     }
     function getFornecedores(){
-        global $conn;
+        try {
+
         $msg = "";
         $sql = "SELECT Fornecedores.*, tipo_produtos.descricao As Categoria from tipo_produtos,Fornecedores where Fornecedores.tipo_produtos_id = tipo_produtos.id;";
-        $result = $conn->query($sql);
-
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -126,16 +147,23 @@ class Fornecedor{
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function guardaAdicionarFornecedor($nome, $categoria, $email, $telefone,$sede,$observacoes){
-    global $conn;
+        try {
+
     $msg = "";
     $flag = false;
 
-    $stmt = $conn->prepare("INSERT INTO Fornecedores (nome, tipo_produtos_id, descricao, email, telefone, morada) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $this->conn->prepare("INSERT INTO Fornecedores (nome, tipo_produtos_id, descricao, email, telefone, morada) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssss", $nome, $categoria, $observacoes, $email, $telefone, $sede);
 
     if($stmt->execute()){
@@ -149,84 +177,95 @@ function guardaAdicionarFornecedor($nome, $categoria, $email, $telefone,$sede,$o
     $resp = json_encode([
         "flag" => $flag,
         "msg" => $msg
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
 
     $stmt->close();
-    $conn->close();
 
     return $resp;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 function removerFornecedores($ID_Fornecedores){
-        global $conn;
+        try {
+
         $msg = "";
         $flag = true;
 
-        $sql = "DELETE FROM Fornecedores WHERE id = ".$ID_Fornecedores;
+        $sql = "DELETE FROM Fornecedores WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Fornecedores);
 
-        if ($conn->query($sql) === TRUE) {
+        if ($stmt->execute()) {
             $msg = "Removido com Sucesso";
         } else {
             $flag = false;
-            $msg = "Error: " . $sql . "<br>" . $conn->error;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
         }
 
         $resp = json_encode(array(
             "flag" => $flag,
             "msg" => $msg
-        ));
-          
-        $conn->close();
+        ), JSON_UNESCAPED_UNICODE);
 
         return($resp);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getDadosFornecedores($ID_Fornecedores){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT tipo_produtos.descricao As Categoria, fornecedores.* from fornecedores,tipo_produtos where fornecedores.tipo_produtos_id = tipo_produtos.id AND fornecedores.id =".$ID_Fornecedores;
-        $result = $conn->query($sql);
+        $sql = "SELECT tipo_produtos.descricao As Categoria, fornecedores.* from fornecedores,tipo_produtos where fornecedores.tipo_produtos_id = tipo_produtos.id AND fornecedores.id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Fornecedores);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
         }
 
-        $conn->close();
+        return (json_encode($row, JSON_UNESCAPED_UNICODE));
 
-        return (json_encode($row));
-
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function guardaEditDadosFornecedores($nome, $categoria, $email, $telefone, $morada, $descricao, $ID_Fornecedor){
+        try {
 
-    global $conn;
     $flag = true;
     $msg = "";
 
-    $sql = "UPDATE Fornecedores 
-            SET nome = ?, 
-                tipo_produtos_id = ?, 
-                email = ?, 
-                telefone = ?, 
-                morada = ?, 
+    $sql = "UPDATE Fornecedores
+            SET nome = ?,
+                tipo_produtos_id = ?,
+                email = ?,
+                telefone = ?,
+                morada = ?,
                 descricao = ?
             WHERE id = ?";
 
-    $stmt = $conn->prepare($sql);
+    $stmt = $this->conn->prepare($sql);
 
     if(!$stmt){
         return json_encode([
             "flag" => false,
-            "msg" => "Erro na preparação: " . $conn->error
-        ]);
+            "msg" => "Erro na preparação: " . $this->conn->error
+        ], JSON_UNESCAPED_UNICODE);
     }
 
-    $stmt->bind_param("sissssi", 
-        $nome, 
+    $stmt->bind_param("sissssi",
+        $nome,
         $categoria,
-        $email, 
-        $telefone, 
-        $morada, 
-        $descricao, 
+        $email,
+        $telefone,
+        $morada,
+        $descricao,
         $ID_Fornecedor
     );
 
@@ -242,7 +281,10 @@ function guardaEditDadosFornecedores($nome, $categoria, $email, $telefone, $mora
     return json_encode([
         "flag" => $flag,
         "msg"  => $msg
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 
 }

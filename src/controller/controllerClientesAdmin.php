@@ -1,31 +1,61 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
 include_once '../model/modelClientesAdmin.php';
-session_start();
 
-$func = new ClienteAdmin();
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['flag' => false, 'msg' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-if ($_POST['op'] == 1) {
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['flag' => false, 'msg' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new ClientesAdmin($conn);
+
+if ($op == 1) {
     $resp = $func->getClientes($_SESSION["utilizador"]);
     echo $resp;
 }
-if ($_POST['op'] == 2) {
+
+if ($op == 2) {
     $resp = $func->getCardUtilizadores();
     echo $resp;
 }
-if ($_POST['op'] == 3) {
-    $resp = $func->registaClientes($_POST["clientNome"],$_POST["clientEmail"],$_POST["clientTelefone"],$_POST["clientTipo"],$_POST["clientNif"],$_POST["clientPassword"],$_FILES['foto']);
+
+if ($op == 3) {
+    $resp = $func->registaClientes(
+        $_POST["clientNome"],
+        $_POST["clientEmail"],
+        $_POST["clientTelefone"],
+        $_POST["clientTipo"],
+        $_POST["clientNif"],
+        $_POST["clientPassword"],
+        $_FILES['foto']
+    );
     echo $resp;
 }
-if ($_POST['op'] == 4) {
+
+if ($op == 4) {
     $resp = $func->removerClientes($_POST["ID_Cliente"]);
     echo $resp;
 }
-if ($_POST['op'] == 5) {
+
+if ($op == 5) {
     $resp = $func->getDadosCliente($_POST["id"]);
     echo $resp;
 }
-if ($_POST['op'] == 6) {
-    $resp = $func->guardaEditCliente(        
+
+if ($op == 6) {
+    $resp = $func->guardaEditCliente(
         $_POST["viewNome"],
         $_POST["viewEmail"],
         $_POST["viewTelefone"],
@@ -33,7 +63,8 @@ if ($_POST['op'] == 6) {
         $_POST["viewNif"],
         $_POST["viewPlano"],
         $_POST["viewRanking"],
-        $_POST["ID_Utilizador"]);
+        $_POST["ID_Utilizador"]
+    );
     echo $resp;
 }
 ?>

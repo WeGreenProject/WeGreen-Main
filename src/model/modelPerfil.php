@@ -1,16 +1,32 @@
 <?php
 
 require_once 'connection.php';
+require_once __DIR__ . '/../services/ProfileAddressFieldsService.php';
+require_once __DIR__ . '/../services/EmailService.php';
 
 class Perfil{
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
+    private function garantirCamposEnderecoPerfilCliente() {
+        ProfileAddressFieldsService::garantirCamposEnderecoPerfil($this->conn);
+    }
+
     function getDadosTipoPerfil($ID_User,$tpUser){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT * FROM Utilizadores WHERE id = " . $ID_User;
-        $result = $conn->query($sql);
+        $sql = "SELECT * FROM Utilizadores WHERE id =  ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -68,41 +84,60 @@ class Perfil{
             $msg .= "</div></li>";
             $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
         }
-        $conn->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
-        function PerfilDoUtilizador($ID_User){
-        global $conn;
+
+    
+    function getDadosTipoPerfilCompleto($ID_User, $tpUser) {
+        try {
+        if ($ID_User && $tpUser) {
+            return $this->getDadosTipoPerfil($ID_User, $tpUser);
+        } else {
+            return "<li><a class='dropdown-item' href='login.html'><i class='fas fa-sign-in-alt me-2'></i>Entrar na sua conta</a></li>";
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function PerfilDoUtilizador($ID_User){
+        try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT * FROM Utilizadores WHERE id = " . $ID_User;
-        $result = $conn->query($sql);
+        $sql = "SELECT * FROM Utilizadores WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("s", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                    return $row['foto'];
-
+            while ($row = $result->fetch_assoc()) {
+                $stmt->close();
+                return $row['foto'];
             }
-
         }
 
-
-        $conn->close();
-
-         return "src/img/pexels-beccacorreiaph-31095884.jpg";
-
+        $stmt->close();
+        return "src/img/pexels-beccacorreiaph-31095884.jpg";
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function verificarContaAlternativa($email, $tipoAtual) {
-        global $conn;
+        try {
 
-        // Se é anunciante (2), procura cliente (3) e vice-versa
+        
         $tipoAlternativo = ($tipoAtual == 2) ? 3 : 2;
 
-        $stmt = $conn->prepare("SELECT id, tipo_utilizador_id FROM Utilizadores WHERE email = ? AND tipo_utilizador_id = ?");
+        $stmt = $this->conn->prepare("SELECT id, tipo_utilizador_id FROM Utilizadores WHERE email = ? AND tipo_utilizador_id = ?");
         $stmt->bind_param("si", $email, $tipoAlternativo);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -115,17 +150,20 @@ class Perfil{
                 'id' => $row['id'],
                 'tipo' => $row['tipo_utilizador_id'],
                 'nome_tipo' => ($row['tipo_utilizador_id'] == 3) ? 'Anunciante' : 'Cliente'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $stmt->close();
-        return json_encode(['existe' => false]);
+        return json_encode(['existe' => false], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function alternarConta($email, $tipoAlvo) {
-        global $conn;
+        try {
 
-        $stmt = $conn->prepare("SELECT * FROM Utilizadores WHERE email = ? AND tipo_utilizador_id = ?");
+        $stmt = $this->conn->prepare("SELECT * FROM Utilizadores WHERE email = ? AND tipo_utilizador_id = ?");
         $stmt->bind_param("si", $email, $tipoAlvo);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -134,7 +172,7 @@ class Perfil{
             $row = $result->fetch_assoc();
             $stmt->close();
 
-            // Atualizar sessão (session_start já foi chamado no controller)
+            
             $_SESSION['utilizador'] = $row['id'];
             $_SESSION['nome'] = $row['nome'];
             $_SESSION['tipo'] = $row['tipo_utilizador_id'];
@@ -145,38 +183,53 @@ class Perfil{
             $_SESSION['data'] = $row['data_criacao'];
             $_SESSION['email'] = $row['email'];
 
-            // Limpar flag de perfil duplo para não redirecionar novamente para escolherConta.php
+            
             unset($_SESSION['perfil_duplo']);
+
+            
+            if ($row['tipo_utilizador_id'] == 3) {
+                require_once 'modelCarrinho.php';
+                $carrinho = new Carrinho($this->conn);
+                $stmtLimpar = $this->conn->prepare("DELETE FROM Carrinho_Itens WHERE utilizador_id = ?");
+                $userId = $row['id'];
+                $stmtLimpar->bind_param("i", $userId);
+                $stmtLimpar->execute();
+                $stmtLimpar->close();
+            }
 
             return json_encode([
                 'success' => true,
                 'tipo' => $row['tipo_utilizador_id'],
                 'redirect' => ($row['tipo_utilizador_id'] == 3) ? 'DashboardAnunciante.php' : 'DashboardCliente.php'
-            ]);
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $stmt->close();
-        return json_encode(['success' => false, 'msg' => 'Conta não encontrada']);
+        return json_encode(['success' => false, 'msg' => 'Conta não encontrada'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
     function logout(){
+        try {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        global $conn;   
+
         $acao = "logout";
 
-        $stmtLog = $conn->prepare(
+        $stmtLog = $this->conn->prepare(
             "INSERT INTO logs_acesso (utilizador_id, acao, email, data_hora)
              VALUES (?, ?, ?, NOW())"
         );
 
             if (!$stmtLog) {
-                die("Erro prepare log: " . $conn->error);
+                die("Erro prepare log: " . $this->conn->error);
             }
 
         if (!$stmtLog) {
-                    die("Erro prepare log: " . $conn->error);
+                    die("Erro prepare log: " . $this->conn->error);
                 }
 
             $stmtLog->bind_param(
@@ -194,7 +247,6 @@ class Perfil{
 
         $_SESSION = array();
 
-
        if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', time()-3600, '/');
         }
@@ -202,15 +254,21 @@ class Perfil{
         session_destroy();
 
         return("Obrigado!");
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getContactForm($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
 
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-
-        $result = $conn->query($sql);
+        $sql = "SELECT * from utilizadores where id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
@@ -232,62 +290,162 @@ class Perfil{
 
             }
         }
-        $conn->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
-function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $email = null){
-    global $conn;
+function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $email = null, $assunto = null){
+    try {
+
     $flag = false;
     $msg = "";
-    $ID_Consumidor = 1; //ID do Admin
+    $ID_Consumidor = 1; 
 
-    if($ID_Anunciante !== null){
-        $stmt = $conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
-        $stmt->bind_param("iis", $ID_Anunciante, $ID_Consumidor, $mensagem);
+    $assuntoTexto = trim((string)$assunto);
+    $mensagemTexto = trim((string)$mensagem);
 
-        if($stmt->execute()) {
-            $flag = true;
-            $msg = "Mensagem enviada com sucesso!";
-        } else {
-            $flag = false;
-            $msg = "Erro ao enviar mensagem.";
+    if ($mensagemTexto === '') {
+        return json_encode([
+            "flag" => false,
+            "msg" => "Mensagem vazia."
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    $nomeRemetente = '';
+    $emailRemetente = '';
+    $idRemetente = 0;
+    $mensagemFinal = $mensagemTexto;
+
+    if ($ID_Anunciante !== null) {
+        $idRemetente = (int)$ID_Anunciante;
+
+        $stmtDados = $this->conn->prepare("SELECT nome, email FROM Utilizadores WHERE id = ? LIMIT 1");
+        $stmtDados->bind_param("i", $idRemetente);
+        $stmtDados->execute();
+        $resDados = $stmtDados->get_result();
+
+        if ($resDados && $resDados->num_rows > 0) {
+            $rowDados = $resDados->fetch_assoc();
+            $nomeRemetente = trim((string)($rowDados['nome'] ?? 'Utilizador WeGreen'));
+            $emailRemetente = trim((string)($rowDados['email'] ?? ''));
+        }
+        $stmtDados->close();
+
+        if (!empty($assuntoTexto)) {
+            $mensagemFinal = "Assunto: {$assuntoTexto}\nMensagem: {$mensagemTexto}";
         }
     } else {
-        // Utilizador não autenticado
-        $remetente = 0;
-        $mensagemFull = "Nome: $nome\nEmail: $email\nMensagem: $mensagem";
-
-        $stmt = $conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
-        $stmt->bind_param("iis", $remetente, $ID_Consumidor, $mensagemFull);
-
-        if($stmt->execute()) {
-            $flag = true;
-            $msg = "Mensagem enviada com sucesso!";
-        } else {
-            $flag = false;
-            $msg = "Erro ao enviar mensagem.";
+        $nomeRemetente = trim((string)$nome);
+        $emailRemetente = trim((string)$email);
+        $mensagemFinal = "Nome: {$nomeRemetente}\nEmail: {$emailRemetente}\n";
+        if (!empty($assuntoTexto)) {
+            $mensagemFinal .= "Assunto: {$assuntoTexto}\n";
         }
+        $mensagemFinal .= "Mensagem: {$mensagemTexto}";
+    }
+
+    $stmt = $this->conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
+    $stmt->bind_param("iis", $idRemetente, $ID_Consumidor, $mensagemFinal);
+
+    if ($stmt->execute()) {
+        $flag = true;
+        $ticketId = (int)$stmt->insert_id;
+
+        $this->enviarEmailSuporteAdmin($ticketId, $nomeRemetente, $emailRemetente, $assuntoTexto, $mensagemTexto, $idRemetente);
+
+        if (filter_var($emailRemetente, FILTER_VALIDATE_EMAIL)) {
+            $this->enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $emailRemetente, $assuntoTexto, $mensagemTexto);
+        }
+
+        $msg = "Mensagem enviada com sucesso!";
+    } else {
+        $flag = false;
+        $msg = "Erro ao enviar mensagem.";
     }
 
     $resp = json_encode([
         "flag" => $flag,
         "msg" => $msg
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
 
     $stmt->close();
-    $conn->close();
 
     return $resp;
+    } catch (Exception $e) {
+        return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+    }
+}
+
+private function enviarEmailSuporteAdmin($ticketId, $nomeRemetente, $emailRemetente, $assunto, $mensagem, $remetenteId) {
+    try {
+        $config = require __DIR__ . '/../config/email_config.php';
+        $adminEmail = trim((string)($config['admin']['email'] ?? ''));
+
+        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+            return;
+        }
+
+        $emailService = new EmailService($this->conn);
+
+        $templatePath = __DIR__ . '/../views/email_templates/suporte_admin.php';
+        if (!file_exists($templatePath)) {
+            return;
+        }
+
+        $nome_remetente = $nomeRemetente ?: 'Visitante';
+        $email_remetente = $emailRemetente ?: 'N/D';
+        $assunto_mensagem = $assunto ?: 'Sem assunto';
+        $mensagem_mensagem = $mensagem;
+        $ticket_id = (int)$ticketId;
+        $remetente_id = (int)$remetenteId;
+
+        ob_start();
+        include $templatePath;
+        $htmlBody = ob_get_clean();
+
+        $subject = "[Suporte WeGreen] Nova mensagem #{$ticketId}";
+        $emailService->send($adminEmail, $subject, $htmlBody);
+    } catch (Exception $e) {
+    }
+}
+
+private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $emailRemetente, $assunto, $mensagem) {
+    try {
+        $emailService = new EmailService($this->conn);
+
+        $templatePath = __DIR__ . '/../views/email_templates/suporte_confirmacao.php';
+        if (!file_exists($templatePath)) {
+            return;
+        }
+
+        $nome_remetente = $nomeRemetente ?: 'Cliente';
+        $assunto_mensagem = $assunto ?: 'Sem assunto';
+        $mensagem_mensagem = $mensagem;
+        $ticket_id = (int)$ticketId;
+
+        ob_start();
+        include $templatePath;
+        $htmlBody = ob_get_clean();
+
+        $subject = "Recebemos o seu pedido de suporte #{$ticketId}";
+        $emailService->send($emailRemetente, $subject, $htmlBody);
+    } catch (Exception $e) {
+    }
 }
     function getDadosPlanos($ID_User,$plano,$tpUser){
-    global $conn;
+        try {
+
     $msg = "";
     $row = "";
 
-    $sql = "SELECT * FROM Utilizadores WHERE id = " . $ID_User;
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM Utilizadores WHERE id =  ?";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bind_param("i", $ID_User);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
@@ -301,7 +459,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                // === PLANO FREE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -319,7 +477,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO PREMIUM ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -335,7 +493,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='checkout.php?plano=crescimentocircular&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO ENTERPRISE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -351,8 +509,8 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='checkout.php?plano=eco&preco=70' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                $msg .= "</div>"; // fecha row
-                $msg .= "</div>"; // fecha container
+                $msg .= "</div>";
+                $msg .= "</div>";
 
                 }
                 else if($plano == 2)
@@ -363,7 +521,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                // === PLANO FREE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -379,7 +537,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO PREMIUM ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -395,7 +553,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO ENTERPRISE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -423,7 +581,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                // === PLANO FREE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -441,7 +599,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO PREMIUM ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -457,7 +615,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO ENTERPRISE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -491,7 +649,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                // === PLANO FREE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -509,7 +667,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold'>Selecionado</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO PREMIUM ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -525,7 +683,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='checkout.php?plano=premium&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO ENTERPRISE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -541,8 +699,8 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='checkout.php?plano=eco&preco=70' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                $msg .= "</div>"; // fecha row
-                $msg .= "</div>"; // fecha container
+                $msg .= "</div>";
+                $msg .= "</div>";
 
                 }
                 else if($plano == 2)
@@ -553,7 +711,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                // === PLANO FREE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -586,7 +744,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO ENTERPRISE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -614,7 +772,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                // === PLANO FREE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -632,7 +790,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO PREMIUM ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -648,7 +806,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                // === PLANO ENTERPRISE ===
+                
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -683,110 +841,141 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
         $msg .= "</div></li>";
         $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
     }
-    $conn->close();
 
     return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
 
-    // Buscar dados do perfil do cliente
     function getDadosPerfilCliente($ID_User) {
-        global $conn;
+        try {
 
-        $sql = "SELECT u.id, u.nome, u.apelido, u.email, u.nif, u.telefone, u.morada, u.foto, u.data_criacao
+        $this->garantirCamposEnderecoPerfilCliente();
+
+        $sql = "SELECT u.id, u.nome, u.apelido, u.email, u.nif, u.telefone, u.morada, u.distrito, u.localidade, u.codigo_postal, u.foto, u.data_criacao
                 FROM Utilizadores u
                 WHERE u.id = ?";
 
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $ID_User);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($row = $result->fetch_assoc()) {
-            // Juntar nome e apelido
             $nomeCompleto = trim($row['nome'] . ' ' . ($row['apelido'] ?? ''));
             $row['nome_completo'] = $nomeCompleto;
 
-            // Adicionar campos vazios para distrito e localidade (não existem na BD)
-            $row['distrito'] = '';
-            $row['localidade'] = '';
+            if (empty($row['codigo_postal']) && !empty($row['morada']) && preg_match('/\b\d{4}-\d{3}\b/', $row['morada'], $matchPostal)) {
+                $row['codigo_postal'] = $matchPostal[0];
+            }
 
             $stmt->close();
-            return json_encode($row);
+            return json_encode($row, JSON_UNESCAPED_UNICODE);
         }
 
         $stmt->close();
-        return json_encode(['error' => 'Utilizador não encontrado']);
+        return json_encode(['error' => 'Utilizador não encontrado'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    // Atualizar dados do perfil do cliente
-    function atualizarPerfilCliente($ID_User, $nome, $email, $telefone = null, $nif = null, $morada = null, $distrito = null, $localidade = null) {
-        global $conn;
+    function atualizarPerfilCliente($ID_User, $nome, $email, $telefone = null, $nif = null, $morada = null, $distrito = null, $localidade = null, $codigo_postal = null) {
+        try {
 
-        // Validações
+        $this->garantirCamposEnderecoPerfilCliente();
+
+        $email = trim((string)$email);
+        $distrito = trim((string)($distrito ?? ''));
+        $localidade = trim((string)($localidade ?? ''));
+        $codigo_postal = trim((string)($codigo_postal ?? ''));
+
         if (empty($nome) || strlen($nome) < 3) {
-            return json_encode(['success' => false, 'message' => 'Nome deve ter no mínimo 3 caracteres']);
+            return json_encode(['success' => false, 'message' => 'Nome deve ter no mínimo 3 caracteres'], JSON_UNESCAPED_UNICODE);
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return json_encode(['success' => false, 'message' => 'Email inválido']);
+            return json_encode(['success' => false, 'message' => 'Email inválido'], JSON_UNESCAPED_UNICODE);
         }
 
         if (empty($morada) || strlen(trim($morada)) < 10) {
-            return json_encode(['success' => false, 'message' => 'Morada completa é obrigatória (mínimo 10 caracteres)']);
+            return json_encode(['success' => false, 'message' => 'Morada completa é obrigatória (mínimo 10 caracteres)'], JSON_UNESCAPED_UNICODE);
         }
 
         if (!empty($nif) && !preg_match('/^[0-9]{9}$/', $nif)) {
-            return json_encode(['success' => false, 'message' => 'NIF deve conter exatamente 9 dígitos']);
+            return json_encode(['success' => false, 'message' => 'NIF deve conter exatamente 9 dígitos'], JSON_UNESCAPED_UNICODE);
         }
 
         if (!empty($telefone) && !preg_match('/^[0-9]{9}$/', $telefone)) {
-            return json_encode(['success' => false, 'message' => 'Telefone deve conter exatamente 9 dígitos']);
+            return json_encode(['success' => false, 'message' => 'Telefone deve conter exatamente 9 dígitos'], JSON_UNESCAPED_UNICODE);
         }
 
-        // Verificar se email já existe (exceto o próprio utilizador)
-        $sqlCheck = "SELECT id FROM utilizadores WHERE email = ? AND id != ?";
-        $stmtCheck = $conn->prepare($sqlCheck);
+        if (!empty($codigo_postal) && !preg_match('/^[0-9]{4}-[0-9]{3}$/', $codigo_postal)) {
+            return json_encode(['success' => false, 'message' => 'Código postal deve ter o formato XXXX-XXX'], JSON_UNESCAPED_UNICODE);
+        }
+
+        
+        $sqlCheck = "SELECT id FROM utilizadores WHERE email = ? AND id != ? AND tipo_utilizador_id = 2";
+        $stmtCheck = $this->conn->prepare($sqlCheck);
         $stmtCheck->bind_param("si", $email, $ID_User);
         $stmtCheck->execute();
         $resultCheck = $stmtCheck->get_result();
 
         if ($resultCheck->num_rows > 0) {
             $stmtCheck->close();
-            return json_encode(['success' => false, 'message' => 'Email já está em uso']);
+            return json_encode(['success' => false, 'message' => 'Email já está em uso'], JSON_UNESCAPED_UNICODE);
         }
         $stmtCheck->close();
 
-        // Separar nome e apelido
         $partesNome = explode(' ', trim($nome), 2);
         $primeiroNome = $partesNome[0];
         $apelido = isset($partesNome[1]) ? $partesNome[1] : null;
 
-        // Atualizar dados (sem distrito e localidade que não existem na BD)
-        $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $ID_User);
+        
+        $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ?, distrito = ?, localidade = ?, codigo_postal = ? WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("sssssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $distrito, $localidade, $codigo_postal, $ID_User);
 
         if ($stmt->execute()) {
-            // Atualizar sessão
             $_SESSION['nome'] = $primeiroNome;
             $_SESSION['email'] = $email;
 
             $stmt->close();
-            return json_encode(['success' => true, 'message' => 'Perfil atualizado com sucesso']);
+            return json_encode(['success' => true, 'message' => 'Perfil atualizado com sucesso'], JSON_UNESCAPED_UNICODE);
         }
 
         $stmt->close();
-        return json_encode(['success' => false, 'message' => 'Erro ao atualizar perfil']);
+        return json_encode(['success' => false, 'message' => 'Erro ao atualizar perfil'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 
-    // Alterar senha do utilizador
-    function alterarSenha($idUser, $senhaAtual, $novaSenha) {
-        global $conn;
+    
+    function atualizarPerfilClienteComPost($utilizador_id, $post_data) {
+        try {
+        $nome = $post_data['nome'] ?? null;
+        $email = $post_data['email'] ?? null;
+        $nif = $post_data['nif'] ?? null;
+        $telefone = $post_data['telefone'] ?? null;
+        $morada = $post_data['morada'] ?? null;
+        $distrito = $post_data['distrito'] ?? null;
+        $localidade = $post_data['localidade'] ?? null;
+        $codigo_postal = $post_data['codigo_postal'] ?? null;
 
-        // Verificar senha atual
+        return $this->atualizarPerfilCliente($utilizador_id, $nome, $email, $telefone, $nif, $morada, $distrito, $localidade, $codigo_postal);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function alterarSenha($idUser, $senhaAtual, $novaSenha) {
+        try {
+
         $sql = "SELECT password FROM Utilizadores WHERE id = ?";
-        $stmt = $conn->prepare($sql);
+        $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $idUser);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -794,32 +983,95 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
         if($result->num_rows > 0) {
             $row = $result->fetch_assoc();
 
-            // Verificar se a senha atual está correta
             if(password_verify($senhaAtual, $row['password'])) {
-                // Hash da nova senha
                 $novaSenhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
 
-                // Atualizar senha
                 $sqlUpdate = "UPDATE Utilizadores SET password = ? WHERE id = ?";
-                $stmtUpdate = $conn->prepare($sqlUpdate);
+                $stmtUpdate = $this->conn->prepare($sqlUpdate);
                 $stmtUpdate->bind_param("si", $novaSenhaHash, $idUser);
 
                 if($stmtUpdate->execute()) {
                     $stmt->close();
                     $stmtUpdate->close();
-                    return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso!']);
+                    return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso!'], JSON_UNESCAPED_UNICODE);
                 } else {
                     $stmt->close();
                     $stmtUpdate->close();
-                    return json_encode(['success' => false, 'message' => 'Erro ao atualizar a senha.']);
+                    return json_encode(['success' => false, 'message' => 'Erro ao atualizar a senha.'], JSON_UNESCAPED_UNICODE);
                 }
             } else {
                 $stmt->close();
-                return json_encode(['success' => false, 'message' => 'Senha atual incorreta.']);
+                return json_encode(['success' => false, 'message' => 'Senha atual incorreta.'], JSON_UNESCAPED_UNICODE);
             }
         } else {
             $stmt->close();
-            return json_encode(['success' => false, 'message' => 'Utilizador não encontrado.']);
+            return json_encode(['success' => false, 'message' => 'Utilizador não encontrado.'], JSON_UNESCAPED_UNICODE);
+        }
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    
+    function getDadosUtilizadorCheckout($utilizador_id) {
+        try {
+
+        $sql = "SELECT nome, email, foto FROM Utilizadores WHERE id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $utilizador_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            return json_encode([
+                'nome' => $row['nome'],
+                'email' => $row['email'],
+                'foto' => $row['foto'] ?? ''
+            ], JSON_UNESCAPED_UNICODE);
+        }
+
+        return json_encode(['error' => 'Utilizador não encontrado'], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    
+    function getContactFormCompleto($utilizador_id) {
+        try {
+        
+        if ($utilizador_id && strpos($utilizador_id, 'temp_') !== 0) {
+            return $this->getContactForm($utilizador_id);
+        }
+
+        return "
+<div class='col-md-6'>
+    <div class='mb-3'>
+        <label for='nome' class='form-label'>Nome</label>
+        <input type='text' class='form-control' id='nome' name='nome' required>
+    </div>
+</div>
+<div class='col-md-6'>
+    <div class='mb-3'>
+        <label for='email' class='form-label'>Email</label>
+        <input type='email' class='form-control' id='email' name='email' required>
+    </div>
+</div>
+<div class='col-12'>
+    <div class='mb-3'>
+        <label for='assunto' class='form-label'>Assunto</label>
+        <input type='text' class='form-control' id='assunto' name='assunto' required>
+    </div>
+</div>
+<div class='col-12'>
+    <div class='mb-3'>
+        <label for='mensagem' class='form-label'>Mensagem</label>
+        <textarea class='form-control' id='mensagem' name='mensagem' rows='5' required></textarea>
+    </div>
+</div>";
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 }

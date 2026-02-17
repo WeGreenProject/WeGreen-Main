@@ -1,364 +1,367 @@
 <?php
-// Desabilitar exibição de erros para evitar quebrar JSON
-error_reporting(E_ALL);
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../../error.log');
 
-include_once '../model/modelDashboardAnunciante.php';
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Validações de segurança
+header('Content-Type: application/json; charset=utf-8');
+
+require_once __DIR__ . '/../model/modelDashboardAnunciante.php';
+
 if (!isset($_SESSION['utilizador'])) {
-    echo json_encode(['error' => 'Não autenticado']);
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-if (!isset($_POST['op'])) {
-    echo json_encode(['error' => 'Operação inválida']);
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-$func = new DashboardAnunciante();
+$func = new DashboardAnunciante($conn);
+$handled = false;
 
-if ($_POST['op'] == 1) {
+if ($op == 1) {
     $resp = $func->getDadosPlanos($_SESSION['utilizador'], $_SESSION['plano']);
     echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 2) {
+if ($op == 2) {
     $resp = $func->carregarProdutos($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 3) {
+if ($op == 3) {
     $resp = $func->carregarPontos($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 4) {
+if ($op == 4) {
     $resp = $func->getGastos($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 12) {
-        $resp = $func->getLucroTotal($_SESSION['utilizador']);
-    echo $resp;
-}
-
-if ($_POST['op'] == 5) {
+if ($op == 5) {
     $resp = $func->getVendasMensais($_SESSION['utilizador']);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 6) {
+if ($op == 6) {
     $resp = $func->getTopProdutos($_SESSION['utilizador']);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 7) {
+if ($op == 7) {
     $resp = $func->getProdutosRecentes($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 8) {
+if ($op == 8) {
     $resp = $func->getTodosProdutos($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-if ($_POST['op'] == 9) {
+if ($op == 9) {
     $resp = $func->getEvolucaoVendas($_SESSION['utilizador']);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-// op 10 - Lucro por Produto (JSON para gráfico)
-if ($_POST['op'] == 10) {
+if ($op == 10) {
     $resp = $func->getLucroPorProduto($_SESSION['utilizador']);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-// op 11 - Margem de Lucro (JSON para gráfico)
-if ($_POST['op'] == 11) {
+if ($op == 11) {
     $resp = $func->getMargemLucro($_SESSION['utilizador']);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-// op 13 - Tipos de Produtos
-if ($_POST['op'] == 13) {
+if ($op == 13) {
     $resp = $func->getTiposProdutos();
     echo $resp;
+    $handled = true;
 }
 
-// op 14 - Limite de Produtos
-if ($_POST['op'] == 14) {
+if ($op == 14) {
     $resp = $func->getLimiteProdutos($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-// op 15 - Buscar Produto por ID
-if ($_POST['op'] == 15) {
+if ($op == 15) {
     $resp = $func->getProdutoById($_POST['id']);
     echo $resp;
+    $handled = true;
 }
 
-// op 16 - Deletar Produto
-if ($_POST['op'] == 16) {
-    $resp = $func->deleteProduto($_POST['id']);
+if ($op == 12) {
+    $resp = $func->getLucroTotal($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-// op 17 - Atualizar Produto (Editar)
-if ($_POST['op'] == 17) {
-    $id = $_POST['id'];
-    $nome = $_POST['nome'];
-    $tipo_produto_id = $_POST['tipo_produto_id'];
-    $preco = $_POST['preco'];
+if ($op == 16) {
+    $id = $_POST['id'] ?? null;
+    if ($id) {
+        $resp = $func->removerProdutosEmMassa([$id]);
+    } else {
+        $resp = json_encode(['success' => false, 'message' => 'ID do produto não fornecido'], JSON_UNESCAPED_UNICODE);
+    }
+    echo $resp;
+    $handled = true;
+}
+
+if ($op == 17) {
+    $id = $_POST['id'] ?? null;
+    $nome = $_POST['nome'] ?? null;
+    $tipo_produto_id = $_POST['tipo_produto_id'] ?? null;
+    $preco = $_POST['preco'] ?? null;
     $stock = $_POST['stock'] ?? 0;
     $marca = $_POST['marca'] ?? '';
     $tamanho = $_POST['tamanho'] ?? '';
-    $estado = $_POST['estado'];
-    $genero = $_POST['genero'];
+    $estado = $_POST['estado'] ?? null;
+    $genero = $_POST['genero'] ?? null;
     $descricao = $_POST['descricao'] ?? '';
+    $sustentavel = $_POST['sustentavel'] ?? 0;
+    $tipo_material = $_POST['tipo_material'] ?? null;
 
-    // Processar fotos se existirem
-    $fotos = [];
-    if (isset($_FILES['foto']) && !empty($_FILES['foto']['name'][0])) {
-        foreach ($_FILES['foto']['name'] as $key => $filename) {
-            if ($_FILES['foto']['error'][$key] === 0) {
-                $tmpName = $_FILES['foto']['tmp_name'][$key];
-                $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-                $newFilename = uniqid() . '_' . time() . '.' . $extension;
-                $uploadPath = __DIR__ . '/../img/' . $newFilename;
-
-                if (move_uploaded_file($tmpName, $uploadPath)) {
-                    $fotos[] = 'src/img/' . $newFilename;
-                }
-            }
-        }
+    if (!$id || !$nome || !$tipo_produto_id || !$preco || !$estado || !$genero) {
+        echo json_encode(['flag' => false, 'msg' => 'Dados obrigatórios em falta'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
-    $resp = $func->atualizarProduto($id, $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $fotos);
-    echo json_encode(['success' => true, 'message' => $resp]);
+    
+    $fotos_files = isset($_FILES['foto']) ? $_FILES['foto'] : null;
+    $resp = $func->atualizarProduto($id, $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $fotos_files, $sustentavel, $tipo_material);
+    echo $resp;
+    $handled = true;
 }
 
-// op 18 - Adicionar Produto (Novo)
-if ($_POST['op'] == 18) {
-    try {
-        $nome = $_POST['nome'] ?? '';
-        $tipo_produto_id = $_POST['tipo_produto_id'] ?? 0;
-        $preco = $_POST['preco'] ?? 0;
-        $stock = $_POST['stock'] ?? 0;
-        $marca = $_POST['marca'] ?? '';
-        $tamanho = $_POST['tamanho'] ?? '';
-        $estado = $_POST['estado'] ?? '';
-        $genero = $_POST['genero'] ?? '';
-        $descricao = $_POST['descricao'] ?? '';
-        $anunciante_id = $_SESSION['utilizador'];
+if ($op == 18) {
+    $nome = $_POST['nome'] ?? null;
+    $tipo_produto_id = $_POST['tipo_produto_id'] ?? null;
+    $preco = $_POST['preco'] ?? null;
+    $stock = $_POST['stock'] ?? 0;
+    $marca = $_POST['marca'] ?? '';
+    $tamanho = $_POST['tamanho'] ?? '';
+    $estado = $_POST['estado'] ?? null;
+    $genero = $_POST['genero'] ?? null;
+    $descricao = $_POST['descricao'] ?? '';
+    $anunciante_id = $_SESSION['utilizador'];
+    $sustentavel = $_POST['sustentavel'] ?? 0;
+    $tipo_material = $_POST['tipo_material'] ?? null;
 
-        // Processar upload de fotos
-        $fotos = [];
-        if (isset($_FILES['foto']) && !empty($_FILES['foto']['name'][0])) {
-            $uploadDir = __DIR__ . '/../img/';
-
-            // Verificar se o diretório existe
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-
-            foreach ($_FILES['foto']['name'] as $key => $filename) {
-                if ($_FILES['foto']['error'][$key] === UPLOAD_ERR_OK) {
-                    $tmpName = $_FILES['foto']['tmp_name'][$key];
-                    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-                    $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-                    if (in_array($extension, $allowedExt)) {
-                        $newFilename = uniqid() . '_' . time() . '.' . $extension;
-                        $uploadPath = $uploadDir . $newFilename;
-
-                        if (move_uploaded_file($tmpName, $uploadPath)) {
-                            $fotos[] = 'src/img/' . $newFilename;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Verificar se tem pelo menos uma foto
-        if (empty($fotos)) {
-            echo json_encode(['success' => false, 'message' => 'É necessário adicionar pelo menos uma foto']);
-            exit;
-        }
-
-        $resp = $func->insertProduto($nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $fotos);
-        echo json_encode(['success' => true, 'message' => $resp]);
-    } catch (Exception $e) {
-        error_log('Erro ao adicionar produto: ' . $e->getMessage());
-        echo json_encode(['success' => false, 'message' => 'Erro ao adicionar produto: ' . $e->getMessage()]);
+    if (!$nome || !$tipo_produto_id || !$preco || !$estado || !$genero) {
+        echo json_encode(['flag' => false, 'msg' => 'Dados obrigatórios em falta'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
+
+    
+    if (!isset($_FILES['foto']) || empty($_FILES['foto']['name'][0])) {
+        echo json_encode(['flag' => false, 'msg' => 'É necessário adicionar pelo menos uma foto'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    
+    $fotos_files = $_FILES['foto'];
+    $resp = $func->insertProduto($nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $fotos_files, $sustentavel, $tipo_material);
+    echo $resp;
+    $handled = true;
 }
 
-// op 19 - Ativar/Desativar múltiplos produtos
-if ($_POST['op'] == 19) {
+if ($op == 19) {
     $ids = $_POST['ids'];
     $ativo = $_POST['ativo'];
     $resp = $func->atualizarAtivoEmMassa($ids, $ativo);
-    echo json_encode(['success' => $resp]);
+    echo json_encode(['success' => (bool)$resp, 'message' => $resp ? 'OK' : 'Erro ao atualizar produtos'], JSON_UNESCAPED_UNICODE);
+    $handled = true;
 }
 
-// op 20 - Receita Total
-if ($_POST['op'] == 20) {
+if ($op == 20) {
     $periodo = $_POST['periodo'] ?? 'all';
     $resp = $func->getReceitaTotal($_SESSION['utilizador'], $periodo);
     echo $resp;
+    $handled = true;
 }
 
-// op 21 - Total de Pedidos
-if ($_POST['op'] == 21) {
+if ($op == 21) {
     $periodo = $_POST['periodo'] ?? 'all';
     $resp = $func->getTotalPedidos($_SESSION['utilizador'], $periodo);
     echo $resp;
+    $handled = true;
 }
 
-// op 22 - Ticket Médio
-if ($_POST['op'] == 22) {
+if ($op == 22) {
     $periodo = $_POST['periodo'] ?? 'all';
     $resp = $func->getTicketMedio($_SESSION['utilizador'], $periodo);
     echo $resp;
+    $handled = true;
 }
 
-// op 23 - Vendas por Categoria
-if ($_POST['op'] == 23) {
+if ($op == 26) {
+    $periodo = $_POST['periodo'] ?? 'all';
+    $resp = $func->getMargemLucroGeral($_SESSION['utilizador'], $periodo);
+    echo $resp;
+    $handled = true;
+}
+
+if ($op == 23) {
     $periodo = $_POST['periodo'] ?? 'all';
     $resp = $func->getVendasPorCategoria($_SESSION['utilizador'], $periodo);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-// op 24 - Receita Diária
-if ($_POST['op'] == 24) {
+if ($op == 24) {
     $periodo = $_POST['periodo'] ?? 'all';
     $resp = $func->getReceitaDiaria($_SESSION['utilizador'], $periodo);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-// op 25 - Relatórios de Produtos
-if ($_POST['op'] == 25) {
+if ($op == 25) {
     $periodo = $_POST['periodo'] ?? 'all';
     $resp = $func->getRelatoriosProdutos($_SESSION['utilizador'], $periodo);
-    echo json_encode($resp);
+    echo $resp;
+    $handled = true;
 }
 
-// op 27 - Obter dados do perfil
-if ($_POST['op'] == 27) {
+if ($op == 27) {
     $resp = $func->getDadosPerfil($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-// op 28 - Atualizar dados de perfil
-if ($_POST['op'] == 28) {
-    $nome = $_POST['nome'];
-    $email = $_POST['email'];
-    $nif = isset($_POST['nif']) ? $_POST['nif'] : null;
-    $telefone = isset($_POST['telefone']) ? $_POST['telefone'] : null;
-    $morada = isset($_POST['morada']) ? $_POST['morada'] : null;
-    echo $func->atualizarPerfil($_SESSION['utilizador'], $nome, $email, $telefone, $nif, $morada);
+if ($op == 28) {
+    $nome = $_POST['nome'] ?? null;
+    $email = $_POST['email'] ?? null;
+    $telefone = $_POST['telefone'] ?? null;
+    $nif = $_POST['nif'] ?? null;
+    $morada = $_POST['morada'] ?? null;
+    $distrito = $_POST['distrito'] ?? null;
+    $localidade = $_POST['localidade'] ?? null;
+    $codigo_postal = $_POST['codigo_postal'] ?? null;
+    $resp = $func->atualizarPerfil($_SESSION['utilizador'], $nome, $email, $telefone, $nif, $morada, $distrito, $localidade, $codigo_postal);
+    echo $resp;
+    $handled = true;
 }
 
-// op 29 - Atualizar foto de perfil
-if ($_POST['op'] == 29) {
-    if (isset($_FILES['foto'])) {
-        $resp = $func->atualizarFotoPerfil($_SESSION['utilizador'], $_FILES['foto']);
-        echo $resp;
+if ($op == 29) {
+    $foto = $_FILES['foto'] ?? null;
+
+    if (!$foto) {
+        echo json_encode(['success' => false, 'message' => 'Nenhuma foto foi enviada'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
+
+    $resp = $func->atualizarFotoPerfil($_SESSION['utilizador'], $foto);
+    echo $resp;
+    $handled = true;
 }
 
-// op 30 - Alterar password
-if ($_POST['op'] == 30) {
+if ($op == 30) {
     $resp = $func->alterarPassword(
         $_SESSION['utilizador'],
         $_POST['senha_atual'],
         $_POST['senha_nova']
     );
     echo $resp;
+    $handled = true;
 }
 
-// op 31 - Obter estatísticas de produtos
-if ($_POST['op'] == 31) {
+if ($op == 31) {
     $resp = $func->getEstatisticasProdutos($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-// op 32 - Obter lista de encomendas
-if ($_POST['op'] == 32) {
+if ($op == 32) {
     $resp = $func->getEncomendas($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-// op 33 - Atualizar status da encomenda
-if ($_POST['op'] == 33) {
-    $encomenda_id = $_POST['encomenda_id'];
-    $novo_estado = $_POST['novo_estado'];
+if ($op == 33) {
+    $encomenda_id = $_POST['encomenda_id'] ?? null;
+    $novo_estado = $_POST['novo_estado'] ?? null;
     $observacao = $_POST['observacao'] ?? '';
     $codigo_rastreio = $_POST['codigo_rastreio'] ?? null;
 
-    $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao, $codigo_rastreio);
-
-    // Enviar email ao cliente sobre a alteração de status
-    $resposta = json_decode($resp, true);
-    if ($resposta['success']) {
-        try {
-            require_once(__DIR__ . '/../services/EmailService.php');
-
-            // Buscar dados do cliente e encomenda
-            $detalhes = $func->obterDetalhesEncomenda($encomenda_id);
-            if ($detalhes) {
-                $emailService = new EmailService();
-                $emailService->enviarEmailStatusEncomenda(
-                    $detalhes['cliente_email'],
-                    $detalhes['cliente_nome'],
-                    $detalhes['codigo_encomenda'],
-                    $novo_estado,
-                    $codigo_rastreio
-                );
-            }
-        } catch (Exception $e) {
-            error_log("Erro ao enviar email de status: " . $e->getMessage());
-            // Não falhar a operação se o email não enviar
-        }
+    if (!$encomenda_id || !$novo_estado) {
+        echo json_encode(['success' => false, 'message' => 'Dados obrigatórios não fornecidos'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
+    $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao, $codigo_rastreio);
     echo $resp;
+    $handled = true;
 }
 
-// op 34 - Obter histórico da encomenda
-if ($_POST['op'] == 34) {
+if ($op == 34) {
     $encomenda_id = $_POST['encomenda_id'];
     $resp = $func->getHistoricoEncomenda($encomenda_id);
     echo $resp;
+    $handled = true;
 }
 
-// op 36 - Remover produtos em massa
-if ($_POST['op'] == 36) {
-    $ids = $_POST['ids'];
+if ($op == 36) {
+    $idsInput = $_POST['ids'] ?? [];
+
+    if (is_array($idsInput)) {
+        $ids = array_values(array_filter(array_map('intval', $idsInput), function($id) {
+            return $id > 0;
+        }));
+    } else {
+        $idsString = trim((string)$idsInput);
+        if ($idsString === '') {
+            $ids = [];
+        } elseif (strpos($idsString, ',') !== false) {
+            $ids = array_values(array_filter(array_map('intval', explode(',', $idsString)), function($id) {
+                return $id > 0;
+            }));
+        } else {
+            $singleId = (int)$idsString;
+            $ids = $singleId > 0 ? [$singleId] : [];
+        }
+    }
+
+    if (empty($ids)) {
+        echo json_encode(['success' => false, 'message' => 'Nenhum produto válido selecionado'], JSON_UNESCAPED_UNICODE);
+        $handled = true;
+    } else {
     $resp = $func->removerProdutosEmMassa($ids);
-    echo $resp; // Já vem como JSON do model
+    echo $resp;
+    $handled = true;
+    }
 }
 
-// op 37 - Ativar Plano Pago
-if ($_POST['op'] == 37) {
+if ($op == 37) {
     $plano_id = $_POST['plano_id'];
     $resp = $func->ativarPlanoPago($_SESSION['utilizador'], $plano_id);
     echo $resp;
+    $handled = true;
 }
 
-// op 38 - Obter Informacoes de Expiracao do Plano
-if ($_POST['op'] == 38) {
+if ($op == 38) {
     $resp = $func->getInfoExpiracaoPlano($_SESSION['utilizador']);
     echo $resp;
+    $handled = true;
 }
 
-// Fechar conexão global no final
-global $conn;
-if (isset($conn)) {
-    $conn->close();
+if (!$handled) {
+    echo json_encode(['success' => false, 'message' => 'Operação não suportada'], JSON_UNESCAPED_UNICODE);
 }
 ?>

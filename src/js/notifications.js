@@ -1,10 +1,38 @@
-/**
- * Sistema de Notificações Unificado - WeGreen
- * Suporta: Cliente, Anunciante e Admin
- */
+
 
 let notificationsDropdownOpen = false;
 let notificationsCache = [];
+
+function escapeHtml(value) {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function normalizeIconMarkup(iconValue, tipo) {
+  const fallback = getIconeByTipo(tipo);
+  const value = (iconValue || "").toString().trim();
+
+  if (!value) return fallback;
+
+  if (value.startsWith("<i") || value.startsWith("<svg")) {
+    return value;
+  }
+
+  if (value.startsWith("fa-")) {
+    return `<i class="fas ${escapeHtml(value)}"></i>`;
+  }
+
+  if (value.includes(" ") && value.includes("fa-")) {
+    return `<i class="${escapeHtml(value)}"></i>`;
+  }
+
+  return value.length <= 3 ? value : fallback;
+}
 
 /**
  * Atualizar contagem de notificações
@@ -17,7 +45,9 @@ function atualizarNotificacoes() {
     dataType: "json",
     success: function (response) {
       console.log("[Notificações] Resposta recebida:", response);
-      if (response.success) {
+      const ok =
+        response && (response.success === true || response.flag === true);
+      if (ok) {
         const badge = $(".notification-badge");
         const count = parseInt(response.count);
 
@@ -40,7 +70,10 @@ function atualizarNotificacoes() {
           console.log("[Notificações] Badge escondido (count = 0)");
         }
       } else {
-        console.warn("[Notificações] Resposta sem sucesso:", response.message);
+        console.warn(
+          "[Notificações] Resposta sem sucesso:",
+          response ? response.message || response.msg : "resposta vazia",
+        );
       }
     },
     error: function (xhr, status, error) {
@@ -63,16 +96,21 @@ function carregarNotificacoes() {
     success: function (response) {
       console.log("[Notificações] Resposta bruta:", JSON.stringify(response));
       console.log("[Notificações] Lista recebida:", response);
-      if (response.success) {
-        notificationsCache = response.data;
-        console.log(
-          "[Notificações] Total de itens:",
-          response.data ? response.data.length : 0,
-        );
-        console.log("[Notificações] Dados:", response.data);
-        renderizarNotificacoes(response.data);
+      const ok =
+        response && (response.success === true || response.flag === true);
+      const lista = response
+        ? response.data || response.notificacoes || []
+        : [];
+      if (ok) {
+        notificationsCache = lista;
+        console.log("[Notificações] Total de itens:", lista ? lista.length : 0);
+        console.log("[Notificações] Dados:", lista);
+        renderizarNotificacoes(lista);
       } else {
-        console.warn("[Notificações] Erro ao listar:", response.message);
+        console.warn(
+          "[Notificações] Erro ao listar:",
+          response ? response.message || response.msg : "resposta vazia",
+        );
         renderizarNotificacoes([]);
       }
     },
@@ -111,16 +149,21 @@ function renderizarNotificacoes(notificacoes) {
 
   notificacoes.forEach((notif) => {
     const timeAgo = calcularTempoDecorrido(notif.data);
-    const icone = notif.icone || getIconeByTipo(notif.tipo);
+    const tipo = (notif.tipo || "").toString();
+    const icone = normalizeIconMarkup(notif.icone, tipo);
+    const titulo = escapeHtml(notif.titulo || "Notificação");
+    const mensagem = escapeHtml(notif.mensagem || "");
+    const link = escapeHtml(notif.link || "#");
+    const id = escapeHtml(notif.id || "");
 
     html += `
-            <div class="notification-item" data-tipo="${notif.tipo}" data-id="${notif.id}" data-link="${notif.link}" onclick="abrirNotificacao('${notif.tipo}', ${notif.id}, '${notif.link}')">
-                <div class="notification-icon ${notif.tipo}">
+        <div class="notification-item" data-tipo="${escapeHtml(tipo)}" data-id="${id}" data-link="${link}" onclick="abrirNotificacao(this.dataset.tipo, this.dataset.id, this.dataset.link)">
+          <div class="notification-icon ${escapeHtml(tipo)}">
                     ${icone}
                 </div>
                 <div class="notification-content">
-                    <div class="notification-title">${notif.titulo}</div>
-                    <div class="notification-message">${notif.mensagem}</div>
+            <div class="notification-title">${titulo}</div>
+            <div class="notification-message">${mensagem}</div>
                     <div class="notification-time">${timeAgo}</div>
                 </div>
             </div>
@@ -201,22 +244,52 @@ function fecharNotificationsDropdown() {
  */
 function abrirNotificacao(tipo, notifId, link) {
   console.log("[Notificações] Abrindo notificação:", { tipo, notifId, link });
+  const tipoNotificacao = (tipo || "").toString().trim();
+  const referenciaId = parseInt(notifId, 10);
+  const destino = (link || "").toString().trim();
 
-  // Marcar como lida
-  $.post("src/controller/controllerNotifications.php", {
-    op: 3,
-    tipo: tipo,
-    id: notifId,
+  let redirecionou = false;
+  const redirecionar = () => {
+    if (redirecionou) return;
+    redirecionou = true;
+
+    if (destino && destino !== "#") {
+      window.location.href = destino;
+    } else {
+      atualizarNotificacoes();
+      carregarNotificacoes();
+    }
+  };
+
+  if (!tipoNotificacao || !Number.isFinite(referenciaId) || referenciaId <= 0) {
+    redirecionar();
+    return;
+  }
+
+  const fallbackRedirect = setTimeout(redirecionar, 1500);
+
+  $.ajax({
+    url: "src/controller/controllerNotifications.php",
+    method: "POST",
+    dataType: "json",
+    timeout: 5000,
+    data: {
+      op: 3,
+      tipo: tipoNotificacao,
+      id: referenciaId,
+    },
   })
     .done(function (response) {
       console.log("[Notificações] Marcada como lida:", response);
     })
     .fail(function (xhr, status, error) {
       console.error("[Notificações] Erro ao marcar como lida:", error);
+      console.error("[Notificações] Resposta:", xhr.responseText);
+    })
+    .always(function () {
+      clearTimeout(fallbackRedirect);
+      redirecionar();
     });
-
-  // Redirecionar
-  window.location.href = link;
 }
 
 /**
@@ -240,7 +313,9 @@ function marcarTodasComoLidas() {
         JSON.stringify(response),
       );
       console.log("[Notificações] Resposta marcar todas:", response);
-      if (response && response.success) {
+      const ok =
+        response && (response.success === true || response.flag === true);
+      if (ok) {
         console.log("[Notificações] Todas marcadas com sucesso!");
         // Limpar cache local
         notificationsCache = [];
@@ -252,11 +327,11 @@ function marcarTodasComoLidas() {
       } else {
         console.error(
           "[Notificações] Erro ao marcar todas:",
-          response ? response.message : "resposta vazia",
+          response ? response.message || response.msg : "resposta vazia",
         );
         alert(
           "Erro ao marcar notificações como lidas: " +
-            (response ? response.message : "Resposta inválida"),
+            (response ? response.message || response.msg : "Resposta inválida"),
         );
       }
     },

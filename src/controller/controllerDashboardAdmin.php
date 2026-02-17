@@ -1,51 +1,79 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelDashboardAdmin.php';
-session_start();
 
-$func = new DashboardAdmin();
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-if (isset($_POST['op']) && $_POST['op'] == 1) {
-    $resp = $func->getDadosPlanos($_SESSION['utilizador'],$_SESSION['plano']);
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new DashboardAdmin($conn);
+
+if ($op == 1) {
+    $resp = $func->getDadosPlanos($_SESSION['utilizador'], $_SESSION['plano']);
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 2) {
+
+if ($op == 2) {
     $resp = $func->getUtilizadores($_SESSION['utilizador']);
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 3) {
+
+if ($op == 3) {
     $resp = $func->getRendimentos();
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 4) {
+
+if ($op == 4) {
     $resp = $func->getGastos();
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 5) {
+
+if ($op == 5) {
     $resp = $func->getVendasGrafico();
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 6) {
+
+if ($op == 6) {
     $resp = $func->getTopTipoGrafico();
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 7) {
+
+if ($op == 7) {
     $resp = $func->getDadosPerfil($_SESSION['utilizador']);
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 8) {
+
+if ($op == 8) {
     $resp = $func->getProdutosInvativo();
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 9) {
+
+if ($op == 9) {
     $resp = $func->getInfoUserDropdown($_SESSION['utilizador']);
     echo $resp;
 }
-if (isset($_POST['op']) && $_POST['op'] == 10) {
+
+if ($op == 10) {
     $resp = $func->logout();
-    echo json_encode(array('flag' => true, 'msg' => 'Logout realizado com sucesso'));
-    exit();
+    echo json_encode(['flag' => true, 'msg' => 'Logout realizado com sucesso'], JSON_UNESCAPED_UNICODE);
+    exit;
 }
-if (isset($_POST['op']) && $_POST['op'] == 21) {
+
+if ($op == 21) {
     $resp = $func->getAdminPerfil($_SESSION["utilizador"]);
     echo $resp;
 }

@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="src/css/style.css">
   <link rel="stylesheet" href="src/css/lib/datatables.css">
   <link rel="stylesheet" href="src/css/lib/select2.css">
-  <link rel="stylesheet" href="assets/css/favoritos.css">
+  <link rel="stylesheet" href="src/css/favoritos.css">
   <link rel="stylesheet" href="src/css/searchAutocomplete.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
@@ -19,7 +19,8 @@
   <script src="src/js/lib/datatables.js"></script>
   <script src="src/js/lib/select2.js"></script>
   <script src="src/js/lib/sweatalert.js"></script>
-  <script src="assets/js/custom/favoritos.js"></script>
+    <script src="src/js/wegreen-modals.js"></script>
+  <script src="src/js/custom/favoritos.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <script src="src/js/searchAutocomplete.js" defer></script>
 </head>
@@ -320,20 +321,9 @@
   </div>
 </footer>
 
-  <script src="src/js/produto.js"></script>
+  <script src="src/js/produto.js?v=<?php echo @filemtime(__DIR__ . '/src/js/produto.js'); ?>"></script>
   <script src="src/js/homepage.js"></script>
-  <script>
-  $(document).ready(function() {
-    // Verificar se botão de favorito existe e atualizar estado
-    const btnFavorito = document.getElementById('btnFavorito');
-    if (btnFavorito) {
-      const produtoId = btnFavorito.getAttribute('data-produto-id');
-      if (produtoId) {
-        verificarFavorito(produtoId, btnFavorito);
-      }
-    }
-  });
-  </script>
+  <script src="src/js/produtoInit.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

@@ -142,20 +142,20 @@ $(function () {
   getSideBar();
   pesquisarChat();
 
-  // Dropdown do usuário
+  
   $("#userMenuBtn").on("click", function (e) {
     e.stopPropagation();
     $("#userDropdown").toggleClass("active");
   });
 
-  // Fechar dropdown ao clicar fora
+  
   $(document).on("click", function (e) {
     if (!$(e.target).closest(".navbar-user").length) {
       $("#userDropdown").removeClass("active");
     }
   });
 
-  // Evitar que cliques dentro do dropdown o fechem
+  
   $("#userDropdown").on("click", function (e) {
     e.stopPropagation();
   });

@@ -62,6 +62,17 @@
                                 </tr>
                             </table>
 
+                            <?php if (!empty($observacao_status ?? '')): ?>
+                            <h3 style="margin: 0 0 10px 0; color: #1f2937; font-size: 18px;">
+                                📝 Observações do Vendedor
+                            </h3>
+                            <div style="background-color: #f9fafb; border-left: 4px solid #22c55e; padding: 15px; margin-bottom: 25px; border-radius: 4px;">
+                                <p style="margin: 0; color: #4b5563; font-size: 14px; line-height: 1.6;">
+                                    <?php echo nl2br(htmlspecialchars($observacao_status)); ?>
+                                </p>
+                            </div>
+                            <?php endif; ?>
+
                             <!-- Avaliação -->
                             <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 8px; padding: 25px; margin-bottom: 25px; text-align: center;">
                                 <h3 style="margin: 0 0 10px 0; color: #92400e; font-size: 20px;">

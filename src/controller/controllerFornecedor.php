@@ -1,41 +1,65 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json; charset=utf-8');
+
 include_once '../model/modelFornecedor.php';
-session_start();
 
-$func = new Fornecedor();
+if (!isset($_SESSION['utilizador'])) {
+    echo json_encode(['success' => false, 'message' => 'Não autenticado'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
-if ($_POST['op'] == 1) {
+$op = $_POST['op'] ?? $_GET['op'] ?? null;
+
+if (!$op) {
+    echo json_encode(['success' => false, 'message' => 'Operação inválida'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$func = new Fornecedor($conn);
+
+if ($op == 1) {
     $resp = $func->getDadosPerfil($_SESSION['utilizador']);
     echo $resp;
 }
-if ($_POST['op'] == 2) {
+
+if ($op == 2) {
     $resp = $func->getFornecedores();
     echo $resp;
 }
-if ($_POST['op'] == 4) {
+
+if ($op == 4) {
     $resp = $func->guardaAdicionarFornecedor(
         $_POST['fornecedorNome'],
         $_POST['fornecedorCategoria'],
         $_POST['fornecedorEmail'],
         $_POST['fornecedortelefone'],
         $_POST['fornecedorSede'],
-        $_POST['observacoes'],
+        $_POST['observacoes']
     );
     echo $resp;
 }
-if ($_POST['op'] == 5) {
+
+if ($op == 5) {
     $resp = $func->getListaCategoria();
     echo $resp;
 }
-if ($_POST['op'] == 6) {
+
+if ($op == 6) {
     $resp = $func->removerFornecedores($_POST['id']);
     echo $resp;
 }
-if ($_POST['op'] == 9) {
+
+if ($op == 9) {
     $resp = $func->getDadosFornecedores($_POST['id']);
     echo $resp;
 }
-if ($_POST['op'] == 67) {
+
+if ($op == 67) {
     $resp = $func->guardaEditDadosFornecedores(
         $_POST['fornecedorNomeEdit'],
         $_POST['fornecedorCategoriaEdit'],

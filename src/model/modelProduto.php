@@ -4,32 +4,54 @@ require_once 'connection.php';
 
 class Produto{
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
     function getDadosProduto($ID_Produto){
-        global $conn;
+        try {
+
         $msg = "";
 
-        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*, Produtos.ativo AS status, utilizadores.nome AS NomeAnunciante,utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil,utilizadores.id As IdUtilizador,ranking.nome As RankNome,(SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante,(SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos,utilizadores,ranking WHERE Produtos.Produto_id = " . $ID_Produto." AND produtos.anunciante_id = utilizadores.id AND utilizadores.ranking_id = ranking.id";
+        $sql = "SELECT Produtos.foto AS FotoProduto, Produtos.*, Produtos.ativo AS status, utilizadores.nome AS NomeAnunciante, utilizadores.pontos_conf AS PontosConfianca, utilizadores.foto AS FotoPerfil, utilizadores.id AS IdUtilizador, COALESCE(ranking.nome, 'Sem ranking') AS RankNome, (SELECT COUNT(*) FROM Produtos WHERE Produtos.anunciante_id = utilizadores.id AND Produtos.ativo = 1) AS TotalProdutosAnunciante, (SELECT COUNT(*) FROM Vendas WHERE Vendas.anunciante_id = utilizadores.id) AS TotalVendasAnunciante FROM Produtos INNER JOIN utilizadores ON Produtos.anunciante_id = utilizadores.id LEFT JOIN ranking ON utilizadores.ranking_id = ranking.id WHERE Produtos.Produto_id = ? AND Produtos.ativo = 1";
 
-        $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = $ID_Produto";
+        $sql2 = "SELECT foto AS ProdutoFoto FROM Produto_Fotos WHERE Produto_id = ?";
 
         $sql3 = "SELECT Produto_id, nome, foto, marca, tamanho, estado, preco
                  FROM Produtos
-                 WHERE genero = (SELECT genero FROM Produtos WHERE Produto_id = $ID_Produto)
-                 AND Produto_id != $ID_Produto
+                 WHERE genero = (SELECT genero FROM Produtos WHERE Produto_id = ?)
+                 AND Produto_id != ?
                  AND ativo = 1
+                 AND stock > 0
+                 AND anunciante_id IS NOT NULL
+                 AND nome != ''
+                 AND preco IS NOT NULL
                  LIMIT 4";
 
-        $result = $conn->query($sql);
-        $result2 = $conn->query($sql2);
-        $result3 = $conn->query($sql3);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_Produto);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $stmt2 = $this->conn->prepare($sql2);
+        $stmt2->bind_param("i", $ID_Produto);
+        $stmt2->execute();
+        $result2 = $stmt2->get_result();
+
+        $stmt3 = $this->conn->prepare($sql3);
+        $stmt3->bind_param("ii", $ID_Produto, $ID_Produto);
+        $stmt3->execute();
+        $result3 = $stmt3->get_result();
 
         if ($result->num_rows > 0) {
             while ($rowProduto = $result->fetch_assoc()) {
-                // Galeria de imagens - Coluna Esquerda
+
                 $msg .= "<div class='col-lg-6'>";
                 $msg .= "<div class='position-relative' style='overflow: hidden;'>";
 
-                // Botão de favorito modernizado
+
                 if(isset($_SESSION['tipo']) && $_SESSION['tipo'] == 2) {
                     $msg .= "<button class='btn-favorito' id='btnFavorito' data-produto-id='".$rowProduto['Produto_id']."' onclick='toggleFavorito(".$rowProduto['Produto_id'].", this)' style='position: absolute; top: 20px; right: 20px; z-index: 100; width: 44px; height: 44px; border-radius: 50%; background: white; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;'>";
                     $msg .= "<i class='far fa-heart' style='font-size: 18px; color: #3cb371;'></i>";
@@ -61,24 +83,49 @@ class Produto{
                 $msg .= "</div>";
                 $msg .= "</div>";
 
-                // Informações do Produto - Coluna Direita
+
                 $msg .= "<div class='col-lg-6'>";
                 $msg .= "<div class='p-3' style='background: white; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);'>";
 
-                // Nome do produto
-                $msg .= "<h1 class='fw-bold mb-3' style='color: #1a1a1a; font-size: 28px;'>".$rowProduto["nome"]."</h1>";
 
-                // Badges com informações
-                $msg .= "<div class='d-flex flex-wrap gap-2 mb-4'>";
-                $msg .= "<span class='badge' style='background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: #2e8b57; padding: 6px 14px; border-radius: 50px; font-weight: 600; font-size: 12px;'>";
-                $msg .= "<i class='bi bi-tag-fill me-1'></i>".$rowProduto["marca"]."</span>";
-                $msg .= "<span class='badge' style='background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: #2e8b57; padding: 6px 14px; border-radius: 50px; font-weight: 600; font-size: 12px;'>";
-                $msg .= "<i class='bi bi-rulers me-1'></i>".$rowProduto["tamanho"]."</span>";
-                $msg .= "<span class='badge' style='background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: #2e8b57; padding: 6px 14px; border-radius: 50px; font-weight: 600; font-size: 12px;'>";
-                $msg .= "<i class='bi bi-star-fill me-1'></i>".$rowProduto["estado"]."</span>";
+                $msg .= "<h1 class='fw-bold mb-2' style='color: #1a1a1a; font-size: 28px;'>".htmlspecialchars($rowProduto["nome"], ENT_QUOTES, 'UTF-8')."</h1>";
+
+
+                $isSustentavel = (int)($rowProduto['sustentavel'] ?? 0) === 1;
+                $tipoMaterial = $rowProduto['tipo_material'] ?? '';
+                $sustentabilidadeTexto = 'Não sustentável';
+                $sustentabilidadeBg = 'background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #6b7280;';
+                $sustentabilidadeIcon = 'bi-slash-circle';
+
+                if ($isSustentavel) {
+                    $mapaSustentabilidade = [
+                        '30_reciclavel' => '~30% reciclável',
+                        '50_reciclavel' => '~50% reciclável',
+                        '70_reciclavel' => '~70% reciclável',
+                        '100_reciclavel' => '100% reciclável'
+                    ];
+
+                    $sustentabilidadeTexto = $mapaSustentabilidade[$tipoMaterial] ?? 'Sustentável';
+                    $sustentabilidadeBg = 'background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: #2e8b57;';
+                    $sustentabilidadeIcon = 'bi-recycle';
+                }
+
+                $msg .= "<div class='mb-3'>";
+                $msg .= "<span class='badge' style='".$sustentabilidadeBg." padding: 7px 14px; border-radius: 50px; font-weight: 600; font-size: 12px;'>";
+                $msg .= "<i class='bi ".$sustentabilidadeIcon." me-1'></i>".$sustentabilidadeTexto."</span>";
                 $msg .= "</div>";
 
-                // Preço em destaque com gradiente verde
+
+                $msg .= "<div class='d-flex flex-wrap gap-2 mb-4'>";
+                $msg .= "<span class='badge' style='background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: #2e8b57; padding: 6px 14px; border-radius: 50px; font-weight: 600; font-size: 12px;'>";
+                $msg .= "<i class='bi bi-tag-fill me-1'></i>".htmlspecialchars($rowProduto["marca"], ENT_QUOTES, 'UTF-8')."</span>";
+                $msg .= "<span class='badge' style='background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: #2e8b57; padding: 6px 14px; border-radius: 50px; font-weight: 600; font-size: 12px;'>";
+                $msg .= "<i class='bi bi-rulers me-1'></i>".htmlspecialchars($rowProduto["tamanho"], ENT_QUOTES, 'UTF-8')."</span>";
+                $msg .= "<span class='badge' style='background: linear-gradient(135deg, #E8F5E9, #C8E6C9); color: #2e8b57; padding: 6px 14px; border-radius: 50px; font-weight: 600; font-size: 12px;'>";
+                $msg .= "<i class='bi bi-star-fill me-1'></i>".htmlspecialchars($rowProduto["estado"], ENT_QUOTES, 'UTF-8')."</span>";
+                $msg .= "</div>";
+
+
                 $msg .= "<div class='mb-4 p-3' style='background: linear-gradient(135deg, #3cb371, #2e8b57); border-radius: 14px; box-shadow: 0 6px 20px rgba(62,179,113,0.3);'>";
                 $msg .= "<div class='d-flex align-items-center justify-content-between'>";
                 $msg .= "<div>";
@@ -91,20 +138,28 @@ class Produto{
                 $msg .= "</div>";
                 $msg .= "</div>";
 
-                // Descrição
+
                 $msg .= "<div class='mb-4'>";
                 $msg .= "<h6 class='fw-bold mb-3' style='color: #1a1a1a; font-size: 14px;'>Descrição</h6>";
-                $msg .= "<p style='color: #64748b; line-height: 1.6; font-size: 14px;'>".$rowProduto["descricao"]."</p>";
+                $msg .= "<p style='color: #64748b; line-height: 1.6; font-size: 14px;'>".htmlspecialchars($rowProduto["descricao"], ENT_QUOTES, 'UTF-8')."</p>";
                 $msg .= "</div>";
 
-                // Botões de ação
+
+                $stock = (int)($rowProduto['stock'] ?? 0);
                 $msg .= "<div class='d-flex gap-2 mb-4'>";
-                $msg .= "<button class='btn flex-grow-1 py-3 fw-bold btnComprarAgora' ";
-                $msg .= "data-id='".$rowProduto['Produto_id']."' ";
-                $msg .= "style='background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; border: none; border-radius: 10px; font-size: 15px; box-shadow: 0 4px 14px rgba(62,179,113,0.3); transition: all 0.3s ease;' ";
-                $msg .= "onmouseover='this.style.transform=\"translateY(-2px)\"; this.style.boxShadow=\"0 6px 18px rgba(62,179,113,0.4)\"' ";
-                $msg .= "onmouseout='this.style.transform=\"translateY(0)\"; this.style.boxShadow=\"0 4px 14px rgba(62,179,113,0.3)\"'>";
-                $msg .= "<i class='bi bi-bag-check-fill me-2'></i>Comprar Agora</button>";
+
+                if ($stock <= 0) {
+                    $msg .= "<button class='btn flex-grow-1 py-3 fw-bold' disabled ";
+                    $msg .= "style='background: #ccc; color: white; border: none; border-radius: 10px; font-size: 15px; cursor: not-allowed;'>";
+                    $msg .= "<i class='bi bi-x-circle me-2'></i>Produto Esgotado</button>";
+                } else {
+                    $msg .= "<button class='btn flex-grow-1 py-3 fw-bold btnComprarAgora' ";
+                    $msg .= "data-id='".$rowProduto['Produto_id']."' ";
+                    $msg .= "style='background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; border: none; border-radius: 10px; font-size: 15px; box-shadow: 0 4px 14px rgba(62,179,113,0.3); transition: all 0.3s ease;' ";
+                    $msg .= "onmouseover='this.style.transform=\"translateY(-2px)\"; this.style.boxShadow=\"0 6px 18px rgba(62,179,113,0.4)\"' ";
+                    $msg .= "onmouseout='this.style.transform=\"translateY(0)\"; this.style.boxShadow=\"0 4px 14px rgba(62,179,113,0.3)\"'>";
+                    $msg .= "<i class='bi bi-bag-check-fill me-2'></i>Comprar Agora</button>";
+                }
 
                 if(isset($_SESSION['utilizador'])) {
                     if($_SESSION['utilizador'] == $rowProduto['IdUtilizador']) {
@@ -120,7 +175,7 @@ class Produto{
                     $msg .= "<i class='bi bi-chat-dots-fill'></i></button>";
                 }
                 $msg .= "</div>";
-                // Card do Anunciante modernizado
+
                 $msg .= "<div class='p-4' style='background: linear-gradient(135deg, #f8f9fa, #ffffff); border: 2px solid #E8F5E9; border-radius: 14px;'>";
                 $msg .= "<div class='d-flex align-items-center gap-2 mb-2'>";
                 $msg .= "<div class='position-relative'>";
@@ -157,12 +212,12 @@ class Produto{
                 $msg .= "</div>";
                 $msg .= "</div>";
 
-                // Seção de Avaliações - Largura Total
+
                 $msg .= "<div class='row mt-4'>";
                 $msg .= "<div class='col-12'>";
                 $msg .= "<div id='SecaoAvaliacoes' class='p-4' style='background: white; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);'>";
 
-                // Header da seção
+
                 $msg .= "<div class='d-flex align-items-center justify-content-between mb-4 pb-3' style='border-bottom: 2px solid #E8F5E9;'>";
                 $msg .= "<h3 class='fw-bold mb-0' style='color: #1a1a1a; font-size: 24px;'>";
                 $msg .= "<i class='fas fa-star' style='color: #ffc107; margin-right: 10px;'></i>Avaliações do Produto</h3>";
@@ -173,10 +228,10 @@ class Produto{
                 $msg .= "</div>";
                 $msg .= "</div>";
 
-                // Grid: Estatísticas + Lista de Avaliações
+
                 $msg .= "<div class='row'>";
 
-                // Coluna Esquerda: Barras de Estatísticas (mais larga)
+
                 $msg .= "<div class='col-md-5'>";
                 $msg .= "<div id='EstatisticasEstrelas' class='p-4' style='background: linear-gradient(135deg, #f8f9fa, #ffffff); border-radius: 14px; border: 2px solid #E8F5E9; height: 100%; display: flex; flex-direction: column;'>";
                 $msg .= "<h6 class='fw-bold mb-4' style='color: #1a1a1a; font-size: 18px;'>Distribuição de Avaliações</h6>";
@@ -184,17 +239,17 @@ class Produto{
                 $msg .= "</div>";
                 $msg .= "</div>";
 
-                // Coluna Direita: Lista de Avaliações com Paginação
+
                 $msg .= "<div class='col-md-7'>";
                 $msg .= "<div id='ListaAvaliacoes' style='padding-right: 10px;'>";
                 $msg .= "<div class='text-center py-4'><div class='spinner-border' style='color: #3cb371;'></div></div>";
                 $msg .= "</div>";
                 $msg .= "<div id='PaginacaoAvaliacoes' class='mt-3 d-flex justify-content-center'></div>";
-                $msg .= "</div>"; // Fecha SecaoAvaliacoes
-                $msg .= "</div>"; // Fecha col-12
-                $msg .= "</div>"; // Fecha row de avaliações
+                $msg .= "</div>";
+                $msg .= "</div>";
+                $msg .= "</div>";
 
-                // Produtos Relacionados com Carrossel
+
                 $msg .= "<div class='mt-5 mb-5'>";
                 $msg .= "<div class='d-flex align-items-center justify-content-between mb-4'>";
                 $msg .= "<h3 class='fw-bold mb-0' style='color: #1a1a1a;'>";
@@ -216,7 +271,7 @@ class Produto{
                         $produtos[] = $rowRelacionados;
                     }
 
-                    // Agrupar produtos de 4 em 4
+
                     $chunks = array_chunk($produtos, 4);
                     $first = true;
 
@@ -228,28 +283,28 @@ class Produto{
                             $msg .= "<div class='col-md-3 col-sm-6'>";
                             $msg .= "<div class='produto-card h-100' style='background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.06); transition: all 0.3s ease; position: relative;' onmouseover='this.style.transform=\"translateY(-8px)\"; this.style.boxShadow=\"0 12px 32px rgba(62,179,113,0.2)\"' onmouseout='this.style.transform=\"translateY(0)\"; this.style.boxShadow=\"0 4px 16px rgba(0,0,0,0.06)\"'>";
 
-                            // Badge de categoria/estado
+
                             $msg .= "<div style='position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; z-index: 10; box-shadow: 0 2px 8px rgba(62,179,113,0.3);'>";
                             $msg .= $produto["estado"]."</div>";
 
-                            // Imagem
+
                             $msg .= "<div style='position: relative; overflow: hidden; background: #f5f5f5;'>";
                             $msg .= "<img src='".$produto["foto"]."' alt='".$produto["nome"]."' style='width: 100%; height: 240px; object-fit: cover; transition: transform 0.3s ease;' onmouseover='this.style.transform=\"scale(1.05)\"' onmouseout='this.style.transform=\"scale(1)\"'>";
                             $msg .= "</div>";
 
-                            // Conteúdo
+
                             $msg .= "<div class='p-3'>";
                             $msg .= "<h6 class='fw-bold mb-2' style='color: #1a1a1a; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>".$produto["nome"]."</h6>";
 
-                            // Info badges
+
                             $msg .= "<div class='d-flex flex-wrap gap-1 mb-3'>";
                             $msg .= "<span class='badge' style='background: #E8F5E9; color: #2e8b57; font-size: 10px; padding: 4px 8px; border-radius: 12px;'>";
-                            $msg .= "<i class='bi bi-tag-fill me-1'></i>".$produto["marca"]."</span>";
+                            $msg .= "<i class='bi bi-tag-fill me-1'></i>".htmlspecialchars($produto["marca"], ENT_QUOTES, 'UTF-8')."</span>";
                             $msg .= "<span class='badge' style='background: #E8F5E9; color: #2e8b57; font-size: 10px; padding: 4px 8px; border-radius: 12px;'>";
-                            $msg .= "<i class='bi bi-rulers me-1'></i>".$produto["tamanho"]."</span>";
+                            $msg .= "<i class='bi bi-rulers me-1'></i>".htmlspecialchars($produto["tamanho"], ENT_QUOTES, 'UTF-8')."</span>";
                             $msg .= "</div>";
 
-                            // Preço
+
                             $msg .= "<div class='d-flex align-items-center justify-content-between mb-3'>";
                             $msg .= "<div>";
                             $msg .= "<small style='color: #888; font-size: 11px; display: block;'>Preço</small>";
@@ -257,7 +312,7 @@ class Produto{
                             $msg .= "</div>";
                             $msg .= "</div>";
 
-                            // Botão
+
                             $msg .= "<a href='produto.php?id=".$produto["Produto_id"]."' class='btn w-100 fw-semibold' style='background: linear-gradient(135deg, #3cb371, #2e8b57); color: white; border: none; border-radius: 10px; padding: 10px; font-size: 13px; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(62,179,113,0.3);' onmouseover='this.style.transform=\"translateY(-2px)\"; this.style.boxShadow=\"0 6px 16px rgba(62,179,113,0.4)\"' onmouseout='this.style.transform=\"translateY(0)\"; this.style.boxShadow=\"0 4px 12px rgba(62,179,113,0.3)\"'>";
                             $msg .= "<i class='bi bi-eye-fill me-2'></i>Ver Detalhes</a>";
                             $msg .= "</div>";
@@ -273,7 +328,7 @@ class Produto{
 
                     $msg .= "</div>";
 
-                    // Controles ocultos (acionados pelos botões personalizados)
+
                     $msg .= "<button class='carousel-control-prev' type='button' data-bs-target='#carouselRelacionados' data-bs-slide='prev' style='display: none;'></button>";
                     $msg .= "<button class='carousel-control-next' type='button' data-bs-target='#carouselRelacionados' data-bs-slide='next' style='display: none;'></button>";
 
@@ -285,6 +340,37 @@ class Produto{
         }
 
         return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    function getProdutosRelacionados($produto_id, $categoria = null, $limite = 4) {
+        try {
+            $sql = "SELECT Produto_id, nome, foto, marca, tamanho, estado, preco
+                    FROM Produtos
+                    WHERE genero = (SELECT genero FROM Produtos WHERE Produto_id = ?)
+                    AND Produto_id != ?
+                    AND ativo = 1
+                    AND stock > 0
+                    AND anunciante_id IS NOT NULL
+                    AND nome != ''
+                    AND preco IS NOT NULL
+                    ORDER BY RAND()
+                    LIMIT ?";
+            $stmt = $this->conn->prepare($sql);
+            $limite = (int)$limite;
+            $stmt->bind_param("iii", $produto_id, $produto_id, $limite);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $produtos = [];
+            while ($row = $result->fetch_assoc()) {
+                $produtos[] = $row;
+            }
+            return json_encode(['success' => true, 'produtos' => $produtos], JSON_UNESCAPED_UNICODE);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'produtos' => []], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
 ?>

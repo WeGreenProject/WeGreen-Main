@@ -1,11 +1,22 @@
-// Sistema de notificações carregado via notifications.js
+﻿function parseJsonSafe(payload) {
+  if (typeof payload === "string") {
+    try {
+      return JSON.parse(payload);
+    } catch (error) {
+      console.error("Resposta JSON inválida:", payload, error);
+      return null;
+    }
+  }
+  return payload;
+}
 
 function getDadosPlanos() {
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
     { op: 1 },
     function (response) {
-      const data = JSON.parse(response);
+      const data = parseJsonSafe(response);
+      if (!data) return;
       if (data.success) {
         $("#PlanosAtual").html(`
           <div class='stat-icon'><i class='fas fa-crown' style='color: #ffffff;'></i></div>
@@ -28,7 +39,8 @@ function CarregaProdutos() {
     "src/controller/controllerDashboardAnunciante.php",
     { op: 2 },
     function (response) {
-      const data = JSON.parse(response);
+      const data = parseJsonSafe(response);
+      if (!data) return;
       $("#ProdutoStock").html(`
         <div class='stat-icon'><i class='fas fa-box' style='color: #ffffff;'></i></div>
         <div class='stat-content'><div class='stat-label'>Total Produtos</div><div class='stat-value'>${data.total}</div></div>
@@ -44,7 +56,8 @@ function CarregaPontos() {
     "src/controller/controllerDashboardAnunciante.php",
     { op: 3 },
     function (response) {
-      const data = JSON.parse(response);
+      const data = parseJsonSafe(response);
+      if (!data) return;
       $("#PontosConfianca").html(`
         <div class='stat-icon'><i class='fas fa-star' style='color: #ffffff;'></i></div>
         <div class='stat-content'><div class='stat-label'>Pontos Confiança</div><div class='stat-value'>${data.pontos}</div></div>
@@ -59,7 +72,8 @@ function getGastos() {
     "src/controller/controllerDashboardAnunciante.php",
     { op: 4 },
     function (response) {
-      const data = JSON.parse(response);
+      const data = parseJsonSafe(response);
+      if (!data) return;
       const gastos = parseFloat(data.total).toFixed(2);
       $("#GastosCard").html(`
         <div class='stat-icon'><i class='fas fa-wallet' style='color: #ffffff;'></i></div>
@@ -82,7 +96,6 @@ function getVendasMensais() {
 
       const ctx3 = chartElement.getContext("2d");
 
-      // Destruir gráfico anterior se existir
       if (window.chartVendas) {
         window.chartVendas.destroy();
       }
@@ -183,14 +196,14 @@ function renderTopProductsChart() {
           {
             data: resp.map((p) => p.vendidos),
             backgroundColor: [
-              "#3cb371", // Verde WeGreen principal
-              "#2d2d2d", // Preto/cinza escuro
-              "#64748b", // Azul-cinza (terceira cor distintiva)
-              "#2e8b57", // Verde escuro
-              "#1a1a1a", // Preto
-              "#5fd8a0", // Verde claro
-              "#3a3a3a", // Cinza escuro
-              "#45b8ac", // Verde-água
+              "#3cb371",
+              "#2d2d2d",
+              "#64748b",
+              "#2e8b57",
+              "#1a1a1a",
+              "#5fd8a0",
+              "#3a3a3a",
+              "#45b8ac",
             ],
             borderColor: "#ffffff",
             borderWidth: 3,
@@ -265,8 +278,8 @@ function renderRecentProducts() {
       produtos.forEach((produto) => {
         const foto = produto.foto || "src/img/no-image.png";
         const stock = produto.stock || 0;
+        const produtoId = Number(produto.Produto_id || produto.id || 0);
 
-        // Status badge similar às encomendas
         let statusClass = "status-badge ";
         let statusText = "";
         if (stock > 10) {
@@ -307,8 +320,8 @@ function renderRecentProducts() {
               </div>
               <div class="produto-card-footer">
                 <div class="produto-card-price">€${preco}</div>
-                <button class="btn-edit-produto" onclick="window.location.href='gestaoProdutosAnunciante.php'">
-                  <i class="fas fa-edit"></i> Editar
+                <button class="btn-edit-produto" onclick="visualizarProduto(${produtoId})">
+                  <i class="fas fa-eye"></i> Ver Detalhes
                 </button>
               </div>
             </div>
@@ -348,7 +361,6 @@ function visualizarFoto(fotoUrl, nomeProduto) {
       htmlContainer: "photo-gallery-content",
     },
     didOpen: () => {
-      // Forçar estilos do cabeçalho verde com letras brancas
       const title = document.querySelector(".photo-gallery-title");
       if (title) {
         title.style.background =
@@ -359,7 +371,6 @@ function visualizarFoto(fotoUrl, nomeProduto) {
         title.style.borderRadius = "16px 16px 0 0";
       }
 
-      // Botão X branco
       const closeBtn = document.querySelector(
         ".photo-gallery-modal .swal2-close",
       );
@@ -498,7 +509,6 @@ function carregarTiposProduto() {
   );
 }
 
-// Carregar estatísticas de relatórios
 function loadReportStats() {
   const periodo = $("#reportPeriod").val();
   $.post(
@@ -531,7 +541,6 @@ function loadReportStats() {
   );
 }
 
-// Vendas por Categoria
 function loadCategorySalesChart() {
   const ctx = document.getElementById("categorySalesChart");
   if (!ctx) {
@@ -572,7 +581,6 @@ function loadCategorySalesChart() {
   );
 }
 
-// Receita Diária
 function loadDailyRevenueChart() {
   const ctx = document.getElementById("dailyRevenueChart");
   if (!ctx) {
@@ -665,7 +673,6 @@ function loadDailyRevenueChart() {
   );
 }
 
-// Tabela de Relatórios
 function loadReportsTable() {
   const periodo = $("#reportPeriod").val();
   $.post(
@@ -747,9 +754,14 @@ function showPage(pageId, target) {
 }
 
 function visualizarProduto(id) {
+  const produtoId = Number(id);
+  if (!Number.isFinite(produtoId) || produtoId <= 0) {
+    return;
+  }
+
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
-    { op: 15, id: id },
+    { op: 15, id: produtoId },
     function (dados) {
       if (dados && dados.Produto_id) {
         const foto = dados.foto ? dados.foto : "src/img/no-image.png";
@@ -884,79 +896,27 @@ function editarProduto(id) {
       if (dados && dados.Produto_id) {
         abrirModalProduto("Editar Produto", dados);
       } else {
-        Swal.fire("Erro", "Erro ao carregar dados do produto", "error");
+        wgError("Erro", "Erro ao carregar dados do produto");
       }
     },
     "json",
   ).fail(function () {
-    Swal.fire("Erro", "Erro na requisição", "error");
+    wgError("Erro", "Erro na requisição");
   });
 }
 
 function removerProduto(id) {
-  Swal.fire({
-    html: `
-      <div style="text-align: center;">
-        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
-          <i class="fas fa-trash-alt" style="font-size: 40px; color: white;"></i>
-        </div>
-        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Remover produto?</h2>
-        <p style="color: #64748b; font-size: 15px; margin: 0;">Esta ação não pode ser desfeita!</p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: "#dc3545",
-    cancelButtonColor: "#6c757d",
-    confirmButtonText: '<i class="fas fa-check"></i> Sim, remover',
-    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-    customClass: {
-      confirmButton: "swal2-confirm-modern",
-      cancelButton: "swal2-cancel-modern",
-      popup: "swal2-border-radius",
-    },
-    buttonsStyling: false,
-    didOpen: () => {
-      const style = document.createElement("style");
-      style.textContent = `
-        .swal2-confirm-modern, .swal2-cancel-modern {
-          padding: 12px 30px !important;
-          border-radius: 8px !important;
-          font-weight: 600 !important;
-          font-size: 14px !important;
-          cursor: pointer !important;
-          transition: all 0.3s ease !important;
-          border: none !important;
-          margin: 5px !important;
-        }
-        .swal2-confirm-modern {
-          background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
-          color: white !important;
-        }
-        .swal2-confirm-modern:hover {
-          transform: translateY(-2px) !important;
-          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
-        }
-        .swal2-cancel-modern {
-          background: #6c757d !important;
-          color: white !important;
-        }
-        .swal2-cancel-modern:hover {
-          background: #5a6268 !important;
-          transform: translateY(-2px) !important;
-        }
-        .swal2-border-radius {
-          border-radius: 12px !important;
-        }
-      `;
-      document.head.appendChild(style);
-    },
+  wgConfirm("Remover produto?", "Esta ação não pode ser desfeita!", {
+    confirmText: '<i class="fas fa-check"></i> Sim, remover',
+    icon: "fa-trash-alt",
+    iconBg: "background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%);",
   }).then((resultado) => {
     if (resultado.isConfirmed) {
       $.post(
         "src/controller/controllerDashboardAnunciante.php",
         { op: 16, id: id },
         function () {
-          Swal.fire("Removido!", "Produto removido com sucesso.", "success");
+          wgSuccess("Removido!", "Produto removido com sucesso.");
           carregarProdutos();
         },
       );
@@ -964,7 +924,6 @@ function removerProduto(id) {
   });
 }
 
-// Alias para remover produto (usado na coluna de ações)
 function confirmarRemoverProduto(id) {
   removerProduto(id);
 }
@@ -990,87 +949,11 @@ function atualizarAcoesEmMassa() {
 function editarSelecionado() {
   const ids = obterProdutosSelecionados();
   if (ids.length === 0) {
-    Swal.fire({
-      html: `
-        <div style="text-align: center;">
-          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
-            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
-          </div>
-          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
-          <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione um produto para editar.</p>
-        </div>
-      `,
-      confirmButtonColor: "#ff9800",
-      confirmButtonText: "OK",
-      customClass: {
-        confirmButton: "swal2-confirm-modern-warning",
-        popup: "swal2-border-radius",
-      },
-      buttonsStyling: false,
-      didOpen: () => {
-        const style = document.createElement("style");
-        style.textContent = `
-          .swal2-confirm-modern-warning {
-            padding: 12px 30px !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-            cursor: pointer !important;
-            transition: all 0.3s ease !important;
-            border: none !important;
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
-            color: white !important;
-          }
-          .swal2-confirm-modern-warning:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
-          }
-        `;
-        document.head.appendChild(style);
-      },
-    });
+    wgWarning("Atenção", "Selecione um produto para editar.");
     return;
   }
   if (ids.length > 1) {
-    Swal.fire({
-      html: `
-        <div style="text-align: center;">
-          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
-            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
-          </div>
-          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
-          <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione apenas um produto para editar.</p>
-        </div>
-      `,
-      confirmButtonColor: "#ff9800",
-      confirmButtonText: "OK",
-      customClass: {
-        confirmButton: "swal2-confirm-modern-warning",
-        popup: "swal2-border-radius",
-      },
-      buttonsStyling: false,
-      didOpen: () => {
-        const style = document.createElement("style");
-        style.textContent = `
-          .swal2-confirm-modern-warning {
-            padding: 12px 30px !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-            cursor: pointer !important;
-            transition: all 0.3s ease !important;
-            border: none !important;
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
-            color: white !important;
-          }
-          .swal2-confirm-modern-warning:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
-          }
-        `;
-        document.head.appendChild(style);
-      },
-    });
+    wgWarning("Atenção", "Selecione apenas um produto para editar.");
     return;
   }
   editarProduto(ids[0]);
@@ -1079,104 +962,18 @@ function editarSelecionado() {
 function removerEmMassa() {
   const ids = obterProdutosSelecionados();
   if (ids.length === 0) {
-    Swal.fire({
-      html: `
-        <div style="text-align: center;">
-          <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);">
-            <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: white;"></i>
-          </div>
-          <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Atenção</h2>
-          <p style="color: #64748b; font-size: 15px; margin: 0;">Selecione pelo menos um produto para remover.</p>
-        </div>
-      `,
-      confirmButtonColor: "#ff9800",
-      confirmButtonText: "OK",
-      customClass: {
-        confirmButton: "swal2-confirm-modern-warning",
-        popup: "swal2-border-radius",
-      },
-      buttonsStyling: false,
-      didOpen: () => {
-        const style = document.createElement("style");
-        style.textContent = `
-          .swal2-confirm-modern-warning {
-            padding: 12px 30px !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            font-size: 14px !important;
-            cursor: pointer !important;
-            transition: all 0.3s ease !important;
-            border: none !important;
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
-            color: white !important;
-          }
-          .swal2-confirm-modern-warning:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4) !important;
-          }
-        `;
-        document.head.appendChild(style);
-      },
-    });
+    wgWarning("Atenção", "Selecione pelo menos um produto para remover.");
     return;
   }
-  Swal.fire({
-    html: `
-      <div style="text-align: center;">
-        <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);">
-          <i class="fas fa-trash-alt" style="font-size: 40px; color: white;"></i>
-        </div>
-        <h2 style="margin: 0 0 10px 0; color: #2d3748; font-size: 24px; font-weight: 700;">Remover ${ids.length} produto${ids.length > 1 ? "s" : ""}?</h2>
-        <p style="color: #64748b; font-size: 15px; margin: 0;">Esta ação não pode ser desfeita!</p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonColor: "#dc3545",
-    cancelButtonColor: "#6c757d",
-    confirmButtonText: '<i class="fas fa-check"></i> Sim, remover',
-    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-    customClass: {
-      confirmButton: "swal2-confirm-modern",
-      cancelButton: "swal2-cancel-modern",
-      popup: "swal2-border-radius",
+  wgConfirm(
+    `Remover ${ids.length} produto${ids.length > 1 ? "s" : ""}?`,
+    "Esta ação não pode ser desfeita!",
+    {
+      confirmText: '<i class="fas fa-check"></i> Sim, remover',
+      icon: "fa-trash-alt",
+      iconBg: "background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%);",
     },
-    buttonsStyling: false,
-    didOpen: () => {
-      const style = document.createElement("style");
-      style.textContent = `
-        .swal2-confirm-modern, .swal2-cancel-modern {
-          padding: 12px 30px !important;
-          border-radius: 8px !important;
-          font-weight: 600 !important;
-          font-size: 14px !important;
-          cursor: pointer !important;
-          transition: all 0.3s ease !important;
-          border: none !important;
-          margin: 5px !important;
-        }
-        .swal2-confirm-modern {
-          background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%) !important;
-          color: white !important;
-        }
-        .swal2-confirm-modern:hover {
-          transform: translateY(-2px) !important;
-          box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
-        }
-        .swal2-cancel-modern {
-          background: #6c757d !important;
-          color: white !important;
-        }
-        .swal2-cancel-modern:hover {
-          background: #5a6268 !important;
-          transform: translateY(-2px) !important;
-        }
-        .swal2-border-radius {
-          border-radius: 12px !important;
-        }
-      `;
-      document.head.appendChild(style);
-    },
-  }).then((resultado) => {
+  ).then((resultado) => {
     if (resultado.isConfirmed) {
       $.ajax({
         url: "src/controller/controllerDashboardAnunciante.php",
@@ -1187,27 +984,23 @@ function removerEmMassa() {
         success: function (response) {
           console.log("Response:", response);
           if (response.success) {
-            // Marcar que estamos recarregando
             window.isReloading = true;
-            Swal.fire(
+            wgSuccess(
               "Removido!",
               response.message || "Produtos removidos/desativados com sucesso.",
-              "success",
             ).then(() => {
-              // Recarregar a página completa para evitar problemas com DataTables
               window.location.reload();
             });
           } else {
-            Swal.fire(
+            wgError(
               "Erro",
               response.message || "Não foi possível remover os produtos.",
-              "error",
             );
           }
         },
         error: function (xhr, status, error) {
           console.error("Erro ao remover:", error, xhr.responseText);
-          Swal.fire("Erro", "Não foi possível remover os produtos.", "error");
+          wgError("Erro", "Não foi possível remover os produtos.");
         },
       });
     }
@@ -1215,13 +1008,11 @@ function removerEmMassa() {
 }
 
 function carregarProdutos() {
-  // Evitar recarregar se estamos prestes a fazer reload da página
   if (window.isReloading) {
     console.log("Cancelando carregarProdutos: página vai recarregar");
     return;
   }
 
-  // Aguardar até que a tabela esteja no DOM
   const waitForTable = setInterval(function () {
     if ($("#productsTable").length) {
       clearInterval(waitForTable);
@@ -1229,7 +1020,6 @@ function carregarProdutos() {
     }
   }, 100);
 
-  // Timeout de segurança (5 segundos)
   setTimeout(function () {
     clearInterval(waitForTable);
   }, 5000);
@@ -1243,14 +1033,12 @@ function carregarProdutosNow() {
     dataType: "json",
   })
     .done(function (dados) {
-      // Se a DataTable já existe, apenas atualiza os dados
       if ($.fn.DataTable.isDataTable("#productsTable")) {
         const table = $("#productsTable").DataTable();
         table.clear().rows.add(dados).draw();
         return;
       }
 
-      // Criar nova DataTable
       window.tabelaProdutos = $("#productsTable").DataTable({
         data: dados,
         columns: [
@@ -1314,14 +1102,14 @@ function carregarProdutosNow() {
     })
     .fail(function (xhr, status, error) {
       console.error("Erro ao carregar produtos:", error);
-      Swal.fire("Erro", "Não foi possível carregar os produtos.", "error");
+      wgError("Erro", "Não foi possível carregar os produtos.");
     });
 }
 
 function abrirModalProduto(titulo, dados = {}) {
-  // Array para armazenar arquivos selecionados
   let selectedFiles = [];
-  const maxPhotos = 5; // Pode ser ajustado baseado no plano
+  const maxPhotos = 5;
+  const isEdicao = titulo.includes("Editar");
 
   Swal.fire({
     html: `
@@ -1405,6 +1193,37 @@ function abrirModalProduto(titulo, dados = {}) {
             </select>
           </div>
         </div>
+        <div class="form-row" style="margin-top: 6px;">
+          <div class="form-col">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 30px;">
+              <input type="checkbox" id="sustentavel" ${
+                Number(dados.sustentavel) === 1 ? "checked" : ""
+              } style="width: 16px; height: 16px; accent-color: #3cb371;">
+              <span><i class="fas fa-leaf" style="color: #3cb371; margin-right: 6px;"></i>Produto Sustentável</span>
+            </label>
+          </div>
+          <div class="form-col" id="materialSustentavelContainer">
+            <label><i class="fas fa-recycle" style="color: #3cb371; margin-right: 6px;"></i>Nível de Material Reciclável</label>
+            <select id="tipo_material">
+            <option value="">Selecionar nível</option>
+            <option value="100_reciclavel" ${
+              dados.tipo_material === "100_reciclavel" ? "selected" : ""
+            }>100% reciclável (Comissão 4%)</option>
+            <option value="70_reciclavel" ${
+              dados.tipo_material === "70_reciclavel" ? "selected" : ""
+            }>70% reciclável (Comissão 5%)</option>
+            <option value="50_reciclavel" ${
+              dados.tipo_material === "50_reciclavel" ? "selected" : ""
+            }>50% reciclável (Comissão 5%)</option>
+            <option value="30_reciclavel" ${
+              dados.tipo_material === "30_reciclavel" ? "selected" : ""
+            }>30% reciclável (Comissão 6%)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row-full">
+          <div id="sustentabilidadeInfo" style="padding: 10px 12px; border-radius: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; font-size: 12px;"></div>
+        </div>
         <div class="form-row-full">
           <label><i class="fas fa-align-left" style="color: #3cb371; margin-right: 6px;"></i>Descrição</label>
           <textarea id="descricao" rows="3">${dados.descricao || ""}</textarea>
@@ -1423,7 +1242,9 @@ function abrirModalProduto(titulo, dados = {}) {
       </form>
     `,
     showCancelButton: true,
-    confirmButtonText: '<i class="fas fa-save"></i> Guardar Produto',
+    confirmButtonText: isEdicao
+      ? '<i class="fas fa-edit"></i> Editar Produto'
+      : '<i class="fas fa-plus"></i> Adicionar Produto',
     cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
     width: 480,
     customClass: {
@@ -1433,24 +1254,100 @@ function abrirModalProduto(titulo, dados = {}) {
       cancelButton: "btn-secondary",
     },
     didOpen: () => {
+      function atualizarInfoSustentabilidade() {
+        const sustentavel = $("#sustentavel").is(":checked");
+        const material = $("#tipo_material").val();
+        const info = $("#sustentabilidadeInfo");
+        const container = $("#materialSustentavelContainer");
+
+        if (!sustentavel) {
+          $("#tipo_material").prop("disabled", true);
+          container.css({ opacity: "0.65" });
+          info
+            .css({
+              background: "#fff7ed",
+              border: "1px solid #fed7aa",
+              color: "#9a3412",
+            })
+            .html(
+              '<i class="fas fa-info-circle" style="margin-right:6px;"></i>Produto não sustentável — comissão aplicada: <strong>6%</strong>.',
+            );
+          return;
+        }
+
+        $("#tipo_material").prop("disabled", false);
+        container.css({ opacity: "1" });
+
+        const mapa = {
+          "100_reciclavel": {
+            nivel: "Excelente",
+            comissao: "4%",
+            detalhe: "100% reciclável",
+          },
+          "70_reciclavel": {
+            nivel: "Elevado",
+            comissao: "5%",
+            detalhe: "70% reciclável",
+          },
+          "50_reciclavel": {
+            nivel: "Intermédio",
+            comissao: "5%",
+            detalhe: "50% reciclável",
+          },
+          "30_reciclavel": {
+            nivel: "Base",
+            comissao: "6%",
+            detalhe: "30% reciclável",
+          },
+        };
+
+        const atual = mapa[material] || null;
+        if (!atual) {
+          info
+            .css({
+              background: "#ecfeff",
+              border: "1px solid #a5f3fc",
+              color: "#155e75",
+            })
+            .html(
+              '<i class="fas fa-leaf" style="margin-right:6px;"></i>Selecione o nível de sustentabilidade para calcular a comissão.',
+            );
+          return;
+        }
+
+        info
+          .css({
+            background: "#f0fdf4",
+            border: "1px solid #bbf7d0",
+            color: "#166534",
+          })
+          .html(
+            `<i class="fas fa-seedling" style="margin-right:6px;"></i>Nível: <strong>${atual.nivel}</strong> (${atual.detalhe}) — comissão aplicada: <strong>${atual.comissao}</strong>.`,
+          );
+      }
+
       carregarTiposProduto();
       if (dados.tipo_produto_id) {
         setTimeout(() => $("#tipo_produto_id").val(dados.tipo_produto_id), 100);
       }
 
-      // Carregar fotos existentes se estiver editando
+      $("#sustentavel, #tipo_material").on(
+        "change",
+        atualizarInfoSustentabilidade,
+      );
+      atualizarInfoSustentabilidade();
+
       if (dados.fotos_array && dados.fotos_array.length > 0) {
         dados.fotos_array.forEach((fotoUrl) => {
           if (fotoUrl && fotoUrl.trim()) {
-            // Criar um objeto File-like para as fotos existentes
             fetch(fotoUrl)
               .then((res) => res.blob())
               .then((blob) => {
                 const file = new File([blob], fotoUrl.split("/").pop(), {
                   type: blob.type,
                 });
-                file.isExisting = true; // Marcador para indicar que é foto existente
-                file.existingUrl = fotoUrl; // URL original para visualização
+                file.isExisting = true;
+                file.existingUrl = fotoUrl;
                 selectedFiles.push(file);
                 renderPhotoPreview();
               })
@@ -1461,12 +1358,10 @@ function abrirModalProduto(titulo, dados = {}) {
         });
       }
 
-      // Handler para o botão de selecionar fotos
       $("#selectPhotosBtn").on("click", function () {
         $("#foto").click();
       });
 
-      // Handler para mudança de arquivos
       $("#foto").on("change", function (e) {
         const files = Array.from(e.target.files);
 
@@ -1503,7 +1398,6 @@ function abrirModalProduto(titulo, dados = {}) {
         $("#photoCount").text(`(${selectedFiles.length}/${maxPhotos})`);
 
         selectedFiles.forEach((file, index) => {
-          // Se for foto existente, usar URL diretamente
           if (file.isExisting && file.existingUrl) {
             const photoCard = $(`
               <div class="photo-preview-card" data-index="${index}" style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; border: 2px solid #3cb371; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: zoom-in; transition: all 0.2s;">
@@ -1522,7 +1416,6 @@ function abrirModalProduto(titulo, dados = {}) {
             `);
             preview.append(photoCard);
           } else {
-            // Se for nova foto, usar FileReader
             const reader = new FileReader();
             reader.onload = function (e) {
               const photoCard = $(`
@@ -1546,7 +1439,6 @@ function abrirModalProduto(titulo, dados = {}) {
           }
         });
 
-        // Handler para remover foto
         setTimeout(() => {
           $(".remove-photo").on("click", function (e) {
             e.stopPropagation();
@@ -1555,13 +1447,11 @@ function abrirModalProduto(titulo, dados = {}) {
             renderPhotoPreview();
           });
 
-          // Handler para pré-visualizar foto
           $(".photo-preview-card").on("click", function () {
             const index = $(this).data("index");
             mostrarGaleriaFotos(index);
           });
 
-          // Hover effect
           $(".photo-preview-card")
             .on("mouseenter", function () {
               $(this).css({
@@ -1638,7 +1528,6 @@ function abrirModalProduto(titulo, dados = {}) {
                     exibirFoto(currentIndex);
                   });
 
-                  // Navegação por teclado
                   $(document).on("keydown.gallery", function (e) {
                     if (e.key === "ArrowLeft") {
                       $("#prevPhoto").click();
@@ -1648,7 +1537,6 @@ function abrirModalProduto(titulo, dados = {}) {
                   });
                 }
 
-                // Estilos
                 if (!$("#galleryStyles").length) {
                   $("<style>")
                     .attr("id", "galleryStyles")
@@ -1702,7 +1590,6 @@ function abrirModalProduto(titulo, dados = {}) {
         exibirFoto(currentIndex);
       }
 
-      // Adicionar estilos ao modal
       $("<style>")
         .text(
           `
@@ -1719,7 +1606,6 @@ function abrirModalProduto(titulo, dados = {}) {
         .appendTo("head");
     },
     preConfirm: () => {
-      // Validação
       if (!$("#nome").val()) {
         Swal.showValidationMessage("Nome do produto é obrigatório");
         return false;
@@ -1750,7 +1636,19 @@ function abrirModalProduto(titulo, dados = {}) {
       formData.append("genero", $("#genero").val());
       formData.append("descricao", $("#descricao").val());
 
-      // Adicionar arquivos selecionados
+      const sustentavel = $("#sustentavel").is(":checked") ? 1 : 0;
+      const tipoMaterial = sustentavel ? $("#tipo_material").val() : "";
+
+      if (sustentavel && !tipoMaterial) {
+        Swal.showValidationMessage(
+          "Selecione o nível de material reciclável para produto sustentável",
+        );
+        return false;
+      }
+
+      formData.append("sustentavel", sustentavel);
+      formData.append("tipo_material", tipoMaterial);
+
       selectedFiles.forEach((file, index) => {
         formData.append("foto[]", file);
       });
@@ -1775,20 +1673,25 @@ function abrirModalProduto(titulo, dados = {}) {
             return false;
           }
 
-          if (dados.success) {
+          const sucesso =
+            dados && (dados.success === true || dados.flag === true);
+          if (sucesso) {
             carregarProdutos();
             carregarEstatisticasProdutos();
-            Swal.fire({
-              icon: "success",
-              title: "Produto salvo!",
-              text: dados.message || "O produto foi adicionado com sucesso.",
-              confirmButtonText: "OK",
-              timer: 2000,
-            });
+            const tituloSucesso = isEdicao
+              ? "Produto editado!"
+              : "Produto adicionado!";
+            const mensagemSucesso =
+              dados.message ||
+              dados.msg ||
+              (isEdicao
+                ? "O produto foi editado com sucesso."
+                : "O produto foi adicionado com sucesso.");
+            wgSuccess(tituloSucesso, mensagemSucesso, { timer: 2000 });
             return true;
           } else {
             Swal.showValidationMessage(
-              dados.message || "Erro ao guardar produto",
+              dados.message || dados.msg || "Erro ao guardar produto",
             );
             return false;
           }
@@ -1804,17 +1707,40 @@ function abrirModalProduto(titulo, dados = {}) {
   });
 }
 
+function aplicarFeaturesPlanoNaUI(dados) {
+  if (!dados) return;
+
+  const planoNome = (dados.plano_nome || "").toString().trim();
+  const podeExportarPdf = Number(dados.plano_relatorio_pdf || 0) === 1;
+  const rastreioTipo = (dados.plano_rastreio_tipo || "Básico").toString();
+
+  if (planoNome !== "Plano Profissional Eco+") {
+    $("#upgradeBtn").show();
+  } else {
+    $("#upgradeBtn").hide();
+  }
+
+  $("#exportProductsBtn, #exportEncomendasBtn, #exportDevolucoesBtn").each(
+    function () {
+      if (podeExportarPdf) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    },
+  );
+
+  document.body.setAttribute("data-plano-rastreio", rastreioTipo);
+}
+
 function verificarPlanoUpgrade() {
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
     { op: 27 },
     function (resp) {
-      const dados = JSON.parse(resp);
-      if (dados && dados.plano_nome !== "Plano Profissional Eco+") {
-        $("#upgradeBtn").show();
-      } else {
-        $("#upgradeBtn").hide();
-      }
+      const dados = parseJsonSafe(resp);
+      if (!dados || dados.error) return;
+      aplicarFeaturesPlanoNaUI(dados);
     },
   );
 }
@@ -1824,16 +1750,13 @@ function carregarPerfil() {
     "src/controller/controllerDashboardAnunciante.php",
     { op: 27 },
     function (resp) {
-      const dados = JSON.parse(resp);
-      if (dados.error) return Swal.fire("Erro", dados.error, "error");
+      const dados = parseJsonSafe(resp);
+      if (!dados) return;
+      if (dados.error) return wgError("Erro", dados.error);
+
+      aplicarFeaturesPlanoNaUI(dados);
 
       const foto = dados.foto || "src/img/default_user.png";
-
-      if (dados.plano_nome !== "Plano Profissional Eco+") {
-        $("#upgradeBtn").show();
-      } else {
-        $("#upgradeBtn").hide();
-      }
 
       $("#profileCard").html(`
       <div class='profile-header-card'>
@@ -1888,7 +1811,6 @@ function carregarPerfil() {
 
       const planoLimite = dados.plano_limite ? dados.plano_limite : "Ilimitado";
 
-      // Calcular progresso para o próximo ranking
       let progressoPct = 0;
       let pontosTexto = `${dados.pontos_conf} pontos`;
       let proximoRankingInfo = "";
@@ -1971,7 +1893,8 @@ function guardarDadosPerfil() {
       morada: $("#moradaAnunciante").val(),
     },
     function (resp) {
-      const dados = JSON.parse(resp);
+      const dados = parseJsonSafe(resp);
+      if (!dados) return;
       if (dados.success) {
         Swal.fire("Sucesso", dados.message, "success");
         carregarPerfil();
@@ -1995,12 +1918,12 @@ function mostrarPlanosUpgrade() {
         <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #ffa500;">
           <h3 style="margin: 0 0 10px 0; color: #ffa500;">⭐ Premium</h3>
           <p style="font-size: 24px; font-weight: bold; margin: 5px 0;">€25/mês</p>
-          <ul style="margin: 10px 0; padding-left: 20px;"><li>Até 10 produtos</li><li>Rastreio básico</li><li>Relatórios em PDF</li></ul>
+          <ul style="margin: 10px 0; padding-left: 20px;"><li>Até 10 produtos</li><li>Rastreio básico</li><li>Exportação de relatórios em PDF</li></ul>
         </div>
         <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #6a4c93;">
           <h3 style="margin: 0 0 10px 0; color: #6a4c93;">💎 Enterprise</h3>
           <p style="font-size: 24px; font-weight: bold; margin: 5px 0;">€100/mês</p>
-          <ul style="margin: 10px 0; padding-left: 20px;"><li>Produtos ilimitados</li><li>Rastreio avançado</li><li>Relatórios em PDF</li><li>Suporte prioritário</li></ul>
+          <ul style="margin: 10px 0; padding-left: 20px;"><li>Produtos ilimitados</li><li>Rastreio avançado</li><li>Exportação de relatórios em PDF</li><li>Suporte prioritário</li></ul>
         </div>
       </div>
     `,
@@ -2026,7 +1949,8 @@ function adicionarFotoPerfil() {
     processData: false,
     contentType: false,
   }).done(function (resp) {
-    const dados = JSON.parse(resp);
+    const dados = parseJsonSafe(resp);
+    if (!dados) return;
     if (dados.success) {
       Swal.fire("Sucesso", dados.message, "success");
       $("#userPhoto").attr("src", dados.foto);
@@ -2073,43 +1997,45 @@ function carregarEstatisticasProdutos() {
 
       $("#totalProdutosCard").html(`
       <div class='stat-icon'><i class='fas fa-box' style='color: #ffffff;'></i></div>
-      <div class='stat-content'><div class='stat-label'>Total de Produtos</div><div class='stat-value'>${stats.total}</div><div class='stat-progress' id='totalProgress'></div></div>
+      <div class='stat-content'><div class='stat-label'>Total de Produtos</div><div class='stat-value'>${stats.total}</div></div>
     `);
 
       $.post(
         "src/controller/controllerDashboardAnunciante.php",
         { op: 14 },
         function (limite) {
-          const percentagem = (limite.current / limite.max) * 100;
-          let corBarra = "#3cb371";
-          if (percentagem >= 90) corBarra = "#ef4444";
-          else if (percentagem >= 70) corBarra = "#fbbf24";
+          const max = Number(limite.max) || 0;
+          const current = Number(limite.current) || 0;
+          const temLimite = max > 0;
 
-          const progressHTML = `<div class='stat-progress-bar'><div class='stat-progress-fill' style='width: ${percentagem}%; background-color: ${corBarra};'></div></div>`;
-          $("#totalProgress").html(progressHTML);
-
-          if (limite.current >= limite.max) {
+          if (temLimite && current >= max) {
             $("#addProductBtn").prop("disabled", true).css({
               "background-color": "#ccc",
               cursor: "not-allowed",
               opacity: "0.6",
+            });
+          } else {
+            $("#addProductBtn").prop("disabled", false).css({
+              "background-color": "",
+              cursor: "",
+              opacity: "",
             });
           }
         },
         "json",
       ).fail(function (xhr, status, error) {
         console.error("Erro ao carregar limite:", error, xhr.responseText);
+        wgError("Erro", "Não foi possível carregar o limite de produtos.");
       });
     },
     "json",
   ).fail(function (xhr, status, error) {
     console.error("Erro ao carregar estatísticas:", error, xhr.responseText);
+    wgError("Erro", "Não foi possível carregar os produtos.");
   });
 }
 
 $(document).ready(function () {
-  // updateDashboard será chamado ao mostrar a página dashboard
-
   $("#reportPeriod").change(function () {
     loadReportStats();
     loadCategorySalesChart();
@@ -2162,7 +2088,6 @@ $(document).ready(function () {
     }
   });
 
-  // Pesquisa global
   $("#searchProduct").on("keyup", function () {
     $("#productsTable").DataTable().search($(this).val()).draw();
   });
@@ -2185,7 +2110,6 @@ $(document).ready(function () {
     const tabela = $("#productsTable").DataTable();
     const dados = tabela.rows({ search: "applied" }).data();
 
-    // Cabeçalho com logo e título
     doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(60, 179, 113);
@@ -2196,7 +2120,6 @@ $(document).ready(function () {
     doc.setTextColor(45, 55, 72);
     doc.text("Relatório de Produtos", 14, 30);
 
-    // Data e informações adicionais
     doc.setFontSize(9);
     doc.setTextColor(100, 116, 139);
     doc.text(
@@ -2262,7 +2185,6 @@ $(document).ready(function () {
         fillColor: [248, 250, 252],
       },
       didDrawPage: function (data) {
-        // Rodapé em cada página
         const pageHeight = doc.internal.pageSize.height;
         doc.setFontSize(8);
         doc.setTextColor(100, 116, 139);
@@ -2275,7 +2197,6 @@ $(document).ready(function () {
       },
     });
 
-    // Resumo no final
     const finalY = doc.lastAutoTable.finalY + 10;
     doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
@@ -2292,21 +2213,22 @@ $(document).ready(function () {
     doc.save(
       "WeGreen_Produtos_" + new Date().toISOString().split("T")[0] + ".pdf",
     );
+    wgSuccess("PDF exportado", "Relatório de produtos gerado com sucesso.", {
+      timer: 1400,
+    });
   });
 
-  // Exportar Encomendas PDF
   $("#exportEncomendasBtn").on("click", function () {
-    // Buscar dados diretos do servidor
     $.post(
       "src/controller/controllerDashboardAnunciante.php",
       { op: 32 },
       function (resp) {
-        const encomendas = JSON.parse(resp);
+        const encomendas = parseJsonSafe(resp);
+        if (!encomendas) return;
 
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF("l"); // landscape
+        const doc = new jsPDF("l");
 
-        // Cabeçalho com logo e título
         doc.setFontSize(22);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(60, 179, 113);
@@ -2317,7 +2239,6 @@ $(document).ready(function () {
         doc.setTextColor(45, 55, 72);
         doc.text("Relatório de Encomendas", 14, 30);
 
-        // Data e informações
         doc.setFontSize(9);
         doc.setTextColor(100, 116, 139);
         doc.text(
@@ -2407,7 +2328,6 @@ $(document).ready(function () {
           },
         });
 
-        // Resumo
         const finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
@@ -2425,38 +2345,73 @@ $(document).ready(function () {
             new Date().toISOString().split("T")[0] +
             ".pdf",
         );
+        wgSuccess(
+          "PDF exportado",
+          "Relatório de encomendas gerado com sucesso.",
+          {
+            timer: 1400,
+          },
+        );
       },
     ).fail(function () {
-      Swal.fire(
-        "Erro",
-        "Não foi possível gerar o PDF. Tente novamente.",
-        "error",
-      );
+      wgError("Erro", "Não foi possível gerar o PDF. Tente novamente.");
     });
   });
 
-  // Exportar Devoluções PDF
   $("#exportDevolucoesBtn").on("click", function () {
-    // Buscar dados diretos do servidor
     $.ajax({
       url: "src/controller/controllerDevolucoes.php?op=3",
       method: "GET",
-      dataType: "json",
-      success: function (response) {
-        if (!response.success || !response.data) {
-          Swal.fire(
-            "Erro",
-            "Não foi possível obter os dados das devoluções.",
-            "error",
+      dataType: "text",
+      success: function (rawResponse) {
+        let devolucoes = [];
+
+        const respostaTexto = (rawResponse || "").toString().trim();
+
+        if (respostaTexto.startsWith("{") || respostaTexto.startsWith("[")) {
+          const parsed = parseJsonSafe(respostaTexto);
+          if (parsed && Array.isArray(parsed.data)) {
+            devolucoes = parsed.data;
+          } else if (Array.isArray(parsed)) {
+            devolucoes = parsed;
+          }
+        }
+
+        if (!devolucoes.length && respostaTexto) {
+          if (typeof extrairDevolucoesDeHtml === "function") {
+            const extraidas = extrairDevolucoesDeHtml(respostaTexto);
+            devolucoes = (extraidas && extraidas.devolucoes) || [];
+          } else {
+            const $rows = $("<tbody>").html(respostaTexto).find("tr");
+            devolucoes = $rows
+              .map(function () {
+                const data = this.dataset || {};
+                return {
+                  codigo_devolucao: data.codigoDevolucao || "",
+                  codigo_encomenda: data.codigoEncomenda || "",
+                  produto_nome: data.produtoNome || "",
+                  cliente_nome: data.clienteNome || "",
+                  motivo: data.motivo || "",
+                  valor_reembolso: data.valorReembolso || "0",
+                  data_solicitacao: data.dataSolicitacao || "",
+                  estado: data.estado || "",
+                };
+              })
+              .get();
+          }
+        }
+
+        if (!devolucoes.length) {
+          wgInfo(
+            "Sem dados",
+            "Não existem devoluções disponíveis para exportar no momento.",
           );
           return;
         }
 
-        const devolucoes = response.data;
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF("l"); // landscape
+        const doc = new jsPDF("l");
 
-        // Cabeçalho com logo e título
         doc.setFontSize(22);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(60, 179, 113);
@@ -2467,7 +2422,6 @@ $(document).ready(function () {
         doc.setTextColor(45, 55, 72);
         doc.text("Relatório de Devoluções", 14, 30);
 
-        // Data e informações
         doc.setFontSize(9);
         doc.setTextColor(100, 116, 139);
         doc.text(
@@ -2491,7 +2445,6 @@ $(document).ready(function () {
           const valor = parseFloat(dev.valor_reembolso || 0);
           valorTotal += valor;
 
-          // Formatar motivo de forma amigável
           const motivoTexto = {
             defeituoso: "Produto Defeituoso",
             tamanho_errado: "Tamanho Errado",
@@ -2502,18 +2455,32 @@ $(document).ready(function () {
           const motivoFormatado =
             motivoTexto[dev.motivo] || dev.motivo || "N/A";
 
-          // Formatar estado de forma amigável
           const estadoTexto = {
             solicitada: "Solicitada",
             aprovada: "Aprovada",
             enviada: "Enviada",
             recebida: "Recebida",
+            produto_enviado: "Produto Enviado",
+            produto_recebido: "Produto Recebido",
             rejeitada: "Rejeitada",
             reembolsada: "Reembolsada",
             cancelada: "Cancelada",
           };
           const estadoFormatado =
             estadoTexto[dev.estado] || dev.estado || "N/A";
+
+          const dataFormatada = dev.data_solicitacao
+            ? (() => {
+                const valor = String(dev.data_solicitacao);
+                if (/^\d{2}\/\d{2}\/\d{4}/.test(valor)) {
+                  return valor;
+                }
+                const parsedDate = new Date(valor);
+                return Number.isNaN(parsedDate.getTime())
+                  ? valor
+                  : parsedDate.toLocaleDateString("pt-PT");
+              })()
+            : "N/A";
 
           linhasTabela.push([
             dev.codigo_devolucao || "N/A",
@@ -2522,9 +2489,7 @@ $(document).ready(function () {
             dev.cliente_nome || "N/A",
             motivoFormatado,
             "€" + valor.toFixed(2),
-            dev.data_solicitacao
-              ? new Date(dev.data_solicitacao).toLocaleDateString("pt-PT")
-              : "N/A",
+            dataFormatada,
             estadoFormatado,
           ]);
         });
@@ -2584,7 +2549,6 @@ $(document).ready(function () {
           },
         });
 
-        // Resumo
         const finalY = doc.lastAutoTable.finalY + 10;
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
@@ -2606,13 +2570,16 @@ $(document).ready(function () {
             new Date().toISOString().split("T")[0] +
             ".pdf",
         );
+        wgSuccess(
+          "PDF exportado",
+          "Relatório de devoluções gerado com sucesso.",
+          {
+            timer: 1400,
+          },
+        );
       },
       error: function () {
-        Swal.fire(
-          "Erro",
-          "Não foi possível gerar o PDF. Tente novamente.",
-          "error",
-        );
+        wgError("Erro", "Não foi possível gerar o PDF. Tente novamente.");
       },
     });
   });
@@ -2620,7 +2587,10 @@ $(document).ready(function () {
   carregarEstatisticasProdutos();
 
   $("#addProductBtn").click(function () {
-    if ($(this).prop("disabled")) return alert("Limite de produtos atingido!");
+    if ($(this).prop("disabled")) {
+      wgWarning("Limite atingido", "Limite de produtos atingido!");
+      return;
+    }
     abrirModalProduto("Adicionar Produto");
   });
 
@@ -2654,7 +2624,12 @@ $(document).ready(function () {
     const senhaConfirm = $("#confirmPassword").val();
 
     if (senhaNova !== senhaConfirm) {
-      return Swal.fire("Erro", "As senhas não correspondem", "error");
+      if (typeof showModernErrorModal === "function") {
+        showModernErrorModal("Erro", "As senhas não correspondem");
+      } else {
+        Swal.fire("Erro", "As senhas não correspondem", "error");
+      }
+      return;
     }
 
     $.post(
@@ -2665,24 +2640,72 @@ $(document).ready(function () {
         senha_nova: senhaNova,
       },
       function (resp) {
-        const dados = JSON.parse(resp);
+        const dados = parseJsonSafe(resp);
+        if (!dados) return;
         if (dados.success) {
-          Swal.fire("Sucesso", dados.message, "success");
+          if (typeof showModernSuccessModal === "function") {
+            showModernSuccessModal("Sucesso", dados.message);
+          } else {
+            Swal.fire("Sucesso", dados.message, "success");
+          }
           $("#passwordForm")[0].reset();
           closePasswordModal();
         } else {
-          Swal.fire("Erro", dados.message, "error");
+          if (typeof showModernErrorModal === "function") {
+            showModernErrorModal("Erro", dados.message);
+          } else {
+            Swal.fire("Erro", dados.message, "error");
+          }
         }
       },
     );
   });
 });
 
-// ==========================================
-// GESTÃO DE ENCOMENDAS
-// ==========================================
-
 let encomendasTable;
+let detalhesProdutosEncomenda = {};
+
+function wgError(title, message) {
+  if (typeof showModernErrorModal === "function") {
+    return showModernErrorModal(title, message);
+  }
+  return Swal.fire(title, message, "error");
+}
+
+function wgSuccess(title, message, opts = {}) {
+  if (typeof showModernSuccessModal === "function") {
+    return showModernSuccessModal(title, message, opts);
+  }
+  return Swal.fire(title, message, "success");
+}
+
+function wgInfo(title, message) {
+  if (typeof showModernInfoModal === "function") {
+    return showModernInfoModal(title, message);
+  }
+  return Swal.fire(title, message, "info");
+}
+
+function wgWarning(title, message) {
+  if (typeof showModernWarningModal === "function") {
+    return showModernWarningModal(title, message);
+  }
+  return Swal.fire(title, message, "warning");
+}
+
+function wgConfirm(title, message, opts = {}) {
+  if (typeof showModernConfirmModal === "function") {
+    return showModernConfirmModal(title, message, opts);
+  }
+  return Swal.fire({
+    title,
+    text: message,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: opts.confirmText || "Confirmar",
+    cancelButtonText: "Cancelar",
+  });
+}
 
 function carregarEncomendas() {
   $.post(
@@ -2690,11 +2713,12 @@ function carregarEncomendas() {
     { op: 32 },
     function (resp) {
       try {
-        const encomendas = JSON.parse(resp);
+        const encomendas = parseJsonSafe(resp);
+        if (!encomendas) return;
         renderEncomendas(encomendas);
       } catch (e) {
         console.error("Erro ao carregar encomendas:", e);
-        Swal.fire("Erro", "Não foi possível carregar as encomendas", "error");
+        wgError("Erro", "Não foi possível carregar as encomendas");
       }
     },
   );
@@ -2702,11 +2726,10 @@ function carregarEncomendas() {
 
 function renderEncomendas(encomendas) {
   const tbody = $("#encomendasTable tbody");
+  detalhesProdutosEncomenda = {};
 
-  // Calcular estatísticas
   atualizarEstatisticasEncomendas(encomendas);
 
-  // Se DataTable existe, apenas limpar os dados
   if ($.fn.DataTable.isDataTable("#encomendasTable")) {
     try {
       const table = $("#encomendasTable").DataTable();
@@ -2715,7 +2738,7 @@ function renderEncomendas(encomendas) {
       if (!encomendas || encomendas.length === 0) {
         tbody.html(`
           <tr>
-            <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
+            <td colspan="9" style="text-align: center; padding: 40px; color: #718096;">
               <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
               <p>Nenhuma encomenda encontrada</p>
               <small>As encomendas dos seus produtos aparecerão aqui</small>
@@ -2735,22 +2758,19 @@ function renderEncomendas(encomendas) {
       return;
     } catch (e) {
       console.warn("Erro ao atualizar tabela, recriando:", e);
-      // Se falhar, destruir e recriar abaixo
+
       try {
         $("#encomendasTable").DataTable().destroy();
-      } catch (e2) {
-        // Ignorar erro de destruição
-      }
+      } catch (e2) {}
     }
   }
 
-  // Criar tabela do zero
   tbody.empty();
 
   if (!encomendas || encomendas.length === 0) {
     tbody.html(`
       <tr>
-        <td colspan="8" style="text-align: center; padding: 40px; color: #718096;">
+        <td colspan="9" style="text-align: center; padding: 40px; color: #718096;">
           <i class="fas fa-shopping-bag" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3;"></i>
           <p>Nenhuma encomenda encontrada</p>
           <small>As encomendas dos seus produtos aparecerão aqui</small>
@@ -2773,22 +2793,18 @@ function criarLinhaEncomenda(encomenda) {
   const estadoTexto = encomenda.estado || "Pendente";
   const statusBadge = `<span class="badge badge-${statusClass}">${estadoTexto}</span>`;
 
-  // Calcular dias desde a encomenda (mantido para referência futura)
   const dataEncomenda = new Date(encomenda.data_completa);
   const hoje = new Date();
   const diasDesdeEncomenda = Math.floor(
     (hoje - dataEncomenda) / (1000 * 60 * 60 * 24),
   );
 
-  // Badge "Novo" e urgência removidos - lógica simplificada
   const badgeNovo = "";
   const classeUrgente = "";
 
-  // Tooltip morada
   const moradaTooltip =
     encomenda.morada_completa || encomenda.morada || "Morada não disponível";
 
-  // Ícone do método de pagamento
   let paymentIcon = '<i class="fas fa-credit-card"></i>';
   if (encomenda.payment_method === "paypal") {
     paymentIcon = '<i class="fab fa-paypal" style="color: #0070ba;"></i>';
@@ -2797,7 +2813,6 @@ function criarLinhaEncomenda(encomenda) {
       '<i class="fas fa-money-check-alt" style="color: #ffb3c7;"></i>';
   }
 
-  // Comissão e lucro líquido
   const comissao = encomenda.comissao || 0;
   const lucroLiquido = encomenda.lucro_liquido || 0;
   const lucroTooltip = `Valor Bruto: €${encomenda.valor.toFixed(
@@ -2806,17 +2821,13 @@ function criarLinhaEncomenda(encomenda) {
     2,
   )}\nLucro Líquido: €${lucroLiquido.toFixed(2)}`;
 
-  // Renderizar produtos (múltiplos produtos ou produto único)
   let produtosHtml = "";
-  let produtosExpandidosHtml = "";
-  let temMultiplosProdutos = false;
 
   if (encomenda.produtos && Array.isArray(encomenda.produtos)) {
     if (encomenda.produtos.length === 1) {
-      // Apenas 1 produto - mostrar normalmente
       const prod = encomenda.produtos[0];
       produtosHtml = `
-        <div class="product-info">
+        <div class="product-info" style="cursor: pointer;" onclick="visualizarProduto(${prod.id})">
           <img src="${prod.foto || "src/img/no-image.png"}" alt="${
             prod.nome
           }" class="product-thumb">
@@ -2827,61 +2838,55 @@ function criarLinhaEncomenda(encomenda) {
         </div>
       `;
     } else {
-      // Múltiplos produtos - mostrar resumo com botão de expandir
-      temMultiplosProdutos = true;
       const primeiraFoto =
         encomenda.produtos[0]?.foto || "src/img/no-image.png";
       const totalProdutos = encomenda.produtos.length;
 
-      produtosHtml = `
-        <div class="product-info" style="cursor: pointer;" onclick="toggleProdutosEncomenda(${encomenda.id})">
-          <img src="${primeiraFoto}" alt="Produtos" class="product-thumb">
-          <div>
-            <div class="product-name">
-              ${totalProdutos} produtos
-              <i class="fas fa-chevron-down" id="arrow-${encomenda.id}" style="margin-left: 8px; font-size: 12px; color: #3cb371; transition: transform 0.3s;"></i>
-            </div>
-            <div class="product-qty">Qtd total: ${encomenda.quantidade}</div>
+      detalhesProdutosEncomenda[encomenda.id] = `
+        <div style="padding: 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin: 8px 0;">
+          <h4 style="margin: 0 0 12px 0; color: #2d3748; font-size: 14px; font-weight: 700;">
+            <i class="fas fa-box" style="margin-right: 8px; color: #3cb371;"></i>
+            Produtos da Encomenda
+          </h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px;">
+            ${encomenda.produtos
+              .map(
+                (prod) => `
+              <div style="display: flex; gap: 10px; padding: 10px; background: white; border-radius: 8px; border: 1px solid #e5e7eb; cursor: pointer;" onclick="visualizarProduto(${prod.id})">
+                <img src="${prod.foto || "src/img/no-image.png"}" alt="${prod.nome}" style="width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;" onclick="event.stopPropagation(); visualizarProduto(${prod.id})">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 4px; font-size: 13px; line-height: 1.3;">${prod.nome}</div>
+                  <div style="color: #718096; font-size: 12px;">
+                    <i class="fas fa-cubes" style="color: #3cb371; margin-right: 5px;"></i>
+                    Quantidade: <strong>${prod.quantidade}</strong>
+                  </div>
+                </div>
+              </div>
+            `,
+              )
+              .join("")}
           </div>
         </div>
       `;
 
-      // HTML dos produtos expandidos (hidden por padrão)
-      produtosExpandidosHtml = `
-        <tr id="produtos-expand-${encomenda.id}" class="produtos-expand-row" style="display: none;">
-          <td colspan="8" style="padding: 0; background: #f9fafb; border-top: 2px solid #3cb371;">
-            <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
-              <h4 style="margin: 0 0 15px 0; color: #2d3748; font-size: 16px; font-weight: 700;">
-                <i class="fas fa-box" style="margin-right: 8px; color: #3cb371;"></i>
-                Produtos da Encomenda
-              </h4>
-              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
-                ${encomenda.produtos
-                  .map(
-                    (prod) => `
-                  <div style="display: flex; gap: 12px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <img src="${prod.foto || "src/img/no-image.png"}" alt="${prod.nome}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 6px; border: 2px solid #e2e8f0;">
-                    <div style="flex: 1;">
-                      <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 5px; font-size: 14px;">${prod.nome}</div>
-                      <div style="color: #718096; font-size: 13px;">
-                        <i class="fas fa-cubes" style="color: #3cb371; margin-right: 5px;"></i>
-                        Quantidade: <strong>${prod.quantidade}</strong>
-                      </div>
-                    </div>
-                  </div>
-                `,
-                  )
-                  .join("")}
-              </div>
+      produtosHtml = `
+        <div class="product-info" style="cursor: pointer;" onclick="toggleProdutosEncomenda(${encomenda.id})">
+          <img src="${primeiraFoto}" alt="Produtos" class="product-thumb" onclick="event.stopPropagation(); visualizarProduto(${encomenda.produtos[0]?.id || 0})">
+          <div>
+            <div class="product-name" onclick="event.stopPropagation(); visualizarProduto(${encomenda.produtos[0]?.id || 0})" style="cursor: pointer;">
+              ${totalProdutos} produtos
             </div>
-          </td>
-        </tr>
+            <div class="product-qty">Qtd total: ${encomenda.quantidade}</div>
+            <div style="margin-top: 4px; line-height: 1;">
+              <i class="fas fa-chevron-down" id="arrow-${encomenda.id}" style="font-size: 12px; color: #3cb371; transition: transform 0.3s;"></i>
+            </div>
+          </div>
+        </div>
       `;
     }
   } else {
-    // Fallback para formato antigo (retrocompatibilidade)
     produtosHtml = `
-      <div class="product-info">
+      <div class="product-info" style="cursor: pointer;" onclick="visualizarProduto(${encomenda.produto_id || 0})">
         <img src="${
           encomenda.produto_foto || "src/img/no-image.png"
         }" alt="${encomenda.produto_nome}" class="product-thumb">
@@ -2895,6 +2900,7 @@ function criarLinhaEncomenda(encomenda) {
 
   const row = `
             <tr data-encomenda-id="${encomenda.id}" class="${classeUrgente}">
+          <td></td>
                 <td>
                     ${badgeNovo}<strong>${encomenda.codigo}</strong>
                     ${
@@ -2957,11 +2963,6 @@ function criarLinhaEncomenda(encomenda) {
             </tr>
         `;
 
-  // Se tem múltiplos produtos, adicionar linha de expansão
-  if (temMultiplosProdutos) {
-    return row + produtosExpandidosHtml;
-  }
-
   return row;
 }
 
@@ -3007,6 +3008,11 @@ function initEncomendasTable() {
         },
         order: [[1, "desc"]],
         pageLength: 10,
+        autoWidth: false,
+        columnDefs: [
+          { targets: 4, width: "26%" },
+          { targets: 5, width: "9%" },
+        ],
         responsive: true,
       });
     } catch (e) {
@@ -3098,24 +3104,23 @@ function verDetalhesEncomenda(encomendaId) {
     "src/controller/controllerDashboardAnunciante.php",
     { op: 32 },
     function (resp) {
-      const encomendas = JSON.parse(resp);
+      const encomendas = parseJsonSafe(resp);
+      if (!encomendas) return;
       const encomenda = encomendas.find((e) => e.id === encomendaId);
 
       if (!encomenda) {
-        Swal.fire("Erro", "Encomenda não encontrada", "error");
+        wgError("Erro", "Encomenda não encontrada");
         return;
       }
 
       const statusClass = getStatusClass(encomenda.estado);
 
-      // Calcular dias desde encomenda
       const dataEncomenda = new Date(encomenda.data_completa);
       const hoje = new Date();
       const diasDesdeEncomenda = Math.floor(
         (hoje - dataEncomenda) / (1000 * 60 * 60 * 24),
       );
 
-      // Prazo estimado de entrega (3 dias após envio)
       let prazoEntrega = "N/A";
       if (encomenda.estado === "Enviado" || encomenda.estado === "Entregue") {
         const dataEstimada = new Date(dataEncomenda);
@@ -3180,8 +3185,8 @@ function verDetalhesEncomenda(encomendaId) {
                                       encomenda.morada_completa ||
                                       encomenda.morada
                                     ).replace(/'/g, "\\'")}')
-.then(() => Swal.fire({icon: 'success', title: 'Copiado!', text: 'Morada copiada para a área de transferência', timer: 1500, showConfirmButton: false}))
-.catch(() => Swal.fire({icon: 'error', title: 'Erro', text: 'Não foi possível copiar', timer: 1500, showConfirmButton: false}))"
+.then(() => (typeof showModernSuccessModal === 'function' ? showModernSuccessModal('Copiado!', 'Morada copiada para a área de transferência', { timer: 1500 }) : Swal.fire({icon: 'success', title: 'Copiado!', text: 'Morada copiada para a área de transferência', timer: 1500, showConfirmButton: false})))
+.catch(() => (typeof showModernErrorModal === 'function' ? showModernErrorModal('Erro', 'Não foi possível copiar') : Swal.fire({icon: 'error', title: 'Erro', text: 'Não foi possível copiar', timer: 1500, showConfirmButton: false})))"
                                        style="color: #3cb371; cursor: pointer; font-size: 14px; flex-shrink: 0;"
                                        title="Copiar morada"></i>
                                 </div>
@@ -3325,7 +3330,6 @@ function verDetalhesEncomenda(encomendaId) {
         confirmButtonText: "Fechar",
         confirmButtonColor: "#3cb371",
         didOpen: () => {
-          // Aplicar estilos do cabeçalho verde
           const title = document.querySelector(
             ".product-modal-view .swal2-title",
           );
@@ -3340,7 +3344,6 @@ function verDetalhesEncomenda(encomendaId) {
             title.style.fontWeight = "600";
           }
 
-          // Botão X branco
           const closeBtn = document.querySelector(
             ".product-modal-view .swal2-close",
           );
@@ -3355,6 +3358,41 @@ function verDetalhesEncomenda(encomendaId) {
 }
 
 function editarStatusEncomenda(encomendaId, statusAtual) {
+  const fluxoStatus = {
+    Pendente: ["Pendente", "Processando", "Cancelado"],
+    Processando: ["Processando", "Enviado", "Cancelado"],
+    Enviado: ["Enviado", "Entregue"],
+    Entregue: ["Entregue"],
+    Cancelado: ["Cancelado"],
+  };
+
+  const opcoesPermitidas = fluxoStatus[statusAtual] || [
+    statusAtual || "Pendente",
+  ];
+  const terminal =
+    statusAtual === "Entregue" ||
+    statusAtual === "Cancelado" ||
+    opcoesPermitidas.length === 1;
+
+  const iconeStatus = {
+    Pendente: "⏳",
+    Processando: "📦",
+    Enviado: "🚚",
+    Entregue: "✔️",
+    Cancelado: "❌",
+  };
+
+  const opcoesStatusHtml = opcoesPermitidas
+    .map(
+      (estado) =>
+        `<option value="${estado}" ${statusAtual === estado ? "selected" : ""}>${iconeStatus[estado] || "•"} ${estado}</option>`,
+    )
+    .join("");
+
+  const rastreioTipo =
+    document.body.getAttribute("data-plano-rastreio") || "Basico";
+  const temRastreioAvancado = rastreioTipo.toLowerCase().includes("avan");
+
   Swal.fire({
     title: "Alterar Status da Encomenda",
     html: `
@@ -3377,15 +3415,17 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
                         Novo Status
                     </label>
                     <select id="novoStatus" style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; background: white; color: #1e293b; font-weight: 500; transition: all 0.3s;" onchange="toggleCodigoRastreio()" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'">
-                        <option value="Pendente" ${statusAtual === "Pendente" ? "selected" : ""}>⏳ Pendente</option>
-                        <option value="Processando" ${statusAtual === "Processando" ? "selected" : ""}>📦 Processando</option>
-                        <option value="Enviado" ${statusAtual === "Enviado" ? "selected" : ""}>🚚 Enviado</option>
-                        <option value="Entregue" ${statusAtual === "Entregue" ? "selected" : ""}>✔️ Entregue</option>
-                        <option value="Cancelado" ${statusAtual === "Cancelado" ? "selected" : ""}>❌ Cancelado</option>
+                    ${opcoesStatusHtml}
                     </select>
+                  <small style="color: #64748b; font-size: 12px; display: block; margin-top: 6px;">
+                    Apenas é permitido avançar para o próximo estado.
+                  </small>
                 </div>
 
-                <!-- Código de rastreio (condicional) -->
+                <!-- Código de rastreio (condicional — só Rastreio Avançado) -->
+                ${
+                  temRastreioAvancado
+                    ? `
                 <div id="codigoRastreioContainer" style="display: ${statusAtual === "Enviado" ? "block" : "none"}; margin-bottom: 18px;">
                     <label style="display: block; margin-bottom: 8px; color: #2d3748; font-weight: 600; font-size: 14px;">
                         <i class="fas fa-barcode" style="margin-right: 6px; color: #3cb371;"></i>
@@ -3398,6 +3438,21 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
                         Obrigatório ao marcar como "Enviado"
                     </small>
                 </div>
+                `
+                    : `
+                <div id="codigoRastreioContainer" style="display: none;"></div>
+                <input type="hidden" id="codigoRastreio" value="">
+                <div style="background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-lock" style="color: #d97706; font-size: 16px;"></i>
+                        <div>
+                            <p style="margin: 0; font-size: 13px; font-weight: 600; color: #92400e;">Rastreio Avançado</p>
+                            <p style="margin: 2px 0 0; font-size: 12px; color: #a16207;">Disponível no Plano Profissional Eco+. <a href="planos.php" style="color: #3cb371; font-weight: 600;">Fazer upgrade</a></p>
+                        </div>
+                    </div>
+                </div>
+                `
+                }
 
                 <!-- Observações -->
                 <div style="margin-bottom: 10px;">
@@ -3414,6 +3469,7 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
                 function toggleCodigoRastreio() {
                     const status = document.getElementById('novoStatus').value;
                     const container = document.getElementById('codigoRastreioContainer');
+                    if (!container || container.querySelector('input[type="hidden"]')) return;
                     if (status === 'Enviado') {
                         container.style.display = 'block';
                         container.style.animation = 'slideDown 0.3s ease-out';
@@ -3438,7 +3494,6 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
       cancelButton: "btn-cancel-gray",
     },
     didOpen: () => {
-      // Aplicar estilos ao título
       const title = document.querySelector(".status-modal-custom .swal2-title");
       if (title) {
         title.style.background =
@@ -3450,12 +3505,32 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
         title.style.fontSize = "20px";
         title.style.fontWeight = "700";
       }
+
+      if (terminal) {
+        const select = document.getElementById("novoStatus");
+        if (select) {
+          select.disabled = true;
+          select.style.background = "#f8fafc";
+          select.style.cursor = "not-allowed";
+        }
+      }
     },
     preConfirm: () => {
       const status = document.getElementById("novoStatus").value;
       const codigoRastreio = document.getElementById("codigoRastreio").value;
 
-      if (status === "Enviado" && !codigoRastreio.trim()) {
+      if (!opcoesPermitidas.includes(status)) {
+        Swal.showValidationMessage(
+          '<i class="fas fa-exclamation-triangle"></i> Só é possível avançar para estados seguintes.',
+        );
+        return false;
+      }
+
+      if (
+        temRastreioAvancado &&
+        status === "Enviado" &&
+        !codigoRastreio.trim()
+      ) {
         Swal.showValidationMessage(
           '<i class="fas fa-exclamation-triangle"></i> Código de rastreio é obrigatório ao marcar como "Enviado"',
         );
@@ -3470,7 +3545,6 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      // Atualiza no backend
       $.post(
         "src/controller/controllerDashboardAnunciante.php",
         {
@@ -3481,22 +3555,18 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
           codigo_rastreio: result.value.codigo_rastreio,
         },
         function (resp) {
-          const dados = JSON.parse(resp);
+          const dados = parseJsonSafe(resp);
+          if (!dados) return;
           if (dados.success) {
-            Swal.fire({
-              title: "Status Atualizado!",
-              text: dados.message,
-              icon: "success",
-              confirmButtonColor: "#3cb371",
-            }).then(() => {
+            wgSuccess("Status Atualizado!", dados.message).then(() => {
               carregarEncomendas();
             });
           } else {
-            Swal.fire("Erro", dados.message, "error");
+            wgError("Erro", dados.message);
           }
         },
       ).fail(function () {
-        Swal.fire("Erro", "Falha ao comunicar com o servidor", "error");
+        wgError("Erro", "Falha ao comunicar com o servidor");
       });
     }
   });
@@ -3507,14 +3577,11 @@ function verHistoricoEncomenda(encomendaId) {
     "src/controller/controllerDashboardAnunciante.php",
     { op: 34, encomenda_id: encomendaId },
     function (resp) {
-      const historico = JSON.parse(resp);
+      const historico = parseJsonSafe(resp);
+      if (!historico) return;
 
       if (!historico || historico.length === 0) {
-        Swal.fire(
-          "Info",
-          "Nenhum histórico encontrado para esta encomenda",
-          "info",
-        );
+        wgInfo("Informação", "Nenhum histórico encontrado para esta encomenda");
         return;
       }
 
@@ -3637,13 +3704,10 @@ function verHistoricoEncomenda(encomendaId) {
       });
     },
   ).fail(function () {
-    Swal.fire("Erro", "Falha ao carregar histórico", "error");
+    wgError("Erro", "Falha ao carregar histórico");
   });
 }
 
-// ========== FUNÇÕES DE INICIALIZAÇÃO POR PÁGINA ==========
-
-// Inicializar página Dashboard
 function initDashboardPage() {
   if (typeof updateDashboard === "function") {
     updateDashboard();
@@ -3656,39 +3720,38 @@ function initDashboardPage() {
     if (typeof renderTopProductsChart === "function") renderTopProductsChart();
     if (typeof renderRecentProducts === "function") renderRecentProducts();
   }
+  if (typeof verificarPlanoUpgrade === "function") verificarPlanoUpgrade();
 }
 
-// Inicializar página Produtos
 function initProductsPage() {
   if (typeof getDadosPlanos === "function") getDadosPlanos();
   if (typeof carregarProdutos === "function") carregarProdutos();
+  if (typeof verificarPlanoUpgrade === "function") verificarPlanoUpgrade();
 }
 
-// Inicializar página Encomendas
 function initSalesPage() {
   if (typeof getDadosPlanos === "function") getDadosPlanos();
   if (typeof initEncomendasTable === "function") initEncomendasTable();
   if (typeof carregarEncomendas === "function") carregarEncomendas();
   if (typeof aplicarFiltrosEncomendas === "function")
     aplicarFiltrosEncomendas();
+  if (typeof verificarPlanoUpgrade === "function") verificarPlanoUpgrade();
 }
 
-// Inicializar página Relatórios/Analytics
 function initAnalyticsPage() {
   if (typeof getDadosPlanos === "function") getDadosPlanos();
   if (typeof loadReportStats === "function") loadReportStats();
   if (typeof loadCategorySalesChart === "function") loadCategorySalesChart();
   if (typeof loadDailyRevenueChart === "function") loadDailyRevenueChart();
   if (typeof loadReportsTable === "function") loadReportsTable();
+  if (typeof verificarPlanoUpgrade === "function") verificarPlanoUpgrade();
 }
 
-// Inicializar página Perfil
 function initProfilePage() {
   if (typeof getDadosPlanos === "function") getDadosPlanos();
   if (typeof carregarPerfil === "function") carregarPerfil();
 }
 
-// Função de Logout
 function logout() {
   Swal.fire({
     html: `
@@ -3914,21 +3977,38 @@ function logoutIncomplete() {
   });
 }
 
-// Toggle produtos expandidos na encomenda
 function toggleProdutosEncomenda(encomendaId) {
-  const expandRow = document.getElementById(`produtos-expand-${encomendaId}`);
   const arrow = document.getElementById(`arrow-${encomendaId}`);
+  const tabela = $("#encomendasTable");
 
-  if (expandRow.style.display === "none") {
-    expandRow.style.display = "table-row";
-    arrow.style.transform = "rotate(180deg)";
+  if (!$.fn.DataTable.isDataTable("#encomendasTable")) {
+    return;
+  }
+
+  const dataTable = tabela.DataTable();
+  const tr = tabela
+    .find(`tbody tr[data-encomenda-id="${encomendaId}"]`)
+    .first();
+
+  if (!tr.length) return;
+
+  const rowApi = dataTable.row(tr);
+  if (!rowApi) return;
+
+  if (rowApi.child.isShown()) {
+    rowApi.child.hide();
+    tr.removeClass("shown");
+    if (arrow) arrow.style.transform = "rotate(0deg)";
   } else {
-    expandRow.style.display = "none";
-    arrow.style.transform = "rotate(0deg)";
+    const detalheHtml =
+      detalhesProdutosEncomenda[encomendaId] ||
+      '<div style="padding: 12px;">Sem detalhes de produtos.</div>';
+    rowApi.child(detalheHtml, "produtos-child-row").show();
+    tr.addClass("shown");
+    if (arrow) arrow.style.transform = "rotate(180deg)";
   }
 }
 
-// Limpar filtros de produtos
 function limparFiltrosProdutos() {
   $("#searchProduct").val("");
   $("#filterTipo").val("").trigger("change");
@@ -3941,7 +4021,6 @@ function limparFiltrosProdutos() {
   }
 }
 
-// Limpar filtros de encomendas
 function limparFiltrosEncomendas() {
   $("#filterEncomendaStatus").val("");
   $("#filterDateFrom").val("");

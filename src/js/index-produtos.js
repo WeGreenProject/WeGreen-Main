@@ -1,4 +1,3 @@
-// Homepage - Carregar produtos em destaque e novidades
 $(document).ready(function () {
   carregarProdutosDestaque();
   carregarMaisVendidos();
@@ -59,7 +58,7 @@ function carregarNovidades() {
     dataType: "json",
     success: function (data) {
       if (data.success && data.produtos) {
-        renderizarProdutos(data.produtos, "#ProdutosRecomendados");
+        renderizarProdutos(data.produtos, "#ProdutosNovidades");
       }
     },
     error: function (error) {
@@ -111,7 +110,6 @@ function renderizarProdutos(produtos, containerId) {
     container.append(card);
   });
 
-  // Adicionar efeito hover
   $(".produto-card-homepage").hover(
     function () {
       $(this).css({
@@ -140,7 +138,7 @@ function carregarRecomendados() {
     dataType: "json",
     success: function (data) {
       if (data.success && data.produtos) {
-        renderizarProdutos(data.produtos, "#ProdutosRecomendados");
+        renderizarProdutos(data.produtos, "#ProdutosNovidades");
       }
     },
     error: function (error) {

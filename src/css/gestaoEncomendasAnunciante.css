@@ -1,0 +1,198 @@
+
+
+td.enc-toggle {
+  width: 24px !important;
+  min-width: 24px;
+  max-width: 32px;
+  text-align: center;
+  padding: 0 4px !important;
+  cursor: pointer;
+  vertical-align: middle;
+  user-select: none;
+}
+
+.enc-toggle-icon {
+  font-size: 11px;
+  color: #b0b8c4;
+  transition:
+    transform 0.25s ease,
+    color 0.2s ease;
+  display: inline-block;
+}
+
+td.enc-toggle:hover .enc-toggle-icon {
+  color: #3cb371;
+}
+
+tr.dt-row-expanded > td.enc-toggle .enc-toggle-icon {
+  transform: rotate(90deg);
+  color: #3cb371;
+}
+
+tr.dt-row-expanded {
+  background: #f7fdf9 !important;
+}
+
+.enc-produto-resumo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.enc-produto-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  background: #3cb371;
+  color: white;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.enc-produto-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2d3748;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+tr.enc-child-tr > td {
+  padding: 0 !important;
+  border-top: none !important;
+  background: transparent !important;
+}
+
+.enc-child-wrapper {
+  width: 100%;
+  background: #f7faf8;
+  border-left: 3px solid #3cb371;
+  margin: 0;
+}
+
+.enc-child-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.enc-child-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 28px 14px 48px;
+  border-bottom: 1px solid #e8ede9;
+  transition: background 0.15s ease;
+  gap: 16px;
+}
+
+.enc-child-row:last-child {
+  border-bottom: none;
+}
+
+.enc-child-row:hover {
+  background: #eef7f1;
+}
+
+.enc-child-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #dce5df;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.enc-child-img-click {
+  cursor: pointer;
+}
+
+.enc-child-prod-name {
+  font-weight: 600;
+  color: #1a202c;
+  font-size: 13.5px;
+  white-space: nowrap;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 60px;
+}
+
+.enc-child-qty-tag,
+.enc-child-tax-tag,
+.enc-child-eco-tag,
+.enc-child-price-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.enc-child-qty-tag {
+  background: #edf2f7;
+  color: #4a5568;
+}
+
+.enc-child-qty-tag i {
+  color: #3cb371;
+  font-size: 10px;
+}
+
+.enc-child-price-tag {
+  background: #e6f7ee;
+  color: #276749;
+}
+
+.enc-child-price-tag i {
+  color: #3cb371;
+  font-size: 10px;
+}
+
+.enc-child-tax-tag {
+  background: #fffbeb;
+  color: #b7791f;
+}
+
+.enc-child-tax-tag i {
+  color: #ecc94b;
+  font-size: 10px;
+}
+
+.enc-child-eco-tag {
+  background: #f0fff4;
+  color: #276749;
+}
+
+.enc-child-eco-tag i {
+  color: #38a169;
+  font-size: 10px;
+}
+
+.enc-child-empty {
+  padding: 16px 24px;
+  text-align: center;
+  color: #a0aec0;
+  font-style: italic;
+  font-size: 13px;
+}
+
+#encomendasTable thead th {
+  white-space: nowrap;
+}
+
+#encomendasTable thead th i {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+}

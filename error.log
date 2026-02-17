@@ -157,3 +157,90 @@ Stack trace:
 #3 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerDashboardAnunciante.php(303): DashboardAnunciante->atualizarStatusEncomenda('1', 'Entregue', '4343', '')
 #4 {main}
   thrown in C:\xampp\htdocs\WeGreen-Main\src\services\EmailService.php on line 28
+[03-Feb-2026 21:34:18 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:34:18 Europe/Berlin] Produto ID recebido: 23
+[03-Feb-2026 21:34:18 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:34:18 Europe/Berlin] Avaliações retornadas: 0
+[03-Feb-2026 21:34:18 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:34:18 Europe/Berlin] Estatísticas - Total: 0, Média: 0
+[03-Feb-2026 21:34:18 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[],"estatisticas":{"total":0,"media":0,"estrelas_5":0,"estrelas_4":0,"estrelas_3":0,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 21:34:21 Europe/Berlin] PHP Parse error:  Unclosed '{' on line 5 in C:\xampp\htdocs\WeGreen-Main\src\model\modelCarrinho.php on line 525
+[03-Feb-2026 21:34:21 Europe/Berlin] PHP Parse error:  Unclosed '{' on line 5 in C:\xampp\htdocs\WeGreen-Main\src\model\modelCarrinho.php on line 525
+[03-Feb-2026 21:34:24 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:34:24 Europe/Berlin] Produto ID recebido: 26
+[03-Feb-2026 21:34:24 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:34:24 Europe/Berlin] Avaliações retornadas: 4
+[03-Feb-2026 21:34:24 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:34:24 Europe/Berlin] Estatísticas - Total: 4, Média: 4.3
+[03-Feb-2026 21:34:24 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[{"id":5,"avaliacao":5,"comentario":"Excelente qualidade! A t-shirt \u00e9 muito confort\u00e1vel e o tecido \u00e9 de primeira. Recomendo!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Admin WeGreen","utilizador_apelido":null},{"id":6,"avaliacao":4,"comentario":"Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Joao","utilizador_apelido":null},{"id":7,"avaliacao":5,"comentario":"Perfeita! Chegou r\u00e1pido e a qualidade \u00e9 excelente. J\u00e1 comprei mais!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Santos","utilizador_apelido":null},{"id":8,"avaliacao":3,"comentario":"Razo\u00e1vel. O tamanho M ficou um pouco justo.","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Luiza","utilizador_apelido":null}],"estatisticas":{"total":4,"media":4.3,"estrelas_5":2,"estrelas_4":1,"estrelas_3":1,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 21:34:25 Europe/Berlin] PHP Parse error:  Unclosed '{' on line 5 in C:\xampp\htdocs\WeGreen-Main\src\model\modelCarrinho.php on line 525
+[03-Feb-2026 21:35:22 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:35:22 Europe/Berlin] Produto ID recebido: 26
+[03-Feb-2026 21:35:22 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:35:22 Europe/Berlin] Avaliações retornadas: 4
+[03-Feb-2026 21:35:22 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:35:22 Europe/Berlin] Estatísticas - Total: 4, Média: 4.3
+[03-Feb-2026 21:35:22 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[{"id":5,"avaliacao":5,"comentario":"Excelente qualidade! A t-shirt \u00e9 muito confort\u00e1vel e o tecido \u00e9 de primeira. Recomendo!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Admin WeGreen","utilizador_apelido":null},{"id":6,"avaliacao":4,"comentario":"Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Joao","utilizador_apelido":null},{"id":7,"avaliacao":5,"comentario":"Perfeita! Chegou r\u00e1pido e a qualidade \u00e9 excelente. J\u00e1 comprei mais!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Santos","utilizador_apelido":null},{"id":8,"avaliacao":3,"comentario":"Razo\u00e1vel. O tamanho M ficou um pouco justo.","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Luiza","utilizador_apelido":null}],"estatisticas":{"total":4,"media":4.3,"estrelas_5":2,"estrelas_4":1,"estrelas_3":1,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 21:35:30 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'temp_69825c0b452c2' in 'where clause' in C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php:98
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php(98): mysqli->query('SELECT * FROM U...')
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerPerfil.php(57): Perfil->PerfilDoUtilizador('temp_69825c0b45...')
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php on line 98
+[03-Feb-2026 21:35:33 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'temp_69825c0b452c2' in 'where clause' in C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php:98
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php(98): mysqli->query('SELECT * FROM U...')
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerPerfil.php(57): Perfil->PerfilDoUtilizador('temp_69825c0b45...')
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php on line 98
+[03-Feb-2026 21:35:51 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'temp_69825c0b452c2' in 'where clause' in C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php:98
+Stack trace:
+#0 C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php(98): mysqli->query('SELECT * FROM U...')
+#1 C:\xampp\htdocs\WeGreen-Main\src\controller\controllerPerfil.php(57): Perfil->PerfilDoUtilizador('temp_69825c0b45...')
+#2 {main}
+  thrown in C:\xampp\htdocs\WeGreen-Main\src\model\modelPerfil.php on line 98
+[03-Feb-2026 21:38:17 Europe/Berlin] PHP Warning:  Undefined array key "tipo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerFavoritos.php on line 22
+[03-Feb-2026 21:38:17 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:38:17 Europe/Berlin] Produto ID recebido: 26
+[03-Feb-2026 21:38:17 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:38:17 Europe/Berlin] Avaliações retornadas: 4
+[03-Feb-2026 21:38:17 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:38:17 Europe/Berlin] Estatísticas - Total: 4, Média: 4.3
+[03-Feb-2026 21:38:17 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[{"id":5,"avaliacao":5,"comentario":"Excelente qualidade! A t-shirt \u00e9 muito confort\u00e1vel e o tecido \u00e9 de primeira. Recomendo!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Admin WeGreen","utilizador_apelido":null},{"id":6,"avaliacao":4,"comentario":"Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Joao","utilizador_apelido":null},{"id":7,"avaliacao":5,"comentario":"Perfeita! Chegou r\u00e1pido e a qualidade \u00e9 excelente. J\u00e1 comprei mais!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Santos","utilizador_apelido":null},{"id":8,"avaliacao":3,"comentario":"Razo\u00e1vel. O tamanho M ficou um pouco justo.","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Luiza","utilizador_apelido":null}],"estatisticas":{"total":4,"media":4.3,"estrelas_5":2,"estrelas_4":1,"estrelas_3":1,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 21:38:20 Europe/Berlin] PHP Warning:  Undefined array key "tipo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerFavoritos.php on line 22
+[03-Feb-2026 21:38:20 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:38:20 Europe/Berlin] Produto ID recebido: 25
+[03-Feb-2026 21:38:20 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:38:20 Europe/Berlin] Avaliações retornadas: 4
+[03-Feb-2026 21:38:20 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:38:20 Europe/Berlin] Estatísticas - Total: 4, Média: 4.3
+[03-Feb-2026 21:38:20 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[{"id":2,"avaliacao":4,"comentario":"Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!","data_criacao":"2026-01-25 19:38:41","utilizador_nome":"Joao","utilizador_apelido":null},{"id":3,"avaliacao":5,"comentario":"Perfeita! Chegou r\u00e1pido e a qualidade \u00e9 excelente. J\u00e1 comprei mais!","data_criacao":"2026-01-25 19:38:41","utilizador_nome":"Maria Santos","utilizador_apelido":null},{"id":4,"avaliacao":3,"comentario":"Razo\u00e1vel. O tamanho M ficou um pouco justo.","data_criacao":"2026-01-25 19:38:41","utilizador_nome":"Maria Luiza","utilizador_apelido":null},{"id":1,"avaliacao":5,"comentario":"Excelente qualidade! A t-shirt \u00e9 muito confort\u00e1vel e o tecido \u00e9 de primeira. Recomendo!","data_criacao":"2026-01-25 19:38:01","utilizador_nome":"Admin WeGreen","utilizador_apelido":null}],"estatisticas":{"total":4,"media":4.3,"estrelas_5":2,"estrelas_4":1,"estrelas_3":1,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 21:38:25 Europe/Berlin] PHP Warning:  Undefined array key "tipo" in C:\xampp\htdocs\WeGreen-Main\src\controller\controllerFavoritos.php on line 22
+[03-Feb-2026 21:38:26 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:38:26 Europe/Berlin] Produto ID recebido: 6
+[03-Feb-2026 21:38:26 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:38:26 Europe/Berlin] Avaliações retornadas: 0
+[03-Feb-2026 21:38:26 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:38:26 Europe/Berlin] Estatísticas - Total: 0, Média: 0
+[03-Feb-2026 21:38:26 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[],"estatisticas":{"total":0,"media":0,"estrelas_5":0,"estrelas_4":0,"estrelas_3":0,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 21:42:32 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:42:32 Europe/Berlin] Produto ID recebido: 26
+[03-Feb-2026 21:42:32 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:42:32 Europe/Berlin] Avaliações retornadas: 4
+[03-Feb-2026 21:42:32 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:42:32 Europe/Berlin] Estatísticas - Total: 4, Média: 4.3
+[03-Feb-2026 21:42:32 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[{"id":5,"avaliacao":5,"comentario":"Excelente qualidade! A t-shirt \u00e9 muito confort\u00e1vel e o tecido \u00e9 de primeira. Recomendo!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Admin WeGreen","utilizador_apelido":null},{"id":6,"avaliacao":4,"comentario":"Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Joao","utilizador_apelido":null},{"id":7,"avaliacao":5,"comentario":"Perfeita! Chegou r\u00e1pido e a qualidade \u00e9 excelente. J\u00e1 comprei mais!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Santos","utilizador_apelido":null},{"id":8,"avaliacao":3,"comentario":"Razo\u00e1vel. O tamanho M ficou um pouco justo.","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Luiza","utilizador_apelido":null}],"estatisticas":{"total":4,"media":4.3,"estrelas_5":2,"estrelas_4":1,"estrelas_3":1,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 21:43:54 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 21:43:54 Europe/Berlin] Produto ID recebido: 26
+[03-Feb-2026 21:43:54 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 21:43:54 Europe/Berlin] Avaliações retornadas: 4
+[03-Feb-2026 21:43:54 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 21:43:54 Europe/Berlin] Estatísticas - Total: 4, Média: 4.3
+[03-Feb-2026 21:43:54 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[{"id":5,"avaliacao":5,"comentario":"Excelente qualidade! A t-shirt \u00e9 muito confort\u00e1vel e o tecido \u00e9 de primeira. Recomendo!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Admin WeGreen","utilizador_apelido":null},{"id":6,"avaliacao":4,"comentario":"Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Joao","utilizador_apelido":null},{"id":7,"avaliacao":5,"comentario":"Perfeita! Chegou r\u00e1pido e a qualidade \u00e9 excelente. J\u00e1 comprei mais!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Santos","utilizador_apelido":null},{"id":8,"avaliacao":3,"comentario":"Razo\u00e1vel. O tamanho M ficou um pouco justo.","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Luiza","utilizador_apelido":null}],"estatisticas":{"total":4,"media":4.3,"estrelas_5":2,"estrelas_4":1,"estrelas_3":1,"estrelas_2":0,"estrelas_1":0}}
+[03-Feb-2026 22:06:32 Europe/Berlin] === CONTROLLER AVALIACOES ===
+[03-Feb-2026 22:06:32 Europe/Berlin] Produto ID recebido: 26
+[03-Feb-2026 22:06:32 Europe/Berlin] Chamando obterAvaliacoesProduto...
+[03-Feb-2026 22:06:32 Europe/Berlin] Avaliações retornadas: 4
+[03-Feb-2026 22:06:32 Europe/Berlin] Chamando obterEstatisticasProduto...
+[03-Feb-2026 22:06:32 Europe/Berlin] Estatísticas - Total: 4, Média: 4.3
+[03-Feb-2026 22:06:32 Europe/Berlin] Enviando resposta JSON: {"success":true,"avaliacoes":[{"id":5,"avaliacao":5,"comentario":"Excelente qualidade! A t-shirt \u00e9 muito confort\u00e1vel e o tecido \u00e9 de primeira. Recomendo!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Admin WeGreen","utilizador_apelido":null},{"id":6,"avaliacao":4,"comentario":"Boa t-shirt, mas esperava um azul um pouco mais escuro. De resto, muito boa!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Joao","utilizador_apelido":null},{"id":7,"avaliacao":5,"comentario":"Perfeita! Chegou r\u00e1pido e a qualidade \u00e9 excelente. J\u00e1 comprei mais!","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Santos","utilizador_apelido":null},{"id":8,"avaliacao":3,"comentario":"Razo\u00e1vel. O tamanho M ficou um pouco justo.","data_criacao":"2026-01-25 19:42:55","utilizador_nome":"Maria Luiza","utilizador_apelido":null}],"estatisticas":{"total":4,"media":4.3,"estrelas_5":2,"estrelas_4":1,"estrelas_3":1,"estrelas_2":0,"estrelas_1":0}}

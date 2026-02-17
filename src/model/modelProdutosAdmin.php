@@ -4,13 +4,22 @@ require_once 'connection.php';
 
 class ProdutosAdmin{
 
+    private $conn;
+
+    public function __construct($conn) {
+        $this->conn = $conn;
+    }
+
     function getDadosPerfil($ID_User){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
-        $sql = "SELECT * from utilizadores where id =".$ID_User;
-
-        $result = $conn->query($sql);
+        $sql = "SELECT * from utilizadores where id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $ID_User);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -35,13 +44,16 @@ class ProdutosAdmin{
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getProdutosAprovar($estado){
-        global $conn;
+        try {
+
         $msg = "";
             if($estado == "Todos")
             {
@@ -77,10 +89,19 @@ class ProdutosAdmin{
                 INNER JOIN Produtos ON Encomendas.produto_id = Produtos.Produto_id
                 INNER JOIN Utilizadores AS Cliente ON Cliente.id = Encomendas.cliente_id
                 INNER JOIN Utilizadores AS Anunciante ON Anunciante.id = Vendas.anunciante_id
-            WHERE Encomendas.estado LIKE '$estado'
+            WHERE Encomendas.estado LIKE ?
             GROUP BY Encomendas.id";
+
+                $stmt = $this->conn->prepare($sql);
+                $stmt->bind_param("s", $estado);
+                $stmt->execute();
+                $result = $stmt->get_result();
             }
-        $result = $conn->query($sql);
+        if (!isset($result)) {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        }
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -109,17 +130,25 @@ class ProdutosAdmin{
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getProdutosPendentes(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As EncomendasCount from Encomendas  where Encomendas.estado like 'Pendente';";
-
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -142,18 +171,26 @@ class ProdutosAdmin{
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
         function getProdutosAprovado(){
-        global $conn;
+            try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As EncomendasCount from Encomendas  where Encomendas.estado like 'Entregue';";
-
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -176,18 +213,26 @@ class ProdutosAdmin{
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
 
+            } catch (Exception $e) {
+                return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            }
     }
     function getProdutosRejeitado(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As EncomendasCount from Encomendas  where Encomendas.estado like 'Cancelada';";
-
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -210,23 +255,41 @@ class ProdutosAdmin{
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 function getFiltro() {
-    global $conn;
+        try {
+
     $msg = "";
     $sql1 = "SELECT COUNT(*) AS EncomendasCount1 FROM Encomendas";
     $sql2 = "SELECT COUNT(*) AS EncomendasCount2 FROM Encomendas WHERE estado = 'Cancelada';";
     $sql3 = "SELECT COUNT(*) AS EncomendasCount3 FROM Encomendas WHERE estado = 'Entregue';";
     $sql4 = "SELECT COUNT(*) AS EncomendasCount4 FROM Encomendas WHERE estado = 'Pendente';";
 
-    $row1 = $conn->query($sql1)->fetch_assoc();
-    $row2 = $conn->query($sql2)->fetch_assoc();
-    $row3 = $conn->query($sql3)->fetch_assoc();
-    $row4 = $conn->query($sql4)->fetch_assoc();
+    $stmt1 = $this->conn->prepare($sql1);
+    $stmt1->execute();
+    $row1 = $stmt1->get_result()->fetch_assoc();
+
+    $stmt2 = $this->conn->prepare($sql2);
+    $stmt2->execute();
+    $row2 = $stmt2->get_result()->fetch_assoc();
+
+    $stmt3 = $this->conn->prepare($sql3);
+    $stmt3->execute();
+    $row3 = $stmt3->get_result()->fetch_assoc();
+
+    $stmt4 = $this->conn->prepare($sql4);
+    $stmt4->execute();
+    $row4 = $stmt4->get_result()->fetch_assoc();
 
     $msg .= "<div class='add-order-section'>";
     $msg .= "<div class='simple-add-section'>";
@@ -241,16 +304,32 @@ function getFiltro() {
     $msg .= "  <button class='filter-btn' onclick='getProdutosAprovar(\"Cancelada\")'>Cancelados <span class='filter-badge' id='rejectedBadge'>".$row2['EncomendasCount2']."</span></button>";
     $msg .= "</div>";
 
-    $conn->close();
+    if (isset($stmt1) && $stmt1) {
+        $stmt1->close();
+    }
+    if (isset($stmt2) && $stmt2) {
+        $stmt2->close();
+    }
+    if (isset($stmt3) && $stmt3) {
+        $stmt3->close();
+    }
+    if (isset($stmt4) && $stmt4) {
+        $stmt4->close();
+    }
 
     return $msg;
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
 }
     function getProdutosTodos(){
+        try {
 
-        global $conn;
         $msg = "";
         $sql = "SELECT Produtos.*,Tipo_Produtos.descricao As TipoProdutoNome,Utilizadores.nome AS nomeAnunciante from Produtos,Tipo_Produtos,Utilizadores where Produtos.tipo_produto_id = Tipo_Produtos.id AND Utilizadores.id = Produtos.anunciante_id;";
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
@@ -276,17 +355,25 @@ function getFiltro() {
             $msg .= "<td></td>";
             $msg .= "</tr>";
         }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
     function getFiltros(){
-        global $conn;
+        try {
+
         $msg = "";
         $row = "";
         $sql = "SELECT Count(*) As ProdutosCount from Produtos  where produtos.estado like 'Rejeitado';";
-
-        $result = $conn->query($sql);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
@@ -310,10 +397,16 @@ function getFiltro() {
                     $msg .= "<div class='profile-role'>Administrador</div>";
                     $msg .= "</div>";
             }
-        $conn->close();
+
+        if (isset($stmt) && $stmt) {
+            $stmt->close();
+        }
 
         return ($msg);
 
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
     }
 }
 ?>

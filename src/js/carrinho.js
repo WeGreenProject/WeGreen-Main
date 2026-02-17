@@ -1,15 +1,23 @@
-// Remover produto do carrinho
+
+function mostrarModalSucessoRemocao(texto) {
+  showModernSuccessModal("Removido!", texto, { timer: 2000 });
+}
+
+function mostrarModalAviso(titulo, texto) {
+  showModernWarningModal(titulo, texto);
+}
+
 function removerDoCarrinho(produto_id) {
-  Swal.fire({
-    title: "Tem a certeza?",
-    text: "Pretende remover este produto do carrinho?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#28a745",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Sim, remover!",
-    cancelButtonText: "Cancelar",
-  }).then((result) => {
+  showModernConfirmModal(
+    "Remover Produto?",
+    "Pretende remover este produto do carrinho?",
+    {
+      confirmText: '<i class="fas fa-trash-alt"></i> Sim, remover',
+      icon: "fa-trash-alt",
+      iconBg:
+        "background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);",
+    },
+  ).then((result) => {
     if (result.isConfirmed) {
       let dados = new FormData();
       dados.append("op", 4);
@@ -19,41 +27,32 @@ function removerDoCarrinho(produto_id) {
         url: "src/controller/controllerCarrinho.php",
         method: "POST",
         data: dados,
-        dataType: "html",
+        dataType: "json",
         cache: false,
         contentType: false,
         processData: false,
       })
         .done(function (msg) {
-          Swal.fire(
-            "Removido!",
-            "O produto foi removido do carrinho.",
-            "success",
-          );
-          loadCarrinho(); // Recarregar carrinho
+          mostrarModalSucessoRemocao("O produto foi removido do carrinho.");
+          loadCarrinho(); 
         })
         .fail(function (jqXHR, textStatus) {
-          Swal.fire({
-            icon: "error",
-            title: "Erro",
-            text: "Não foi possível remover o produto.",
-          });
+          showModernErrorModal("Erro", "Não foi possível remover o produto.");
         });
     }
   });
 }
 
 function limparCarrinho() {
-  Swal.fire({
-    title: "Limpar carrinho?",
-    text: "Todos os produtos serão removidos!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#28a745",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Sim, limpar tudo!",
-    cancelButtonText: "Cancelar",
-  }).then((result) => {
+  showModernConfirmModal(
+    "Limpar carrinho?",
+    "Todos os produtos serão removidos!",
+    {
+      confirmText: '<i class="fas fa-trash-alt"></i> Sim, limpar tudo!',
+      icon: "fa-trash-alt",
+      iconBg: "background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);",
+    },
+  ).then((result) => {
     if (result.isConfirmed) {
       let dados = new FormData();
       dados.append("op", 5);
@@ -62,21 +61,17 @@ function limparCarrinho() {
         url: "src/controller/controllerCarrinho.php",
         method: "POST",
         data: dados,
-        dataType: "html",
+        dataType: "json",
         cache: false,
         contentType: false,
         processData: false,
       })
         .done(function (msg) {
-          Swal.fire("Limpo!", "O carrinho foi limpo com sucesso.", "success");
-          loadCarrinho(); // Recarregar carrinho
+          showModernSuccessModal("Limpo!", "O carrinho foi limpo com sucesso.");
+          loadCarrinho(); 
         })
         .fail(function (jqXHR, textStatus) {
-          Swal.fire({
-            icon: "error",
-            title: "Erro",
-            text: "Não foi possível limpar o carrinho.",
-          });
+          showModernErrorModal("Erro", "Não foi possível limpar o carrinho.");
         });
     }
   });
@@ -86,11 +81,7 @@ function aplicarCupao() {
   let codigo = $("#couponCode").val();
 
   if (codigo.trim() === "") {
-    Swal.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Por favor, insira um código de cupão!",
-    });
+    showModernErrorModal("Oops...", "Por favor, insira um código de cupão!");
     return;
   }
 
@@ -102,27 +93,24 @@ function aplicarCupao() {
     url: "src/controller/controllerCarrinho.php",
     method: "POST",
     data: dados,
-    dataType: "html",
+    dataType: "json",
     cache: false,
     contentType: false,
     processData: false,
   })
-    .done(function (msg) {
-      if (msg.includes("sucesso")) {
-        Swal.fire({
-          icon: "success",
-          title: "Cupão aplicado!",
-          text: "Desconto de 10% aplicado ao seu carrinho",
-          showConfirmButton: true,
-          timer: 2000,
-        });
+    .done(function (resp) {
+      if (resp.flag) {
+        showModernSuccessModal(
+          "Cupão aplicado!",
+          "Desconto de 10% aplicado ao seu carrinho",
+          { timer: 2000 },
+        );
         getResumoPedido();
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Cupão inválido",
-          text: "O código inserido não é válido ou já expirou.",
-        });
+        showModernErrorModal(
+          "Cupão inválido",
+          resp.msg || "O código inserido não é válido ou já expirou.",
+        );
       }
     })
     .fail(function (jqXHR, textStatus) {
@@ -131,16 +119,15 @@ function aplicarCupao() {
 }
 
 function removerCupao() {
-  Swal.fire({
-    title: "Remover cupão?",
-    text: "O desconto será removido do carrinho.",
-    icon: "question",
-    showCancelButton: true,
-    confirmButtonColor: "#ffd700",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Sim, remover",
-    cancelButtonText: "Cancelar",
-  }).then((result) => {
+  showModernConfirmModal(
+    "Remover cupão?",
+    "O desconto será removido do carrinho.",
+    {
+      confirmText: '<i class="fas fa-tag"></i> Sim, remover',
+      icon: "fa-tag",
+      iconBg: "background: linear-gradient(135deg, #ffd700 0%, #f5a623 100%);",
+    },
+  ).then((result) => {
     if (result.isConfirmed) {
       let dados = new FormData();
       dados.append("op", 8);
@@ -149,18 +136,14 @@ function removerCupao() {
         url: "src/controller/controllerCarrinho.php",
         method: "POST",
         data: dados,
-        dataType: "html",
+        dataType: "json",
         cache: false,
         contentType: false,
         processData: false,
       })
         .done(function (msg) {
-          Swal.fire({
-            icon: "success",
-            title: "Removido!",
-            text: "Cupão removido com sucesso.",
+          showModernSuccessModal("Removido!", "Cupão removido com sucesso.", {
             timer: 1500,
-            showConfirmButton: false,
           });
           getResumoPedido();
         })
@@ -185,31 +168,24 @@ function irParaCheckout() {
     processData: false,
   })
     .done(function (response) {
-      if (response.tem_produtos) {
+      if (response.tem_produtos == 1) {
         window.location.href = "checkout_stripe.php";
       } else {
-        Swal.fire({
-          icon: "warning",
-          title: "Carrinho Vazio",
-          text: "Adicione produtos ao carrinho antes de finalizar a compra!",
-        });
+        showModernWarningModal(
+          "Carrinho Vazio",
+          "Adicione produtos ao carrinho antes de finalizar a compra!",
+        );
       }
     })
     .fail(function (jqXHR, textStatus) {
-      Swal.fire({
-        icon: "error",
-        title: "Erro",
-        text: "Ocorreu um erro. Tente novamente.",
-      });
+      showModernErrorModal("Erro", "Ocorreu um erro. Tente novamente.");
     });
 }
 
-// ============ FUNÇÕES DOS STEPS ============
 let currentStep = 1;
 const totalSteps = 4;
-let isUserLoggedIn = false; // Estado de login do utilizador
+let isUserLoggedIn = false; 
 
-// Funções de perfil (compatível com index.html)
 function getDadosTipoPerfil() {
   let dados = new FormData();
   dados.append("op", 1);
@@ -225,16 +201,14 @@ function getDadosTipoPerfil() {
   })
     .done(function (msg) {
       $("#PerfilTipo").html(msg);
-      // Verificar se está logado baseado no conteúdo retornado
+      
       if (msg.includes("Olá")) {
         isUserLoggedIn = true;
       } else {
         isUserLoggedIn = false;
       }
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Request failed: " + textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
 }
 
 function PerfilDoUtilizador() {
@@ -253,18 +227,44 @@ function PerfilDoUtilizador() {
     .done(function (msg) {
       $("#FotoPerfil").attr("src", msg);
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Request failed: " + textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
 }
 
-// Carregar nome do utilizador (chama as funções acima)
 function loadUserName() {
   PerfilDoUtilizador();
   getDadosTipoPerfil();
 }
 
-// Carregar carrinho (versão JSON)
+function normalizarRespostaCarrinho(response) {
+  const produtosRaw = Array.isArray(response?.items)
+    ? response.items
+    : Array.isArray(response?.produtos)
+      ? response.produtos
+      : [];
+
+  const produtos = produtosRaw.map((item) => {
+    const produtoId =
+      item.id !== undefined
+        ? item.id
+        : item.Produto_id !== undefined
+          ? item.Produto_id
+          : item.produto_id;
+
+    return {
+      ...item,
+      id: parseInt(produtoId, 10),
+      produto_id: parseInt(produtoId, 10),
+      stock: item.stock !== undefined ? parseInt(item.stock, 10) : null,
+    };
+  });
+
+  return {
+    flag: !!response?.flag,
+    items: produtos,
+    total: parseFloat(response?.total || 0),
+  };
+}
+
 function loadCarrinho() {
   $.ajax({
     url: "src/controller/controllerCarrinho.php",
@@ -272,9 +272,11 @@ function loadCarrinho() {
     data: { op: 10 },
     dataType: "json",
   })
-    .done(function (data) {
-      if (data.produtos && data.produtos.length > 0) {
-        displayCarrinho(data.produtos, data.total);
+    .done(function (response) {
+      const carrinho = normalizarRespostaCarrinho(response);
+
+      if (carrinho.items.length > 0) {
+        displayCarrinho(carrinho.items, carrinho.total);
       } else {
         $("#cartItemsStep1").html(
           '<p class="text-center text-muted py-4">O carrinho está vazio.</p>',
@@ -282,17 +284,13 @@ function loadCarrinho() {
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("ERRO loadCarrinho:", textStatus, errorThrown);
-      console.error("Resposta do servidor:", jqXHR.responseText);
-      Swal.fire({
-        icon: "error",
-        title: "Erro ao Carregar Carrinho",
-        text: "Não foi possível carregar os produtos. Tente novamente.",
-      });
+      showModernErrorModal(
+        "Erro ao Carregar Carrinho",
+        "Não foi possível carregar os produtos. Tente novamente.",
+      );
     });
 }
 
-// Atualizar quantidade (incremento +1 ou -1)
 function updateQuantidade(produtoId, mudanca) {
   $.ajax({
     url: "src/controller/controllerCarrinho.php",
@@ -305,36 +303,27 @@ function updateQuantidade(produtoId, mudanca) {
     dataType: "json",
   })
     .done(function (response) {
-      if (response.success) {
-        // Atualizar quantidade no input
+      if (response.flag) {
+        
         const newQty = parseInt($("#qty-" + produtoId).val()) + mudanca;
         if (newQty > 0) {
           $("#qty-" + produtoId).val(newQty);
-          // Recarregar carrinho para atualizar totais
+          
           loadCarrinho();
           updateOrderSummary();
         }
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Erro",
-          text: response.message || "Não foi possível atualizar a quantidade.",
-        });
+        showModernErrorModal(
+          "Erro",
+          response.msg || "Não foi possível atualizar a quantidade.",
+        );
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX:", textStatus, errorThrown);
-      console.error("Resposta:", jqXHR.responseText);
-      Swal.fire({
-        icon: "error",
-        title: "Erro",
-        text:
-          "Erro ao atualizar quantidade: " + (jqXHR.responseText || textStatus),
-      });
+      showModernErrorModal("Erro", "Erro ao atualizar quantidade.");
     });
 }
 
-// Definir quantidade exata (via input)
 function setQuantidade(produtoId, novaQuantidade) {
   const qty = parseInt(novaQuantidade);
   if (isNaN(qty) || qty < 1) {
@@ -348,12 +337,11 @@ function setQuantidade(produtoId, novaQuantidade) {
   const mudanca = qty - currentQty;
 
   if (mudanca !== 0) {
-    // Atualizar via AJAX multiple vezes se necessário
+    
     updateQuantidadeDireta(produtoId, qty);
   }
 }
 
-// Atualizar quantidade direta (chamadas múltiplas se necessário)
 function updateQuantidadeDireta(produtoId, targetQty) {
   const currentQty = parseInt($("#qty-" + produtoId).val());
   const mudanca = targetQty > currentQty ? 1 : -1;
@@ -378,7 +366,7 @@ function updateQuantidadeDireta(produtoId, targetQty) {
       },
       dataType: "json",
     }).done(function (response) {
-      if (response.success) {
+      if (response.flag) {
         completed++;
         updateStep();
       }
@@ -388,18 +376,17 @@ function updateQuantidadeDireta(produtoId, targetQty) {
   updateStep();
 }
 
-// Remover produto do carrinho
 function removeFromCart(produtoId) {
-  Swal.fire({
-    title: "Remover Produto?",
-    text: "Tem certeza que deseja remover este produto do carrinho?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3cb371",
-    cancelButtonColor: "#dc3545",
-    confirmButtonText: "Sim, remover",
-    cancelButtonText: "Cancelar",
-  }).then((result) => {
+  showModernConfirmModal(
+    "Remover Produto?",
+    "Tem certeza que deseja remover este produto do carrinho?",
+    {
+      confirmText: '<i class="fas fa-trash-alt"></i> Sim, remover',
+      icon: "fa-trash-alt",
+      iconBg:
+        "background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);",
+    },
+  ).then((result) => {
     if (result.isConfirmed) {
       $.ajax({
         url: "src/controller/controllerCarrinho.php",
@@ -411,41 +398,32 @@ function removeFromCart(produtoId) {
         dataType: "json",
       })
         .done(function (response) {
-          if (response.success) {
-            // Animação de remoção
+          if (response.flag) {
+            
             $("#cart-item-" + produtoId).fadeOut(300, function () {
               $(this).remove();
               loadCarrinho();
               updateOrderSummary();
             });
 
-            Swal.fire({
-              icon: "success",
-              title: "Removido!",
-              text: "Produto removido do carrinho.",
-              timer: 1500,
-              showConfirmButton: false,
-            });
+            mostrarModalSucessoRemocao("Produto removido do carrinho.");
           } else {
-            Swal.fire({
-              icon: "error",
-              title: "Erro",
-              text: response.message || "Não foi possível remover o produto.",
-            });
+            showModernErrorModal(
+              "Erro",
+              response.msg || "Não foi possível remover o produto.",
+            );
           }
         })
         .fail(function () {
-          Swal.fire({
-            icon: "error",
-            title: "Erro",
-            text: "Erro ao remover produto. Tente novamente.",
-          });
+          showModernErrorModal(
+            "Erro",
+            "Erro ao remover produto. Tente novamente.",
+          );
         });
     }
   });
 }
 
-// Carregar resumo do pedido
 function loadResumoPedido() {
   $.ajax({
     url: "src/controller/controllerCarrinho.php",
@@ -457,12 +435,12 @@ function loadResumoPedido() {
   });
 }
 
-// Exibir itens do carrinho
 function displayCarrinho(items, total) {
   let html = "";
   if (items && items.length > 0) {
     items.forEach((item) => {
-      const reachedStock = item.quantidade >= item.stock;
+      const stockLimitado = Number.isFinite(item.stock) && item.stock > 0;
+      const reachedStock = stockLimitado && item.quantidade >= item.stock;
       const minQuantity = item.quantidade <= 1;
       html += `
                 <div class="cart-item d-flex align-items-center mb-3 p-3 bg-light rounded" id="cart-item-${
@@ -479,7 +457,7 @@ function displayCarrinho(items, total) {
                           .toFixed(2)
                           .replace(".", ",")} €</p>
                         ${
-                          item.stock
+                          stockLimitado
                             ? `<small class="text-muted d-block">Stock disponível: ${item.stock}</small>`
                             : ""
                         }
@@ -494,7 +472,7 @@ function displayCarrinho(items, total) {
                                    id="qty-${item.id}"
                                    value="${item.quantidade}"
                                    min="1"
-                                   max="${item.stock || 99}"
+                                   max="${stockLimitado ? item.stock : 99}"
                                    style="width: 60px;"
                                    onchange="setQuantidade(${
                                      item.id
@@ -537,11 +515,10 @@ function displayCarrinho(items, total) {
   $("#cartItemsStep1").html(html);
 }
 
-// Mostrar step - Atualizar indicadores horizontais
 function showStep(step) {
   currentStep = step;
 
-  // Atualizar steps
+  
   for (let i = 1; i <= totalSteps; i++) {
     $(`#step-${i}`).removeClass("active-step completed-step upcoming-step");
 
@@ -554,7 +531,7 @@ function showStep(step) {
     }
   }
 
-  // Atualizar indicadores horizontais no topo
+  
   $(".step-progress-item").each(function (index) {
     const stepNum = index + 1;
     $(this).removeClass("active completed");
@@ -566,96 +543,36 @@ function showStep(step) {
     }
   });
 
-  // Scroll suave para o topo do step - DESATIVADO para evitar scroll no carregamento inicial
-  // setTimeout(() => {
-  //   $(".steps-progress-container")[0]?.scrollIntoView({
-  //     behavior: "smooth",
-  //     block: "start",
-  //   });
+  
+  
+  
+  
+  
+  
 }
 
-// Ir para próximo step
 function nextStep() {
   if (currentStep < totalSteps) {
     if (validateStep(currentStep)) {
-      // Se indo para step 2 (entrega), preencher dados do utilizador
-      if (currentStep === 1) {
-        preencherDadosUtilizador();
-      }
       showStep(currentStep + 1, true);
     }
   }
 }
 
-// Preencher dados do utilizador automaticamente
-function preencherDadosUtilizador() {
-  $.ajax({
-    url: "src/controller/controllerPerfil.php",
-    method: "POST",
-    data: { op: 12 },
-    dataType: "json",
-    success: function (response) {
-      if (response.success && response.data) {
-        const dados = response.data;
-
-        // Preencher nome e apelido
-        if (dados.nome) {
-          const nomeCompleto = dados.nome.split(" ");
-          $("#firstName").val(nomeCompleto[0] || "");
-          $("#lastName").val(nomeCompleto.slice(1).join(" ") || "");
-        }
-
-        // Preencher morada se disponível
-        if (dados.morada && dados.morada !== "Morada não cadastrada") {
-          // Tentar extrair partes da morada
-          const moradaParts = dados.morada.split(",");
-          if (moradaParts.length > 0) {
-            $("#address1").val(moradaParts[0].trim());
-          }
-          if (moradaParts.length > 1) {
-            $("#address2").val(moradaParts[1].trim());
-          }
-
-          // Tentar extrair código postal (formato XXXX-XXX)
-          const zipMatch = dados.morada.match(/\d{4}-\d{3}/);
-          if (zipMatch) {
-            $("#zipCode").val(zipMatch[0]);
-          }
-
-          // Tentar extrair cidade
-          const cidadeMatch = dados.morada.match(
-            /[A-ZÀ-Ú][a-zà-ú]+(?:\s+[A-ZÀ-Ú][a-zà-ú]+)*/,
-          );
-          if (cidadeMatch) {
-            $("#city").val(cidadeMatch[0]);
-            $("#state").val(cidadeMatch[0]);
-          }
-        }
-      }
-    },
-    error: function (xhr, status, error) {
-      console.log("Erro ao carregar dados do utilizador:", error);
-    },
-  });
-}
-
-// Voltar step anterior
 function previousStep() {
   if (currentStep > 1) {
     showStep(currentStep - 1, true);
   }
 }
 
-// Validar step atual
 function validateStep(step) {
   if (step === 1) {
     const hasItems = $("#cartItemsStep1 .cart-item").length > 0;
     if (!hasItems) {
-      Swal.fire({
-        icon: "warning",
-        title: "Carrinho Vazio",
-        text: "Adicione produtos ao carrinho antes de continuar.",
-      });
+      mostrarModalAviso(
+        "Carrinho Vazio",
+        "Adicione produtos ao carrinho antes de continuar.",
+      );
       return false;
     }
     return true;
@@ -669,76 +586,69 @@ function validateStep(step) {
     const zipCode = $("#zipCode").val().trim();
     const state = $("#state").val();
 
-    // Validação específica por campo
+    
     if (!firstName) {
       $("#firstName").focus();
-      Swal.fire({
-        icon: "warning",
-        title: "Nome Obrigatório",
-        text: "Por favor, preencha o seu primeiro nome.",
-      });
+      mostrarModalAviso(
+        "Nome Obrigatório",
+        "Por favor, preencha o seu primeiro nome.",
+      );
       return false;
     }
 
     if (!lastName) {
       $("#lastName").focus();
-      Swal.fire({
-        icon: "warning",
-        title: "Apelido Obrigatório",
-        text: "Por favor, preencha o seu apelido.",
-      });
+      mostrarModalAviso(
+        "Apelido Obrigatório",
+        "Por favor, preencha o seu apelido.",
+      );
       return false;
     }
 
     if (!address1) {
       $("#address1").focus();
-      Swal.fire({
-        icon: "warning",
-        title: "Morada Obrigatória",
-        text: "Por favor, preencha a sua morada.",
-      });
+      mostrarModalAviso(
+        "Morada Obrigatória",
+        "Por favor, preencha a sua morada.",
+      );
       return false;
     }
 
     if (!city) {
       $("#city").focus();
-      Swal.fire({
-        icon: "warning",
-        title: "Cidade Obrigatória",
-        text: "Por favor, preencha a sua cidade.",
-      });
+      mostrarModalAviso(
+        "Cidade Obrigatória",
+        "Por favor, preencha a sua cidade.",
+      );
       return false;
     }
 
     if (!zipCode) {
       $("#zipCode").focus();
-      Swal.fire({
-        icon: "warning",
-        title: "Código Postal Obrigatório",
-        text: "Por favor, preencha o código postal no formato XXXX-XXX.",
-      });
+      mostrarModalAviso(
+        "Código Postal Obrigatório",
+        "Por favor, preencha o código postal no formato XXXX-XXX.",
+      );
       return false;
     }
 
-    // Validação formato postal code PT
+    
     const zipCodePattern = /^[0-9]{4}-[0-9]{3}$/;
     if (!zipCodePattern.test(zipCode)) {
       $("#zipCode").focus();
-      Swal.fire({
-        icon: "warning",
-        title: "Código Postal Inválido",
-        text: "Use o formato português: XXXX-XXX (ex: 1000-001)",
-      });
+      mostrarModalAviso(
+        "Código Postal Inválido",
+        "Use o formato português: XXXX-XXX (ex: 1000-001)",
+      );
       return false;
     }
 
     if (!state) {
       $("#state").focus();
-      Swal.fire({
-        icon: "warning",
-        title: "Localidade Obrigatória",
-        text: "Por favor, selecione a localidade/distrito.",
-      });
+      mostrarModalAviso(
+        "Localidade Obrigatória",
+        "Por favor, selecione a localidade/distrito.",
+      );
       return false;
     }
 
@@ -749,42 +659,38 @@ function validateStep(step) {
   if (step === 3) {
     const selectedTransportadora = localStorage.getItem("transportadora_id");
     if (!selectedTransportadora) {
-      Swal.fire({
-        icon: "warning",
-        title: "Transportadora Não Selecionada",
-        text: "Selecione uma transportadora antes de continuar.",
-      });
+      mostrarModalAviso(
+        "Transportadora Não Selecionada",
+        "Selecione uma transportadora antes de continuar.",
+      );
       return false;
     }
 
-    // Se for pickup point (ID 2 ou 4), verificar se selecionou um ponto
+    
     if (selectedTransportadora === "2" || selectedTransportadora === "4") {
       const pickupPointId = localStorage.getItem("pickup_point_id");
       if (!pickupPointId) {
-        Swal.fire({
-          icon: "warning",
-          title: "Ponto de Recolha Não Selecionado",
-          text: "Selecione um ponto de recolha no mapa.",
-        });
+        mostrarModalAviso(
+          "Ponto de Recolha Não Selecionado",
+          "Selecione um ponto de recolha no mapa.",
+        );
         return false;
       }
     }
 
-    // Verificar se utilizador está logado ANTES de ir para pagamento
+    
     if (!isUserLoggedIn) {
-      Swal.fire({
-        icon: "info",
-        title: "Login Necessário para Pagamento",
-        html: "Para finalizar a compra, precisa estar logado.<br><small class='text-muted'>Os seus dados de envio serão guardados.</small>",
-        showCancelButton: true,
-        confirmButtonText:
-          '<i class="bi bi-box-arrow-in-right"></i> Fazer Login',
-        cancelButtonText: "Cancelar",
-        confirmButtonColor: "#3cb371",
-        cancelButtonColor: "#6c757d",
-      }).then((result) => {
+      showModernConfirmModal(
+        "Login Necessário para Pagamento",
+        "Para finalizar a compra, precisa estar logado.",
+        {
+          confirmText: '<i class="bi bi-box-arrow-in-right"></i> Fazer Login',
+          icon: "fa-sign-in-alt",
+          iconBg:
+            "background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3);",
+        },
+      ).then((result) => {
         if (result.isConfirmed) {
-          // Dados já estão guardados em localStorage
           window.location.href = "login.html?redirect=Carrinho.html";
         }
       });
@@ -797,7 +703,6 @@ function validateStep(step) {
   return true;
 }
 
-// Guardar informações de entrega
 function saveShippingInfo() {
   const shippingData = {
     firstName: $("#firstName").val().trim(),
@@ -810,10 +715,9 @@ function saveShippingInfo() {
   };
 
   localStorage.setItem("shippingInfo", JSON.stringify(shippingData));
-  updateOrderSummary(); // Atualizar resumo sidebar
+  updateOrderSummary(); 
 }
 
-// Selecionar transportadora
 function selectTransportadora(id, price) {
   $(".transportadora-card")
     .removeClass("selected")
@@ -823,16 +727,16 @@ function selectTransportadora(id, price) {
   localStorage.setItem("transportadora_id", id.toString());
   localStorage.setItem("transportadora_price", price.toString());
 
-  updateOrderSummary(); // Atualizar resumo sidebar
+  updateOrderSummary(); 
 
-  // Se for pickup point (IDs 2 ou 4), mostrar mapa
+  
   if (id === 2 || id === 4) {
-    // Limpar seleção anterior de pickup point
+    
     localStorage.removeItem("pickup_point_id");
     localStorage.removeItem("pickup_point_name");
     localStorage.removeItem("pickup_point_address");
 
-    // Desabilitar botão de continuar até selecionar ponto
+    
     $("button[onclick*='nextStep']")
       .prop("disabled", true)
       .addClass("disabled-btn");
@@ -840,7 +744,7 @@ function selectTransportadora(id, price) {
     const transportadoraType = id === 2 ? "ctt_pickup" : "dpd_pickup";
     showPickupMap(transportadoraType);
 
-    // Scroll suave para o mapa após renderizar
+    
     setTimeout(() => {
       const mapContainer = document.getElementById("pickupMapContainer");
       if (mapContainer) {
@@ -849,14 +753,13 @@ function selectTransportadora(id, price) {
     }, 300);
   } else {
     hidePickupMap();
-    // Reabilitar botão de continuar
+    
     $("button[onclick*='nextStep']")
       .prop("disabled", false)
       .removeClass("disabled-btn");
   }
 }
 
-// Mostrar revisão de dados de entrega
 function displayShippingReview() {
   const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
 
@@ -884,7 +787,6 @@ function displayShippingReview() {
   $("#shippingReview").html(html);
 }
 
-// Mostrar revisão da transportadora
 function displayTransportadoraReview() {
   const transportadoraId = localStorage.getItem("transportadora_id");
   const transportadoraPrice = localStorage.getItem("transportadora_price");
@@ -930,20 +832,21 @@ function displayTransportadoraReview() {
   $("#transportadoraReview").html(html);
 }
 
-// Mostrar revisão do carrinho
 function displayCartReview() {
   $.ajax({
     url: "src/controller/controllerCarrinho.php",
     method: "POST",
     data: { op: 10 },
     dataType: "json",
-  }).done(function (data) {
-    if (data.success) {
+  }).done(function (response) {
+    const carrinho = normalizarRespostaCarrinho(response);
+
+    if (carrinho.flag && carrinho.items.length) {
       let html = "";
-      data.items.forEach((item) => {
+      carrinho.items.forEach((item) => {
         html += `
                     <div class="cart-item d-flex align-items-center mb-3 p-3 bg-light rounded">
-                        <img src="${item.imagem}" alt="${
+                        <img src="${item.foto}" alt="${
                           item.nome
                         }" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
                         <div class="ms-3 flex-grow-1">
@@ -964,7 +867,7 @@ function displayCartReview() {
       const transportadoraPrice = parseFloat(
         localStorage.getItem("transportadora_price") || 0,
       );
-      const subtotal = parseFloat(data.total);
+      const subtotal = carrinho.total;
       const total = subtotal + transportadoraPrice;
 
       html += `
@@ -992,18 +895,7 @@ function displayCartReview() {
   });
 }
 
-// Finalizar pedido
 function finalizarPedido() {
-  // Validar checkbox GDPR
-  if (!$("#gdprConsent").is(":checked")) {
-    Swal.fire({
-      icon: "warning",
-      title: "Termos Não Aceites",
-      text: "Por favor, aceite os Termos e Condições e a Política de Privacidade para continuar.",
-    });
-    return;
-  }
-
   const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
   const transportadoraId = localStorage.getItem("transportadora_id");
   const pickupPointId = localStorage.getItem("pickup_point_id");
@@ -1011,21 +903,48 @@ function finalizarPedido() {
   const pickupPointAddress = localStorage.getItem("pickup_point_address");
 
   if (!transportadoraId) {
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Selecione uma transportadora.",
-    });
+    showModernErrorModal("Erro", "Selecione uma transportadora.");
     return;
   }
 
-  // Mostrar loading
+  
   Swal.fire({
-    title: "A processar...",
-    text: "Por favor aguarde enquanto processamos o seu pedido.",
+    html: `
+      <div style="text-align: center; padding: 6px 0;">
+        <div style="width: 76px; height: 76px; margin: 0 auto 18px; border-radius: 50%; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(60, 179, 113, 0.25);">
+          <i class="fas fa-lock" style="font-size: 34px; color: #2d8a5a;"></i>
+        </div>
+        <h2 style="margin: 0 0 8px 0; color: #1f2937; font-size: 24px; font-weight: 700;">A processar pagamento</h2>
+        <p style="margin: 0; color: #64748b; font-size: 15px;">A encaminhar para o Stripe em segurança...</p>
+      </div>
+    `,
     allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    customClass: {
+      popup: "swal2-border-radius",
+    },
     didOpen: () => {
+      const popup = Swal.getPopup();
+      if (popup) {
+        popup.style.borderRadius = "14px";
+        popup.style.padding = "24px";
+      }
       Swal.showLoading();
+
+      if (!document.getElementById("wegreen-swal-loading-style")) {
+        const style = document.createElement("style");
+        style.id = "wegreen-swal-loading-style";
+        style.textContent = `
+          .swal2-loader {
+            border-color: #d1fae5 transparent #d1fae5 transparent !important;
+            width: 2.4em !important;
+            height: 2.4em !important;
+            margin-top: 14px !important;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     },
   });
 
@@ -1038,7 +957,7 @@ function finalizarPedido() {
     transportadora_id: transportadoraId,
   };
 
-  // Adicionar dados do pickup point se aplicável
+  
   if ((transportadoraId === "2" || transportadoraId === "4") && pickupPointId) {
     fields.pickup_point_id = pickupPointId;
     fields.pickup_point_name = pickupPointName;
@@ -1057,64 +976,17 @@ function finalizarPedido() {
   form.submit();
 }
 
-// Logout
 function logout() {
-  Swal.fire({
-    html: `
-      <div style="padding: 20px 0;">
-        <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-          <i class="fas fa-sign-out-alt" style="font-size: 32px; color: #dc2626;"></i>
-        </div>
-        <h2 style="margin: 0 0 12px 0; color: #1e293b; font-size: 24px; font-weight: 700;">Terminar Sessao?</h2>
-        <p style="margin: 0; color: #64748b; font-size: 15px; line-height: 1.6;">Tem a certeza que pretende sair da sua conta?</p>
-      </div>
-    `,
-    showCancelButton: true,
-    confirmButtonText: '<i class="fas fa-sign-out-alt"></i> Sim, sair',
-    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-    confirmButtonColor: "#dc2626",
-    cancelButtonColor: "#64748b",
-    customClass: {
-      confirmButton: "swal2-confirm-modern",
-      cancelButton: "swal2-cancel-modern",
-      popup: "swal2-logout-popup",
+  showModernConfirmModal(
+    "Terminar Sessão?",
+    "Tem a certeza que pretende sair da sua conta?",
+    {
+      confirmText: '<i class="fas fa-sign-out-alt"></i> Sim, sair',
+      icon: "fa-sign-out-alt",
+      iconBg:
+        "background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);",
     },
-    buttonsStyling: false,
-    reverseButtons: true,
-    didOpen: () => {
-      const popup = Swal.getPopup();
-      popup.style.borderRadius = "16px";
-      popup.style.padding = "25px";
-
-      const confirmBtn = popup.querySelector(".swal2-confirm");
-      const cancelBtn = popup.querySelector(".swal2-cancel");
-
-      if (confirmBtn) {
-        confirmBtn.style.padding = "12px 28px";
-        confirmBtn.style.borderRadius = "10px";
-        confirmBtn.style.fontSize = "15px";
-        confirmBtn.style.fontWeight = "600";
-        confirmBtn.style.border = "none";
-        confirmBtn.style.cursor = "pointer";
-        confirmBtn.style.transition = "all 0.3s ease";
-        confirmBtn.style.backgroundColor = "#dc2626";
-        confirmBtn.style.color = "#ffffff";
-        confirmBtn.style.marginLeft = "10px";
-      }
-
-      if (cancelBtn) {
-        cancelBtn.style.padding = "12px 28px";
-        cancelBtn.style.borderRadius = "10px";
-        cancelBtn.style.fontSize = "15px";
-        cancelBtn.style.fontWeight = "600";
-        cancelBtn.style.border = "2px solid #e2e8f0";
-        cancelBtn.style.cursor = "pointer";
-        cancelBtn.style.transition = "all 0.3s ease";
-        cancelBtn.style.backgroundColor = "#ffffff";
-        cancelBtn.style.color = "#64748b";
-      }
-    },
-  }).then((result) => {
+  ).then((result) => {
     if (result.isConfirmed) {
       Swal.fire({
         html: `
@@ -1152,7 +1024,6 @@ function logout() {
   });
 }
 
-// Atualizar resumo do pedido no sidebar
 function updateOrderSummary() {
   const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
   const transportadoraId = localStorage.getItem("transportadora_id");
@@ -1174,18 +1045,20 @@ function updateOrderSummary() {
       <h3><i class="bi bi-receipt"></i> Resumo do Pedido</h3>
   `;
 
-  // Produtos do carrinho
+  
   $.ajax({
     url: "src/controller/controllerCarrinho.php",
     method: "POST",
     data: { op: 10 },
     dataType: "json",
-    async: false, // Síncrono para popular imediatamente
-  }).done(function (data) {
-    if (data && data.produtos && data.produtos.length > 0) {
-      html += `<div class="mb-3"><strong>Produtos (${data.produtos.length})</strong></div>`;
+    async: false, 
+  }).done(function (response) {
+    const carrinho = normalizarRespostaCarrinho(response);
 
-      data.produtos.forEach((item) => {
+    if (carrinho.items.length > 0) {
+      html += `<div class="mb-3"><strong>Produtos (${carrinho.items.length})</strong></div>`;
+
+      carrinho.items.forEach((item) => {
         html += `
           <div class="summary-row">
             <div>
@@ -1202,13 +1075,13 @@ function updateOrderSummary() {
       html += `
         <div class="summary-row">
           <span>Subtotal</span>
-          <strong>${parseFloat(data.total)
+          <strong>${parseFloat(carrinho.total)
             .toFixed(2)
             .replace(".", ",")} €</strong>
         </div>
       `;
 
-      // Shipping info se disponível
+      
       if (shippingInfo.firstName) {
         html += `
           <div class="mt-3 pt-3 border-top">
@@ -1222,7 +1095,7 @@ function updateOrderSummary() {
         `;
       }
 
-      // Transportadora se selecionada
+      
       if (transportadoraId) {
         html += `
           <div class="mt-3 pt-3 border-top">
@@ -1232,7 +1105,7 @@ function updateOrderSummary() {
             }</small>
             ${
               pickupPointName
-                ? `<br><small class="text-muted">📍 ${pickupPointName}</small>`
+                ? `<br><small class="text-muted">ðŸ“ ${pickupPointName}</small>`
                 : ""
             }
           </div>
@@ -1244,8 +1117,8 @@ function updateOrderSummary() {
           </div>
         `;
 
-        // Total final
-        const total = parseFloat(data.total) + transportadoraPrice;
+        
+        const total = parseFloat(response.total) + transportadoraPrice;
         html += `
           <div class="summary-row mt-3 pt-3 border-top">
             <span class="h5 mb-0">Total</span>
@@ -1264,26 +1137,8 @@ function updateOrderSummary() {
   $("#ResumoPedido").html(html);
 }
 
-// Pre-preencher formulário com dados salvos em localStorage
-function loadShippingInfo() {
-  const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
-
-  if (shippingInfo.firstName) {
-    $("#firstName").val(shippingInfo.firstName);
-    $("#lastName").val(shippingInfo.lastName);
-    $("#address1").val(shippingInfo.address1);
-    $("#address2").val(shippingInfo.address2 || "");
-    $("#city").val(shippingInfo.city);
-    $("#zipCode").val(shippingInfo.zipCode);
-    $("#state").val(shippingInfo.state);
-  }
-}
-
 $(function () {
-  console.log("Carrinho.js iniciado");
-  console.log("Bootstrap disponível:", typeof bootstrap !== "undefined");
-
-  // Inicializar Bootstrap Dropdowns manualmente
+  
   if (typeof bootstrap !== "undefined") {
     var dropdownElementList = [].slice.call(
       document.querySelectorAll('[data-bs-toggle="dropdown"]'),
@@ -1291,17 +1146,15 @@ $(function () {
     var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
       return new bootstrap.Dropdown(dropdownToggleEl);
     });
-    console.log("Dropdowns Bootstrap inicializados:", dropdownList.length);
   }
 
-  // Inicializar steps
+  
   showStep(1);
   loadUserName();
   loadCarrinho();
-  loadShippingInfo(); // Pre-preencher formulário se já existem dados
-  updateOrderSummary(); // Popular sidebar desde o início
+  updateOrderSummary(); 
 
-  // Event listener para o formulário de entrega
+  
   $("#shippingForm").on("submit", function (e) {
     e.preventDefault();
     if (validateStep(2)) {
@@ -1309,27 +1162,24 @@ $(function () {
     }
   });
 
-  // Adicionar navegação por teclado nas transportadoras
+  
   $(".transportadora-card").on("keypress", function (e) {
     if (e.which === 13 || e.which === 32) {
-      // Enter ou Space
+      
       e.preventDefault();
       $(this).click();
     }
   });
 });
 
-// ==================== LEAFLET + OPENSTREETMAP PICKUP POINT FUNCTIONALITY ====================
-
 let pickupMap = null;
 let pickupMarkers = [];
 let userLocation = null;
 
-// Função para extrair cidade do ponto de recolha
 function getCityFromPickupPoint(point) {
   if (point.city) return point.city;
 
-  // Mapa de cidades baseado em nomes e endereços
+  
   const cityMap = {
     Lisboa: [
       "Lisboa Centro",
@@ -1393,10 +1243,9 @@ function getCityFromPickupPoint(point) {
   return null;
 }
 
-// Dados dos pontos de recolha CTT e DPD em Portugal (principais cidades)
 const pickupPoints = {
   ctt_pickup: [
-    // LISBOA E ARREDORES
+    
     {
       id: 1,
       name: "CTT Lisboa Centro",
@@ -1433,7 +1282,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 21 498 0100",
     },
-    // PORTO E ARREDORES
+    
     {
       id: 5,
       name: "CTT Porto Centro",
@@ -1461,7 +1310,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 22 937 0400",
     },
-    // BRAGA
+    
     {
       id: 8,
       name: "CTT Braga",
@@ -1471,7 +1320,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
       phone: "+351 253 203 500",
     },
-    // COIMBRA
+    
     {
       id: 9,
       name: "CTT Coimbra",
@@ -1481,7 +1330,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
       phone: "+351 239 851 700",
     },
-    // AVEIRO
+    
     {
       id: 10,
       name: "CTT Aveiro",
@@ -1491,7 +1340,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 234 377 800",
     },
-    // VISEU
+    
     {
       id: 11,
       name: "CTT Viseu",
@@ -1501,7 +1350,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 232 480 900",
     },
-    // SETÚBAL
+    
     {
       id: 12,
       name: "CTT Setúbal",
@@ -1511,7 +1360,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
       phone: "+351 265 541 100",
     },
-    // ÉVORA
+    
     {
       id: 13,
       name: "CTT Évora",
@@ -1521,7 +1370,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 266 748 200",
     },
-    // FARO E ALGARVE
+    
     {
       id: 14,
       name: "CTT Faro",
@@ -1549,7 +1398,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 289 585 500",
     },
-    // LEIRIA
+    
     {
       id: 17,
       name: "CTT Leiria",
@@ -1559,7 +1408,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 244 839 600",
     },
-    // SANTARÉM
+    
     {
       id: 18,
       name: "CTT Santarém",
@@ -1569,7 +1418,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 243 309 700",
     },
-    // GUIMARÃES
+    
     {
       id: 19,
       name: "CTT Guimarães",
@@ -1579,7 +1428,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 253 540 100",
     },
-    // VIANA DO CASTELO
+    
     {
       id: 20,
       name: "CTT Viana do Castelo",
@@ -1590,7 +1439,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 258 809 200",
     },
-    // VILA REAL
+    
     {
       id: 21,
       name: "CTT Vila Real",
@@ -1600,7 +1449,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 259 309 300",
     },
-    // BRAGANÇA
+    
     {
       id: 22,
       name: "CTT Bragança",
@@ -1610,7 +1459,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 273 309 400",
     },
-    // GUARDA
+    
     {
       id: 23,
       name: "CTT Guarda",
@@ -1620,7 +1469,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 271 205 500",
     },
-    // CASTELO BRANCO
+    
     {
       id: 24,
       name: "CTT Castelo Branco",
@@ -1630,7 +1479,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 272 348 600",
     },
-    // PORTALEGRE
+    
     {
       id: 25,
       name: "CTT Portalegre",
@@ -1640,7 +1489,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 245 307 700",
     },
-    // BEJA
+    
     {
       id: 26,
       name: "CTT Beja",
@@ -1650,7 +1499,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 284 311 800",
     },
-    // FUNCHAL (MADEIRA)
+    
     {
       id: 27,
       name: "CTT Funchal",
@@ -1660,7 +1509,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-13:00",
       phone: "+351 291 214 900",
     },
-    // PONTA DELGADA (AÇORES)
+    
     {
       id: 28,
       name: "CTT Ponta Delgada",
@@ -1670,7 +1519,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 296 209 100",
     },
-    // FIGUEIRA DA FOZ
+    
     {
       id: 29,
       name: "CTT Figueira da Foz",
@@ -1680,7 +1529,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 233 407 200",
     },
-    // CALDAS DA RAINHA
+    
     {
       id: 30,
       name: "CTT Caldas da Rainha",
@@ -1690,7 +1539,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 262 839 300",
     },
-    // TORRES VEDRAS
+    
     {
       id: 31,
       name: "CTT Torres Vedras",
@@ -1700,7 +1549,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 261 310 400",
     },
-    // SINTRA
+    
     {
       id: 32,
       name: "CTT Sintra",
@@ -1710,7 +1559,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 219 247 500",
     },
-    // OEIRAS
+    
     {
       id: 33,
       name: "CTT Oeiras",
@@ -1720,7 +1569,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 214 408 600",
     },
-    // PÓVOA DE VARZIM
+    
     {
       id: 34,
       name: "CTT Póvoa de Varzim",
@@ -1730,7 +1579,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 252 615 700",
     },
-    // BARCELOS
+    
     {
       id: 35,
       name: "CTT Barcelos",
@@ -1740,7 +1589,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 253 809 800",
     },
-    // ESPINHO
+    
     {
       id: 36,
       name: "CTT Espinho",
@@ -1750,7 +1599,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 227 331 900",
     },
-    // OLHÃO
+    
     {
       id: 37,
       name: "CTT Olhão",
@@ -1760,7 +1609,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 289 702 100",
     },
-    // TAVIRA
+    
     {
       id: 38,
       name: "CTT Tavira",
@@ -1772,7 +1621,7 @@ const pickupPoints = {
     },
   ],
   dpd_pickup: [
-    // LISBOA E ARREDORES
+    
     {
       id: 39,
       name: "DPD Lisboa Amoreiras",
@@ -1809,7 +1658,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 10:00-22:00",
       phone: "+351 21 272 3000",
     },
-    // PORTO E ARREDORES
+    
     {
       id: 43,
       name: "DPD Porto Norte Shopping",
@@ -1837,7 +1686,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
       phone: "+351 22 948 6000",
     },
-    // BRAGA
+    
     {
       id: 46,
       name: "DPD Braga Parque",
@@ -1847,7 +1696,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 10:00-23:00",
       phone: "+351 253 680 700",
     },
-    // COIMBRA
+    
     {
       id: 47,
       name: "DPD Coimbra Shopping",
@@ -1857,7 +1706,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 09:00-23:00",
       phone: "+351 239 497 800",
     },
-    // AVEIRO
+    
     {
       id: 48,
       name: "DPD Aveiro Centro",
@@ -1867,7 +1716,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
       phone: "+351 234 098 900",
     },
-    // VISEU
+    
     {
       id: 49,
       name: "DPD Viseu",
@@ -1877,7 +1726,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 232 419 100",
     },
-    // SETÚBAL
+    
     {
       id: 50,
       name: "DPD Setúbal",
@@ -1887,7 +1736,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-19:00, Sáb: 09:00-14:00",
       phone: "+351 265 709 200",
     },
-    // ÉVORA
+    
     {
       id: 51,
       name: "DPD Évora",
@@ -1897,7 +1746,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 266 760 300",
     },
-    // FARO E ALGARVE
+    
     {
       id: 52,
       name: "DPD Faro Forum Algarve",
@@ -1925,7 +1774,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 282 769 600",
     },
-    // LEIRIA
+    
     {
       id: 55,
       name: "DPD Leiria Shopping",
@@ -1935,7 +1784,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 09:00-23:00",
       phone: "+351 244 870 700",
     },
-    // SANTARÉM
+    
     {
       id: 56,
       name: "DPD Santarém",
@@ -1945,7 +1794,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 243 330 800",
     },
-    // GUIMARÃES
+    
     {
       id: 57,
       name: "DPD Guimarães Shopping",
@@ -1955,7 +1804,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 10:00-23:00",
       phone: "+351 253 510 200",
     },
-    // VIANA DO CASTELO
+    
     {
       id: 58,
       name: "DPD Viana Shopping",
@@ -1965,7 +1814,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 10:00-23:00",
       phone: "+351 258 820 300",
     },
-    // VILA REAL
+    
     {
       id: 59,
       name: "DPD Vila Real",
@@ -1975,7 +1824,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 259 320 400",
     },
-    // BRAGANÇA
+    
     {
       id: 60,
       name: "DPD Bragança",
@@ -1985,7 +1834,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 273 320 500",
     },
-    // GUARDA
+    
     {
       id: 61,
       name: "DPD Guarda",
@@ -1995,7 +1844,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 271 220 600",
     },
-    // CASTELO BRANCO
+    
     {
       id: 62,
       name: "DPD Castelo Branco",
@@ -2005,7 +1854,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 272 320 700",
     },
-    // PORTALEGRE
+    
     {
       id: 63,
       name: "DPD Portalegre",
@@ -2015,7 +1864,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 245 330 800",
     },
-    // BEJA
+    
     {
       id: 64,
       name: "DPD Beja",
@@ -2025,7 +1874,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 284 320 900",
     },
-    // FUNCHAL (MADEIRA)
+    
     {
       id: 65,
       name: "DPD Funchal Madeira Shopping",
@@ -2035,7 +1884,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 10:00-23:00",
       phone: "+351 291 230 100",
     },
-    // PONTA DELGADA (AÇORES)
+    
     {
       id: 66,
       name: "DPD Ponta Delgada",
@@ -2045,7 +1894,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 296 280 200",
     },
-    // FIGUEIRA DA FOZ
+    
     {
       id: 67,
       name: "DPD Figueira da Foz",
@@ -2055,7 +1904,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 233 430 300",
     },
-    // CALDAS DA RAINHA
+    
     {
       id: 68,
       name: "DPD Caldas da Rainha",
@@ -2065,7 +1914,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 262 840 400",
     },
-    // TORRES VEDRAS
+    
     {
       id: 69,
       name: "DPD Torres Vedras",
@@ -2075,7 +1924,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 261 320 500",
     },
-    // SINTRA
+    
     {
       id: 70,
       name: "DPD Sintra",
@@ -2085,7 +1934,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-12:00",
       phone: "+351 21 890 1234",
     },
-    // OEIRAS
+    
     {
       id: 71,
       name: "DPD Oeiras Parque",
@@ -2095,7 +1944,7 @@ const pickupPoints = {
       hours: "Seg-Dom: 10:00-23:00",
       phone: "+351 214 405 600",
     },
-    // PÓVOA DE VARZIM
+    
     {
       id: 72,
       name: "DPD Póvoa de Varzim",
@@ -2105,7 +1954,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 252 690 700",
     },
-    // BARCELOS
+    
     {
       id: 73,
       name: "DPD Barcelos",
@@ -2115,7 +1964,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 253 820 800",
     },
-    // ESPINHO
+    
     {
       id: 74,
       name: "DPD Espinho",
@@ -2125,7 +1974,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 227 340 900",
     },
-    // OLHÃO
+    
     {
       id: 75,
       name: "DPD Olhão",
@@ -2135,7 +1984,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 289 710 100",
     },
-    // TAVIRA
+    
     {
       id: 76,
       name: "DPD Tavira",
@@ -2145,7 +1994,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 281 325 200",
     },
-    // VILA REAL DE SANTO ANTÓNIO
+    
     {
       id: 77,
       name: "DPD Vila Real de Santo António",
@@ -2155,7 +2004,7 @@ const pickupPoints = {
       hours: "Seg-Sex: 09:00-18:00, Sáb: 09:00-13:00",
       phone: "+351 281 510 300",
     },
-    // LOULÉ
+    
     {
       id: 78,
       name: "DPD Loulé",
@@ -2169,7 +2018,7 @@ const pickupPoints = {
 };
 
 function showPickupMap(transportadoraId) {
-  // Criar container do mapa se não existir
+  
   let mapContainer = $("#pickupMapContainer");
   if (mapContainer.length === 0) {
     const shippingInfo = JSON.parse(
@@ -2191,7 +2040,7 @@ function showPickupMap(transportadoraId) {
     `;
     $(".transportadora-options").after(mapHTML);
   } else {
-    // Atualizar subtítulo com cidade filtrada
+    
     const shippingInfo = JSON.parse(
       localStorage.getItem("shippingInfo") || "{}",
     );
@@ -2204,7 +2053,7 @@ function showPickupMap(transportadoraId) {
     mapContainer.show();
   }
 
-  // Inicializar mapa
+  
   setTimeout(() => {
     initPickupMap(transportadoraId);
   }, 100);
@@ -2221,40 +2070,27 @@ function initPickupMap(transportadoraId) {
   let points = pickupPoints[transportadoraId] || [];
 
   if (points.length === 0) {
-    console.error("Nenhum ponto de recolha encontrado para:", transportadoraId);
     return;
   }
 
-  // Filtrar por cidade selecionada
+  
   const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo") || "{}");
-  const selectedCity = shippingInfo.state; // state contém a cidade selecionada
-
-  console.log("🔍 Cidade selecionada:", selectedCity);
-  console.log("📍 Total de pontos antes do filtro:", points.length);
+  const selectedCity = shippingInfo.state; 
 
   if (selectedCity) {
-    // Filtrar pontos pela cidade usando a função getCityFromPickupPoint
+    
     const filteredPoints = points.filter((p) => {
       const pointCity = getCityFromPickupPoint(p);
-      console.log(`   Ponto: ${p.name} → Cidade extraída: ${pointCity}`);
       return pointCity === selectedCity;
     });
-
-    console.log(
-      `✅ Pontos filtrados para ${selectedCity}:`,
-      filteredPoints.length,
-    );
 
     if (filteredPoints.length > 0) {
       points = filteredPoints;
     } else {
-      console.warn(
-        `⚠️ Nenhum ponto encontrado para ${selectedCity}. Usando pontos da região mais próxima.`,
-      );
-      // Tentar encontrar pontos no distrito/região
+      
       const regionPoints = points.filter((p) => {
         const pointCity = getCityFromPickupPoint(p);
-        // Procurar pontos num raio de cidades próximas (mesmo distrito)
+        
         return (
           pointCity &&
           pointCity
@@ -2264,46 +2100,40 @@ function initPickupMap(transportadoraId) {
       });
       if (regionPoints.length > 0) {
         points = regionPoints;
-        console.log(
-          `📍 Encontrados ${regionPoints.length} pontos na região de ${selectedCity}`,
-        );
       }
     }
   }
 
-  // Verificar se Leaflet está disponível
+  
   if (typeof L === "undefined") {
-    console.error("Leaflet não carregado");
-    Swal.fire({
-      icon: "warning",
-      title: "Mapa Indisponível",
-      text: "Use a lista abaixo para selecionar um ponto de recolha",
-      timer: 3000,
-    });
+    showModernWarningModal(
+      "Mapa Indisponível",
+      "Use a lista abaixo para selecionar um ponto de recolha",
+    );
     renderPickupPointsList(points);
     return;
   }
 
-  // Remover mapa anterior se existir
+  
   if (pickupMap) {
     pickupMap.remove();
   }
 
-  // Inicializar Leaflet map (zoom inicial será ajustado depois)
+  
   pickupMap = L.map("pickupMap").setView([38.7223, -9.1393], 7);
 
-  // Adicionar tile layer do OpenStreetMap
+  
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
       '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
   }).addTo(pickupMap);
 
-  // Limpar marcadores anteriores
+  
   pickupMarkers.forEach((marker) => marker.remove());
   pickupMarkers = [];
 
-  // Ícone customizado verde
+  
   const greenIcon = L.divIcon({
     className: "custom-leaflet-marker",
     html: '<div class="marker-pin-green"><i class="bi bi-geo-alt-fill"></i></div>',
@@ -2312,7 +2142,7 @@ function initPickupMap(transportadoraId) {
     popupAnchor: [0, -42],
   });
 
-  // Adicionar marcadores
+  
   points.forEach((point) => {
     const marker = L.marker([point.lat, point.lng], { icon: greenIcon }).addTo(
       pickupMap,
@@ -2344,10 +2174,10 @@ function initPickupMap(transportadoraId) {
     pickupMarkers.push(marker);
   });
 
-  // Renderizar lista de pontos
+  
   renderPickupPointsList(points);
 
-  // Ajustar zoom do mapa para os pontos filtrados
+  
   if (points.length > 0) {
     const initialBounds = L.latLngBounds(points.map((p) => [p.lat, p.lng]));
     setTimeout(() => {
@@ -2358,7 +2188,7 @@ function initPickupMap(transportadoraId) {
     }, 500);
   }
 
-  // Tentar obter localização do usuário
+  
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -2367,7 +2197,7 @@ function initPickupMap(transportadoraId) {
           lng: position.coords.longitude,
         };
 
-        // Ícone azul para o usuário
+        
         const userIcon = L.divIcon({
           className: "custom-user-marker",
           html: '<div class="marker-pin-blue"><i class="bi bi-person-fill"></i></div>',
@@ -2375,16 +2205,16 @@ function initPickupMap(transportadoraId) {
           iconAnchor: [12, 35],
         });
 
-        // Adicionar marcador do usuário
+        
         L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
           .addTo(pickupMap)
           .bindPopup("<strong>A sua localização</strong>");
 
-        // Ordenar pontos por distância
+        
         const pointsWithDistance = calculateDistances(points, userLocation);
         renderPickupPointsList(pointsWithDistance);
 
-        // Ajustar bounds do mapa incluindo localização do usuário
+        
         const allLats = [...points.map((p) => p.lat), userLocation.lat];
         const allLngs = [...points.map((p) => p.lng), userLocation.lng];
         const boundsWithUser = L.latLngBounds(
@@ -2398,7 +2228,7 @@ function initPickupMap(transportadoraId) {
           });
         }, 500);
 
-        // Abrir popup do ponto mais próximo
+        
         if (pointsWithDistance.length > 0 && pickupMarkers.length > 0) {
           const closestPoint = pointsWithDistance[0];
           const closestMarker = pickupMarkers.find((m) => {
@@ -2414,9 +2244,8 @@ function initPickupMap(transportadoraId) {
         }
       },
       (error) => {
-        console.log("Geolocalização não disponível:", error);
         renderPickupPointsList(points);
-        // Abrir popup do primeiro ponto se houver
+        
         if (points.length > 0 && pickupMarkers.length > 0) {
           setTimeout(() => pickupMarkers[0].openPopup(), 500);
         }
@@ -2424,7 +2253,7 @@ function initPickupMap(transportadoraId) {
     );
   } else {
     renderPickupPointsList(points);
-    // Abrir popup do primeiro ponto se houver
+    
     if (points.length > 0 && pickupMarkers.length > 0) {
       setTimeout(() => pickupMarkers[0].openPopup(), 500);
     }
@@ -2446,7 +2275,7 @@ function calculateDistances(points, userLoc) {
 }
 
 function getDistanceInKm(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Raio da Terra em km
+  const R = 6371; 
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =
@@ -2501,7 +2330,7 @@ function focusPickupPoint(lat, lng) {
   if (pickupMap) {
     pickupMap.setView([lat, lng], 15);
 
-    // Abrir popup do marcador correspondente
+    
     pickupMarkers.forEach((marker) => {
       const pos = marker.getLatLng();
       if (
@@ -2519,14 +2348,14 @@ function selectPickupPoint(id, name, address) {
   localStorage.setItem("pickup_point_name", name);
   localStorage.setItem("pickup_point_address", address);
 
-  updateOrderSummary(); // Atualizar resumo com pickup point
+  updateOrderSummary(); 
 
-  // Reabilitar botão de continuar
+  
   $("button[onclick*='nextStep']")
     .prop("disabled", false)
     .removeClass("disabled-btn");
 
-  // Destacar ponto selecionado
+  
   $(".pickup-point-item").removeClass("selected");
   $(".pickup-point-item").each(function () {
     if ($(this).find("h5").text() === name) {
@@ -2534,7 +2363,7 @@ function selectPickupPoint(id, name, address) {
     }
   });
 
-  // Scroll suave de volta para o botão de continuar
+  
   setTimeout(() => {
     const continueBtn = $("button[onclick*='nextStep']")[0];
     if (continueBtn) {

@@ -2,6 +2,8 @@
 session_start();
 
 if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
+
+$user_plano_id = (int)($_SESSION['plano'] ?? 1);
 ?>
 
 <!DOCTYPE html>
@@ -15,21 +17,23 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
   <link rel="stylesheet" href="src/css/DashboardCliente.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="src/css/DashboardAnunciante.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="src/css/gestaoProdutos.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="src/css/gestaoEncomendasAnunciante.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="src/css/modalProduto.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="src/css/lib/datatables.css">
   <link rel="stylesheet" href="src/css/lib/select2.css">
-  <link rel="stylesheet" href="assets/css/notifications-dropdown.css">
+  <link rel="stylesheet" href="src/css/notifications-dropdown.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script src="src/js/lib/jquery.js"></script>
   <script src="src/js/lib/datatables.js"></script>
   <script src="src/js/lib/select2.js"></script>
   <script src="src/js/lib/sweatalert.js"></script>
+  <script src="src/js/wegreen-modals.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-  <script src="src/js/notifications.js"></script>
-  <script src="src/js/Anunciante.js"></script>
-  <script src="src/js/GuiaEnvio.js"></script>
+  <script src="src/js/notifications.js?v=<?php echo time(); ?>"></script>
+  <script src="src/js/Anunciante.js?v=<?php echo time(); ?>"></script>
+  <script src="src/js/GuiaEnvio.js?v=<?php echo time(); ?>"></script>
 </head>
 
 <body>
@@ -111,7 +115,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
               <i class="fas fa-key"></i>
               <span>Alterar Senha</span>
             </a>
-            <button class="dropdown-item" id="btnAlternarConta" onclick="verificarEAlternarConta()" style="display:none;">
+            <button class="dropdown-item" id="btnAlternarConta" onclick="verificarEAlternarConta()"
+              style="display:none;">
               <i class="fas fa-exchange-alt"></i>
               <span id="textoAlternar">Alternar Conta</span>
             </button>
@@ -130,7 +135,7 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             <div class="actions-left">
             </div>
             <div class="actions-right">
-              <button id="exportEncomendasBtn" class="btn-export-pdf">
+              <button id="exportEncomendasBtn" class="btn-export-pdf" style="display:none;">
                 <i class="fas fa-file-pdf"></i>
                 <span>Exportar PDF</span>
               </button>
@@ -184,11 +189,12 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
             <table id="encomendasTable" class="display">
               <thead>
                 <tr>
+                  <th style="width:24px;min-width:24px;padding:0;"></th>
                   <th><i class="fas fa-hashtag"></i> Nº Encomenda</th>
                   <th><i class="fas fa-calendar-alt"></i> Data</th>
                   <th><i class="fas fa-user"></i> Cliente</th>
-                  <th><i class="fas fa-box"></i> Produtos</th>
-                  <th><i class="fas fa-truck"></i> Transportadora</th>
+                  <th style="width:26%;min-width:300px;"><i class="fas fa-box"></i> Produtos</th>
+                  <th style="width:9%;min-width:120px;"><i class="fas fa-truck"></i> Transportadora</th>
                   <th><i class="fas fa-euro-sign"></i> Lucro Líquido</th>
                   <th><i class="fas fa-info-circle"></i> Status</th>
                   <th><i class="fas fa-cog"></i> Ações</th>
@@ -204,12 +210,8 @@ if($_SESSION['tipo'] == 3 || $_SESSION['tipo'] == 1){
     </main>
   </div>
 
-  <script>
-  $(document).ready(function() {
-    initSalesPage();
-  });
-  </script>
-  <script src="src/js/alternancia.js"></script>
+  <script src="src/js/gestaoEncomendasAnunciante.js?v=<?php echo time(); ?>"></script>
+  <script src="src/js/alternancia.js?v=<?php echo time(); ?>"></script>
 </body>
 <?php
 }else{
