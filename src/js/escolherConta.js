@@ -7,9 +7,8 @@ function selecionarConta(tipo) {
     },
     function (resp) {
       try {
-        
-        const cleanResp = resp.trim();
-        const resultado = JSON.parse(cleanResp);
+        const resultado =
+          typeof resp === "string" ? JSON.parse(resp.trim()) : resp;
 
         if (resultado.success) {
           showModernSuccessModal("Conta Selecionada!", "A redirecionar...", {
@@ -26,7 +25,16 @@ function selecionarConta(tipo) {
         );
       }
     },
+    "json",
   ).fail(function (xhr, status, error) {
-    showModernErrorModal("Erro", "Erro ao selecionar conta: " + error);
+    let msg = "Erro ao selecionar conta: " + error;
+    if (
+      xhr &&
+      xhr.responseJSON &&
+      (xhr.responseJSON.msg || xhr.responseJSON.message)
+    ) {
+      msg = xhr.responseJSON.msg || xhr.responseJSON.message;
+    }
+    showModernErrorModal("Erro", msg);
   });
 }

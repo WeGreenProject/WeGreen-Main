@@ -1,3 +1,34 @@
+<?php
+$baseUrl = rtrim($base_url ?? 'http://localhost/WeGreen-Main', '/');
+$parsedBase = parse_url($baseUrl);
+$baseOrigin = ($parsedBase['scheme'] ?? 'http') . '://' . ($parsedBase['host'] ?? 'localhost') . (isset($parsedBase['port']) ? ':' . $parsedBase['port'] : '');
+
+$normalizarImagemEmail = function ($caminho) use ($baseUrl, $baseOrigin) {
+    if (empty($caminho)) {
+        return '';
+    }
+
+    $url = str_replace('\\', '/', trim((string)$caminho));
+
+    if (preg_match('#^https?://#i', $url)) {
+        return $url;
+    }
+
+    if (strpos($url, '//') === 0) {
+        return 'https:' . $url;
+    }
+
+    if (strpos($url, '/WeGreen-Main/') === 0) {
+        return $baseOrigin . $url;
+    }
+
+    if (strpos($url, '/') === 0) {
+        return $baseOrigin . $url;
+    }
+
+    return $baseUrl . '/' . ltrim($url, '/');
+};
+?>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -55,11 +86,56 @@
                                             <strong>Data da Solicitação:</strong> <?php echo date('d/m/Y H:i', strtotime($data_solicitacao)); ?>
                                         </p>
                                         <p style="margin: 0; color: #92400e; font-size: 14px;">
-                                            <strong>Produto:</strong> <?php echo htmlspecialchars($produto_nome); ?>
+                                            <strong>Produto(s):</strong>
+                                            <?php if (!empty($qtd_produtos_devolucao) && (int)$qtd_produtos_devolucao > 1): ?>
+                                                <?php echo (int)$qtd_produtos_devolucao; ?> itens
+                                            <?php else: ?>
+                                                <?php echo htmlspecialchars($produto_nome); ?>
+                                            <?php endif; ?>
                                         </p>
                                     </td>
                                 </tr>
                             </table>
+
+                            <!-- Produtos da Devolução -->
+                            <?php if (!empty($produtos_lista) && is_array($produtos_lista)): ?>
+                            <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f9fafb; border-radius: 6px; margin-bottom: 25px;">
+                                <tr>
+                                    <td>
+                                        <p style="margin: 0 0 12px 0; color: #1f2937; font-size: 16px; font-weight: bold;">
+                                            🛍 Produtos incluídos na devolução
+                                        </p>
+
+                                        <?php foreach ($produtos_lista as $item): ?>
+                                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #e5e7eb;">
+                                                <tr>
+                                                    <td width="70" valign="top">
+                                                        <?php if (!empty($item['foto'])): ?>
+                                                            <img src="<?php echo htmlspecialchars($normalizarImagemEmail($item['foto'])); ?>"
+                                                                 alt="Produto"
+                                                                 style="width: 56px; height: 56px; border-radius: 6px; object-fit: cover; border:1px solid #e5e7eb;">
+                                                        <?php else: ?>
+                                                            <div style="width: 56px; height: 56px; background-color: #e5e7eb; border-radius: 6px;"></div>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td valign="top" style="padding-left: 10px;">
+                                                        <p style="margin: 0 0 4px 0; color: #1f2937; font-size: 15px; font-weight: 700;">
+                                                            <?php echo htmlspecialchars($item['nome'] ?? 'Produto'); ?>
+                                                        </p>
+                                                        <p style="margin: 0; color: #6b7280; font-size: 13px;">
+                                                            <strong>Quantidade:</strong> <?php echo (int)($item['quantidade'] ?? 1); ?>
+                                                        </p>
+                                                        <p style="margin: 2px 0 0 0; color: #6b7280; font-size: 13px;">
+                                                            <strong>Reembolso:</strong> <?php echo number_format((float)($item['valor_reembolso'] ?? 0), 2, ',', '.'); ?>€
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        <?php endforeach; ?>
+                                    </td>
+                                </tr>
+                            </table>
+                            <?php endif; ?>
 
                             <!-- Motivo -->
                             <div style="background-color: #f9fafb; border-left: 4px solid #f59e0b; padding: 15px; margin-bottom: 25px; border-radius: 4px;">
@@ -106,7 +182,7 @@
                                             <strong>Valor a Reembolsar:</strong>
                                         </p>
                                         <p style="margin: 0; color: #15803d; font-size: 24px; font-weight: bold;">
-                                            <?php echo number_format($valor_reembolso, 2, ',', '.'); ?>€
+                                            <?php echo number_format((float)($valor_reembolso_total ?? $valor_reembolso ?? 0), 2, ',', '.'); ?>€
                                         </p>
                                         <p style="margin: 10px 0 0 0; color: #166534; font-size: 12px;">
                                             * O reembolso será feito para o método de pagamento original
@@ -124,7 +200,7 @@
                             <table width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td align="center" style="padding: 10px 0;">
-                                        <a href="<?php echo $_SERVER['HTTP_HOST'] ?? 'wegreen.com'; ?>/minhasEncomendas.php"
+                                        <a href="<?php echo htmlspecialchars($baseUrl); ?>/minhasEncomendas.php"
                                            style="display: inline-block; background-color: #f59e0b; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-size: 16px; font-weight: bold;">
                                             Ver Status da Devolução
                                         </a>
@@ -135,7 +211,7 @@
                             <!-- Mensagem de Apoio -->
                             <p style="margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px; line-height: 1.6; text-align: center;">
                                 Tem alguma dúvida? Entre em contacto connosco através do nosso<br>
-                                <a href="<?php echo $_SERVER['HTTP_HOST'] ?? 'wegreen.com'; ?>/suporte.html" style="color: #f59e0b; text-decoration: none;">
+                                <a href="<?php echo htmlspecialchars($baseUrl); ?>/suporte.html" style="color: #f59e0b; text-decoration: none;">
                                     <strong>Centro de Apoio</strong>
                                 </a>
                             </p>

@@ -18,13 +18,11 @@ function login1() {
       if (obj.flag) {
         alerta2(obj.msg);
 
-        
         if (obj.perfil_duplo) {
           setTimeout(function () {
             window.location.href = "escolherConta.php";
           }, 1500);
         } else {
-          
           const urlParams = new URLSearchParams(window.location.search);
           const redirectUrl = urlParams.get("redirect");
 
@@ -32,35 +30,26 @@ function login1() {
             if (redirectUrl) {
               window.location.href = redirectUrl;
             } else {
-              
               if (obj.tipo_utilizador == 1) {
-                
                 window.location.href = "DashboardAdmin.php";
               } else if (obj.tipo_utilizador == 3) {
-                
                 window.location.href = "DashboardAnunciante.php";
               } else if (obj.tipo_utilizador == 2) {
-                
                 window.location.href = "DashboardCliente.php";
               } else {
-                
                 window.location.href = "index.html";
               }
             }
           }, 2000);
         }
       } else {
-        
         if (obj.email_nao_verificado) {
-          Swal.fire({
-            icon: "warning",
-            title: "Email Não Verificado",
-            text: obj.msg,
-            showCancelButton: true,
-            confirmButtonText: "Reenviar Email",
-            cancelButtonText: "Fechar",
-            confirmButtonColor: "#3cb371",
-            cancelButtonColor: "#6b7280",
+          showModernConfirmModal("Email Não Verificado", obj.msg, {
+            icon: "fa-exclamation",
+            iconBg:
+              "background: linear-gradient(135deg, #f4c28a 0%, #e2a76f 100%);",
+            confirmText: '<i class="fas fa-paper-plane"></i> Reenviar Email',
+            cancelText: '<i class="fas fa-times"></i> Fechar',
           }).then((result) => {
             if (result.isConfirmed) {
               window.location.href =
@@ -162,7 +151,6 @@ document.addEventListener("DOMContentLoaded", function () {
         passwordInput.getAttribute("type") === "password" ? "text" : "password";
       passwordInput.setAttribute("type", type);
 
-      
       const icon = this.querySelector("i");
       icon.classList.toggle("fa-eye");
       icon.classList.toggle("fa-eye-slash");

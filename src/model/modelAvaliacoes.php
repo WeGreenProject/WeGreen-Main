@@ -78,6 +78,7 @@ class Avaliacoes {
 
         $sql = "SELECT
                     a.id,
+                    a.utilizador_id,
                     a.avaliacao,
                     a.comentario,
                     a.data_criacao,
@@ -257,6 +258,68 @@ class Avaliacoes {
         return $produtos;
         } catch (Exception $e) {
             return [];
+        }
+    }
+
+    function reportarAvaliacao($avaliacao_id, $denunciante_id, $motivo, $descricao = null) {
+        try {
+
+        if (empty($avaliacao_id) || empty($denunciante_id) || empty($motivo)) {
+            return ['success' => false, 'message' => 'Dados obrigatórios não fornecidos'];
+        }
+
+        $sqlAvaliacao = "SELECT a.id, a.utilizador_id, a.produto_id, p.anunciante_id
+                        FROM Avaliacoes_Produtos a
+                        INNER JOIN produtos p ON p.Produto_id = a.produto_id
+                        WHERE a.id = ?
+                        LIMIT 1";
+
+        $stmtAvaliacao = $this->conn->prepare($sqlAvaliacao);
+        $stmtAvaliacao->bind_param("i", $avaliacao_id);
+        $stmtAvaliacao->execute();
+        $resultAvaliacao = $stmtAvaliacao->get_result();
+
+        if ($resultAvaliacao->num_rows === 0) {
+            $stmtAvaliacao->close();
+            return ['success' => false, 'message' => 'Avaliação não encontrada'];
+        }
+
+        $avaliacao = $resultAvaliacao->fetch_assoc();
+        $stmtAvaliacao->close();
+
+        $denunciado_id = (int)($avaliacao['utilizador_id'] ?? 0);
+
+        if ($denunciado_id <= 0) {
+            return ['success' => false, 'message' => 'Não foi possível identificar o utilizador denunciado'];
+        }
+
+        if ($denunciado_id === (int)$denunciante_id) {
+            return ['success' => false, 'message' => 'Não pode denunciar a sua própria avaliação'];
+        }
+
+        $motivoNormalizado = trim((string)$motivo);
+        $descricaoNormalizada = trim((string)($descricao ?? ''));
+        $textoDenuncia = "[Avaliação #{$avaliacao_id}] Motivo: {$motivoNormalizado}";
+        if ($descricaoNormalizada !== '') {
+            $textoDenuncia .= " | Detalhes: {$descricaoNormalizada}";
+        }
+
+        $sqlInsert = "INSERT INTO denuncias (denunciante_id, denunciado_id, descricao, estado, data_registo)
+                      VALUES (?, ?, ?, 'Pendente', CURDATE())";
+
+        $stmtInsert = $this->conn->prepare($sqlInsert);
+        $stmtInsert->bind_param("iis", $denunciante_id, $denunciado_id, $textoDenuncia);
+
+        if ($stmtInsert->execute()) {
+            $stmtInsert->close();
+            return ['success' => true, 'message' => 'Reporte enviado com sucesso'];
+        }
+
+        $stmtInsert->close();
+        return ['success' => false, 'message' => 'Erro ao registar reporte'];
+
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => 'Erro interno do servidor'];
         }
     }
 }

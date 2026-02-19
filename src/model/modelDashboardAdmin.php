@@ -5,9 +5,33 @@ require_once __DIR__ . '/connection.php';
 class DashboardAdmin{
 
     private $conn;
+    private $imagemProdutoFallback = 'src/img/pexels-beccacorreiaph-31095884.jpg';
 
     public function __construct($conn) {
         $this->conn = $conn;
+    }
+
+    private function resolverCaminhoImagemProduto($foto) {
+        $foto = trim((string)$foto);
+        if ($foto === '') {
+            return $this->imagemProdutoFallback;
+        }
+
+        if (preg_match('/^(https?:\/\/|data:)/i', $foto)) {
+            return $foto;
+        }
+
+        $candidato = $foto;
+        if (!preg_match('/^(src\/|assets\/)/i', $candidato)) {
+            $candidato = 'src/img/' . ltrim($candidato, '/\\');
+        }
+
+        $caminhoFisico = realpath(__DIR__ . '/../../' . $candidato);
+        if ($caminhoFisico && is_file($caminhoFisico)) {
+            return str_replace('\\', '/', $candidato);
+        }
+
+        return $this->imagemProdutoFallback;
     }
 
     function getDadosPlanos($ID_User,$plano){
@@ -534,9 +558,10 @@ function getVendasGrafico() {
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
+                $fotoProduto = $this->resolverCaminhoImagemProduto($row['foto'] ?? '');
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
-                $msg .= "<td><img src=".$row['foto']." class='rounded-circle profile-img-small me-1' width='100px'></td>";
+                $msg .= "<td><img src='".htmlspecialchars($fotoProduto, ENT_QUOTES, 'UTF-8')."' class='rounded-circle profile-img-small me-1' width='100px' onerror=\"this.onerror=null;this.src='".htmlspecialchars($this->imagemProdutoFallback, ENT_QUOTES, 'UTF-8')."';\"></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";

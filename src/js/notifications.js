@@ -1,7 +1,19 @@
-
-
 let notificationsDropdownOpen = false;
 let notificationsCache = [];
+
+function mostrarModalSucesso(titulo, mensagem, opcoes) {
+  if (typeof showModernSuccessModal === "function") {
+    return showModernSuccessModal(titulo, mensagem, opcoes || {});
+  }
+  return Swal.fire({ icon: "success", title: titulo, text: mensagem });
+}
+
+function mostrarModalErro(titulo, mensagem) {
+  if (typeof showModernErrorModal === "function") {
+    return showModernErrorModal(titulo, mensagem);
+  }
+  return Swal.fire({ icon: "error", title: titulo, text: mensagem });
+}
 
 function escapeHtml(value) {
   if (value === null || value === undefined) return "";
@@ -182,6 +194,8 @@ function getIconeByTipo(tipo) {
     devolucao: "↩️",
     utilizador: "👤",
     produto: "📦",
+    suporte: "🎧",
+    chat: "💬",
   };
   return icones[tipo] || "🔔";
 }
@@ -237,6 +251,95 @@ function fecharNotificationsDropdown() {
   $("#notificationsDropdown").removeClass("active");
   notificationsDropdownOpen = false;
   $(document).off("click.notifications");
+}
+
+function executarLogoutGlobal() {
+  $.ajax({
+    url: "src/controller/controllerPerfil.php?op=2",
+    method: "GET",
+    timeout: 5000,
+  }).always(function () {
+    window.location.href = "index.html";
+  });
+}
+
+if (typeof window.logout !== "function") {
+  window.logout = function () {
+    if (typeof showModernConfirmModal === "function") {
+      showModernConfirmModal(
+        "Terminar Sessão?",
+        "Tem a certeza que pretende sair?",
+        {
+          confirmText: '<i class="fas fa-check"></i> Sim, sair',
+          icon: "fa-sign-out-alt",
+          iconBg:
+            "background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);",
+        },
+      ).then(function (result) {
+        if (result && result.isConfirmed) {
+          executarLogoutGlobal();
+        }
+      });
+      return;
+    }
+
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "warning",
+        title: "Terminar Sessão?",
+        text: "Tem a certeza que pretende sair?",
+        showCancelButton: true,
+        confirmButtonText: "Sim, sair",
+        cancelButtonText: "Cancelar",
+      }).then(function (result) {
+        if (result && result.isConfirmed) {
+          executarLogoutGlobal();
+        }
+      });
+      return;
+    }
+
+    executarLogoutGlobal();
+  };
+}
+
+function inicializarDropdownUtilizador() {
+  const $btn = $("#userMenuBtn");
+  const $dropdown = $("#userDropdown");
+
+  if (!$btn.length || !$dropdown.length) {
+    return;
+  }
+
+  $btn.off("click.userDropdown").on("click.userDropdown", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === "function") {
+      e.stopImmediatePropagation();
+    }
+
+    const estaAberto = $dropdown.hasClass("active");
+    if (estaAberto) {
+      $dropdown.removeClass("active");
+    } else {
+      $dropdown.addClass("active");
+    }
+  });
+
+  $dropdown.off("click.userDropdown").on("click.userDropdown", function (e) {
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === "function") {
+      e.stopImmediatePropagation();
+    }
+  });
+
+  $(document)
+    .off("click.userDropdown")
+    .on("click.userDropdown", function (e) {
+      if (!$(e.target).closest(".navbar-user, #userDropdown").length) {
+        $dropdown.removeClass("active");
+      }
+    });
 }
 
 /**
@@ -329,7 +432,8 @@ function marcarTodasComoLidas() {
           "[Notificações] Erro ao marcar todas:",
           response ? response.message || response.msg : "resposta vazia",
         );
-        alert(
+        mostrarModalErro(
+          "Erro",
           "Erro ao marcar notificações como lidas: " +
             (response ? response.message || response.msg : "Resposta inválida"),
         );
@@ -339,7 +443,7 @@ function marcarTodasComoLidas() {
       console.error("[Notificações] Erro AJAX ao marcar todas:", error);
       console.error("[Notificações] Status:", status);
       console.error("[Notificações] Resposta:", xhr.responseText);
-      alert("Erro ao marcar notificações: " + error);
+      mostrarModalErro("Erro", "Erro ao marcar notificações: " + error);
     },
   });
 }
@@ -373,6 +477,8 @@ $(document).ready(function () {
     e.stopPropagation();
     toggleNotificationsDropdown();
   });
+
+  inicializarDropdownUtilizador();
 
   // Atualização automática
   atualizarNotificacoes(); // Primeira chamada

@@ -35,6 +35,13 @@ if ($op == 1) {
     $fotos = json_decode($_POST['fotos'] ?? '[]', true);
     $produtos_selecionados = json_decode($_POST['produtos_selecionados'] ?? '[]', true);
 
+    // DEBUG: Log what is received from the frontend
+    error_log('[ControllerDevolucoes] op=1 - encomenda_id=' . $encomenda_id . ', motivo=' . $motivo);
+    error_log('[ControllerDevolucoes] produtos_selecionados RAW: ' . ($_POST['produtos_selecionados'] ?? 'N/A'));
+    error_log('[ControllerDevolucoes] produtos_selecionados PARSED: ' . json_encode($produtos_selecionados, JSON_UNESCAPED_UNICODE));
+    error_log('[ControllerDevolucoes] Total produtos: ' . count($produtos_selecionados));
+    error_log('[ControllerDevolucoes] fotos RAW: ' . ($_POST['fotos'] ?? 'N/A'));
+
     if (!$encomenda_id || !$motivo) {
         echo json_encode(['flag' => false, 'msg' => 'Dados incompletos'], JSON_UNESCAPED_UNICODE);
         exit;
@@ -177,14 +184,12 @@ if ($op == 11) {
     }
 
     $devolucao_id = $_POST['devolucao_id'] ?? null;
-    $codigo_rastreio = $_POST['codigo_rastreio'] ?? '';
-
     if (!$devolucao_id) {
         echo json_encode(['flag' => false, 'msg' => 'ID da devolução não fornecido'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    $resp = $func->confirmarEnvioCliente($devolucao_id, $_SESSION['utilizador'], $codigo_rastreio);
+    $resp = $func->confirmarEnvioCliente($devolucao_id, $_SESSION['utilizador']);
     echo $resp;
 }
 
@@ -196,13 +201,14 @@ if ($op == 12) {
 
     $devolucao_id = $_POST['devolucao_id'] ?? null;
     $notas_recebimento = $_POST['notas_recebimento'] ?? '';
+    $codigo_envio_confirmacao = $_POST['codigo_envio_confirmacao'] ?? '';
 
     if (!$devolucao_id) {
         echo json_encode(['flag' => false, 'msg' => 'ID da devolução não fornecido'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    $resp = $func->confirmarRecebimentoVendedor($devolucao_id, $_SESSION['utilizador'], $notas_recebimento);
+    $resp = $func->confirmarRecebimentoVendedor($devolucao_id, $_SESSION['utilizador'], $notas_recebimento, $codigo_envio_confirmacao);
     echo $resp;
 }
 ?>

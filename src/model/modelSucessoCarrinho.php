@@ -168,8 +168,6 @@ class SucessoCarrinho {
                     $check_result = $stmt_check->get_result();
                 } while ($check_result && $check_result->num_rows > 0);
 
-                $codigo_confirmacao = 'CONF-' . strtoupper(substr(md5(uniqid($codigo_encomenda, true)), 0, 6));
-
                 $dias_prazo = ($transportadora_id == 2) ? 2 : 4;
                 $prazo_estimado = date('Y-m-d', strtotime("+{$dias_prazo} days"));
 
@@ -211,16 +209,16 @@ class SucessoCarrinho {
                     NOW(), ?, ?, ?,
                     ?, ?, ?,
                     ?, 'Pendente', ?,
-                    ?, ?, 0
+                    NULL, ?, 0
                 )");
                 $stmt_encomenda->bind_param(
-                    "ssssiiissssssssss",
+                    "ssssiiisssssssss",
                     $codigo_encomenda, $payment_intent_id, $payment_method, $payment_status,
                     $utilizador_id, $transportadora_id, $primeiro_produto_id,
                     $morada, $tipo_entrega, $ponto_recolha_id,
                     $nome_ponto_recolha, $morada_ponto_recolha, $morada_completa,
                     $nome_destinatario, $plano_rastreio,
-                    $codigo_confirmacao, $prazo_estimado
+                    $prazo_estimado
                 );
 
                 if (!$stmt_encomenda->execute()) {
@@ -303,7 +301,6 @@ class SucessoCarrinho {
                     'morada_ponto_recolha' => $morada_ponto_recolha,
                     'morada_completa' => $morada_completa,
                     'nome_destinatario' => $nome_destinatario,
-                    'codigo_confirmacao_recepcao' => $codigo_confirmacao,
                     'prazo_estimado_entrega' => $prazo_estimado
                 ];
 
@@ -423,6 +420,7 @@ class SucessoCarrinho {
                 'morada' => $morada,
                 'total' => $total,
                 'produtos' => $produtos_array,
+                'nome_cliente' => $dadosEntrega['nome_destinatario'] ?? 'Cliente',
                 'tipo_entrega' => $dadosEntrega['tipo_entrega'] ?? 'domicilio',
                 'nome_ponto_recolha' => $dadosEntrega['nome_ponto_recolha'] ?? null,
                 'morada_ponto_recolha' => $dadosEntrega['morada_ponto_recolha'] ?? null,
@@ -530,11 +528,13 @@ class SucessoCarrinho {
             $width = 600;
             $height = 300;
 
-            $mapa_url = "https://staticmap.openstreetmap.de/staticmap.php?" . http_build_query([
-                'center' => "$lat,$lon",
-                'zoom' => $zoom,
-                'size' => "{$width}x{$height}",
-                'markers' => "$lat,$lon,lightgreen"
+            $mapa_url = "https://static-maps.yandex.ru/1.x/?" . http_build_query([
+                'lang' => 'pt_PT',
+                'll' => "$lon,$lat",
+                'z' => $zoom,
+                'size' => "{$width},{$height}",
+                'l' => 'map',
+                'pt' => "$lon,$lat,pm2gnm"
             ]);
 
             return $mapa_url;

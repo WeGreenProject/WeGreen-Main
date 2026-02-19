@@ -98,8 +98,30 @@ if ($op == 14) {
 }
 
 if ($op == 15) {
-    if (isset($_SESSION['email']) && isset($_POST['tipoAlvo'])) {
-        $resp = $func->alternarConta($_SESSION['email'], $_POST['tipoAlvo']);
+    $tipoAlvo = isset($_POST['tipoAlvo']) ? (int)$_POST['tipoAlvo'] : 0;
+
+    if (!isset($_SESSION['email']) || !isset($_SESSION['tipo'])) {
+        echo json_encode(['success' => false, 'message' => 'Sessão inválida'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (!in_array($tipoAlvo, [2, 3], true)) {
+        echo json_encode(['success' => false, 'message' => 'Tipo de conta inválido'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (empty($_SESSION['perfil_duplo'])) {
+        echo json_encode(['success' => false, 'message' => 'Não existem duas contas associadas a este email.'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if ($tipoAlvo === (int)$_SESSION['tipo']) {
+        echo json_encode(['success' => true, 'redirect' => ((int)$_SESSION['tipo'] === 3 ? 'DashboardAnunciante.php' : 'DashboardCliente.php')], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    if (isset($_SESSION['email'])) {
+        $resp = $func->alternarConta($_SESSION['email'], $tipoAlvo);
         echo $resp;
     } else {
         echo json_encode(['success' => false, 'message' => 'Dados insuficientes'], JSON_UNESCAPED_UNICODE);

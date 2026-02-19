@@ -112,15 +112,57 @@ function removerClientes(id) {
   });
 }
 function registaClientes() {
+  const nome = String($("#clientNome").val() || "").trim();
+  const email = String($("#clientEmail").val() || "").trim();
+  const telefone = String($("#clientTelefone").val() || "").trim();
+  const tipo = String($("#clientTipo").val() || "").trim();
+  const nif = String($("#clientNif").val() || "").trim();
+  const morada = String($("#clientMorada").val() || "").trim();
+  const password = String($("#clientPassword").val() || "");
+  const passwordConfirm = String($("#clientPasswordConfirm").val() || "");
+  const foto = $("#imagemClient").prop("files")[0] || null;
+
+  if (!nome || !email || !tipo || !password || !passwordConfirm) {
+    alerta(
+      "Utilizador",
+      "Preencha os campos obrigatórios: nome, email, tipo de utilizador, senha e confirmação.",
+      "warning",
+    );
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alerta("Utilizador", "Introduza um email válido.", "warning");
+    return;
+  }
+
+  if (password.length < 6) {
+    alerta(
+      "Utilizador",
+      "A senha deve ter pelo menos 6 caracteres.",
+      "warning",
+    );
+    return;
+  }
+
+  if (password !== passwordConfirm) {
+    alerta("Utilizador", "As senhas não coincidem.", "warning");
+    return;
+  }
+
   let dados = new FormData();
   dados.append("op", 3);
-  dados.append("clientNome", $("#clientNome").val());
-  dados.append("clientEmail", $("#clientEmail").val());
-  dados.append("clientTelefone", $("#clientTelefone").val());
-  dados.append("clientTipo", $("#clientTipo").val());
-  dados.append("clientNif", $("#clientNif").val());
-  dados.append("clientPassword", $("#clientPassword").val());
-  dados.append("foto", $("#imagemClient").prop("files")[0]);
+  dados.append("clientNome", nome);
+  dados.append("clientEmail", email);
+  dados.append("clientTelefone", telefone);
+  dados.append("clientTipo", tipo);
+  dados.append("clientNif", nif);
+  dados.append("clientMorada", morada);
+  dados.append("clientPassword", password);
+  if (foto) {
+    dados.append("foto", foto);
+  }
 
   $.ajax({
     url: "src/controller/controllerClientesAdmin.php",
@@ -133,18 +175,53 @@ function registaClientes() {
   })
 
     .done(function (resp) {
+      const tipoNomes = {
+        1: "Administrador",
+        2: "Cliente",
+        3: "Anunciante",
+      };
+      const tipoNome = tipoNomes[Number(tipo)] || "Utilizador";
+
       if (resp.flag) {
         closeModal();
-        alerta("Utilizador", resp.msg || "Sucesso", "success");
+        alerta(
+          `${tipoNome} criado`,
+          resp.msg || `${tipoNome} criado com sucesso.`,
+          "success",
+        );
         getClientes();
         getCardUtilizadores();
       } else {
-        alerta("Utilizador", resp.msg || "Erro", "error");
+        alerta(
+          `Erro ao criar ${tipoNome.toLowerCase()}`,
+          resp.msg ||
+            resp.message ||
+            `Não foi possível criar ${tipoNome.toLowerCase()}.`,
+          "error",
+        );
       }
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      const tipoNomes = {
+        1: "Administrador",
+        2: "Cliente",
+        3: "Anunciante",
+      };
+      const tipoNome = tipoNomes[Number(tipo)] || "Utilizador";
+      let mensagemErro = `Erro ao criar ${tipoNome.toLowerCase()}.`;
+
+      try {
+        const response = JSON.parse(jqXHR.responseText || "{}");
+        mensagemErro = response.msg || response.message || mensagemErro;
+      } catch (e) {
+        if (textStatus === "parsererror") {
+          mensagemErro =
+            "Erro ao processar resposta do servidor. Verifique os dados do formulário e tente novamente.";
+        }
+      }
+
+      alerta(`Erro ao criar ${tipoNome.toLowerCase()}`, mensagemErro, "error");
     });
 }
 function alerta(titulo, msg, icon) {
@@ -198,6 +275,14 @@ function getDadosCliente(id) {
 }
 
 function guardaEditCliente(ID_Utilizador) {
+  const tipoNomes = {
+    1: "Administrador",
+    2: "Cliente",
+    3: "Anunciante",
+  };
+  const tipoSelecionado = Number($("#viewTipo").val());
+  const tipoTitulo = tipoNomes[tipoSelecionado] || "Utilizador";
+
   let dados = new FormData();
   dados.append("op", 6);
   dados.append("viewIDedit", $("#viewIDedit").val());
@@ -222,12 +307,12 @@ function guardaEditCliente(ID_Utilizador) {
     .done(function (resp) {
       closeModal2();
       if (resp.flag) {
-        alerta("Fornecedor", resp.msg || "Sucesso", "success");
+        alerta(tipoTitulo, resp.msg || "Sucesso", "success");
         alerta2(resp.msg || "Sucesso", "success");
         getClientes();
       } else {
         alerta2(resp.msg || "Erro", "error");
-        alerta("Fornecedor", resp.msg || "Erro", "error");
+        alerta(tipoTitulo, resp.msg || "Erro", "error");
       }
     })
     .fail(function (jqXHR, textStatus) {

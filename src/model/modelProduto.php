@@ -202,8 +202,9 @@ class Produto{
                 $msg .= "<div style='color: #888; font-size: 11px;'>Vendidos</div>";
                 $msg .= "</div>";
                 $msg .= "<div style='width: 1px; background: #E8F5E9;'></div>";
+                $confiancaPercent = min(100, max(0, (int)round(((float)$rowProduto["PontosConfianca"] / 850) * 100)));
                 $msg .= "<div class='flex-grow-1'>";
-                $msg .= "<div class='fw-bold' style='color: #3cb371; font-size: 17px;'>".$rowProduto["PontosConfianca"]."%</div>";
+                $msg .= "<div class='fw-bold' style='color: #3cb371; font-size: 17px;'>".$confiancaPercent."%</div>";
                 $msg .= "<div style='color: #888; font-size: 11px;'>Confiança</div>";
                 $msg .= "</div>";
                 $msg .= "</div>";

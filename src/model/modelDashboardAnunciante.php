@@ -13,6 +13,41 @@ class DashboardAnunciante {
         $this->conn = $conn;
     }
 
+    private function gerarCodigoConfirmacaoRececao() {
+        do {
+            $codigo = 'CONF-' . strtoupper(substr(bin2hex(random_bytes(5)), 0, 6));
+            $stmt = $this->conn->prepare("SELECT id FROM Encomendas WHERE codigo_confirmacao_recepcao = ? LIMIT 1");
+            $stmt->bind_param("s", $codigo);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            $existe = ($res && $res->num_rows > 0);
+            $stmt->close();
+        } while ($existe);
+
+        return $codigo;
+    }
+
+    private function obterCodigoConfirmacaoPorCodigoEncomenda($codigoEncomenda) {
+        $sql = "SELECT codigo_confirmacao_recepcao
+                FROM Encomendas
+                WHERE codigo_encomenda = ?
+                  AND codigo_confirmacao_recepcao IS NOT NULL
+                  AND codigo_confirmacao_recepcao <> ''
+                LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param("s", $codigoEncomenda);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result ? $result->fetch_assoc() : null;
+        $stmt->close();
+
+        return $row['codigo_confirmacao_recepcao'] ?? null;
+    }
+
     private function garantirCamposEnderecoPerfil() {
         ProfileAddressFieldsService::garantirCamposEnderecoPerfil($this->conn);
     }
@@ -627,8 +662,9 @@ function removerProdutosEmMassa($ids) {
 
         $foto_principal = $fotosProcessadas[0];
         $ativo = 0;
+        $motivo_rejeicao = 'PENDENTE_REVISAO_ANUNCIANTE';
 
-        $sql = "INSERT INTO Produtos (nome, tipo_produto_id, preco, stock, marca, tamanho, estado, genero, descricao, anunciante_id, foto, ativo, sustentavel, tipo_material) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO Produtos (nome, tipo_produto_id, preco, stock, marca, tamanho, estado, genero, descricao, anunciante_id, foto, ativo, motivo_rejeicao, sustentavel, tipo_material) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
@@ -636,7 +672,7 @@ function removerProdutosEmMassa($ids) {
         }
 
         $sustentavel_int = (int)$sustentavel;
-        $stmt->bind_param("sidisssssissis", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $foto_principal, $ativo, $sustentavel_int, $tipo_material);
+        $stmt->bind_param("sidisssssisisis", $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $foto_principal, $ativo, $motivo_rejeicao, $sustentavel_int, $tipo_material);
 
         if (!$stmt->execute()) {
             $erro = $stmt->error;
@@ -646,6 +682,8 @@ function removerProdutosEmMassa($ids) {
 
         $produto_id = $this->conn->insert_id;
         $stmt->close();
+
+    $this->reabrirNotificacaoProdutoParaAdmin($produto_id);
 
         if (count($fotosProcessadas) > 1) {
             $sqlFotos = "INSERT INTO Produto_Fotos (produto_id, foto) VALUES (?, ?)";
@@ -730,9 +768,31 @@ function removerProdutosEmMassa($ids) {
             $stmtAtivo->close();
         }
 
+        $this->reabrirNotificacaoProdutoParaAdmin($id);
+
         return json_encode(['flag' => true, 'msg' => 'Produto atualizado com sucesso']);
         } catch (Exception $e) {
             return json_encode(['flag' => false, 'msg' => 'Erro interno do servidor']);
+        }
+    }
+
+    private function reabrirNotificacaoProdutoParaAdmin($produto_id) {
+        try {
+
+        $produto_id = (int)$produto_id;
+        if ($produto_id <= 0) {
+            return;
+        }
+
+        $sql = "DELETE FROM notificacoes_lidas WHERE referencia_id = ? AND tipo_notificacao = 'produto'";
+        $stmt = $this->conn->prepare($sql);
+        if ($stmt) {
+            $stmt->bind_param("i", $produto_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        } catch (Exception $e) {
         }
     }
 
@@ -1239,7 +1299,7 @@ function getEncomendas($ID_User) {
                     e.morada_completa,
                     e.nome_destinatario,
                     e.tipo_entrega,
-                    e.codigo_rastreio,
+                    e.codigo_confirmacao_recepcao,
                     u.nome AS cliente_nome,
                     u.email AS cliente_email,
                     t.nome AS transportadora_nome,
@@ -1252,7 +1312,7 @@ function getEncomendas($ID_User) {
                 WHERE v.anunciante_id = ?
                 GROUP BY e.id, e.codigo_encomenda, e.payment_id, e.payment_method, e.payment_status,
                          e.data_envio, e.estado, e.morada, e.morada_completa, e.nome_destinatario,
-                         e.tipo_entrega, e.codigo_rastreio, u.nome, u.email, t.nome
+                         e.tipo_entrega, e.codigo_confirmacao_recepcao, u.nome, u.email, t.nome
                 ORDER BY e.data_envio DESC";
 
         $stmt_enc = $this->conn->prepare($sql);
@@ -1313,7 +1373,7 @@ function getEncomendas($ID_User) {
                 'morada_completa' => $row['morada_completa'] ?: $row['morada'],
                 'nome_destinatario' => $row['nome_destinatario'] ?: $row['cliente_nome'],
                 'tipo_entrega' => $row['tipo_entrega'] ?: 'domicilio',
-                'codigo_rastreio' => $row['codigo_rastreio'],
+                'codigo_confirmacao_recepcao' => $row['codigo_confirmacao_recepcao'],
                 'cliente_nome' => $row['cliente_nome'],
                 'cliente_email' => $row['cliente_email'],
                 'produtos' => $produtos,
@@ -1333,10 +1393,10 @@ function getEncomendas($ID_User) {
         }
     }
 
-    function atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao = '', $codigo_rastreio = null) {
+    function atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao = '') {
 
         try {
-            $sql_dados = "SELECT e.cliente_id, e.codigo_encomenda, e.morada, e.transportadora_id, e.data_envio, e.estado,
+                 $sql_dados = "SELECT e.cliente_id, e.codigo_encomenda, e.morada, e.transportadora_id, e.data_envio, e.estado, e.codigo_confirmacao_recepcao,
                                  u.nome as cliente_nome, p.nome as produto_nome, p.foto
                           FROM Encomendas e
                           INNER JOIN Utilizadores u ON e.cliente_id = u.id
@@ -1371,10 +1431,17 @@ function getEncomendas($ID_User) {
                 ], JSON_UNESCAPED_UNICODE);
             }
 
-            if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
-                $sql = "UPDATE Encomendas SET estado = ?, codigo_rastreio = ? WHERE id = ?";
+            $codigo_confirmacao_recepcao = $dados_encomenda['codigo_confirmacao_recepcao'] ?? null;
+
+            if ($novo_estado === 'Enviado') {
+                $codigo_confirmacao_recepcao = $this->obterCodigoConfirmacaoPorCodigoEncomenda($dados_encomenda['codigo_encomenda']);
+                if (empty($codigo_confirmacao_recepcao)) {
+                    $codigo_confirmacao_recepcao = $this->gerarCodigoConfirmacaoRececao();
+                }
+
+                $sql = "UPDATE Encomendas SET estado = ?, codigo_confirmacao_recepcao = ? WHERE id = ?";
                 $stmt = $this->conn->prepare($sql);
-                $stmt->bind_param("ssi", $novo_estado, $codigo_rastreio, $encomenda_id);
+                $stmt->bind_param("ssi", $novo_estado, $codigo_confirmacao_recepcao, $encomenda_id);
             } else {
                 $sql = "UPDATE Encomendas SET estado = ? WHERE id = ?";
                 $stmt = $this->conn->prepare($sql);
@@ -1387,9 +1454,23 @@ function getEncomendas($ID_User) {
             }
             $stmt->close();
 
+            if ($novo_estado === 'Enviado' && !empty($codigo_confirmacao_recepcao)) {
+                $sqlSyncCodigo = "UPDATE Encomendas
+                                  SET codigo_confirmacao_recepcao = ?
+                                  WHERE codigo_encomenda = ?
+                                    AND (codigo_confirmacao_recepcao IS NULL OR codigo_confirmacao_recepcao = '')";
+                $stmtSync = $this->conn->prepare($sqlSyncCodigo);
+                if ($stmtSync) {
+                    $codigoEnc = $dados_encomenda['codigo_encomenda'];
+                    $stmtSync->bind_param("ss", $codigo_confirmacao_recepcao, $codigoEnc);
+                    $stmtSync->execute();
+                    $stmtSync->close();
+                }
+            }
+
             $descricao = empty($observacao) ? "Status alterado para: $novo_estado" : $observacao;
-            if ($novo_estado === 'Enviado' && !empty($codigo_rastreio)) {
-                $descricao .= " - Código de rastreio: $codigo_rastreio";
+            if ($novo_estado === 'Enviado' && !empty($codigo_confirmacao_recepcao)) {
+                $descricao .= " - Código de confirmação de receção: $codigo_confirmacao_recepcao";
             }
 
             $sqlHist = "INSERT INTO Historico_Produtos (encomenda_id, estado_encomenda, descricao) VALUES (?, ?, ?)";
@@ -1398,7 +1479,7 @@ function getEncomendas($ID_User) {
             $stmtHist->execute();
             $stmtHist->close();
 
-            $this->enviarEmailMudancaStatus($dados_encomenda, $novo_estado, $codigo_rastreio, $observacao);
+            $this->enviarEmailMudancaStatus($dados_encomenda, $novo_estado, $codigo_confirmacao_recepcao, $observacao);
 
 
             if ($novo_estado === 'Cancelado') {
@@ -1425,7 +1506,7 @@ function getEncomendas($ID_User) {
     }
 
 
-    private function enviarEmailMudancaStatus($dados_encomenda, $novo_estado, $codigo_rastreio = null, $observacao = '') {
+    private function enviarEmailMudancaStatus($dados_encomenda, $novo_estado, $codigo_confirmacao_recepcao = null, $observacao = '') {
 
         try {
             $emailService = new EmailService($this->conn);
@@ -1443,7 +1524,8 @@ function getEncomendas($ID_User) {
                 'codigo_encomenda' => $dados_encomenda['codigo_encomenda'],
                 'data_encomenda' => $dados_encomenda['data_envio'],
                 'transportadora' => $transportadora,
-                'morada' => $dados_encomenda['morada']
+                'morada' => $dados_encomenda['morada'],
+                'nome_cliente' => $dados_encomenda['cliente_nome'] ?? 'Cliente'
             ];
 
             if (!empty(trim((string)$observacao))) {
@@ -1479,18 +1561,11 @@ function getEncomendas($ID_User) {
 
             } elseif ($novo_estado === 'Enviado') {
                 $template = 'status_enviado';
-                $dadosEmail['codigo_rastreio'] = $codigo_rastreio ?? 'N/A';
                 $dadosEmail['data_envio'] = date('Y-m-d H:i:s');
-
-
-                if ($dados_encomenda['transportadora_id'] == 1) {
-                    $dadosEmail['link_rastreio'] = 'https://www.ctt.pt/feapl_2/app/open/objectSearch/objectSearch.jspx?objects=' . urlencode($codigo_rastreio);
-                } elseif ($dados_encomenda['transportadora_id'] == 2) {
-                    $dadosEmail['link_rastreio'] = 'https://www.dpd.com/pt/pt/tracking/?parcelNumber=' . urlencode($codigo_rastreio);
-                } else {
-                    $dadosEmail['link_rastreio'] = '#';
-                }
-
+                $dadosEmail['codigo_confirmacao_recepcao'] = $codigo_confirmacao_recepcao;
+                $dadosEmail['link_confirmacao_recepcao'] = !empty($codigo_confirmacao_recepcao)
+                    ? ('http://localhost/WeGreen-Main/confirmar_entrega.php?cod=' . urlencode($codigo_confirmacao_recepcao))
+                    : 'http://localhost/WeGreen-Main/confirmar_entrega.php';
 
                 $prazo_dias = ($dados_encomenda['transportadora_id'] == 2) ? 2 : 4;
                 $data_estimada = date('d/m/Y', strtotime("+{$prazo_dias} days"));
@@ -1499,8 +1574,8 @@ function getEncomendas($ID_User) {
             } elseif ($novo_estado === 'Entregue') {
                 $template = 'status_entregue';
                 $dadosEmail['data_entregue'] = date('Y-m-d H:i:s');
-                if (!empty($codigo_rastreio)) {
-                    $dadosEmail['codigo_rastreio'] = $codigo_rastreio;
+                if (!empty($codigo_confirmacao_recepcao)) {
+                    $dadosEmail['codigo_confirmacao_recepcao'] = $codigo_confirmacao_recepcao;
                 }
 
             } elseif ($novo_estado === 'Cancelado') {
@@ -1515,7 +1590,32 @@ function getEncomendas($ID_User) {
             }
 
             if (!empty($template)) {
-                $emailService->sendFromTemplate($dados_encomenda['cliente_id'], $template, $dadosEmail, 'cliente');
+                $enviado = $emailService->sendFromTemplate($dados_encomenda['cliente_id'], $template, $dadosEmail, 'cliente');
+                if (!$enviado) {
+                    error_log('WeGreen Email: falha ao enviar template ' . $template . ' para cliente_id=' . (int)$dados_encomenda['cliente_id'] . ' encomenda=' . ($dados_encomenda['codigo_encomenda'] ?? 'N/A'));
+
+                    if ($template === 'status_enviado') {
+                        $stmtEmail = $this->conn->prepare("SELECT email FROM Utilizadores WHERE id = ? LIMIT 1");
+                        if ($stmtEmail) {
+                            $clienteId = (int)$dados_encomenda['cliente_id'];
+                            $stmtEmail->bind_param("i", $clienteId);
+                            $stmtEmail->execute();
+                            $resultEmail = $stmtEmail->get_result();
+                            $rowEmail = $resultEmail ? $resultEmail->fetch_assoc() : null;
+                            $stmtEmail->close();
+
+                            if (!empty($rowEmail['email'])) {
+                                $emailService->enviarEmailStatusEncomenda(
+                                    $rowEmail['email'],
+                                    $dadosEmail['nome_cliente'] ?? 'Cliente',
+                                    $dados_encomenda['codigo_encomenda'] ?? '',
+                                    'Enviado',
+                                    $codigo_confirmacao_recepcao
+                                );
+                            }
+                        }
+                    }
+                }
             }
 
         } catch (Exception $e) {

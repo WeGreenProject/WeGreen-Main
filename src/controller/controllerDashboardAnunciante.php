@@ -143,7 +143,7 @@ if ($op == 17) {
         exit;
     }
 
-    
+
     $fotos_files = isset($_FILES['foto']) ? $_FILES['foto'] : null;
     $resp = $func->atualizarProduto($id, $nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $fotos_files, $sustentavel, $tipo_material);
     echo $resp;
@@ -169,13 +169,13 @@ if ($op == 18) {
         exit;
     }
 
-    
+
     if (!isset($_FILES['foto']) || empty($_FILES['foto']['name'][0])) {
         echo json_encode(['flag' => false, 'msg' => 'É necessário adicionar pelo menos uma foto'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    
+
     $fotos_files = $_FILES['foto'];
     $resp = $func->insertProduto($nome, $tipo_produto_id, $preco, $stock, $marca, $tamanho, $estado, $genero, $descricao, $anunciante_id, $fotos_files, $sustentavel, $tipo_material);
     echo $resp;
@@ -298,14 +298,13 @@ if ($op == 33) {
     $encomenda_id = $_POST['encomenda_id'] ?? null;
     $novo_estado = $_POST['novo_estado'] ?? null;
     $observacao = $_POST['observacao'] ?? '';
-    $codigo_rastreio = $_POST['codigo_rastreio'] ?? null;
 
     if (!$encomenda_id || !$novo_estado) {
         echo json_encode(['success' => false, 'message' => 'Dados obrigatórios não fornecidos'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao, $codigo_rastreio);
+    $resp = $func->atualizarStatusEncomenda($encomenda_id, $novo_estado, $observacao);
     echo $resp;
     $handled = true;
 }

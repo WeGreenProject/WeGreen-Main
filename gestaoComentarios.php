@@ -307,11 +307,11 @@ if($_SESSION['tipo'] == 1){
                                     <th><i class="fas fa-hashtag"></i> ID</th>
                                     <th><i class="fas fa-image"></i> Foto</th>
                                     <th><i class="fas fa-user"></i>Denunciante</th>
+                                    <th><i class="fas fa-envelope"></i> Email Denunciante</th>
                                     <th><i class="fas fa-align-left"></i> Motivo</th>
                                     <th><i class="fas fa-exclamation-triangle"></i> Denunciado</th>
                                     <th><i class="fas fa-info-circle"></i> Estado</th>
                                     <th><i class="fas fa-calendar"></i> Data</th>
-                                    <th><i class="fas fa-cog"></i> Ação</th>
                                 </tr>
                             </thead>
                             <tbody id="reportsTableBody">
@@ -357,7 +357,7 @@ if($_SESSION['tipo'] == 1){
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="src/js/Adminstrador.js"></script>
-<script src="src/js/gestaoComentarios.js"></script>
+<script src="src/js/gestaoComentarios.js?v=<?php echo time(); ?>"></script>
 
 </html>
 

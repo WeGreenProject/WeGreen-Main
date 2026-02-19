@@ -37,14 +37,88 @@ class Encomendas {
                     (SELECT SUM(v.valor)
                      FROM vendas v
                      WHERE v.encomenda_id = e.id) as total,
-                    -- Informações de devolução ativa
-                    d.id as devolucao_id,
-                    d.codigo_devolucao as devolucao_codigo,
-                    d.estado as devolucao_estado,
-                    CASE WHEN d.id IS NOT NULL THEN 1 ELSE 0 END as devolucao_ativa
+                                        -- Informações agregadas de devolução ativa por encomenda
+                                        (SELECT d1.id
+                                         FROM devolucoes d1
+                                         WHERE d1.encomenda_id = e.id
+                                             AND d1.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')
+                                         ORDER BY
+                                             FIELD(d1.estado, 'solicitada', 'aprovada', 'produto_enviado', 'produto_recebido'),
+                                             d1.data_solicitacao DESC,
+                                             d1.id DESC
+                                         LIMIT 1) as devolucao_id,
+                                        (SELECT d2.codigo_devolucao
+                                         FROM devolucoes d2
+                                         WHERE d2.encomenda_id = e.id
+                                             AND d2.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')
+                                         ORDER BY
+                                             FIELD(d2.estado, 'solicitada', 'aprovada', 'produto_enviado', 'produto_recebido'),
+                                             d2.data_solicitacao DESC,
+                                             d2.id DESC
+                                         LIMIT 1) as devolucao_codigo,
+                                        (SELECT
+                                                CASE
+                                                        WHEN SUM(CASE WHEN d3.estado = 'solicitada' THEN 1 ELSE 0 END) > 0 THEN 'solicitada'
+                                                        WHEN SUM(CASE WHEN d3.estado = 'aprovada' THEN 1 ELSE 0 END) > 0 THEN 'aprovada'
+                                                        WHEN SUM(CASE WHEN d3.estado = 'produto_enviado' THEN 1 ELSE 0 END) > 0 THEN 'produto_enviado'
+                                                        WHEN SUM(CASE WHEN d3.estado = 'produto_recebido' THEN 1 ELSE 0 END) > 0 THEN 'produto_recebido'
+                                                        ELSE NULL
+                                                END
+                                         FROM devolucoes d3
+                                         WHERE d3.encomenda_id = e.id
+                                             AND d3.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')) as devolucao_estado,
+                                        (SELECT COUNT(*)
+                                         FROM devolucoes d4
+                                         WHERE d4.encomenda_id = e.id
+                                             AND d4.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')) as devolucao_ativa,
+                                        (SELECT COUNT(DISTINCT d5.produto_id)
+                                         FROM devolucoes d5
+                                         WHERE d5.encomenda_id = e.id
+                                             AND d5.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')) as devolucao_num_produtos,
+                                        (SELECT COUNT(*)
+                                         FROM devolucoes d5a
+                                         WHERE d5a.encomenda_id = e.id
+                                             AND d5a.estado = 'aprovada') as devolucao_aprovada_qtd,
+                                        (SELECT COUNT(*)
+                                         FROM devolucoes d5b
+                                         WHERE d5b.encomenda_id = e.id
+                                             AND d5b.estado = 'solicitada') as devolucao_solicitada_qtd,
+                                        (SELECT d5c.id
+                                         FROM devolucoes d5c
+                                         WHERE d5c.encomenda_id = e.id
+                                             AND d5c.estado = 'aprovada'
+                                         ORDER BY d5c.data_aprovacao DESC, d5c.data_solicitacao DESC, d5c.id DESC
+                                         LIMIT 1) as devolucao_aprovada_id,
+                                        (SELECT d5d.codigo_devolucao
+                                         FROM devolucoes d5d
+                                         WHERE d5d.encomenda_id = e.id
+                                             AND d5d.estado = 'aprovada'
+                                         ORDER BY d5d.data_aprovacao DESC, d5d.data_solicitacao DESC, d5d.id DESC
+                                         LIMIT 1) as devolucao_aprovada_codigo,
+                                        (SELECT GROUP_CONCAT(DISTINCT p2.nome ORDER BY p2.nome SEPARATOR ', ')
+                                         FROM devolucoes d6
+                                         INNER JOIN produtos p2 ON d6.produto_id = p2.Produto_id
+                                         WHERE d6.encomenda_id = e.id
+                                             AND d6.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')) as devolucao_produtos_nomes,
+                                        (SELECT d7.estado
+                                         FROM devolucoes d7
+                                         WHERE d7.encomenda_id = e.id
+                                         ORDER BY d7.data_solicitacao DESC, d7.id DESC
+                                         LIMIT 1) as devolucao_ultima_estado,
+                                        (SELECT d8.codigo_devolucao
+                                         FROM devolucoes d8
+                                         WHERE d8.encomenda_id = e.id
+                                         ORDER BY d8.data_solicitacao DESC, d8.id DESC
+                                         LIMIT 1) as devolucao_ultima_codigo,
+                                        (SELECT d9.notas_anunciante
+                                         FROM devolucoes d9
+                                         WHERE d9.encomenda_id = e.id
+                                         ORDER BY d9.data_solicitacao DESC, d9.id DESC
+                                         LIMIT 1) as devolucao_ultima_notas_anunciante,
+                                        (SELECT COUNT(*)
+                                         FROM devolucoes d10
+                                         WHERE d10.encomenda_id = e.id) as devolucao_existe
                 FROM encomendas e
-                LEFT JOIN devolucoes d ON e.id = d.encomenda_id
-                    AND d.estado NOT IN ('rejeitada', 'cancelada', 'reembolsada')
                 WHERE e.cliente_id = ?
                 ORDER BY e.data_envio DESC, e.id DESC";
 

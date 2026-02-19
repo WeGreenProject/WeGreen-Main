@@ -106,6 +106,26 @@ function criarCardEncomenda(enc) {
     Number(enc.encomenda_totalmente_avaliada || 0) === 1;
   const statusInfo = getStatusInfo(estado);
   const timeline = criarTimeline(estado);
+  const devolucaoAtiva = Number(enc.devolucao_ativa || 0) > 0;
+  const devolucaoInfo = getDevolucaoStatusInfo(enc.devolucao_estado);
+  const devolucaoProdutos = (enc.devolucao_produtos_nomes || "").toString();
+  const devolucaoQtdProdutos = Number(enc.devolucao_num_produtos || 0);
+  const devolucaoQtdAprovada = Number(enc.devolucao_aprovada_qtd || 0);
+  const devolucaoQtdSolicitada = Number(enc.devolucao_solicitada_qtd || 0);
+  const devolucaoAprovadaId = Number(enc.devolucao_aprovada_id || 0);
+  const devolucaoAprovadaCodigo = (enc.devolucao_aprovada_codigo || "")
+    .toString()
+    .trim();
+  const podeConfirmarEnvio = devolucaoAtiva && devolucaoQtdAprovada > 0;
+  const devolucaoUltimaEstado = (enc.devolucao_ultima_estado || "")
+    .toString()
+    .trim()
+    .toLowerCase();
+  const devolucaoUltimaInfo = getDevolucaoStatusInfo(devolucaoUltimaEstado);
+  const devolucaoTemHistorico = Number(enc.devolucao_existe || 0) > 0;
+  const respostaVendedor = (enc.devolucao_ultima_notas_anunciante || "")
+    .toString()
+    .trim();
 
   let produtosHTML = "";
   let fotoProduto = enc.foto_produto || "assets/media/products/default.jpg";
@@ -203,6 +223,55 @@ function criarCardEncomenda(enc) {
                         </div>
                     </div>
 
+                      ${
+                        devolucaoAtiva
+                          ? `
+                      <div style="margin: 0 24px 14px 24px; border: 1px solid ${devolucaoInfo.border}; background: ${devolucaoInfo.bg}; border-radius: 10px; padding: 10px 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: ${devolucaoInfo.color}; font-weight: 700; font-size: 13px; margin-bottom: 4px;">
+                          <i class="fas ${devolucaoInfo.icon}"></i>
+                          ${devolucaoInfo.text}
+                        </div>
+                        <div style="color: #334155; font-size: 12px; line-height: 1.45;">
+                          ${devolucaoQtdProdutos > 0 ? `<strong>${devolucaoQtdProdutos}</strong> produto(s) em devolução` : "Produtos em devolução"}
+                          ${devolucaoProdutos ? `: ${devolucaoProdutos}` : ""}
+                        </div>
+                        ${
+                          podeConfirmarEnvio && devolucaoQtdSolicitada > 0
+                            ? `<div style="margin-top: 6px; color: #1d4ed8; font-size: 12px; line-height: 1.45;"><i class="fas fa-info-circle" style="margin-right: 4px;"></i><strong>${devolucaoQtdAprovada}</strong> item(ns) já aprovado(s) para envio e <strong>${devolucaoQtdSolicitada}</strong> ainda em análise.</div>`
+                            : ""
+                        }
+                        ${
+                          respostaVendedor
+                            ? `<div style="margin-top: 8px; color: #334155; font-size: 12px; line-height: 1.45;"><strong>Resposta do vendedor:</strong> ${respostaVendedor}</div>`
+                            : ""
+                        }
+                      </div>
+                      `
+                          : ""
+                      }
+
+                      ${
+                        !devolucaoAtiva &&
+                        devolucaoTemHistorico &&
+                        ["rejeitada", "reembolsada", "cancelada"].includes(
+                          devolucaoUltimaEstado,
+                        )
+                          ? `
+                      <div style="margin: 0 24px 14px 24px; border: 1px solid ${devolucaoUltimaInfo.border}; background: ${devolucaoUltimaInfo.bg}; border-radius: 10px; padding: 10px 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: ${devolucaoUltimaInfo.color}; font-weight: 700; font-size: 13px; margin-bottom: 4px;">
+                          <i class="fas ${devolucaoUltimaInfo.icon}"></i>
+                          ${devolucaoUltimaInfo.text}
+                        </div>
+                        ${
+                          respostaVendedor
+                            ? `<div style="color: #334155; font-size: 12px; line-height: 1.45;"><strong>Resposta do vendedor:</strong> ${respostaVendedor}</div>`
+                            : ""
+                        }
+                      </div>
+                      `
+                          : ""
+                      }
+
                     <div class="order-actions">
                         <button class="btn-action btn-primary" onclick="verDetalhes('${enc.codigo_encomenda}')">
                             <i class="fas fa-eye"></i> Ver Detalhes
@@ -217,9 +286,9 @@ function criarCardEncomenda(enc) {
                             : ""
                         }
                         ${
-                          estado === "entregue" && !enc.devolucao_ativa
+                          estado === "entregue" && !devolucaoAtiva
                             ? `
-                            <button class="btn-action btn-warning" onclick="abrirModalDevolucao('${enc.id}', '${enc.codigo_encomenda}', ${JSON.stringify(enc.produtos).replace(/"/g, "&quot;")})">
+                            <button class="btn-action btn-warning" onclick="abrirModalDevolucao('${enc.id}', '${enc.codigo_encomenda}', ${JSON.stringify(enc.produtos_lista || []).replace(/"/g, "&quot;")})">
                                 <i class="fas fa-undo"></i> Solicitar Devolução
                             </button>
                             <button class="btn-action btn-secondary" onclick="comprarNovamente('${enc.codigo_encomenda}')">
@@ -238,17 +307,16 @@ function criarCardEncomenda(enc) {
                             : ""
                         }
                         ${
-                          enc.devolucao_ativa &&
-                          enc.devolucao_estado === "aprovada"
+                          podeConfirmarEnvio
                             ? `
-                            <button class="btn-action btn-success" onclick="mostrarModalConfirmarEnvio(${enc.devolucao_id}, '${enc.devolucao_codigo}')">
+                            <button class="btn-action btn-success" onclick="mostrarModalConfirmarEnvio(${devolucaoAprovadaId || enc.devolucao_id}, '${devolucaoAprovadaCodigo || enc.devolucao_codigo || ""}')">
                                 <i class="fas fa-shipping-fast"></i> Confirmar Envio
                             </button>
                         `
                             : ""
                         }
                         ${
-                          enc.devolucao_ativa &&
+                          devolucaoAtiva &&
                           enc.devolucao_estado === "produto_enviado"
                             ? `
                             <span class="badge-info" style="padding: 8px 16px; background: #3b82f6; color: white; border-radius: 6px; font-size: 13px;">
@@ -258,7 +326,7 @@ function criarCardEncomenda(enc) {
                             : ""
                         }
                         ${
-                          enc.devolucao_ativa &&
+                          devolucaoAtiva &&
                           enc.devolucao_estado === "produto_recebido"
                             ? `
                             <span class="badge-success" style="padding: 8px 16px; background: #10b981; color: white; border-radius: 6px; font-size: 13px;">
@@ -362,6 +430,72 @@ function getStatusInfo(estado) {
     statusMap[estado] || {
       class: "",
       text: estado,
+    }
+  );
+}
+
+function getDevolucaoStatusInfo(estadoDevolucao) {
+  const estado = (estadoDevolucao || "").toString().trim().toLowerCase();
+
+  const map = {
+    solicitada: {
+      text: "Devolução solicitada - a aguardar resposta do vendedor",
+      color: "#92400e",
+      bg: "#fffbeb",
+      border: "#fcd34d",
+      icon: "fa-hourglass-half",
+    },
+    aprovada: {
+      text: "Devolução aprovada - falta confirmar envio",
+      color: "#1d4ed8",
+      bg: "#eff6ff",
+      border: "#93c5fd",
+      icon: "fa-check-circle",
+    },
+    produto_enviado: {
+      text: "Devolução enviada - a aguardar receção",
+      color: "#1e3a8a",
+      bg: "#dbeafe",
+      border: "#60a5fa",
+      icon: "fa-truck",
+    },
+    produto_recebido: {
+      text: "Produto recebido - a aguardar reembolso",
+      color: "#065f46",
+      bg: "#ecfdf5",
+      border: "#6ee7b7",
+      icon: "fa-money-bill-wave",
+    },
+    rejeitada: {
+      text: "Devolução rejeitada pelo vendedor",
+      color: "#991b1b",
+      bg: "#fef2f2",
+      border: "#fca5a5",
+      icon: "fa-times-circle",
+    },
+    reembolsada: {
+      text: "Devolução concluída - reembolso processado",
+      color: "#065f46",
+      bg: "#ecfdf5",
+      border: "#6ee7b7",
+      icon: "fa-euro-sign",
+    },
+    cancelada: {
+      text: "Devolução cancelada",
+      color: "#475569",
+      bg: "#f8fafc",
+      border: "#cbd5e1",
+      icon: "fa-ban",
+    },
+  };
+
+  return (
+    map[estado] || {
+      text: "Devolução em processamento",
+      color: "#334155",
+      bg: "#f8fafc",
+      border: "#cbd5e1",
+      icon: "fa-undo",
     }
   );
 }
@@ -923,6 +1057,7 @@ function mostrarModalAvaliacao(produtos, encomenda_codigo) {
     const imagem = produto.foto || "assets/media/products/placeholder.jpg";
     const temAnterior = index > 0;
     const temProximo = index < produtos.length - 1;
+    const mostrarAnteriorSeparado = !temProximo && temAnterior;
     const html = `
       <div class="avaliacao-modal-wrap">
         <div class="avaliacao-modal-top">
@@ -951,10 +1086,14 @@ function mostrarModalAvaliacao(produtos, encomenda_codigo) {
       title: produto.avaliado ? "Avaliação Registada" : "Avaliar Produto",
       html: html,
       showCancelButton: true,
-      showDenyButton: temProximo,
+      showDenyButton: temProximo || mostrarAnteriorSeparado,
       confirmButtonText: produto.avaliado ? "Fechar" : "Enviar Avaliação",
-      denyButtonText: "Próximo",
-      cancelButtonText: temAnterior ? "Anterior" : "Cancelar",
+      denyButtonText: temProximo ? "Próximo" : "Anterior",
+      cancelButtonText: mostrarAnteriorSeparado
+        ? "Cancelar"
+        : temAnterior
+          ? "Anterior"
+          : "Cancelar",
       allowOutsideClick: false,
       buttonsStyling: false,
       customClass: {
@@ -1021,7 +1160,11 @@ function mostrarModalAvaliacao(produtos, encomenda_codigo) {
           }
         });
       } else if (result.isDenied) {
-        showProduct(index + 1);
+        if (temProximo) {
+          showProduct(index + 1);
+        } else if (temAnterior) {
+          showProduct(index - 1);
+        }
       } else if (result.dismiss === Swal.DismissReason.cancel && temAnterior) {
         showProduct(index - 1);
       } else if (

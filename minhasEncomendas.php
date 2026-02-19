@@ -1,9 +1,14 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
+if(!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])){
     header("Location: login.html");
     exit();
+}
+
+if($_SESSION['tipo'] != 2){
+  header("Location: forbiddenerror.html");
+  exit();
 }
 ?>
 
@@ -15,6 +20,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Minhas Encomendas - WeGreen</title>
   <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
+  <link rel="stylesheet" href="src/css/lib/bootstrap.css">
   <link rel="stylesheet" href="src/css/DashboardCliente.css">
   <link rel="stylesheet" href="src/css/notifications-dropdown.css">
   <link rel="stylesheet" href="src/css/lib/datatables.css">
@@ -22,6 +28,7 @@ if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script src="src/js/lib/jquery.js"></script>
+  <script src="src/js/lib/bootstrap.js"></script>
   <script src="src/js/lib/datatables.js"></script>
   <script src="src/js/lib/select2.js"></script>
   <script src="src/js/lib/sweatalert.js"></script>

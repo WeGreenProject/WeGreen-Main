@@ -33,30 +33,15 @@
                             </p>
 
                             <p style="margin: 0 0 25px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                                Excelente notícia! A sua encomenda foi entregue à transportadora e está a caminho. Utilize o código de rastreio abaixo para acompanhar a entrega.
+                                Excelente notícia! A sua encomenda foi enviada e está a caminho. Quando a receber, confirme a entrega com o código abaixo.
                             </p>
 
-                            <!-- Código de Rastreio em Destaque -->
-                            <table width="100%" cellpadding="20" cellspacing="0" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 8px; margin-bottom: 25px; border: 2px solid #3b82f6;">
-                                <tr>
-                                    <td align="center">
-                                        <p style="margin: 0 0 10px 0; color: #1e40af; font-size: 14px; font-weight: bold;">
-                                            📍 CÓDIGO DE RASTREIO
-                                        </p>
-                                        <p style="margin: 0 0 15px 0; color: #1f2937; font-size: 28px; font-weight: bold; letter-spacing: 2px;">
-                                            <?php echo htmlspecialchars($codigo_rastreio); ?>
-                                        </p>
-                                        <a href="<?php echo htmlspecialchars($link_rastreio ?? '#'); ?>"
-                                           style="display: inline-block; background-color: #3b82f6; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: bold;">
-                                            🔍 Rastrear Encomenda
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f9fafb; border-radius: 6px; margin-bottom: 25px;">
+                            <table width="100%" cellpadding="15" cellspacing="0" style="background-color: #f9fafb; border-radius: 6px; margin-bottom: 25px; border: 1px solid #e5e7eb;">
                                 <tr>
                                     <td>
+                                        <p style="margin: 0 0 10px 0; color: #1f2937; font-size: 16px; font-weight: bold;">
+                                            📋 Resumo da Encomenda
+                                        </p>
                                         <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 14px;">
                                             <strong>Encomenda:</strong> <?php echo htmlspecialchars($codigo_encomenda); ?>
                                         </p>
@@ -66,11 +51,21 @@
                                         <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 14px;">
                                             <strong>Transportadora:</strong> <?php echo htmlspecialchars($transportadora); ?>
                                         </p>
+                                        <p style="margin: 0 0 5px 0; color: #065f46; font-size: 14px; font-weight: bold;">
+                                            <strong>🔐 Código de Confirmação:</strong> <?php echo htmlspecialchars($codigo_confirmacao_recepcao ?? 'N/A'); ?>
+                                        </p>
                                         <?php if (isset($prazo_estimado)): ?>
-                                        <p style="margin: 0; color: #22c55e; font-size: 14px; font-weight: bold;">
+                                        <p style="margin: 0 0 12px 0; color: #22c55e; font-size: 14px; font-weight: bold;">
                                             <strong>Entrega Estimada:</strong> <?php echo htmlspecialchars($prazo_estimado); ?>
                                         </p>
                                         <?php endif; ?>
+
+                                        <div style="margin-top: 12px;">
+                                            <a href="<?php echo htmlspecialchars($link_confirmacao_recepcao ?? 'http://localhost/WeGreen-Main/confirmar_entrega.php'); ?>"
+                                               style="display: inline-block; background-color: #10b981; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: bold;">
+                                                ✓ Confirmar Receção
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>

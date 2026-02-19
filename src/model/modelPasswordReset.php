@@ -125,7 +125,7 @@ class PasswordReset {
             'data' => $data
         ], JSON_UNESCAPED_UNICODE);
         } catch (Exception $e) {
-            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            return json_encode(['flag' => false, 'msg' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -140,35 +140,106 @@ class PasswordReset {
         }
 
         $token_hash = hash('sha256', $token);
-        $utilizador_id = $validacao['data']['utilizador_id'];
+        $utilizador_id = (int)($validacao['data']['utilizador_id'] ?? 0);
 
-        $password_hash = md5($nova_password);
-
-        $stmt = $this->conn->prepare("UPDATE Utilizadores SET password = ? WHERE id = ?");
-        $stmt->bind_param("si", $password_hash, $utilizador_id);
-
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if ($utilizador_id <= 0) {
             return json_encode([
                 'flag' => false,
-                'msg' => 'Erro ao atualizar password: ' . $stmt->error
+                'msg' => 'Utilizador inválido para redefinição de password.'
             ], JSON_UNESCAPED_UNICODE);
         }
 
-        $stmt->close();
+        $stmtUser = $this->conn->prepare("SELECT id, nome, email, tipo_utilizador_id FROM Utilizadores WHERE id = ? LIMIT 1");
+        $stmtUser->bind_param("i", $utilizador_id);
+        $stmtUser->execute();
+        $resultUser = $stmtUser->get_result();
 
+        if ($resultUser->num_rows === 0) {
+            $stmtUser->close();
+            return json_encode([
+                'flag' => false,
+                'msg' => 'Utilizador não encontrado para redefinição de password.'
+            ], JSON_UNESCAPED_UNICODE);
+        }
+
+        $userAtual = $resultUser->fetch_assoc();
+        $stmtUser->close();
+
+        $idsParaAtualizar = [(int)$userAtual['id']];
+        $tipoAtual = (int)$userAtual['tipo_utilizador_id'];
+        $emailAtual = trim((string)$userAtual['email']);
+
+        if ($emailAtual !== '' && in_array($tipoAtual, [2, 3], true)) {
+            $stmtDual = $this->conn->prepare("SELECT id FROM Utilizadores WHERE email = ? AND tipo_utilizador_id IN (2, 3)");
+            $stmtDual->bind_param("s", $emailAtual);
+            $stmtDual->execute();
+            $resultDual = $stmtDual->get_result();
+
+            while ($rowDual = $resultDual->fetch_assoc()) {
+                $idsParaAtualizar[] = (int)$rowDual['id'];
+            }
+
+            $stmtDual->close();
+            $idsParaAtualizar = array_values(array_unique($idsParaAtualizar));
+        }
+
+        $password_hash = password_hash($nova_password, PASSWORD_DEFAULT);
         $usado_em = date('Y-m-d H:i:s');
-        $stmt = $this->conn->prepare("UPDATE password_resets SET usado = 1, usado_em = ? WHERE token = ?");
-        $stmt->bind_param("ss", $usado_em, $token_hash);
-        $stmt->execute();
-        $stmt->close();
+
+        $this->conn->begin_transaction();
+
+        $stmtUpdateUser = $this->conn->prepare("UPDATE Utilizadores SET password = ? WHERE id = ?");
+        foreach ($idsParaAtualizar as $idAlvo) {
+            $stmtUpdateUser->bind_param("si", $password_hash, $idAlvo);
+
+            if (!$stmtUpdateUser->execute()) {
+                $erro = $stmtUpdateUser->error;
+                $stmtUpdateUser->close();
+                $this->conn->rollback();
+                return json_encode([
+                    'flag' => false,
+                    'msg' => 'Erro ao atualizar password: ' . $erro
+                ], JSON_UNESCAPED_UNICODE);
+            }
+        }
+        $stmtUpdateUser->close();
+
+        $stmtToken = $this->conn->prepare("UPDATE password_resets SET usado = 1, usado_em = ? WHERE token = ?");
+        $stmtToken->bind_param("ss", $usado_em, $token_hash);
+        if (!$stmtToken->execute()) {
+            $erro = $stmtToken->error;
+            $stmtToken->close();
+            $this->conn->rollback();
+            return json_encode([
+                'flag' => false,
+                'msg' => 'Erro ao marcar token como usado: ' . $erro
+            ], JSON_UNESCAPED_UNICODE);
+        }
+        $stmtToken->close();
+
+        $this->conn->commit();
+
+        $emailDestino = trim((string)$userAtual['email']);
+        $nomeDestino = trim((string)$userAtual['nome']);
+        if ($emailDestino !== '') {
+            try {
+                $emailService = new EmailService($this->conn);
+                $emailService->enviarPasswordAlterada($emailDestino, $nomeDestino !== '' ? $nomeDestino : 'Utilizador', 'redefinicao_token');
+            } catch (\Exception $e) {
+            }
+        }
 
         return json_encode([
             'flag' => true,
-            'msg' => 'Password redefinida com sucesso! Pode agora fazer login com a nova password.'
+            'msg' => count($idsParaAtualizar) > 1
+                ? 'Password redefinida com sucesso em todas as contas associadas! Pode agora fazer login com a nova password.'
+                : 'Password redefinida com sucesso! Pode agora fazer login com a nova password.'
         ], JSON_UNESCAPED_UNICODE);
         } catch (Exception $e) {
-            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            if ($this->conn && method_exists($this->conn, 'rollback')) {
+                @$this->conn->rollback();
+            }
+            return json_encode(['flag' => false, 'msg' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -186,7 +257,7 @@ class PasswordReset {
 
         return $this->redefinirPassword($token, $nova_password);
         } catch (Exception $e) {
-            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            return json_encode(['flag' => false, 'msg' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -204,7 +275,7 @@ class PasswordReset {
 
         return $removidos;
         } catch (Exception $e) {
-            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            return json_encode(['flag' => false, 'msg' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
 }

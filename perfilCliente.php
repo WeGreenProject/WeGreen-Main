@@ -1,9 +1,14 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['utilizador']) || $_SESSION['tipo'] != 2){
+if(!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])){
     header("Location: login.html");
     exit();
+}
+
+if($_SESSION['tipo'] != 2){
+  header("Location: forbiddenerror.html");
+  exit();
 }
 ?>
 <!DOCTYPE html>
