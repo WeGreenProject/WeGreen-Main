@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
 class PasswordReset {
@@ -34,20 +34,20 @@ class PasswordReset {
         $token = bin2hex(random_bytes(32));
         $token_hash = hash('sha256', $token);
 
-        
+
         $expira_em = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-        
+
         $ip_address = $_SERVER['REMOTE_ADDR'] ?? null;
         $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
 
-        
+
         $stmt = $this->conn->prepare("UPDATE password_resets SET usado = 1 WHERE utilizador_id = ? AND usado = 0");
         $stmt->bind_param("i", $user['id']);
         $stmt->execute();
         $stmt->close();
 
-        
+
         $stmt = $this->conn->prepare("INSERT INTO password_resets (utilizador_id, email, token, expira_em, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("isssss", $user['id'], $email, $token_hash, $expira_em, $ip_address, $user_agent);
 
@@ -61,11 +61,11 @@ class PasswordReset {
 
         $stmt->close();
 
-        
+
         $base_url = 'http://localhost/WeGreen-Main';
         $reset_link = $base_url . '/reset_password.html?token=' . urlencode($token);
 
-        
+
         try {
             $emailService = new EmailService($this->conn);
             $emailEnviado = $emailService->sendResetPassword($email, $user['nome'], $reset_link);
@@ -132,7 +132,7 @@ class PasswordReset {
     function redefinirPassword($token, $nova_password) {
         try {
 
-        
+
         $validacao = json_decode($this->validarToken($token), true);
 
         if (!$validacao['flag']) {
@@ -175,7 +175,7 @@ class PasswordReset {
     function redefinirPasswordComValidacao($token, $nova_password) {
         try {
 
-        
+
         if (strlen($nova_password) < 6) {
             return json_encode([
                 'flag' => false,
@@ -183,7 +183,7 @@ class PasswordReset {
             ], JSON_UNESCAPED_UNICODE);
         }
 
-        
+
         return $this->redefinirPassword($token, $nova_password);
         } catch (Exception $e) {
             return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);

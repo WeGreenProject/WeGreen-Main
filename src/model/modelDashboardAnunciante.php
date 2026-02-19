@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
 require_once __DIR__ . '/../services/RankingService.php';
 require_once __DIR__ . '/../services/ProfileAddressFieldsService.php';

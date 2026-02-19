@@ -51,24 +51,24 @@ class RankingService {
         return $existe;
     }
 
-    
+
     public function adicionarPontosVenda($anuncianteId) {
         return $this->adicionarPontos($anuncianteId, 25, 'Venda concluída');
     }
 
-    
+
     public function removerPontosDevolucao($anuncianteId) {
         return $this->adicionarPontos($anuncianteId, -100, 'Devolução aprovada');
     }
 
-    
+
     public function removerPontosCancelamento($anuncianteId) {
         return $this->adicionarPontos($anuncianteId, -100, 'Cancelamento de encomenda');
     }
 
-    
+
     public function adicionarPontos($anuncianteId, $pontos, $motivo = '') {
-        
+
         $sql = "UPDATE Utilizadores SET pontos_conf = GREATEST(0, COALESCE(pontos_conf, 0) + ?) WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         if (!$stmt) {
@@ -78,7 +78,7 @@ class RankingService {
         $stmt->execute();
         $stmt->close();
 
-        
+
         $sqlGet = "SELECT pontos_conf FROM Utilizadores WHERE id = ? LIMIT 1";
         $stmtGet = $this->conn->prepare($sqlGet);
         $stmtGet->bind_param("i", $anuncianteId);
@@ -89,10 +89,10 @@ class RankingService {
 
         $pontosAtuais = (int)($row['pontos_conf'] ?? 0);
 
-        
+
         $novoRankingId = $this->calcularRanking($pontosAtuais);
 
-        
+
         $sqlRank = "SELECT ranking_id FROM Utilizadores WHERE id = ? LIMIT 1";
         $stmtRank = $this->conn->prepare($sqlRank);
         $stmtRank->bind_param("i", $anuncianteId);
@@ -103,7 +103,7 @@ class RankingService {
 
         $rankingAnterior = (int)($rowRank['ranking_id'] ?? 1);
 
-        
+
         if ($novoRankingId !== $rankingAnterior) {
             $sqlUpdate = "UPDATE Utilizadores SET ranking_id = ? WHERE id = ?";
             $stmtUpdate = $this->conn->prepare($sqlUpdate);
@@ -111,7 +111,7 @@ class RankingService {
             $stmtUpdate->execute();
             $stmtUpdate->close();
 
-            
+
             if ($novoRankingId >= 3 && $rankingAnterior < 3) {
                 $this->registarDescontoPrata($anuncianteId);
             }
@@ -120,12 +120,12 @@ class RankingService {
         return true;
     }
 
-    
+
     public function recalcularPontosCriterios($anuncianteId) {
         $pontosBonus = 0;
 
-        
-        
+
+
         if ($this->tabelaExiste('Avaliacoes')) {
             $sqlAvg = "SELECT AVG(avaliacao) as media, COUNT(*) as total
                        FROM Avaliacoes
@@ -145,7 +145,7 @@ class RankingService {
                     elseif ($media >= 3.5) $pontosBonus += 75;
                     elseif ($media >= 3.0) $pontosBonus += 50;
 
-                    
+
                     $totalAvaliacoes = (int)$rowAvg['total'];
                     if ($totalAvaliacoes >= 50) $pontosBonus += 50;
                     elseif ($totalAvaliacoes >= 25) $pontosBonus += 30;
@@ -154,7 +154,7 @@ class RankingService {
             }
         }
 
-        
+
         $temReembolsada = $this->colunaExiste('Vendas', 'reembolsada');
         $sqlVendas = "SELECT COUNT(*) as total FROM Vendas WHERE anunciante_id = ?";
         if ($temReembolsada) {
@@ -174,7 +174,7 @@ class RankingService {
             elseif ($totalVendas >= 20) $pontosBonus += 15;
         }
 
-        
+
         if ($this->tabelaExiste('Encomendas')) {
             $sqlRepeat = "SELECT COUNT(DISTINCT e.cliente_id) as clientes_unicos,
                                  COUNT(e.id) as total_encomendas
@@ -192,7 +192,7 @@ class RankingService {
                 $clientesUnicos = (int)($rowRepeat['clientes_unicos'] ?? 0);
                 $totalEncomendas = (int)($rowRepeat['total_encomendas'] ?? 0);
 
-                
+
                 if ($clientesUnicos > 0 && $totalEncomendas > 0) {
                     $taxaRepetição = $totalEncomendas / $clientesUnicos;
                     if ($taxaRepetição >= 3.0) $pontosBonus += 50;
@@ -205,13 +205,13 @@ class RankingService {
         return $pontosBonus;
     }
 
-    
+
     public function recalcularPontosCompleto($anuncianteId) {
         if (!$this->tabelaExiste('Vendas')) {
             return 0;
         }
 
-        
+
         $temReembolsada = $this->colunaExiste('Vendas', 'reembolsada');
         $sqlVendas = "SELECT COUNT(*) as total FROM Vendas WHERE anunciante_id = ?";
         if ($temReembolsada) {
@@ -226,7 +226,7 @@ class RankingService {
             $stmtV->close();
         }
 
-        
+
         $devolucoes = 0;
         if ($this->tabelaExiste('Devolucoes')) {
             $sqlDev = "SELECT COUNT(*) as total FROM Devolucoes d
@@ -241,7 +241,7 @@ class RankingService {
             }
         }
 
-        
+
         $cancelamentos = 0;
         if ($this->tabelaExiste('Encomendas')) {
             $sqlCancel = "SELECT COUNT(*) as total FROM Encomendas e
@@ -256,15 +256,15 @@ class RankingService {
             }
         }
 
-        
+
         $pontosBase = ($vendas * 25) - ($devolucoes * 100) - ($cancelamentos * 100);
         $pontosBase = max(0, $pontosBase);
 
-        
+
         $pontosBonus = $this->recalcularPontosCriterios($anuncianteId);
         $pontosTotal = $pontosBase + $pontosBonus;
 
-        
+
         $rankAnterior = 1;
         $sqlRankAtual = "SELECT ranking_id FROM Utilizadores WHERE id = ? LIMIT 1";
         $stmtRA = $this->conn->prepare($sqlRankAtual);
@@ -278,7 +278,7 @@ class RankingService {
             $stmtRA->close();
         }
 
-        
+
         $novoRanking = $this->calcularRanking($pontosTotal);
         $sqlUpdate = "UPDATE Utilizadores SET pontos_conf = ?, ranking_id = ? WHERE id = ?";
         $stmtUpdate = $this->conn->prepare($sqlUpdate);
@@ -286,7 +286,7 @@ class RankingService {
         $stmtUpdate->execute();
         $stmtUpdate->close();
 
-        
+
         if ($novoRanking >= 3 && $rankAnterior < 3) {
             $this->registarDescontoPrata($anuncianteId);
         }
@@ -294,18 +294,18 @@ class RankingService {
         return $pontosTotal;
     }
 
-    
+
     private function calcularRanking($pontos) {
-        if ($pontos >= 850) return 5; 
-        if ($pontos >= 650) return 4; 
-        if ($pontos >= 400) return 3; 
-        if ($pontos >= 200) return 2; 
-        return 1; 
+        if ($pontos >= 850) return 5;
+        if ($pontos >= 650) return 4;
+        if ($pontos >= 400) return 3;
+        if ($pontos >= 200) return 2;
+        return 1;
     }
 
-    
+
     private function registarDescontoPrata($anuncianteId) {
-        
+
         $sqlCheck = "SELECT id FROM descontos_ranking WHERE anunciante_id = ? AND usado = 0 LIMIT 1";
         $stmtCheck = $this->conn->prepare($sqlCheck);
         if (!$stmtCheck) return;
@@ -314,7 +314,7 @@ class RankingService {
         $result = $stmtCheck->get_result();
         $stmtCheck->close();
 
-        if ($result->num_rows > 0) return; 
+        if ($result->num_rows > 0) return;
 
         $sqlInsert = "INSERT INTO descontos_ranking (anunciante_id, tipo_desconto, valor_desconto, usado, data_criacao)
                       VALUES (?, 'upgrade_plano', 50, 0, NOW())";
@@ -326,7 +326,7 @@ class RankingService {
         }
     }
 
-    
+
     public function getDescontoDisponivel($anuncianteId) {
         $sql = "SELECT * FROM descontos_ranking WHERE anunciante_id = ? AND usado = 0 ORDER BY data_criacao DESC LIMIT 1";
         $stmt = $this->conn->prepare($sql);
@@ -339,7 +339,7 @@ class RankingService {
         return $desconto;
     }
 
-    
+
     public function usarDesconto($descontoId) {
         $sql = "UPDATE descontos_ranking SET usado = 1 WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
@@ -350,7 +350,7 @@ class RankingService {
         return $result;
     }
 
-    
+
     public function recalcularTodosAnunciantes() {
         $ids = [];
 

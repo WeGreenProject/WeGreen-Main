@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 
 class ChatAnunciante {
 
@@ -10,13 +10,13 @@ class ChatAnunciante {
         $this->conn = $conn;
     }
 
-    
+
     function getSideBar($anuncianteId) {
         try {
 
         $msg = "";
 
-        
+
         $sql = "SELECT DISTINCT
             u.id AS IdCliente,
             u.nome,
@@ -88,13 +88,13 @@ class ChatAnunciante {
         }
     }
 
-    
+
     function getConversas($anuncianteId, $clienteId) {
         try {
 
         $msg = "";
 
-        
+
         $fotoAnunciante = $this->getFotoUsuario($anuncianteId);
         $fotoCliente = $this->getFotoUsuario($clienteId);
         $nomeAnunciante = $this->getNomeUsuario($anuncianteId);
@@ -103,7 +103,7 @@ class ChatAnunciante {
         $inicialAnunciante = $this->getIniciais($nomeAnunciante);
         $inicialCliente = $this->getIniciais($nomeCliente);
 
-        
+
         $sql = "SELECT
             m.mensagem,
             m.anexo,
@@ -130,7 +130,7 @@ class ChatAnunciante {
                 $anexoHtml = $this->renderAnexo($row['anexo']);
 
                 if ($isMensagemEnviada) {
-                    
+
                     $msg .= "<div class='message sent'>";
                     if (!empty($fotoAnunciante)) {
                         $msg .= "<div class='message-avatar'><img src='".$fotoAnunciante."' alt='Anunciante'></div>";
@@ -146,7 +146,7 @@ class ChatAnunciante {
                     $msg .= "</div>";
                     $msg .= "</div>";
                 } else {
-                    
+
                     $msg .= "<div class='message'>";
                     if (!empty($fotoCliente)) {
                         $msg .= "<div class='message-avatar'><img src='".$fotoCliente."' alt='Cliente'></div>";
@@ -178,7 +178,7 @@ class ChatAnunciante {
         }
     }
 
-    
+
     function enviarMensagem($anuncianteId, $clienteId, $mensagem, $anexo = null) {
         try {
 
@@ -214,7 +214,7 @@ class ChatAnunciante {
         }
     }
 
-    
+
     function pesquisarChat($pesquisa, $anuncianteId) {
         try {
 
@@ -293,7 +293,7 @@ class ChatAnunciante {
         }
     }
 
-    
+
     private function renderAnexo($anexo) {
         if (empty($anexo)) return '';
         $ext = strtolower(pathinfo($anexo, PATHINFO_EXTENSION));
@@ -377,7 +377,7 @@ class ChatAnunciante {
             return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
-    
+
     function getMensagemConversaNaoSelecionada() {
         return '
         <div class="empty-chat">

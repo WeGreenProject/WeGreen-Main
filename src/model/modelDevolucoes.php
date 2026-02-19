@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
 require_once __DIR__ . '/../services/RankingService.php';
 
@@ -12,7 +12,7 @@ class Devolucoes {
         $this->conn = $conn;
     }
 
-    
+
     private function getTaxaComissaoPorProduto($produtoId) {
         $sql = "SELECT sustentavel, tipo_material FROM Produtos WHERE Produto_id = ? LIMIT 1";
         $stmt = $this->conn->prepare($sql);
@@ -152,13 +152,13 @@ class Devolucoes {
         $prodImg     = !empty($dev['produto_imagem']) ? $esc($dev['produto_imagem']) : (!empty($dev['produto_foto']) ? $esc($dev['produto_foto']) : 'src/img/no-image.png');
         $valor       = number_format((float)($dev['valor_reembolso'] ?? 0), 2, '.', '');
 
-        
+
         $diasDesde = 0;
         if (!empty($dev['data_solicitacao'])) {
             $diasDesde = (int)((time() - strtotime($dev['data_solicitacao'])) / 86400);
         }
 
-        
+
         $iconeMap = [
             'solicitada' => 'fa-clock', 'aprovada' => 'fa-check-circle', 'rejeitada' => 'fa-times-circle',
             'produto_enviado' => 'fa-shipping-fast', 'produto_recebido' => 'fa-box-open',
@@ -179,7 +179,7 @@ class Devolucoes {
         $cor       = $corMap[$estado] ?? '#94a3b8';
         $badgeClass = $badgeMap[$estado] ?? 'secondary';
 
-        
+
         $etapas = ['solicitada', 'aprovada', 'produto_enviado', 'produto_recebido', 'reembolsada'];
         $etapaRejeitada = in_array($estado, ['rejeitada', 'cancelada']);
         $etapaIdx = array_search($estado, $etapas);
@@ -213,7 +213,7 @@ class Devolucoes {
             $stepperHTML .= '</div>';
         }
 
-        
+
         $fotos = is_array($dev['fotos'] ?? null) ? $dev['fotos'] : [];
         $fotosHTML = '';
         if (!empty($fotos)) {
@@ -228,7 +228,7 @@ class Devolucoes {
             $fotosHTML .= '</div>';
         }
 
-        
+
         $alertaHTML = '';
         if ($diasDesde > 3 && $estado === 'solicitada') {
             $alertaHTML = '<div class="dev-alert-pending">
@@ -237,17 +237,17 @@ class Devolucoes {
             </div>';
         }
 
-        
+
         $textoIntegradoHtml = !empty($dev['notas_cliente'])
             ? '<p style="margin:10px 0 0; font-size:13px; color:#4b5563; line-height:1.45;"><strong>Cliente:</strong> ' . $esc($dev['notas_cliente']) . '</p>'
             : '';
 
-        
+
         $dataSol = !empty($dev['data_solicitacao']) ? date('d/m/Y H:i', strtotime($dev['data_solicitacao'])) : 'N/A';
         $dataReemb = !empty($dev['data_reembolso']) ? date('d/m/Y H:i', strtotime($dev['data_reembolso'])) : '';
         $valorClass = $estado === 'reembolsada' ? 'dev-valor-success' : 'dev-valor-highlight';
 
-        
+
         $html = '
 <style>
   .dev-modal { text-align:left; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
@@ -376,7 +376,7 @@ class Devolucoes {
     function solicitarDevolucao($encomenda_id, $cliente_id, $motivo, $motivo_detalhe = '', $notas_cliente = '', $fotos = [], $produtos_selecionados = []) {
 
         try {
-            
+
             $elegibilidade = $this->obterElegibilidadeDados($encomenda_id, $cliente_id);
             if (!$elegibilidade['elegivel']) {
                 return json_encode(['flag' => false, 'msg' => $elegibilidade['motivo']], JSON_UNESCAPED_UNICODE);
@@ -384,7 +384,7 @@ class Devolucoes {
 
             $encomenda = $elegibilidade['encomenda'];
 
-            
+
             $sql_produtos = "SELECT v.*, p.nome, p.foto
                             FROM vendas v
                             INNER JOIN produtos p ON v.Produto_id = p.Produto_id
@@ -399,7 +399,7 @@ class Devolucoes {
                 $produtos_encomenda[$row['produto_id']] = $row;
             }
 
-            
+
             foreach ($produtos_selecionados as $produto_sel) {
                 if (!isset($produtos_encomenda[$produto_sel['produto_id']])) {
                     return json_encode(['flag' => false, 'msg' => 'Produto inválido selecionado.'], JSON_UNESCAPED_UNICODE);
@@ -411,19 +411,19 @@ class Devolucoes {
                 }
             }
 
-            
+
             $codigo_devolucao = $this->gerarCodigoDevolucao();
             $fotos_json = json_encode($fotos, JSON_UNESCAPED_UNICODE);
 
             $devolucoes_criadas = [];
 
-            
+
             foreach ($produtos_selecionados as $produto_sel) {
                 $produto_id = $produto_sel['produto_id'];
                 $quantidade = $produto_sel['quantidade'];
                 $prod_enc = $produtos_encomenda[$produto_id];
 
-                
+
                 $valor_reembolso = ($prod_enc['valor'] / $prod_enc['quantidade']) * $quantidade;
 
                 $sql = "INSERT INTO devolucoes (
@@ -457,11 +457,11 @@ class Devolucoes {
                 $devolucao_id = $stmt->insert_id;
                 $devolucoes_criadas[] = $devolucao_id;
 
-                
+
                 $this->registrarHistorico($devolucao_id, null, 'solicitada', 'cliente', 'Devolução solicitada pelo cliente');
             }
 
-            
+
             if (!empty($devolucoes_criadas)) {
                 $this->enviarNotificacaoSolicitacao($devolucoes_criadas[0]);
             }
@@ -474,7 +474,7 @@ class Devolucoes {
     }
 
     private function obterElegibilidadeDados($encomenda_id, $cliente_id) {
-        
+
         $sql = "SELECT e.*, v.valor, v.anunciante_id, e.payment_id
                 FROM encomendas e
                 LEFT JOIN vendas v ON e.id = v.encomenda_id
@@ -495,7 +495,7 @@ class Devolucoes {
 
         $encomenda = $result->fetch_assoc();
 
-        
+
         $sqlCheck = "SELECT id FROM devolucoes WHERE encomenda_id = ? AND estado NOT IN ('rejeitada', 'cancelada')";
         $stmtCheck = $this->conn->prepare($sqlCheck);
         $stmtCheck->bind_param('i', $encomenda_id);
@@ -508,7 +508,7 @@ class Devolucoes {
             ];
         }
 
-        
+
         if ($encomenda['estado'] !== 'Entregue') {
             return [
                 'elegivel' => false,
@@ -516,7 +516,7 @@ class Devolucoes {
             ];
         }
 
-        
+
         $dataParaCalculo = $encomenda['data_confirmacao_recepcao'] ?? $encomenda['data_envio'];
         if (!empty($dataParaCalculo)) {
             $data_entrega = new DateTime($dataParaCalculo);
@@ -570,7 +570,7 @@ class Devolucoes {
 
         $devolucoes = [];
         while ($row = $result->fetch_assoc()) {
-            
+
             if (!empty($row['fotos'])) {
                 $row['fotos'] = json_decode($row['fotos'], true);
             } else {
@@ -622,7 +622,7 @@ class Devolucoes {
 
         $devolucoes = [];
         while ($row = $result->fetch_assoc()) {
-            
+
             $sql_cliente = "SELECT nome, email FROM Utilizadores WHERE id = ?";
             $stmt_cliente = $this->conn->prepare($sql_cliente);
             $stmt_cliente->bind_param('i', $row['cliente_id']);
@@ -634,9 +634,9 @@ class Devolucoes {
             $row['cliente_nome'] = $cliente ? $cliente['nome'] : 'Cliente não encontrado';
             $row['cliente_email'] = $cliente ? $cliente['email'] : '';
 
-            
-            
-            
+
+
+
             if (!empty($row['produto_id'])) {
                 $sql_produto = "SELECT nome, foto FROM Produtos WHERE Produto_id = ?";
                 $stmt_produto = $this->conn->prepare($sql_produto);
@@ -649,7 +649,7 @@ class Devolucoes {
                 $row['produto_nome'] = $produto ? $produto['nome'] : 'Produto Removido';
                 $row['produto_imagem'] = $produto ? $produto['foto'] : null;
             } else {
-                
+
                 $sql_produtos = "SELECT p.nome, p.foto
                                 FROM Vendas v
                                 INNER JOIN Produtos p ON v.produto_id = p.Produto_id
@@ -706,7 +706,7 @@ class Devolucoes {
             return '<div style="text-align:center;padding:30px;color:#ef4444;"><i class="fas fa-exclamation-circle" style="font-size:32px;"></i><p style="margin-top:12px;">Devolução não encontrada.</p></div>';
         }
 
-        
+
         $historico = [];
         $sqlHist = "SELECT * FROM historico_devolucoes WHERE devolucao_id = ? ORDER BY data_alteracao ASC";
         $stmtHist = $this->conn->prepare($sqlHist);
@@ -720,7 +720,7 @@ class Devolucoes {
             $stmtHist->close();
         }
 
-        
+
         if (empty($historico)) {
             $historico = $this->construirTimelineAPartirDeDatas($devolucao);
         }
@@ -730,7 +730,7 @@ class Devolucoes {
         return $this->renderDetalhesHtml($devolucao);
     }
 
-    
+
     private function construirTimelineAPartirDeDatas($dev) {
         $timeline = [];
 
@@ -800,7 +800,7 @@ class Devolucoes {
 
     function aprovarDevolucao($devolucao_id, $anunciante_id, $notas_anunciante = '') {
         try {
-            
+
             $devolucao = $this->obterDetalhesDados($devolucao_id);
 
             if (!$devolucao) {
@@ -830,14 +830,14 @@ class Devolucoes {
 
             $this->registrarHistorico($devolucao_id, 'solicitada', 'aprovada', 'anunciante', $notas_anunciante);
 
-            
+
             try {
                 $rankingService = new RankingService($this->conn);
                 $rankingService->removerPontosDevolucao((int)$anunciante_id);
             } catch (Exception $rankEx) {
             }
 
-            
+
             $this->enviarNotificacaoAprovacao($devolucao_id);
 
             return json_encode(['flag' => true, 'msg' => 'Devolução aprovada com sucesso! Aguardando recebimento do produto.'], JSON_UNESCAPED_UNICODE);
@@ -878,7 +878,7 @@ class Devolucoes {
 
             $this->registrarHistorico($devolucao_id, 'solicitada', 'rejeitada', 'anunciante', $notas_anunciante);
 
-            
+
             $this->enviarNotificacaoRejeicao($devolucao_id);
 
             return json_encode(['flag' => true, 'msg' => 'Devolução rejeitada.'], JSON_UNESCAPED_UNICODE);
@@ -920,7 +920,7 @@ class Devolucoes {
             $obs = $codigo_rastreio ? "Código de rastreio: {$codigo_rastreio}" : "Sem código de rastreio";
             $this->registrarHistorico($devolucao_id, 'aprovada', 'produto_enviado', 'cliente', $obs);
 
-            
+
             $this->enviarNotificacaoEnvio($devolucao_id);
 
             return json_encode(['flag' => true, 'msg' => 'Envio confirmado! O vendedor será notificado.'], JSON_UNESCAPED_UNICODE);
@@ -962,7 +962,7 @@ class Devolucoes {
 
             $this->registrarHistorico($devolucao_id, 'produto_enviado', 'produto_recebido', 'anunciante', $notas_recebimento);
 
-            
+
             $this->enviarNotificacaoRecebimento($devolucao_id);
 
             return json_encode(['flag' => true, 'msg' => 'Recebimento confirmado! Agora você pode processar o reembolso.'], JSON_UNESCAPED_UNICODE);
@@ -980,20 +980,20 @@ class Devolucoes {
                 return json_encode(['flag' => false, 'msg' => 'Devolução não encontrada.'], JSON_UNESCAPED_UNICODE);
             }
 
-            
+
             if ($devolucao['estado'] === 'reembolsada') {
                 return json_encode(['flag' => false, 'msg' => 'Esta devolução já foi reembolsada.'], JSON_UNESCAPED_UNICODE);
             }
 
-            
+
             if ($devolucao['estado'] !== 'produto_recebido') {
                 return json_encode(['flag' => false, 'msg' => 'Você precisa confirmar o recebimento do produto antes de processar o reembolso.'], JSON_UNESCAPED_UNICODE);
             }
 
-            
+
             if (empty($devolucao['payment_intent_id'])) {
-                
-                
+
+
                 $sql = "UPDATE devolucoes
                         SET reembolso_stripe_id = 'manual',
                             reembolso_status = 'manual',
@@ -1028,14 +1028,14 @@ class Devolucoes {
                 return json_encode(['flag' => true, 'msg' => 'Reembolso processado manualmente com sucesso! (Sem pagamento Stripe associado — reembolso fora da plataforma)', 'refund_id' => 'manual', 'status' => 'manual'], JSON_UNESCAPED_UNICODE);
             }
 
-            
+
             require_once __DIR__ . '/../../vendor/autoload.php';
             \Stripe\Stripe::setApiKey('sk_test_51SAniYBgsjq4eGslagm3l86yXwCOicwq02ABZ54SCT7e8p9HiOTdciQcB3hQXxN4i6hVwlxohVvbtzQXEoPhg7yd009a6ubA3l');
 
-            
+
             $refund = \Stripe\Refund::create([
                 'payment_intent' => $devolucao['payment_intent_id'],
-                'amount' => intval($devolucao['valor_reembolso'] * 100), 
+                'amount' => intval($devolucao['valor_reembolso'] * 100),
                 'reason' => 'requested_by_customer',
                 'metadata' => [
                     'devolucao_id' => $devolucao_id,
@@ -1056,7 +1056,7 @@ class Devolucoes {
             $stmt->bind_param('ssi', $refund->id, $refund_status, $devolucao_id);
             $stmt->execute();
 
-            
+
             $this->reverterVendaEComissao(
                 $devolucao['encomenda_id'],
                 $devolucao['valor_reembolso'],
@@ -1072,14 +1072,14 @@ class Devolucoes {
                 "Reembolso Stripe ID: {$refund->id} - Status: {$refund->status}"
             );
 
-            
+
             $this->enviarNotificacaoReembolso($devolucao_id);
 
             return json_encode(['flag' => true, 'msg' => 'Reembolso processado com sucesso!', 'refund_id' => $refund->id, 'status' => $refund->status], JSON_UNESCAPED_UNICODE);
 
         } catch (\Stripe\Exception\ApiErrorException $e) {
 
-            
+
             $sql_manual = "UPDATE devolucoes
                     SET reembolso_stripe_id = 'manual_stripe_falha',
                         reembolso_status = 'manual',
@@ -1115,7 +1115,7 @@ class Devolucoes {
 
     private function reverterVendaEComissao($encomenda_id, $valor_reembolso, $produto_id = null, $anunciante_id = null) {
         try {
-            
+
             $sqlVenda = "SELECT id, anunciante_id, produto_id, valor, lucro
                         FROM vendas
                         WHERE encomenda_id = ?";
@@ -1160,7 +1160,7 @@ class Devolucoes {
 
             $comissao = $valorReembolsoAplicado * $taxaComissao;
 
-            
+
             $sqlRendimento = "INSERT INTO rendimento (valor, anunciante_id, descricao, data_registo)
                               VALUES (?, ?, CONCAT('Reversão de comissão - Encomenda ID: ', ?, ' - Produto ID: ', ?), NOW())";
             $stmtRendimento = $this->conn->prepare($sqlRendimento);
@@ -1174,7 +1174,7 @@ class Devolucoes {
             } else {
             }
 
-            
+
             $sqlPendentes = "SELECT COUNT(*) AS total_pendentes
                             FROM vendas v
                             WHERE v.encomenda_id = ?
@@ -1240,7 +1240,7 @@ class Devolucoes {
                 return;
             }
 
-            
+
             if (!empty($devolucao['cliente_email'])) {
                 $emailService->enviarEmail(
                     $devolucao['cliente_email'],
@@ -1251,7 +1251,7 @@ class Devolucoes {
                 );
             }
 
-            
+
             if (!empty($devolucao['anunciante_email'])) {
                 $emailService->enviarEmail(
                     $devolucao['anunciante_email'],
@@ -1274,7 +1274,7 @@ class Devolucoes {
                 return;
             }
 
-            
+
             if (!empty($devolucao['cliente_email'])) {
                 $emailService->enviarEmail(
                     $devolucao['cliente_email'],
@@ -1285,7 +1285,7 @@ class Devolucoes {
                 );
             }
 
-            
+
             $this->criarNotificacaoSistema(
                 $devolucao['cliente_id'],
                 'devolucao_aprovada',
@@ -1350,7 +1350,7 @@ class Devolucoes {
                 return;
             }
 
-            
+
             if (!empty($devolucao['anunciante_email'])) {
                 $emailService->enviarEmail(
                     $devolucao['anunciante_email'],
@@ -1361,7 +1361,7 @@ class Devolucoes {
                 );
             }
 
-            
+
             $rastreio = !empty($devolucao['codigo_rastreio']) ? " (Rastreio: {$devolucao['codigo_rastreio']})" : "";
             $this->criarNotificacaoSistema(
                 $devolucao['anunciante_id'],
@@ -1383,7 +1383,7 @@ class Devolucoes {
                 return;
             }
 
-            
+
             if (!empty($devolucao['cliente_email'])) {
                 $emailService->enviarEmail(
                     $devolucao['cliente_email'],
@@ -1394,7 +1394,7 @@ class Devolucoes {
                 );
             }
 
-            
+
             $this->criarNotificacaoSistema(
                 $devolucao['cliente_id'],
                 'devolucao_recebida',
@@ -1441,34 +1441,34 @@ class Devolucoes {
 
     function uploadFotoDevolucao($file) {
         try {
-            
+
             if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
                 return json_encode(['flag' => false, 'msg' => 'Erro no upload'], JSON_UNESCAPED_UNICODE);
             }
 
-            
+
             $allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
             if (!in_array($file['type'], $allowed)) {
                 return json_encode(['flag' => false, 'msg' => 'Formato inválido. Use JPEG, PNG ou WEBP'], JSON_UNESCAPED_UNICODE);
             }
 
-            
+
             if ($file['size'] > 5 * 1024 * 1024) {
                 return json_encode(['flag' => false, 'msg' => 'Arquivo muito grande. Máximo 5MB'], JSON_UNESCAPED_UNICODE);
             }
 
-            
+
             $upload_dir = __DIR__ . '/../../assets/media/devolucoes/';
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
 
-            
+
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
             $filename = uniqid('dev_') . '_' . time() . '.' . $extension;
             $filepath = $upload_dir . $filename;
 
-            
+
             if (move_uploaded_file($file['tmp_name'], $filepath)) {
                 return json_encode(['flag' => true, 'msg' => 'Upload concluíddo', 'url' => 'assets/media/devolucoes/' . $filename], JSON_UNESCAPED_UNICODE);
             } else {
