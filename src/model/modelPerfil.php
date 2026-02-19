@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/../services/ProfileAddressFieldsService.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
@@ -92,7 +92,7 @@ class Perfil{
         }
     }
 
-    
+
     function getDadosTipoPerfilCompleto($ID_User, $tpUser) {
         try {
         if ($ID_User && $tpUser) {
@@ -134,7 +134,7 @@ class Perfil{
     function verificarContaAlternativa($email, $tipoAtual) {
         try {
 
-        
+
         $tipoAlternativo = ($tipoAtual == 2) ? 3 : 2;
 
         $stmt = $this->conn->prepare("SELECT id, tipo_utilizador_id FROM Utilizadores WHERE email = ? AND tipo_utilizador_id = ?");
@@ -172,7 +172,7 @@ class Perfil{
             $row = $result->fetch_assoc();
             $stmt->close();
 
-            
+
             $_SESSION['utilizador'] = $row['id'];
             $_SESSION['nome'] = $row['nome'];
             $_SESSION['tipo'] = $row['tipo_utilizador_id'];
@@ -183,10 +183,10 @@ class Perfil{
             $_SESSION['data'] = $row['data_criacao'];
             $_SESSION['email'] = $row['email'];
 
-            
+
             unset($_SESSION['perfil_duplo']);
 
-            
+
             if ($row['tipo_utilizador_id'] == 3) {
                 require_once 'modelCarrinho.php';
                 $carrinho = new Carrinho($this->conn);
@@ -302,7 +302,7 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
     $flag = false;
     $msg = "";
-    $ID_Consumidor = 1; 
+    $ID_Consumidor = 1;
 
     $assuntoTexto = trim((string)$assunto);
     $mensagemTexto = trim((string)$mensagem);
@@ -459,7 +459,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -477,7 +477,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -493,7 +493,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='checkout.php?plano=crescimentocircular&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -521,7 +521,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -537,7 +537,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -553,7 +553,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -581,7 +581,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -599,7 +599,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -615,7 +615,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -649,7 +649,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -667,7 +667,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold'>Selecionado</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -683,7 +683,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='checkout.php?plano=premium&preco=25' class='btn btn-wegreen-accent text-black rounded-pill px-4'>Selecionar</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -711,7 +711,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -744,7 +744,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-dark text-wegreen-dark rounded-pill px-4 fw-bold' disabled style='opacity: 0.6; cursor: not-allowed;'>Plano Atual</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -772,7 +772,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
 
                 $msg .= "<div class='row g-4 justify-content-center'>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -790,7 +790,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -806,7 +806,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
                 $msg .= "<a href='#' class='btn btn-secondary text-white rounded-pill px-4' disabled style='opacity: 0.5; cursor: not-allowed;'>Downgrade não permitido</a>";
                 $msg .= "</div></div></div>";
 
-                
+
                 $msg .= "<div class='col-md-4'>";
                 $msg .= "<div class='card h-100 border-0 shadow-lg rounded-4 bg-wegreen-accent text-white'>";
                 $msg .= "<div class='card-body py-5'>";
@@ -916,7 +916,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
             return json_encode(['success' => false, 'message' => 'Código postal deve ter o formato XXXX-XXX'], JSON_UNESCAPED_UNICODE);
         }
 
-        
+
         $sqlCheck = "SELECT id FROM utilizadores WHERE email = ? AND id != ? AND tipo_utilizador_id = 2";
         $stmtCheck = $this->conn->prepare($sqlCheck);
         $stmtCheck->bind_param("si", $email, $ID_User);
@@ -933,7 +933,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
         $primeiroNome = $partesNome[0];
         $apelido = isset($partesNome[1]) ? $partesNome[1] : null;
 
-        
+
         $sql = "UPDATE utilizadores SET nome = ?, apelido = ?, email = ?, nif = ?, telefone = ?, morada = ?, distrito = ?, localidade = ?, codigo_postal = ? WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("sssssssssi", $primeiroNome, $apelido, $email, $nif, $telefone, $morada, $distrito, $localidade, $codigo_postal, $ID_User);
@@ -953,7 +953,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
         }
     }
 
-    
+
     function atualizarPerfilClienteComPost($utilizador_id, $post_data) {
         try {
         $nome = $post_data['nome'] ?? null;
@@ -1012,7 +1012,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
         }
     }
 
-    
+
     function getDadosUtilizadorCheckout($utilizador_id) {
         try {
 
@@ -1037,10 +1037,10 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
         }
     }
 
-    
+
     function getContactFormCompleto($utilizador_id) {
         try {
-        
+
         if ($utilizador_id && strpos($utilizador_id, 'temp_') !== 0) {
             return $this->getContactForm($utilizador_id);
         }

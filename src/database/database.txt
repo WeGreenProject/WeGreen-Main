@@ -108,6 +108,26 @@ CREATE TABLE IF NOT EXISTS `denuncias` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura da tabela `descontos_ranking`
+--
+
+DROP TABLE IF EXISTS `descontos_ranking`;
+CREATE TABLE IF NOT EXISTS `descontos_ranking` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `anunciante_id` int(11) NOT NULL,
+  `tipo_desconto` varchar(100) NOT NULL DEFAULT '50_pct_plano',
+  `valor_desconto` decimal(5,2) NOT NULL DEFAULT 50.00,
+  `usado` tinyint(1) DEFAULT 0,
+  `data_criacao` timestamp NOT NULL DEFAULT current_timestamp(),
+  `data_uso` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_anunciante_id` (`anunciante_id`),
+  KEY `idx_usado` (`usado`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura da tabela `devolucoes`
 --
 
@@ -125,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `devolucoes` (
   `motivo_detalhe` text DEFAULT NULL,
   `notas_cliente` text DEFAULT NULL,
   `notas_anunciante` text DEFAULT NULL,
-  `estado` enum('solicitada','aprovada','rejeitada','produto_recebido','reembolsada','cancelada') DEFAULT 'solicitada',
+  `estado` enum('solicitada','aprovada','rejeitada','produto_enviado','produto_recebido','reembolsada','cancelada') DEFAULT 'solicitada',
   `payment_intent_id` varchar(100) DEFAULT NULL,
   `reembolso_stripe_id` varchar(100) DEFAULT NULL,
   `reembolso_status` varchar(50) DEFAULT NULL COMMENT 'pending, succeeded, failed, canceled',
@@ -755,6 +775,9 @@ CREATE TABLE IF NOT EXISTS `produtos` (
   `tamanho` varchar(30) DEFAULT NULL,
   `estado` varchar(20) DEFAULT NULL,
   `descricao` varchar(255) DEFAULT NULL,
+  `sustentavel` tinyint(1) DEFAULT 0,
+  `tipo_material` varchar(100) DEFAULT NULL,
+  `motivo_rejeicao` text DEFAULT NULL,
   `data_criacao` date DEFAULT curdate(),
   `ativo` tinyint(1) DEFAULT 1,
   `stock` int(11) DEFAULT 0,
@@ -1131,7 +1154,7 @@ CREATE TABLE IF NOT EXISTS `view_devolucoes_completa` (
 ,`notas_cliente` text
 ,`notas_anunciante` text
 ,`notas_recebimento` text
-,`estado` enum('solicitada','aprovada','rejeitada','produto_recebido','reembolsada','cancelada')
+,`estado` enum('solicitada','aprovada','rejeitada','produto_enviado','produto_recebido','reembolsada','cancelada')
 ,`payment_intent_id` varchar(100)
 ,`reembolso_stripe_id` varchar(100)
 ,`reembolso_status` varchar(50)
@@ -1165,7 +1188,7 @@ CREATE TABLE IF NOT EXISTS `view_devolucoes_completa` (
 DROP TABLE IF EXISTS `stats_devolucoes_anunciante`;
 
 DROP VIEW IF EXISTS `stats_devolucoes_anunciante`;
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `stats_devolucoes_anunciante`  AS SELECT `d`.`anunciante_id` AS `anunciante_id`, count(`d`.`id`) AS `total_devolucoes`, sum(case when `d`.`estado` = 'solicitada' then 1 else 0 end) AS `pendentes`, sum(case when `d`.`estado` = 'aprovada' then 1 else 0 end) AS `aprovadas`, sum(case when `d`.`estado` = 'rejeitada' then 1 else 0 end) AS `rejeitadas`, sum(case when `d`.`estado` = 'reembolsada' then 1 else 0 end) AS `reembolsadas`, coalesce(sum(`d`.`valor_reembolso`),0) AS `valor_total_reembolsado` FROM `devolucoes` AS `d` GROUP BY `d`.`anunciante_id` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `stats_devolucoes_anunciante`  AS SELECT `d`.`anunciante_id` AS `anunciante_id`, count(`d`.`id`) AS `total_devolucoes`, sum(case when `d`.`estado` = 'solicitada' then 1 else 0 end) AS `pendentes`, sum(case when `d`.`estado` = 'aprovada' then 1 else 0 end) AS `aprovadas`, sum(case when `d`.`estado` in ('produto_enviado','produto_recebido') then 1 else 0 end) AS `em_progresso`, sum(case when `d`.`estado` = 'rejeitada' then 1 else 0 end) AS `rejeitadas`, sum(case when `d`.`estado` = 'reembolsada' then 1 else 0 end) AS `reembolsadas`, coalesce(sum(case when `d`.`estado` = 'reembolsada' then `d`.`valor_reembolso` else 0 end),0) AS `valor_total_reembolsado` FROM `devolucoes` AS `d` GROUP BY `d`.`anunciante_id` ;
 
 -- --------------------------------------------------------
 
@@ -1200,6 +1223,12 @@ ALTER TABLE `carrinho_itens`
 ALTER TABLE `denuncias`
   ADD CONSTRAINT `denuncias_ibfk_1` FOREIGN KEY (`denunciante_id`) REFERENCES `utilizadores` (`id`),
   ADD CONSTRAINT `denuncias_ibfk_2` FOREIGN KEY (`denunciado_id`) REFERENCES `utilizadores` (`id`);
+
+--
+-- Limitadores para a tabela `descontos_ranking`
+--
+ALTER TABLE `descontos_ranking`
+  ADD CONSTRAINT `descontos_ranking_ibfk_1` FOREIGN KEY (`anunciante_id`) REFERENCES `utilizadores` (`id`) ON DELETE CASCADE;
 
 --
 -- Limitadores para a tabela `encomendas`

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 
 class ChatCliente {
 
@@ -10,7 +10,7 @@ class ChatCliente {
         $this->conn = $conn;
     }
 
-    
+
     function getSideBar($clienteId) {
         try {
 
@@ -87,13 +87,13 @@ class ChatCliente {
         }
     }
 
-    
+
     function getConversas($clienteId, $vendedorId) {
         try {
 
         $msg = "";
 
-        
+
         $fotoCliente = $this->getFotoUsuario($clienteId);
         $fotoVendedor = $this->getFotoUsuario($vendedorId);
         $nomeCliente = $this->getNomeUsuario($clienteId);
@@ -102,7 +102,7 @@ class ChatCliente {
         $inicialCliente = $this->getIniciais($nomeCliente);
         $inicialVendedor = $this->getIniciais($nomeVendedor);
 
-        
+
         $sql = "SELECT
             m.mensagem,
             m.anexo,
@@ -129,7 +129,7 @@ class ChatCliente {
                 $anexoHtml = $this->renderAnexo($row['anexo']);
 
                 if ($isMensagemEnviada) {
-                    
+
                     $msg .= "<div class='message sent'>";
                     if (!empty($fotoCliente)) {
                         $msg .= "<div class='message-avatar'><img src='".$fotoCliente."' alt='Cliente'></div>";
@@ -145,7 +145,7 @@ class ChatCliente {
                     $msg .= "</div>";
                     $msg .= "</div>";
                 } else {
-                    
+
                     $msg .= "<div class='message'>";
                     if (!empty($fotoVendedor)) {
                         $msg .= "<div class='message-avatar'><img src='".$fotoVendedor."' alt='Vendedor'></div>";
@@ -177,7 +177,7 @@ class ChatCliente {
         }
     }
 
-    
+
     function enviarMensagem($clienteId, $vendedorId, $mensagem, $anexo = null) {
         try {
 
@@ -213,7 +213,7 @@ class ChatCliente {
         }
     }
 
-    
+
     function pesquisarChat($pesquisa, $clienteId) {
         try {
 
@@ -292,7 +292,7 @@ class ChatCliente {
         }
     }
 
-    
+
     private function renderAnexo($anexo) {
         if (empty($anexo)) return '';
         $ext = strtolower(pathinfo($anexo, PATHINFO_EXTENSION));
@@ -377,7 +377,7 @@ class ChatCliente {
         }
     }
 
-    
+
     function getDadosVendedor($vendedorId) {
         try {
 
@@ -406,7 +406,7 @@ class ChatCliente {
         }
     }
 
-    
+
     function getMensagemConversaNaoSelecionada() {
         try {
         return '

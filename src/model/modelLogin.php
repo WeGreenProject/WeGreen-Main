@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 
 class Login {
 
@@ -66,15 +66,15 @@ class Login {
             $_SESSION['data'] = $row['data_criacao'];
             $_SESSION['email'] = $row['email'];
 
-            
+
             if ($temp_user_id && $temp_user_id !== $row['id']) {
                 require_once 'modelCarrinho.php';
                 $carrinho = new Carrinho($this->conn);
                 if ($row['tipo_utilizador_id'] == 2) {
-                    
+
                     $carrinho->transferirCarrinhoTemporario($temp_user_id, $row['id']);
                 } else {
-                    
+
                     $stmtLimpar = $this->conn->prepare("DELETE FROM Carrinho_Itens WHERE utilizador_id = ?");
                     $stmtLimpar->bind_param("i", $temp_user_id);
                     $stmtLimpar->execute();
@@ -83,7 +83,7 @@ class Login {
                 unset($_SESSION['temp_user_id']);
             }
 
-            
+
             if ($row['tipo_utilizador_id'] == 1 || $row['tipo_utilizador_id'] == 3) {
                 if (!isset($carrinho)) {
                     require_once 'modelCarrinho.php';
@@ -104,7 +104,7 @@ class Login {
             );
 
             if (!$stmtLog) {
-                
+
             } else {
                 $stmtLog->bind_param(
                     "iss",
@@ -114,7 +114,7 @@ class Login {
                 );
 
                 if (!$stmtLog->execute()) {
-                    
+
                 }
 
                 $stmtLog->close();

@@ -1,5 +1,5 @@
 <?php
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 
 class Notifications {
 
@@ -72,7 +72,7 @@ class Notifications {
 
         $count = 0;
 
-        
+
         $sql_encomendas = "SELECT COUNT(*) as total
                           FROM Encomendas e
                           INNER JOIN produtos p ON e.produto_id = p.Produto_id
@@ -92,7 +92,7 @@ class Notifications {
         $encomendas_count = (int)$row['total'];
         $count += $encomendas_count;
 
-        
+
         $sql_devolucoes = "SELECT COUNT(*) as total
                           FROM devolucoes d
                           LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
@@ -111,7 +111,7 @@ class Notifications {
         $devolucoes_count = (int)$row['total'];
         $count += $devolucoes_count;
 
-        
+
         $sql_stock = "SELECT COUNT(*) as total
                       FROM Produtos p
                       INNER JOIN Utilizadores u ON p.anunciante_id = u.id
@@ -130,7 +130,7 @@ class Notifications {
             $count += (int)$row['total'];
         }
 
-        
+
         $sql_esgotados = "SELECT COUNT(*) as total
                           FROM Produtos p
                           LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'stock_esgotado') AND nl.referencia_id = p.Produto_id)
@@ -147,7 +147,7 @@ class Notifications {
             $count += (int)$row['total'];
         }
 
-        
+
         $sql_rejeitados = "SELECT COUNT(*) as total
                           FROM Produtos p
                           LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao IN ('produto', 'produto_rejeitado') AND nl.referencia_id = p.Produto_id)
@@ -175,7 +175,7 @@ class Notifications {
 
         $notificacoes = [];
 
-        
+
         $sql_encomendas = "SELECT
                             e.id,
                             e.codigo_encomenda,
@@ -215,7 +215,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql_devolucoes = "SELECT
                             d.id,
                             d.codigo_devolucao,
@@ -249,7 +249,7 @@ class Notifications {
             $titulo = 'Devolução Solicitada';
             $mensagem = 'Devolução #' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
 
-            
+
             if ($row['estado'] === 'produto_enviado') {
                 $icone = 'fa-shipping-fast';
                 $titulo = 'Produto Enviado';
@@ -272,7 +272,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql_stock = "SELECT
                         p.Produto_id as id,
                         p.nome as produto_nome,
@@ -308,7 +308,7 @@ class Notifications {
             }
         }
 
-        
+
         $sql_esgotados = "SELECT
                             p.Produto_id as id,
                             p.nome as produto_nome,
@@ -341,7 +341,7 @@ class Notifications {
             }
         }
 
-        
+
         $sql_rejeitados = "SELECT
                             p.Produto_id as id,
                             p.nome as produto_nome,
@@ -376,7 +376,7 @@ class Notifications {
             }
         }
 
-        
+
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
@@ -396,7 +396,7 @@ class Notifications {
 
         $count = 0;
 
-        
+
         $sql = "SELECT COUNT(*) as total
                 FROM Encomendas e
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'encomenda' AND nl.referencia_id = e.id)
@@ -412,7 +412,7 @@ class Notifications {
         $row = $result->fetch_assoc();
         $count += (int)$row['total'];
 
-        
+
         $sql = "SELECT COUNT(*) as total
                 FROM devolucoes d
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'devolucao' AND nl.referencia_id = d.id)
@@ -439,7 +439,7 @@ class Notifications {
 
         $notificacoes = [];
 
-        
+
         $sql = "SELECT
                     e.id,
                     e.codigo_encomenda,
@@ -485,7 +485,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql = "SELECT
                     d.id,
                     d.codigo_devolucao,
@@ -515,7 +515,7 @@ class Notifications {
             $titulo = 'Devolução ' . ucfirst($row['estado']);
             $mensagem = '#' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
 
-            
+
             if ($row['estado'] === 'aprovada') {
                 $icone = 'fa-check-circle';
                 $titulo = 'Devolução Aprovada';
@@ -550,7 +550,7 @@ class Notifications {
             ];
         }
 
-        
+
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
@@ -613,7 +613,7 @@ class Notifications {
 
         $count = 0;
 
-        
+
         $sql = "SELECT COUNT(*) as total
                 FROM Utilizadores u
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'utilizador' AND nl.referencia_id = u.id)
@@ -627,7 +627,7 @@ class Notifications {
         $row = $result->fetch_assoc();
         $count += (int)$row['total'];
 
-        
+
         $sql = "SELECT COUNT(*) as total
                 FROM produtos p
                 LEFT JOIN notificacoes_lidas nl ON (nl.utilizador_id = ? AND nl.tipo_notificacao = 'produto' AND nl.referencia_id = p.Produto_id)
@@ -653,7 +653,7 @@ class Notifications {
 
         $notificacoes = [];
 
-        
+
         $sql = "SELECT
                     u.id,
                     u.nome,
@@ -687,7 +687,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql = "SELECT
                     p.Produto_id,
                     p.nome,
@@ -720,7 +720,7 @@ class Notifications {
             ];
         }
 
-        
+
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
@@ -753,12 +753,12 @@ class Notifications {
         }
     }
 
-    
+
     function marcarTodasComoLidas($utilizador_id, $tipo_utilizador) {
         try {
 
-        
-        
+
+
         $notificacoes = $this->listarTodasNotificacoesPorTipo($utilizador_id, $tipo_utilizador);
 
         if (!is_array($notificacoes)) {
@@ -788,7 +788,7 @@ class Notifications {
 
         $notificacoes = [];
 
-        
+
         $sql = "SELECT
                     e.id,
                     e.codigo_encomenda,
@@ -833,7 +833,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql = "SELECT
                     d.id,
                     d.codigo_devolucao,
@@ -861,7 +861,7 @@ class Notifications {
             $titulo = 'Devolução ' . ucfirst($row['estado']);
             $mensagem = '#' . $row['codigo_devolucao'] . ' - ' . $row['produto_nome'];
 
-            
+
             if ($row['estado'] === 'aprovada') {
                 $icone = 'fa-check-circle';
                 $titulo = 'Devolução Aprovada';
@@ -896,7 +896,7 @@ class Notifications {
             ];
         }
 
-        
+
         usort($notificacoes, function($a, $b) {
             return strtotime($b['data']) - strtotime($a['data']);
         });
@@ -912,7 +912,7 @@ class Notifications {
 
         $notificacoes = [];
 
-        
+
         $sql = "SELECT
                     e.id,
                     e.codigo_encomenda,
@@ -948,7 +948,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql = "SELECT
                     d.id,
                     d.codigo_devolucao,
@@ -970,7 +970,7 @@ class Notifications {
         $result = $stmt->get_result();
 
         while ($row = $result->fetch_assoc()) {
-            
+
             $icone = 'fa-undo';
             $titulo = 'Devolução ' . ucfirst($row['estado']);
 
@@ -1006,7 +1006,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql = "SELECT
                     p.Produto_id as id,
                     p.nome as produto_nome,
@@ -1042,7 +1042,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql = "SELECT
                     p.Produto_id as id,
                     p.nome as produto_nome,
@@ -1078,7 +1078,7 @@ class Notifications {
             }
         }
 
-        
+
         $sql = "SELECT
                     p.Produto_id as id,
                     p.nome as produto_nome,
@@ -1126,7 +1126,7 @@ class Notifications {
 
         $notificacoes = [];
 
-        
+
         $sql = "SELECT
                     u.id,
                     u.nome,
@@ -1157,7 +1157,7 @@ class Notifications {
             ];
         }
 
-        
+
         $sql = "SELECT
                     p.Produto_id,
                     p.nome,

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'connection.php';
+require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
 
 class VerificarEmail {
@@ -42,7 +42,7 @@ class VerificarEmail {
             ], JSON_UNESCAPED_UNICODE);
         }
 
-        
+
         $agora = new DateTime();
         $expira = new DateTime($user['token_expira_em']);
 
@@ -80,7 +80,7 @@ class VerificarEmail {
         }
     }
 
-    
+
     function reenviarVerificacao($email) {
 
         $stmt = $this->conn->prepare("
