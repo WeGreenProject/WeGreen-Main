@@ -1,4 +1,4 @@
-function getDadosTipoPerfil() {
+﻿function getDadosTipoPerfil() {
   const dados = new FormData();
   dados.append("op", 1);
 
@@ -18,7 +18,6 @@ function getDadosTipoPerfil() {
       }
     })
     .fail(function (jqXHR, textStatus) {
-      console.error("Falha ao carregar menu de perfil:", textStatus);
     });
 }
 
@@ -42,7 +41,6 @@ function PerfilDoUtilizador() {
       }
     })
     .fail(function (jqXHR, textStatus) {
-      console.error("Falha ao carregar foto de perfil:", textStatus);
     });
 }
 
@@ -62,7 +60,6 @@ function logout() {
       window.location.href = "index.html";
     })
     .fail(function (jqXHR, textStatus) {
-      console.error("Falha ao terminar sessão:", textStatus);
     });
 }
 
@@ -88,7 +85,6 @@ function getDadosPlanos() {
       container.html(msg);
     })
     .fail(function (jqXHR, textStatus) {
-      console.error("Falha ao carregar planos:", textStatus);
     });
 }
 

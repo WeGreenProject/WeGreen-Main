@@ -1,4 +1,4 @@
-function getFiltrosDesignerCategoria() {
+﻿function getFiltrosDesignerCategoria() {
   let dados = new FormData();
   dados.append("op", 1);
 
@@ -12,7 +12,6 @@ function getFiltrosDesignerCategoria() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#CategoriaSelect").html(msg);
     })
 
@@ -34,7 +33,6 @@ function getFiltrosDesignerTamanho() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#tamanhoSelect").html(msg);
     })
 
@@ -56,7 +54,6 @@ function getFiltrosDesignerEstado() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#estadoSelect").html(msg);
     })
 
@@ -118,7 +115,6 @@ function getProdutoDesignerMostrar() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoInfo").html(msg);
 
       $(".btnComprarAgora").on("click", function () {
@@ -145,8 +141,6 @@ function comprarAgora(produtoId) {
     processData: false,
   })
     .done(function (response) {
-      console.log("Resposta do servidor:", response);
-
       if (response.includes("Erro")) {
         Swal.fire({
           title: "Erro!",
@@ -166,7 +160,6 @@ function comprarAgora(produtoId) {
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX:", textStatus, errorThrown);
       Swal.fire({
         title: "Erro!",
         text: "Não foi possível adicionar o produto ao carrinho",

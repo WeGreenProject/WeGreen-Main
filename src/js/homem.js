@@ -1,4 +1,4 @@
-function getProdutosHomem() {
+﻿function getProdutosHomem() {
   let categoria = $("#CategoriaSelect").val();
   let tamanho = $("#tamanhoSelect").val();
   let estado = $("#estadoSelect").val();
@@ -20,7 +20,6 @@ function getProdutosHomem() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoHomemVenda").html(msg);
 
       
@@ -115,7 +114,6 @@ function getProdutoHomemMostrar() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoInfo").html(msg);
 
       $(".btnComprarAgora").on("click", function () {
@@ -142,7 +140,6 @@ function getFiltrosHomemCategoria() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#CategoriaSelect").html(msg);
     })
 
@@ -164,7 +161,6 @@ function getFiltrosHomemTamanho() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#tamanhoSelect").html(msg);
     })
 
@@ -186,7 +182,6 @@ function getFiltrosHomemEstado() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#estadoSelect").html(msg);
     })
 

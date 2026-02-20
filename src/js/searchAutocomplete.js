@@ -1,4 +1,4 @@
-
+﻿
 (function () {
   let debounceTimer;
   let currentFocus = -1;
@@ -93,7 +93,6 @@
           }
         },
         error: function (xhr, status, error) {
-          console.error("Erro na pesquisa:", error);
         },
       });
     } else {
@@ -107,7 +106,6 @@
           }
         })
         .catch((error) => {
-          console.error("Erro na pesquisa:", error);
         });
     }
   }

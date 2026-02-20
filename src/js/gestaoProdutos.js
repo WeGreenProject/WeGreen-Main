@@ -1,4 +1,4 @@
-let topProductsChartInstance = null;
+﻿let topProductsChartInstance = null;
 let salesChartInstance = null;
 
 function mostrarErroRequest(contexto, jqXHR, textStatus) {
@@ -126,8 +126,6 @@ function getTopTipoGrafico() {
       });
     },
     error: function (xhr, status, error) {
-      console.error("Erro AJAX:", error);
-      console.error("Resposta do servidor:", xhr.responseText);
     },
   });
 }
@@ -214,8 +212,6 @@ function getProdutoVendidos() {
       });
     },
     error: function (xhr, status, error) {
-      console.error("Erro AJAX:", error);
-      console.error("Resposta do servidor:", xhr.responseText);
     },
   });
 }
@@ -491,7 +487,6 @@ function adicionarProdutos() {
     processData: false,
   })
     .done(function (msg) {
-      console.log("Resposta do servidor:", msg);
       let obj = JSON.parse(msg);
       if (obj.flag) {
         alerta("Sucesso", obj.msg, "success");
@@ -502,8 +497,6 @@ function adicionarProdutos() {
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX:", textStatus, errorThrown);
-      console.log("Resposta:", jqXHR.responseText);
       mostrarErroRequest("Adicionar Produto", jqXHR, textStatus);
     });
 }

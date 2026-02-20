@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
@@ -55,7 +55,6 @@
     </div>
 
     <script>
-      
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get("token");
 
@@ -76,7 +75,7 @@
             {
               method: "POST",
               body: formData,
-            }
+            },
           );
 
           const result = await response.json();
@@ -87,7 +86,6 @@
             showError(result.msg);
           }
         } catch (error) {
-          console.error("Erro:", error);
           showError("Erro ao processar verificação. Tente novamente.");
         }
       }
@@ -104,7 +102,6 @@
         `;
         document.getElementById("actionLinks").style.display = "block";
 
-        
         setTimeout(() => {
           window.location.href = "login.html";
         }, 3000);

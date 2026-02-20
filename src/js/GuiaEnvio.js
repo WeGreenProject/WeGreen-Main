@@ -1,4 +1,4 @@
-
+﻿
 function guiaError(title, message) {
   if (typeof showModernErrorModal === "function") {
     return showModernErrorModal(title, message);
@@ -14,14 +14,10 @@ function guiaSuccess(title, message, opts = {}) {
 }
 
 function imprimirGuiaEnvio(encomendaId) {
-  console.log("Gerando guia de envio para encomenda ID:", encomendaId);
-
   $.post(
     "src/controller/controllerDashboardAnunciante.php",
     { op: 32 },
     function (resp) {
-      console.log("Resposta recebida:", resp);
-
       try {
         const encomendas =
           typeof resp === "string"
@@ -31,21 +27,15 @@ function imprimirGuiaEnvio(encomendaId) {
               : resp && Array.isArray(resp.data)
                 ? resp.data
                 : [];
-        console.log("Encomendas parseadas:", encomendas);
-
         const encomenda = encomendas.find(
           (e) => Number(e.id) === Number(encomendaId),
         );
 
         if (!encomenda) {
-          console.error("Encomenda não encontrada com ID:", encomendaId);
           guiaError("Erro", "Encomenda não encontrada");
           return;
         }
 
-        console.log("Encomenda encontrada:", encomenda);
-
-        
         const produtos = encomenda.produtos || [];
 
         
@@ -255,17 +245,13 @@ function imprimirGuiaEnvio(encomendaId) {
         );
 
         
-        console.log("Gerando PDF...");
         doc.save(`Guia_Envio_${encomenda.codigo}.pdf`);
-        console.log("PDF gerado com sucesso!");
-
         guiaSuccess(
           "Guia Gerada com Sucesso!",
           `O arquivo Guia_Envio_${encomenda.codigo}.pdf foi gerado com sucesso.`,
           { timer: 2000 },
         );
       } catch (error) {
-        console.error("Erro ao gerar guia de envio:", error);
         guiaError(
           "Erro",
           "Não foi possível gerar a guia de envio: " + error.message,
@@ -273,7 +259,6 @@ function imprimirGuiaEnvio(encomendaId) {
       }
     },
   ).fail(function (xhr, status, error) {
-    console.error("Erro na requisição AJAX:", status, error);
     guiaError(
       "Erro",
       "Não foi possível carregar os dados da encomenda. Verifique a conexão.",

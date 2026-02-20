@@ -3,7 +3,6 @@
     try {
       return JSON.parse(payload);
     } catch (error) {
-      console.error("Resposta JSON inválida:", payload, error);
       return null;
     }
   }
@@ -30,7 +29,6 @@ function getDadosPlanos() {
       }
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Plano:", textStatus);
   });
 }
 
@@ -47,7 +45,6 @@ function CarregaProdutos() {
       `);
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Produtos:", textStatus);
   });
 }
 
@@ -64,7 +61,6 @@ function CarregaPontos() {
       `);
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Pontos:", textStatus);
   });
 }
 function getGastos() {
@@ -81,7 +77,6 @@ function getGastos() {
       `);
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Gastos:", textStatus);
   });
 }
 
@@ -182,7 +177,6 @@ function renderTopProductsChart() {
   }).done(function (resp) {
     const ctx = document.getElementById("topProductsChart");
     if (!ctx) {
-      console.warn("Elemento topProductsChart não encontrado");
       return;
     }
     if (window.topProductsChartInstance)
@@ -332,7 +326,6 @@ function renderRecentProducts() {
       container.html(html);
     })
     .fail(function (xhr, status, error) {
-      console.error("Erro ao carregar produtos recentes:", error);
       $("#recentProducts").html(
         '<div style="color: #E53E3E; text-align: center; padding: 20px;">Erro ao carregar produtos</div>',
       );
@@ -544,7 +537,6 @@ function loadReportStats() {
 function loadCategorySalesChart() {
   const ctx = document.getElementById("categorySalesChart");
   if (!ctx) {
-    console.warn("Elemento categorySalesChart não encontrado");
     return;
   }
   if (
@@ -584,7 +576,6 @@ function loadCategorySalesChart() {
 function loadDailyRevenueChart() {
   const ctx = document.getElementById("dailyRevenueChart");
   if (!ctx) {
-    console.warn("Elemento dailyRevenueChart não encontrado");
     return;
   }
   if (
@@ -982,7 +973,6 @@ function removerEmMassa() {
         traditional: true,
         dataType: "json",
         success: function (response) {
-          console.log("Response:", response);
           if (response.success) {
             window.isReloading = true;
             wgSuccess(
@@ -999,7 +989,6 @@ function removerEmMassa() {
           }
         },
         error: function (xhr, status, error) {
-          console.error("Erro ao remover:", error, xhr.responseText);
           wgError("Erro", "Não foi possível remover os produtos.");
         },
       });
@@ -1009,7 +998,6 @@ function removerEmMassa() {
 
 function carregarProdutos() {
   if (window.isReloading) {
-    console.log("Cancelando carregarProdutos: página vai recarregar");
     return;
   }
 
@@ -1101,7 +1089,6 @@ function carregarProdutosNow() {
         });
     })
     .fail(function (xhr, status, error) {
-      console.error("Erro ao carregar produtos:", error);
       wgError("Erro", "Não foi possível carregar os produtos.");
     });
 }
@@ -1352,7 +1339,6 @@ function abrirModalProduto(titulo, dados = {}) {
                 renderPhotoPreview();
               })
               .catch((err) => {
-                console.error("Erro ao carregar foto existente:", err);
               });
           }
         });
@@ -1666,7 +1652,6 @@ function abrirModalProduto(titulo, dados = {}) {
             dados =
               typeof response === "string" ? JSON.parse(response) : response;
           } catch (e) {
-            console.error("Erro ao processar resposta:", e);
             Swal.showValidationMessage(
               "Erro ao processar resposta do servidor",
             );
@@ -1697,7 +1682,6 @@ function abrirModalProduto(titulo, dados = {}) {
           }
         })
         .catch((error) => {
-          console.error("Erro ao guardar produto:", error);
           Swal.showValidationMessage(
             "Erro ao guardar produto. Tente novamente.",
           );
@@ -1865,7 +1849,6 @@ function carregarPerfil() {
     `);
     },
   ).fail(function (jqXHR, textStatus, errorThrown) {
-    console.error("Erro ao carregar perfil:", textStatus, errorThrown);
     Swal.fire("Erro", "Não foi possível carregar o perfil.", "error");
   });
 }
@@ -2024,13 +2007,11 @@ function carregarEstatisticasProdutos() {
         },
         "json",
       ).fail(function (xhr, status, error) {
-        console.error("Erro ao carregar limite:", error, xhr.responseText);
         wgError("Erro", "Não foi possível carregar o limite de produtos.");
       });
     },
     "json",
   ).fail(function (xhr, status, error) {
-    console.error("Erro ao carregar estatísticas:", error, xhr.responseText);
     wgError("Erro", "Não foi possível carregar os produtos.");
   });
 }
@@ -2717,7 +2698,6 @@ function carregarEncomendas() {
         if (!encomendas) return;
         renderEncomendas(encomendas);
       } catch (e) {
-        console.error("Erro ao carregar encomendas:", e);
         wgError("Erro", "Não foi possível carregar as encomendas");
       }
     },
@@ -2757,8 +2737,6 @@ function renderEncomendas(encomendas) {
       aplicarFiltrosEncomendas();
       return;
     } catch (e) {
-      console.warn("Erro ao atualizar tabela, recriando:", e);
-
       try {
         $("#encomendasTable").DataTable().destroy();
       } catch (e2) {}
@@ -3016,7 +2994,6 @@ function initEncomendasTable() {
         responsive: true,
       });
     } catch (e) {
-      console.error("Erro ao inicializar tabela de encomendas:", e);
     }
   }
 }

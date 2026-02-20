@@ -1,4 +1,4 @@
-let notificationsDropdownOpen = false;
+﻿let notificationsDropdownOpen = false;
 let notificationsCache = [];
 
 function mostrarModalSucesso(titulo, mensagem, opcoes) {
@@ -50,48 +50,30 @@ function normalizeIconMarkup(iconValue, tipo) {
  * Atualizar contagem de notificações
  */
 function atualizarNotificacoes() {
-  console.log("[Notificações] Atualizando contagem...");
   $.ajax({
     url: "src/controller/controllerNotifications.php?op=1",
     method: "GET",
     dataType: "json",
     success: function (response) {
-      console.log("[Notificações] Resposta recebida:", response);
       const ok =
         response && (response.success === true || response.flag === true);
       if (ok) {
         const badge = $(".notification-badge");
         const count = parseInt(response.count);
 
-        console.log("[Notificações] Contagem:", count);
-        console.log(
-          "[Notificações] Badge encontrado:",
-          badge.length,
-          "elemento(s)",
-        );
-
         if (count > 0) {
           badge
             .text(count > 99 ? "99+" : count)
             .show()
             .css("display", "inline-block");
-          console.log("[Notificações] Badge mostrado com contagem:", count);
         } else {
           // Forçar hide com CSS inline para garantir
           badge.text("").hide().css({ display: "none", visibility: "hidden" });
-          console.log("[Notificações] Badge escondido (count = 0)");
         }
       } else {
-        console.warn(
-          "[Notificações] Resposta sem sucesso:",
-          response ? response.message || response.msg : "resposta vazia",
-        );
       }
     },
     error: function (xhr, status, error) {
-      console.error("[Notificações] Erro ao atualizar:", error);
-      console.error("[Notificações] Status:", status);
-      console.error("[Notificações] Resposta:", xhr.responseText);
     },
   });
 }
@@ -100,14 +82,11 @@ function atualizarNotificacoes() {
  * Carregar lista de notificações
  */
 function carregarNotificacoes() {
-  console.log("[Notificações] Carregando lista...");
   $.ajax({
     url: "src/controller/controllerNotifications.php?op=2",
     method: "GET",
     dataType: "json",
     success: function (response) {
-      console.log("[Notificações] Resposta bruta:", JSON.stringify(response));
-      console.log("[Notificações] Lista recebida:", response);
       const ok =
         response && (response.success === true || response.flag === true);
       const lista = response
@@ -115,21 +94,12 @@ function carregarNotificacoes() {
         : [];
       if (ok) {
         notificationsCache = lista;
-        console.log("[Notificações] Total de itens:", lista ? lista.length : 0);
-        console.log("[Notificações] Dados:", lista);
         renderizarNotificacoes(lista);
       } else {
-        console.warn(
-          "[Notificações] Erro ao listar:",
-          response ? response.message || response.msg : "resposta vazia",
-        );
         renderizarNotificacoes([]);
       }
     },
     error: function (xhr, status, error) {
-      console.error("[Notificações] Erro ao carregar:", error);
-      console.error("[Notificações] Status:", status);
-      console.error("[Notificações] Resposta:", xhr.responseText);
       renderizarNotificacoes([]);
     },
   });
@@ -140,14 +110,7 @@ function carregarNotificacoes() {
  */
 function renderizarNotificacoes(notificacoes) {
   const container = $("#notificationsList");
-  console.log(
-    "[Notificações] Renderizando",
-    notificacoes ? notificacoes.length : 0,
-    "notificações",
-  );
-
   if (!notificacoes || notificacoes.length === 0) {
-    console.log("[Notificações] Mostrando mensagem 'sem notificações'");
     container.html(`
             <div class="notifications-empty">
                 <i class="fas fa-bell-slash"></i>
@@ -346,7 +309,6 @@ function inicializarDropdownUtilizador() {
  * Abrir notificação (redirecionar e marcar como lida)
  */
 function abrirNotificacao(tipo, notifId, link) {
-  console.log("[Notificações] Abrindo notificação:", { tipo, notifId, link });
   const tipoNotificacao = (tipo || "").toString().trim();
   const referenciaId = parseInt(notifId, 10);
   const destino = (link || "").toString().trim();
@@ -383,11 +345,8 @@ function abrirNotificacao(tipo, notifId, link) {
     },
   })
     .done(function (response) {
-      console.log("[Notificações] Marcada como lida:", response);
     })
     .fail(function (xhr, status, error) {
-      console.error("[Notificações] Erro ao marcar como lida:", error);
-      console.error("[Notificações] Resposta:", xhr.responseText);
     })
     .always(function () {
       clearTimeout(fallbackRedirect);
@@ -399,27 +358,15 @@ function abrirNotificacao(tipo, notifId, link) {
  * Marcar todas como lidas
  */
 function marcarTodasComoLidas() {
-  console.log("[Notificações] Marcando todas como lidas...");
-  console.log(
-    "[Notificações] Notificações em cache:",
-    notificationsCache.length,
-  );
-
   $.ajax({
     url: "src/controller/controllerNotifications.php",
     method: "POST",
     data: { op: 4 },
     dataType: "json",
     success: function (response) {
-      console.log(
-        "[Notificações] Resposta marcar todas (raw):",
-        JSON.stringify(response),
-      );
-      console.log("[Notificações] Resposta marcar todas:", response);
       const ok =
         response && (response.success === true || response.flag === true);
       if (ok) {
-        console.log("[Notificações] Todas marcadas com sucesso!");
         // Limpar cache local
         notificationsCache = [];
         // Atualizar interface
@@ -428,10 +375,6 @@ function marcarTodasComoLidas() {
         // Fechar dropdown após marcar
         setTimeout(fecharNotificationsDropdown, 500);
       } else {
-        console.error(
-          "[Notificações] Erro ao marcar todas:",
-          response ? response.message || response.msg : "resposta vazia",
-        );
         mostrarModalErro(
           "Erro",
           "Erro ao marcar notificações como lidas: " +
@@ -440,9 +383,6 @@ function marcarTodasComoLidas() {
       }
     },
     error: function (xhr, status, error) {
-      console.error("[Notificações] Erro AJAX ao marcar todas:", error);
-      console.error("[Notificações] Status:", status);
-      console.error("[Notificações] Resposta:", xhr.responseText);
       mostrarModalErro("Erro", "Erro ao marcar notificações: " + error);
     },
   });

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
@@ -387,10 +387,6 @@ class Devolucoes {
         try {
 
             // DEBUG: Registar dados recebidos
-            error_log('[Devolucoes] solicitarDevolucao chamado - encomenda_id=' . $encomenda_id . ', cliente_id=' . $cliente_id . ', motivo=' . $motivo);
-            error_log('[Devolucoes] produtos_selecionados recebidos: ' . json_encode($produtos_selecionados, JSON_UNESCAPED_UNICODE));
-            error_log('[Devolucoes] Total produtos selecionados: ' . count($produtos_selecionados));
-            error_log('[Devolucoes] fotos recebidas: ' . json_encode($fotos, JSON_UNESCAPED_UNICODE));
 
             $elegibilidade = $this->obterElegibilidadeDados($encomenda_id, $cliente_id);
             if (!$elegibilidade['elegivel']) {
@@ -415,7 +411,6 @@ class Devolucoes {
             }
             $stmt_produtos->close();
 
-            error_log('[Devolucoes] Produtos na encomenda: ' . count($produtos_encomenda) . ' - IDs: ' . implode(',', array_keys($produtos_encomenda)));
 
 
             foreach ($produtos_selecionados as $produto_sel) {
@@ -486,7 +481,6 @@ class Devolucoes {
                 $stmt->close();
                 $devolucoes_criadas[] = $devolucao_id;
 
-                error_log('[Devolucoes] Produto inserido - devolucao_id=' . $devolucao_id . ', produto_id=' . $produto_id . ', codigo=' . $codigo_devolucao . ', valor=' . $valor_reembolso);
 
                 $anunciante_id = (int)$prod_enc['anunciante_id'];
                 if (!isset($devolucoes_por_anunciante[$anunciante_id])) {
@@ -512,8 +506,6 @@ class Devolucoes {
             }
 
 
-            error_log('[Devolucoes] Loop concluído - total devolucoes criadas: ' . count($devolucoes_criadas) . ', IDs: ' . implode(',', $devolucoes_criadas));
-            error_log('[Devolucoes] Anunciantes agrupados: ' . count($devolucoes_por_anunciante) . ' - IDs: ' . implode(',', array_keys($devolucoes_por_anunciante)));
 
             if (!empty($devolucoes_criadas)) {
                 $this->enviarNotificacaoSolicitacaoAgrupada($devolucoes_criadas, $devolucoes_por_anunciante);
@@ -529,10 +521,8 @@ class Devolucoes {
 
     private function enviarNotificacaoSolicitacaoAgrupada($devolucoes_criadas, $devolucoes_por_anunciante) {
         try {
-            error_log('[Devolucoes][Email] Iniciando envio de emails agrupados - devolucoes: ' . json_encode($devolucoes_criadas));
 
             if (empty($devolucoes_criadas)) {
-                error_log('[Devolucoes][Email] Nenhuma devolução para enviar emails');
                 return;
             }
 
@@ -540,7 +530,6 @@ class Devolucoes {
 
             // Cliente: um único email de confirmação da solicitação
             $devolucaoCliente = $this->obterDetalhesDados((int)$devolucoes_criadas[0]);
-            error_log('[Devolucoes][Email] Dados cliente obtidos: ' . ($devolucaoCliente ? 'OK - email=' . ($devolucaoCliente['cliente_email'] ?? 'N/A') : 'NULL'));
 
             if ($devolucaoCliente && !empty($devolucaoCliente['cliente_email'])) {
                 $produtosCliente = [];
@@ -560,7 +549,6 @@ class Devolucoes {
                     $devolucaoCliente['valor_reembolso_total'] = $valorTotalCliente;
                 }
 
-                error_log('[Devolucoes][Email] Enviando email ao cliente: ' . $devolucaoCliente['cliente_email'] . ' com ' . count($produtosCliente) . ' produto(s), total=€' . $valorTotalCliente);
                 $resultCliente = $emailService->enviarEmail(
                     $devolucaoCliente['cliente_email'],
                     'devolucao_solicitada',
@@ -568,21 +556,17 @@ class Devolucoes {
                     $devolucaoCliente['cliente_id'],
                     'cliente'
                 );
-                error_log('[Devolucoes][Email] Resultado envio cliente: ' . ($resultCliente ? 'OK' : 'FALHOU'));
             } else {
-                error_log('[Devolucoes][Email] SKIP email cliente - dados insuficientes');
             }
 
             // Anunciantes: um email por vendedor, contendo apenas os seus produtos
             foreach ($devolucoes_por_anunciante as $anunciante_id => $grupo) {
                 if (empty($grupo['devolucao_ids'])) {
-                    error_log('[Devolucoes][Email] SKIP anunciante ' . $anunciante_id . ' - sem devolucao_ids');
                     continue;
                 }
 
                 $devolucaoRef = $this->obterDetalhesDados((int)$grupo['devolucao_ids'][0]);
                 if (!$devolucaoRef || empty($devolucaoRef['anunciante_email'])) {
-                    error_log('[Devolucoes][Email] SKIP anunciante ' . $anunciante_id . ' - dados não encontrados ou sem email');
                     continue;
                 }
 
@@ -590,7 +574,6 @@ class Devolucoes {
                 $devolucaoRef['valor_reembolso_total'] = (float)$grupo['valor_total'];
                 $devolucaoRef['qtd_produtos_devolucao'] = count($grupo['produtos']);
 
-                error_log('[Devolucoes][Email] Enviando email ao anunciante ' . $anunciante_id . ': ' . $devolucaoRef['anunciante_email'] . ' com ' . count($grupo['produtos']) . ' produto(s)');
                 $resultAnunciante = $emailService->enviarEmail(
                     $devolucaoRef['anunciante_email'],
                     'nova_devolucao_anunciante',
@@ -598,10 +581,8 @@ class Devolucoes {
                     (int)$anunciante_id,
                     'anunciante'
                 );
-                error_log('[Devolucoes][Email] Resultado envio anunciante ' . $anunciante_id . ': ' . ($resultAnunciante ? 'OK' : 'FALHOU'));
             }
 
-            error_log('[Devolucoes][Email] Envio de emails concluído');
 
         } catch (Exception $e) {
             error_log('[Devolucoes][Email] ERRO ao enviar emails: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());

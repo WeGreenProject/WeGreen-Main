@@ -1,9 +1,8 @@
-function parseAlternanciaResponse(payload) {
+﻿function parseAlternanciaResponse(payload) {
   if (typeof payload === "string") {
     try {
       return JSON.parse(payload);
     } catch (e) {
-      console.error("Resposta inválida em alternância:", payload, e);
       return null;
     }
   }
@@ -20,10 +19,8 @@ function verificarContaAlternativa() {
         $("#textoAlternar").text("Alternar para " + dados.nome_tipo);
       }
     } catch (e) {
-      console.error("Erro ao verificar conta alternativa:", e);
     }
   }).fail(function () {
-    console.error("Erro na requisição de verificação de conta");
   });
 }
 

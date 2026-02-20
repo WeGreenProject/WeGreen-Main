@@ -1,4 +1,4 @@
-function login1() {
+﻿function login1() {
   let dados = new FormData();
   dados.append("op", 1);
   dados.append("email", $("#emailLogin").val());
@@ -64,9 +64,6 @@ function login1() {
     })
 
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro completo:", jqXHR.responseText);
-      console.error("Status:", textStatus);
-      console.error("Error:", errorThrown);
       Swal.fire({
         icon: "error",
         title: "Erro ao fazer login",

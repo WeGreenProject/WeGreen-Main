@@ -1,11 +1,9 @@
-let clienteAtual = null;
-let imagemAnexada = null;
+﻿let clienteAtual = null;
+let ficheiroAnexado = null;
 
 function getSideBar() {
   let dados = new FormData();
   dados.append("op", 1);
-
-  console.log("getSideBar() chamada");
 
   $.ajax({
     url: "src/controller/controllerChatAnunciante.php",
@@ -17,18 +15,14 @@ function getSideBar() {
     processData: false,
   })
     .done(function (msg) {
-      console.log("getSideBar response:", msg);
       $("#ListaClientes").html(msg);
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro ao carregar clientes:", textStatus, errorThrown);
-      console.error("Response:", jqXHR.responseText);
       alerta("Erro", "Não foi possível carregar as conversas", "error");
     });
 }
 
 function selecionarCliente(clienteId, clienteNome) {
-  console.log("selecionarCliente() chamada", clienteId, clienteNome);
   clienteAtual = clienteId;
 
   const iniciais = getIniciais(clienteNome);
@@ -42,15 +36,9 @@ function selecionarCliente(clienteId, clienteNome) {
   $(`[data-cliente-id="${clienteId}"]`).addClass("active");
 
   getConversas(clienteId);
-
-  console.log(
-    "Input container agora tem classe active:",
-    $("#BotaoEscrever").hasClass("active"),
-  );
 }
 
 function getConversas(clienteId) {
-  console.log("getConversas() chamada", clienteId);
   let dados = new FormData();
   dados.append("op", 2);
   dados.append("IdCliente", clienteId);
@@ -68,13 +56,10 @@ function getConversas(clienteId) {
       $("#chatMessages").html(msg);
       scrollToBottom();
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Erro ao carregar mensagens:", textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
 }
 
 function enviarMensagem() {
-  console.log("enviarMensagem() chamada");
   if (!clienteAtual) {
     alerta("Aviso", "Selecione um cliente primeiro", "warning");
     return;
@@ -82,7 +67,7 @@ function enviarMensagem() {
 
   const mensagem = $("#messageInput").val().trim();
 
-  if (!mensagem && !imagemAnexada) {
+  if (!mensagem && !ficheiroAnexado) {
     return;
   }
 
@@ -91,8 +76,8 @@ function enviarMensagem() {
   dados.append("IdCliente", clienteAtual);
   dados.append("mensagem", mensagem);
 
-  if (imagemAnexada) {
-    dados.append("imagem", imagemAnexada);
+  if (ficheiroAnexado) {
+    dados.append("imagem", ficheiroAnexado);
   }
 
   $.ajax({
@@ -119,35 +104,91 @@ function enviarMensagem() {
       }
     })
     .fail(function (jqXHR, textStatus) {
-      console.error("Erro ao enviar mensagem:", textStatus);
       alerta("Erro", "Não foi possível enviar a mensagem", "error");
     });
 }
 
-function anexarImagem(file) {
-  if (!file || !file.type.startsWith("image/")) {
-    alerta("Aviso", "Por favor, selecione apenas imagens", "warning");
+function anexarFicheiro(file) {
+  if (!file) {
     return;
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    alerta("Aviso", "A imagem deve ter no máximo 5MB", "warning");
+  const tiposPermitidos = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/plain",
+  ];
+
+  const extensoesPermitidas = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "txt",
+  ];
+
+  const extensao = (file.name.split(".").pop() || "").toLowerCase();
+  const tipoValido = file.type ? tiposPermitidos.includes(file.type) : false;
+  const extensaoValida = extensoesPermitidas.includes(extensao);
+
+  if (!tipoValido && !extensaoValida) {
+    alerta("Aviso", "Tipo de ficheiro não suportado", "warning");
     return;
   }
 
-  imagemAnexada = file;
+  if (file.size > 10 * 1024 * 1024) {
+    alerta("Aviso", "O ficheiro deve ter no máximo 10MB", "warning");
+    return;
+  }
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    $("#previewImg").attr("src", e.target.result);
-    $("#imagePreview").show();
-  };
-  reader.readAsDataURL(file);
+  ficheiroAnexado = file;
+
+  if (file.type && file.type.startsWith("image/")) {
+    $("#filePreviewInfo").remove();
+    $("#previewImg").show();
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      $("#previewImg").attr("src", e.target.result);
+      $("#imagePreview").show();
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  $("#previewImg").attr("src", "").hide();
+
+  if (!$("#filePreviewInfo").length) {
+    $("#imagePreview").prepend(
+      `<div id="filePreviewInfo" style="display:flex; align-items:center; gap:8px; padding:8px 30px 8px 10px; border-radius:8px; background:#f6f8fa; color:#2d3748; max-width:260px;">
+         <i class="fas fa-file-alt" style="color:#3cb371;"></i>
+         <span id="filePreviewName" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></span>
+       </div>`,
+    );
+  }
+
+  $("#filePreviewName").text(file.name);
+  $("#imagePreview").show();
 }
 
 function limparPreview() {
-  imagemAnexada = null;
+  ficheiroAnexado = null;
+  $("#filePreviewInfo").remove();
   $("#previewImg").attr("src", "");
+  $("#previewImg").show();
   $("#imagePreview").hide();
   $("#fileInput").val("");
 }
@@ -171,9 +212,7 @@ function pesquisarChat() {
     .done(function (msg) {
       $("#ListaClientes").html(msg);
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Erro na pesquisa:", textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
 }
 
 function abrirConversaPorUtilizadorId(utilizadorId, tentativas = 0) {
@@ -255,7 +294,7 @@ $(document).ready(function () {
       if (item.type.indexOf("image") !== -1) {
         e.preventDefault();
         const blob = item.getAsFile();
-        anexarImagem(blob);
+        anexarFicheiro(blob);
         break;
       }
     }
@@ -268,7 +307,7 @@ $(document).ready(function () {
   $("#fileInput").on("change", function () {
     const file = this.files[0];
     if (file) {
-      anexarImagem(file);
+      anexarFicheiro(file);
     }
   });
 

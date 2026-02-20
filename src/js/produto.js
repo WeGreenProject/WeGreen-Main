@@ -1,4 +1,4 @@
-function getProdutoMostrar() {
+﻿function getProdutoMostrar() {
   const params = new URLSearchParams(window.location.search);
   const produtoID = params.get("id");
 
@@ -21,7 +21,6 @@ function getProdutoMostrar() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoInfo").html(msg);
 
       $(".btnComprarAgora").on("click", function () {
@@ -30,9 +29,6 @@ function getProdutoMostrar() {
       });
 
       setTimeout(function () {
-        console.log(
-          "✅ HTML do produto carregado, iniciando carregamento de avaliações...",
-        );
         carregarAvaliacoes(produtoID);
       }, 100);
     })
@@ -103,8 +99,6 @@ function comprarAgora(produtoId) {
     processData: false,
   })
     .done(function (response) {
-      console.log("Resposta do servidor:", response);
-
       if (!response || response.flag !== true) {
         const msg =
           (response && response.msg) ||
@@ -124,8 +118,6 @@ function comprarAgora(produtoId) {
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX:", textStatus, errorThrown);
-
       let msg = "Não foi possível adicionar o produto ao carrinho";
       if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.msg) {
         msg = jqXHR.responseJSON.msg;
@@ -154,8 +146,6 @@ $(function () {
 });
 
 function carregarAvaliacoes(produtoId) {
-  console.log("🔍 Carregando avaliações para produto ID:", produtoId);
-
   $.ajax({
     url: "src/controller/controllerAvaliacoes.php",
     method: "POST",
@@ -166,16 +156,10 @@ function carregarAvaliacoes(produtoId) {
     dataType: "json",
     cache: false,
     success: function (response) {
-      console.log("✅ Resposta recebida:", response);
-
       if (response && response.success) {
         utilizadorAutenticado = Boolean(response.autenticado);
         utilizadorIdAtual = Number(response.utilizador_id_atual || 0);
-        console.log("📊 Avaliações:", response.avaliacoes);
-        console.log("📈 Estatísticas:", response.estatisticas);
-
         if (!response.avaliacoes || !response.estatisticas) {
-          console.error("❌ Dados de avaliações inválidos na resposta");
           $("#ListaAvaliacoes").html(
             '<div class="text-center py-2" style="color: #888;"><small>Erro ao carregar avaliações</small></div>',
           );
@@ -184,16 +168,12 @@ function carregarAvaliacoes(produtoId) {
 
         renderizarAvaliacoes(response.avaliacoes, response.estatisticas);
       } else {
-        console.error("❌ Resposta sem sucesso:", response);
         $("#ListaAvaliacoes").html(
           '<div class="text-center py-2" style="color: #888;"><small>Erro ao carregar avaliações</small></div>',
         );
       }
     },
     error: function (xhr, status, error) {
-      console.error("❌ Erro AJAX:", { xhr, status, error });
-      console.error("Resposta do servidor:", xhr.responseText);
-
       $("#ListaAvaliacoes").html(
         '<div class="text-center py-2" style="color: #888;"><small>Erro ao carregar avaliações</small></div>',
       );
@@ -208,18 +188,13 @@ let utilizadorAutenticado = false;
 let utilizadorIdAtual = 0;
 
 function renderizarAvaliacoes(avaliacoes, estatisticas) {
-  console.log("🎨 Iniciando renderização de avaliações...");
-
   if (!$("#MediaAvaliacoes").length) {
-    console.error("❌ Elemento #MediaAvaliacoes não encontrado no DOM");
     return;
   }
   if (!$("#barrasEstrelas").length) {
-    console.error("❌ Elemento #barrasEstrelas não encontrado no DOM");
     return;
   }
   if (!$("#ListaAvaliacoes").length) {
-    console.error("❌ Elemento #ListaAvaliacoes não encontrado no DOM");
     return;
   }
 
@@ -229,11 +204,7 @@ function renderizarAvaliacoes(avaliacoes, estatisticas) {
   $("#MediaAvaliacoes .stars-display").html(starsHtml);
   $("#MediaAvaliacoes .rating-text").text(estatisticas.media.toFixed(1));
   $("#MediaAvaliacoes .total-reviews").text(`(${estatisticas.total})`);
-  console.log("✅ Média atualizada:", estatisticas.media);
-
   renderizarBarrasEstatisticas(estatisticas);
-  console.log("✅ Barras de estatísticas renderizadas");
-
   if (avaliacoes.length === 0) {
     $("#ListaAvaliacoes").html(`
       <div class="text-center py-3" style="color: #888;">
@@ -242,11 +213,9 @@ function renderizarAvaliacoes(avaliacoes, estatisticas) {
       </div>
     `);
     $("#PaginacaoAvaliacoes").html("");
-    console.log("ℹ️ Nenhuma avaliação para exibir");
     return;
   }
 
-  console.log(`✅ Renderizando ${avaliacoes.length} avaliação(ões)...`);
   renderizarPagina(1);
 }
 
