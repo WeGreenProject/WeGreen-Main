@@ -143,7 +143,7 @@
                       <thead>
                         <tr>
                           <th>ID</th>
-                          <th>Cliente</th>
+                          <th>Utilizador</th>
                           <th>Tipo</th>
                           <th>Telefone</th>
                           <th>Data Registo</th>

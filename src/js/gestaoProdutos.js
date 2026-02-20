@@ -1,3 +1,21 @@
+﻿let topProductsChartInstance = null;
+let salesChartInstance = null;
+
+function mostrarErroRequest(contexto, jqXHR, textStatus) {
+  let mensagem = "Ocorreu um erro ao comunicar com o servidor.";
+
+  try {
+    const resposta = JSON.parse(jqXHR?.responseText || "{}");
+    mensagem = resposta.msg || resposta.message || mensagem;
+  } catch (e) {
+    if (textStatus) {
+      mensagem = `${mensagem} (${textStatus})`;
+    }
+  }
+
+  showModernErrorModal(contexto || "Gestão de Produtos", mensagem);
+}
+
 function getMinhasVendas() {
   if ($.fn.DataTable.isDataTable("#minhasVendasBody")) {
     $("#minhasVendasBody").DataTable().destroy();
@@ -22,7 +40,7 @@ function getMinhasVendas() {
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Gestão de Produtos", jqXHR, textStatus);
     });
 }
 function getTopTipoGrafico() {
@@ -32,11 +50,20 @@ function getTopTipoGrafico() {
     data: { op: 15 },
     dataType: "json",
     success: function (response) {
-      console.log("Resposta AJAX:", response);
+      const canvas = document.getElementById("topProductsChart");
+      if (!canvas) return;
 
-      const ctx3 = document.getElementById("topProductsChart").getContext("2d");
+      const graficoExistente = Chart.getChart(canvas);
+      if (graficoExistente) {
+        graficoExistente.destroy();
+      }
+      if (topProductsChartInstance) {
+        topProductsChartInstance.destroy();
+      }
 
-      new Chart(ctx3, {
+      const ctx3 = canvas.getContext("2d");
+
+      topProductsChartInstance = new Chart(ctx3, {
         type: "doughnut",
         data: {
           labels: response.dados1,
@@ -44,14 +71,14 @@ function getTopTipoGrafico() {
             {
               data: response.dados2,
               backgroundColor: [
-                "#3cb371", 
-                "#2d3748", 
-                "#2e8b57", 
-                "#1a202c", 
-                "#90c896", 
-                "#4a5568", 
-                "#22c55e", 
-                "#374151", 
+                "#3cb371",
+                "#2d3748",
+                "#2e8b57",
+                "#1a202c",
+                "#90c896",
+                "#4a5568",
+                "#22c55e",
+                "#374151",
               ],
               borderColor: "#ffffff",
               borderWidth: 4,
@@ -99,8 +126,6 @@ function getTopTipoGrafico() {
       });
     },
     error: function (xhr, status, error) {
-      console.error("Erro AJAX:", error);
-      console.error("Resposta do servidor:", xhr.responseText);
     },
   });
 }
@@ -111,11 +136,20 @@ function getProdutoVendidos() {
     data: { op: 16 },
     dataType: "json",
     success: function (response) {
-      console.log("Resposta AJAX:", response);
+      const canvas = document.getElementById("salesChart");
+      if (!canvas) return;
 
-      const ctx3 = document.getElementById("salesChart").getContext("2d");
+      const graficoExistente = Chart.getChart(canvas);
+      if (graficoExistente) {
+        graficoExistente.destroy();
+      }
+      if (salesChartInstance) {
+        salesChartInstance.destroy();
+      }
 
-      new Chart(ctx3, {
+      const ctx3 = canvas.getContext("2d");
+
+      salesChartInstance = new Chart(ctx3, {
         type: "doughnut",
         data: {
           labels: response.dados1,
@@ -123,14 +157,14 @@ function getProdutoVendidos() {
             {
               data: response.dados2,
               backgroundColor: [
-                "#2e8b57", 
-                "#374151", 
-                "#3cb371", 
-                "#1f2937", 
-                "#90c896", 
-                "#4b5563", 
-                "#22c55e", 
-                "#2d3748", 
+                "#2e8b57",
+                "#374151",
+                "#3cb371",
+                "#1f2937",
+                "#90c896",
+                "#4b5563",
+                "#22c55e",
+                "#2d3748",
               ],
               borderColor: "#ffffff",
               borderWidth: 4,
@@ -178,8 +212,6 @@ function getProdutoVendidos() {
       });
     },
     error: function (xhr, status, error) {
-      console.error("Erro AJAX:", error);
-      console.error("Resposta do servidor:", xhr.responseText);
     },
   });
 }
@@ -218,12 +250,35 @@ function getDesativacao(produto_id) {
 
     .done(function (msg) {
       let obj = JSON.parse(msg);
-      alerta2(obj.msg, "success");
+      alerta("Gestão de Produtos", obj.msg, "success");
       getProdutos();
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Gestão de Produtos", jqXHR, textStatus);
+    });
+}
+function getAtivacao(produto_id) {
+  let dados = new FormData();
+  dados.append("op", 18);
+  dados.append("produto_id", produto_id);
+
+  $.ajax({
+    url: "src/controller/controllerGestaoProdutos.php",
+    method: "POST",
+    data: dados,
+    dataType: "html",
+    cache: false,
+    contentType: false,
+    processData: false,
+  })
+    .done(function (msg) {
+      let obj = JSON.parse(msg);
+      alerta("Gestão de Produtos", obj.msg, "success");
+      getProdutos();
+    })
+    .fail(function (jqXHR, textStatus) {
+      mostrarErroRequest("Gestão de Produtos", jqXHR, textStatus);
     });
 }
 function getProdutos() {
@@ -253,7 +308,7 @@ function getProdutos() {
       });
     })
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Gestão de Produtos", jqXHR, textStatus);
     });
 }
 function getListaVendedores() {
@@ -271,14 +326,13 @@ function getListaVendedores() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#listaVendedor").html(msg);
       $("#vendedorprodutoEdit").html(msg);
       $("#vendedorprodutoEdit2").html(msg);
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Gestão de Produtos", jqXHR, textStatus);
     });
 }
 function getListaCategoria() {
@@ -296,14 +350,13 @@ function getListaCategoria() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#listaCategoria").html(msg);
       $("#categoriaprodutoEdit").html(msg);
       $("#categoriaprodutoEdit2").html(msg);
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Gestão de Produtos", jqXHR, textStatus);
     });
 }
 function getDadosInativos(Produto_id) {
@@ -325,7 +378,7 @@ function getDadosInativos(Produto_id) {
       abrirModalVerificacao(obj);
     })
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Gestão de Produtos", jqXHR, textStatus);
     });
 }
 function getFotosSection(Produto_id) {
@@ -345,16 +398,15 @@ function getFotosSection(Produto_id) {
     .done(function (msg) {
       $("#fotos-section").html(msg);
       $("#fotos-section2").html(msg);
-      console.log(msg);
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Fotos do Produto", jqXHR, textStatus);
     });
 }
 function guardaEditProduto(Produto_id) {
   let dados = new FormData();
-  dados.append("op", 7);
+  dados.append("op", 17);
   dados.append("Produto_id", Produto_id);
 
   $.ajax({
@@ -372,23 +424,20 @@ function guardaEditProduto(Produto_id) {
       let obj = JSON.parse(msg);
       if (obj.flag) {
         alerta("Sucesso", obj.msg, "success");
-        alerta2(obj.msg, "success");
-        getInativos();
-        getMeusProdutos();
+        getProdutos();
       } else {
-        alerta2(obj.msg, "error");
         alerta("Erro", obj.msg, "error");
       }
-      console.log(msg);
     })
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Aprovação de Produto", jqXHR, textStatus);
     });
 }
-function rejeitaEditProduto(Produto_id) {
+function rejeitaEditProduto(Produto_id, motivo_rejeicao) {
   let dados = new FormData();
   dados.append("op", 9);
   dados.append("Produto_id", Produto_id);
+  dados.append("motivo_rejeicao", motivo_rejeicao || "");
 
   $.ajax({
     url: "src/controller/controllerGestaoProdutos.php",
@@ -405,16 +454,13 @@ function rejeitaEditProduto(Produto_id) {
       let obj = JSON.parse(msg);
       if (obj.flag) {
         alerta("Sucesso", obj.msg, "success");
-        alerta2(obj.msg, "success");
-        getInativos();
+        getProdutos();
       } else {
-        alerta2(obj.msg, "error");
         alerta("Erro", obj.msg, "error");
       }
-      console.log(msg);
     })
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Rejeição de Produto", jqXHR, textStatus);
     });
 }
 function adicionarProdutos() {
@@ -441,22 +487,17 @@ function adicionarProdutos() {
     processData: false,
   })
     .done(function (msg) {
-      console.log("Resposta do servidor:", msg);
       let obj = JSON.parse(msg);
       if (obj.flag) {
         alerta("Sucesso", obj.msg, "success");
-        alerta2(obj.msg, "success");
         getProdutos();
         $("#addVendaForm")[0].reset();
       } else {
-        alerta2(obj.msg, "error");
         alerta("Erro", obj.msg, "error");
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX:", textStatus, errorThrown);
-      console.log("Resposta:", jqXHR.responseText);
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Adicionar Produto", jqXHR, textStatus);
     });
 }
 function getDadosPerfil() {
@@ -478,43 +519,24 @@ function getDadosPerfil() {
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      mostrarErroRequest("Perfil", jqXHR, textStatus);
     });
 }
 function alerta(titulo, msg, icon) {
-  Swal.fire({
-    position: "center",
-    icon: icon,
-    title: titulo,
-    text: msg,
-    showConfirmButton: true,
-  });
+  if (icon === "success") {
+    showModernSuccessModal(titulo, msg);
+  } else if (icon === "error") {
+    showModernErrorModal(titulo, msg);
+  } else if (icon === "warning") {
+    showModernWarningModal(titulo, msg);
+  } else if (icon === "info") {
+    showModernInfoModal(titulo, msg);
+  } else {
+    showModernInfoModal(titulo, msg);
+  }
 }
 function alerta2(msg, icon) {
-  let customClass = "";
-  if (icon === "success") {
-    customClass = "toast-success";
-  } else if (icon === "error") {
-    customClass = "toast-error";
-  }
-  const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    customClass: {
-      popup: "custom-toast",
-    },
-    didOpen: (toast) => {
-      toast.onmouseenter = Swal.stopTimer;
-      toast.onmouseleave = Swal.resumeTimer;
-    },
-  });
-  Toast.fire({
-    icon: icon,
-    title: msg,
-  });
+  alerta("Gestão de Produtos", msg, icon);
 }
 function alerta3(Produto_id) {
   Swal.fire({
@@ -533,7 +555,6 @@ function alerta3(Produto_id) {
 }
 
 function abrirModalVerificacao(dados) {
-  
   let fotosHTML =
     '<div style="display: flex; align-items: center; justify-content: center; height: 400px;"><p style="color: #64748b;">Carregando fotos...</p></div>';
 
@@ -762,7 +783,61 @@ function abrirModalVerificacao(dados) {
       if (result.isConfirmed) {
         guardaEditProduto(dados.Produto_id);
       } else if (result.isDenied) {
-        rejeitaEditProduto(dados.Produto_id);
+        Swal.fire({
+          title:
+            '<div style="display:flex;align-items:center;justify-content:center;gap:10px;"><i class="fas fa-clipboard-list" style="color:#dc2626;"></i><span>Motivo da rejeição</span></div>',
+          input: "textarea",
+          inputLabel:
+            "Descreva claramente o motivo para notificar o anunciante",
+          inputPlaceholder:
+            "Ex.: Fotos sem qualidade suficiente, descrição incompleta, dados inconsistentes...",
+          inputAttributes: {
+            "aria-label": "Motivo da rejeição",
+            maxlength: 500,
+          },
+          width: 760,
+          confirmButtonColor: "#dc2626",
+          cancelButtonColor: "#64748b",
+          showCancelButton: true,
+          confirmButtonText:
+            '<i class="fas fa-times-circle"></i> Confirmar rejeição',
+          cancelButtonText: '<i class="fas fa-arrow-left"></i> Cancelar',
+          customClass: {
+            popup: "product-modal-view",
+            title: "modal-title",
+            inputLabel: "modal-subtitle",
+            confirmButton: "btn-danger",
+            cancelButton: "btn-cancel",
+          },
+          didOpen: () => {
+            const textarea = Swal.getInput();
+            if (textarea) {
+              textarea.style.minHeight = "150px";
+              textarea.style.resize = "vertical";
+              textarea.style.borderRadius = "12px";
+              textarea.style.border = "1px solid #e2e8f0";
+              textarea.style.padding = "14px";
+              textarea.style.fontSize = "14px";
+              textarea.style.lineHeight = "1.5";
+              textarea.style.color = "#1e293b";
+            }
+          },
+          inputValidator: (value) => {
+            if (!value || !String(value).trim()) {
+              return "O motivo da rejeição é obrigatório.";
+            }
+            if (String(value).trim().length < 8) {
+              return "O motivo deve ter pelo menos 8 caracteres.";
+            }
+          },
+        }).then((motivoResult) => {
+          if (motivoResult.isConfirmed) {
+            rejeitaEditProduto(
+              dados.Produto_id,
+              String(motivoResult.value || "").trim(),
+            );
+          }
+        });
       }
     });
   }

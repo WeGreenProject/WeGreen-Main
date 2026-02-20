@@ -10,6 +10,26 @@ class Login {
         $this->conn = $conn;
     }
 
+    private function validarPassword($passwordDigitada, $passwordGuardada) {
+        if (!is_string($passwordGuardada) || $passwordGuardada === '') {
+            return false;
+        }
+
+        if (hash_equals($passwordGuardada, $passwordDigitada)) {
+            return true;
+        }
+
+        if (strlen($passwordGuardada) === 32 && ctype_xdigit($passwordGuardada)) {
+            return hash_equals(strtolower($passwordGuardada), md5($passwordDigitada));
+        }
+
+        if (strpos($passwordGuardada, '$2y$') === 0 || strpos($passwordGuardada, '$argon2') === 0) {
+            return password_verify($passwordDigitada, $passwordGuardada);
+        }
+
+        return false;
+    }
+
     function iniciarSessao($email, $pw) {
         try {
 
@@ -21,21 +41,29 @@ class Login {
             }
 
             $stmt = $this->conn->prepare(
-                "SELECT * FROM Utilizadores WHERE email = ? AND password = ?"
+                "SELECT * FROM Utilizadores WHERE email = ? ORDER BY id ASC"
             );
 
             if (!$stmt) {
                 return json_encode(["flag" => false, "msg" => "Erro ao processar login"], JSON_UNESCAPED_UNICODE);
             }
 
-            $stmt->bind_param("ss", $email, $pw);
+            $stmt->bind_param("s", $email);
             $stmt->execute();
 
         $result = $stmt->get_result();
+        $row = null;
 
         if ($result->num_rows > 0) {
+            while ($user = $result->fetch_assoc()) {
+                if ($this->validarPassword($pw, $user['password'])) {
+                    $row = $user;
+                    break;
+                }
+            }
+        }
 
-            $row = $result->fetch_assoc();
+        if ($row !== null) {
 
             if (isset($row['email_verificado']) && $row['email_verificado'] == 0) {
 
@@ -65,6 +93,18 @@ class Login {
             $_SESSION['plano'] = $row['plano_id'];
             $_SESSION['data'] = $row['data_criacao'];
             $_SESSION['email'] = $row['email'];
+
+            $stmtPerfis = $this->conn->prepare("SELECT COUNT(*) as total FROM Utilizadores WHERE email = ? AND tipo_utilizador_id IN (2,3)");
+            if ($stmtPerfis) {
+                $stmtPerfis->bind_param("s", $row['email']);
+                $stmtPerfis->execute();
+                $resultadoPerfis = $stmtPerfis->get_result();
+                $totalPerfis = (int)($resultadoPerfis->fetch_assoc()['total'] ?? 0);
+                $_SESSION['perfil_duplo'] = ($totalPerfis > 1);
+                $stmtPerfis->close();
+            } else {
+                $_SESSION['perfil_duplo'] = false;
+            }
 
 
             if ($temp_user_id && $temp_user_id !== $row['id']) {

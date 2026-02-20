@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
   carregarProdutosDestaque();
   carregarMaisVendidos();
   carregarNovidades();
@@ -20,7 +20,6 @@ function carregarMaisVendidos() {
       }
     },
     error: function (error) {
-      console.error("Erro ao carregar produtos mais vendidos:", error);
     },
   });
 }
@@ -41,7 +40,6 @@ function carregarProdutosDestaque() {
       }
     },
     error: function (error) {
-      console.error("Erro ao carregar produtos em destaque:", error);
     },
   });
 }
@@ -62,7 +60,6 @@ function carregarNovidades() {
       }
     },
     error: function (error) {
-      console.error("Erro ao carregar produtos recomendados:", error);
     },
   });
 }
@@ -142,7 +139,6 @@ function carregarRecomendados() {
       }
     },
     error: function (error) {
-      console.error("Erro ao carregar produtos recomendados:", error);
     },
   });
 }

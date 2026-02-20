@@ -17,6 +17,10 @@ class Registo{
         $flag = false;
 
 
+        $email = mb_strtolower(trim($email), 'UTF-8');
+        $nif = trim((string)$nif);
+        $nif = ($nif === '') ? null : $nif;
+
         if (empty($nome) || empty($apelido) || empty($email) || empty($password) || empty($morada) || empty($codigo_postal) || empty($distrito) || empty($localidade)) {
             return json_encode([
                 "flag" => false,

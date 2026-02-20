@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/connection.php';
 require_once __DIR__ . '/../services/EmailService.php';
@@ -107,7 +107,8 @@ class Devolucoes {
 
         if (($dev['estado'] ?? '') === 'produto_enviado') {
             $codigo = htmlspecialchars($dev['codigo_devolucao'] ?? '');
-            $acoes .= "<button class='btn-icon btn-success' onclick=\"mostrarModalConfirmarRecebimento({$dev['id']}, '{$codigo}')\" title='Confirmar Recebimento'><i class='fas fa-box-open'></i></button>";
+            $codigoEnvio = htmlspecialchars($dev['codigo_envio_devolucao'] ?? '');
+            $acoes .= "<button class='btn-icon btn-success' onclick=\"mostrarModalConfirmarRecebimento({$dev['id']}, '{$codigo}', '{$codigoEnvio}')\" title='Confirmar Recebimento'><i class='fas fa-box-open'></i></button>";
         }
 
         if (($dev['estado'] ?? '') === 'produto_recebido' && ($dev['reembolso_status'] ?? '') !== 'succeeded') {
@@ -292,9 +293,11 @@ class Devolucoes {
   .dev-tag-valor i { color:#ef4444; }
   .dev-tag-encomenda { background:#e0f2fe; color:#0c4a6e; }
   .dev-tag-encomenda i { color:#0ea5e9; }
-  .dev-foto-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin-top:12px; }
-  .dev-foto-item { position:relative; border-radius:8px; overflow:hidden; border:2px solid #e5e7eb; cursor:pointer; aspect-ratio:1; }
-  .dev-foto-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .3s; }
+    .dev-foto-grid { display:flex; flex-wrap:nowrap; gap:10px; margin-top:12px; overflow-x:auto; overflow-y:hidden; padding-bottom:4px; }
+    .dev-foto-grid::-webkit-scrollbar { height:8px; }
+    .dev-foto-grid::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; }
+    .dev-foto-item { position:relative; border-radius:8px; overflow:hidden; border:2px solid #e5e7eb; cursor:pointer; width:120px; min-width:120px; height:120px; flex:0 0 auto; }
+    .dev-foto-item img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .3s; }
   .dev-foto-item:hover img { transform:scale(1.05); }
   .dev-foto-overlay { position:absolute; inset:0; background:rgba(0,0,0,.3); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .3s; color:#fff; font-size:18px; }
   .dev-foto-item:hover .dev-foto-overlay { opacity:1; }
@@ -329,11 +332,6 @@ class Devolucoes {
                     </div>
                 </div>
 
-                ' . (!empty($fotosHTML) ? '
-                <div class="dev-section" style="border-left-color:#f59e0b; background:linear-gradient(135deg,#fffbeb 0%,#fff 100%); margin-top:14px; padding:14px;">
-                    <h4><i class="fas fa-camera" style="color:#f59e0b;"></i> Fotos Anexadas (' . count($fotos) . ')</h4>
-                    ' . $fotosHTML . '
-                </div>' : '') . '
             </div>
 
             <!-- Coluna Direita: cliente + devolução -->
@@ -362,10 +360,21 @@ class Devolucoes {
                     ' . (!empty($dataReemb) ? '<p class="dev-field"><strong>Data Reembolso:</strong> ' . $dataReemb . '</p>' : '') . '
                     ' . (!empty($dev['reembolso_stripe_id']) ? '<p class="dev-field" style="font-size:12px;"><strong>ID:</strong> <span style="color:#94a3b8;">' . $esc($dev['reembolso_stripe_id']) . '</span></p>' : '') . '
                     ' . (!empty($dev['codigo_envio_devolucao']) ? '<p class="dev-field"><strong>Cód. Envio:</strong> ' . $esc($dev['codigo_envio_devolucao']) . '</p>' : '') . '
-                    ' . (!empty($dev['codigo_rastreio']) ? '<p class="dev-field"><strong>Rastreio:</strong> ' . $esc($dev['codigo_rastreio']) . '</p>' : '') . '
                 </div>
+
+                ' . (!empty(trim((string)($dev['notas_anunciante'] ?? ''))) ? '
+                <div class="dev-section dev-section-notes">
+                    <h4><i class="fas fa-comment-dots"></i> Resposta do Vendedor</h4>
+                    <p class="dev-field" style="margin:0; white-space:pre-wrap;">' . nl2br($esc(trim((string)$dev['notas_anunciante']))) . '</p>
+                </div>' : '') . '
             </div>
         </div>
+
+                ' . (!empty($fotosHTML) ? '
+                <div class="dev-section" style="border-left-color:#f59e0b; background:linear-gradient(135deg,#fffbeb 0%,#fff 100%); padding:14px;">
+                        <h4><i class="fas fa-camera" style="color:#f59e0b;"></i> Fotos Anexadas (' . count($fotos) . ')</h4>
+                        ' . $fotosHTML . '
+                </div>' : '') . '
 
   </div>
 </div>';
@@ -376,6 +385,8 @@ class Devolucoes {
     function solicitarDevolucao($encomenda_id, $cliente_id, $motivo, $motivo_detalhe = '', $notas_cliente = '', $fotos = [], $produtos_selecionados = []) {
 
         try {
+
+            // DEBUG: Registar dados recebidos
 
             $elegibilidade = $this->obterElegibilidadeDados($encomenda_id, $cliente_id);
             if (!$elegibilidade['elegivel']) {
@@ -398,6 +409,8 @@ class Devolucoes {
             while ($row = $result_produtos->fetch_assoc()) {
                 $produtos_encomenda[$row['produto_id']] = $row;
             }
+            $stmt_produtos->close();
+
 
 
             foreach ($produtos_selecionados as $produto_sel) {
@@ -412,16 +425,24 @@ class Devolucoes {
             }
 
 
-            $codigo_devolucao = $this->gerarCodigoDevolucao();
             $fotos_json = json_encode($fotos, JSON_UNESCAPED_UNICODE);
 
             $devolucoes_criadas = [];
+            $devolucoes_por_anunciante = [];
+            $codigos_gerados = [];
+            $codigo_devolucao_referencia = null;
 
 
             foreach ($produtos_selecionados as $produto_sel) {
                 $produto_id = $produto_sel['produto_id'];
                 $quantidade = $produto_sel['quantidade'];
                 $prod_enc = $produtos_encomenda[$produto_id];
+
+                $codigo_devolucao = $this->gerarCodigoDevolucaoUnico($codigos_gerados);
+                $codigos_gerados[] = $codigo_devolucao;
+                if ($codigo_devolucao_referencia === null) {
+                    $codigo_devolucao_referencia = $codigo_devolucao;
+                }
 
 
                 $valor_reembolso = ($prod_enc['valor'] / $prod_enc['quantidade']) * $quantidade;
@@ -451,25 +472,120 @@ class Devolucoes {
                 );
 
                 if (!$stmt->execute()) {
-                    throw new Exception("Erro ao inserir devolução: " . $stmt->error);
+                    $erro = $stmt->error;
+                    $stmt->close();
+                    throw new Exception("Erro ao inserir devolução: " . $erro);
                 }
 
                 $devolucao_id = $stmt->insert_id;
+                $stmt->close();
                 $devolucoes_criadas[] = $devolucao_id;
+
+
+                $anunciante_id = (int)$prod_enc['anunciante_id'];
+                if (!isset($devolucoes_por_anunciante[$anunciante_id])) {
+                    $devolucoes_por_anunciante[$anunciante_id] = [
+                        'devolucao_ids' => [],
+                        'produtos' => [],
+                        'valor_total' => 0.0,
+                    ];
+                }
+
+                $devolucoes_por_anunciante[$anunciante_id]['devolucao_ids'][] = $devolucao_id;
+                $devolucoes_por_anunciante[$anunciante_id]['produtos'][] = [
+                    'produto_id' => (int)$produto_id,
+                    'nome' => $prod_enc['nome'] ?? 'Produto',
+                    'foto' => $prod_enc['foto'] ?? null,
+                    'quantidade' => (int)$quantidade,
+                    'valor_reembolso' => (float)$valor_reembolso,
+                ];
+                $devolucoes_por_anunciante[$anunciante_id]['valor_total'] += (float)$valor_reembolso;
 
 
                 $this->registrarHistorico($devolucao_id, null, 'solicitada', 'cliente', 'Devolução solicitada pelo cliente');
             }
 
 
+
             if (!empty($devolucoes_criadas)) {
-                $this->enviarNotificacaoSolicitacao($devolucoes_criadas[0]);
+                $this->enviarNotificacaoSolicitacaoAgrupada($devolucoes_criadas, $devolucoes_por_anunciante);
             }
 
-            return json_encode(['flag' => true, 'msg' => 'Devolução solicitada com sucesso!', 'codigo_devolucao' => $codigo_devolucao, 'devolucoes_criadas' => count($devolucoes_criadas)], JSON_UNESCAPED_UNICODE);
+            return json_encode(['flag' => true, 'msg' => 'Devolução solicitada com sucesso!', 'codigo_devolucao' => $codigo_devolucao_referencia, 'devolucoes_criadas' => count($devolucoes_criadas)], JSON_UNESCAPED_UNICODE);
 
         } catch (Exception $e) {
+            error_log('[Devolucoes] ERRO em solicitarDevolucao: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
             return json_encode(['flag' => false, 'msg' => 'Erro ao solicitar devolução: ' . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+        }
+    }
+
+    private function enviarNotificacaoSolicitacaoAgrupada($devolucoes_criadas, $devolucoes_por_anunciante) {
+        try {
+
+            if (empty($devolucoes_criadas)) {
+                return;
+            }
+
+            $emailService = new EmailService($this->conn);
+
+            // Cliente: um único email de confirmação da solicitação
+            $devolucaoCliente = $this->obterDetalhesDados((int)$devolucoes_criadas[0]);
+
+            if ($devolucaoCliente && !empty($devolucaoCliente['cliente_email'])) {
+                $produtosCliente = [];
+                $valorTotalCliente = 0.0;
+                foreach ($devolucoes_por_anunciante as $grupo) {
+                    if (!empty($grupo['produtos']) && is_array($grupo['produtos'])) {
+                        foreach ($grupo['produtos'] as $item) {
+                            $produtosCliente[] = $item;
+                            $valorTotalCliente += (float)($item['valor_reembolso'] ?? 0);
+                        }
+                    }
+                }
+
+                if (!empty($produtosCliente)) {
+                    $devolucaoCliente['produtos_lista'] = $produtosCliente;
+                    $devolucaoCliente['qtd_produtos_devolucao'] = count($produtosCliente);
+                    $devolucaoCliente['valor_reembolso_total'] = $valorTotalCliente;
+                }
+
+                $resultCliente = $emailService->enviarEmail(
+                    $devolucaoCliente['cliente_email'],
+                    'devolucao_solicitada',
+                    $devolucaoCliente,
+                    $devolucaoCliente['cliente_id'],
+                    'cliente'
+                );
+            } else {
+            }
+
+            // Anunciantes: um email por vendedor, contendo apenas os seus produtos
+            foreach ($devolucoes_por_anunciante as $anunciante_id => $grupo) {
+                if (empty($grupo['devolucao_ids'])) {
+                    continue;
+                }
+
+                $devolucaoRef = $this->obterDetalhesDados((int)$grupo['devolucao_ids'][0]);
+                if (!$devolucaoRef || empty($devolucaoRef['anunciante_email'])) {
+                    continue;
+                }
+
+                $devolucaoRef['produtos_lista'] = $grupo['produtos'];
+                $devolucaoRef['valor_reembolso_total'] = (float)$grupo['valor_total'];
+                $devolucaoRef['qtd_produtos_devolucao'] = count($grupo['produtos']);
+
+                $resultAnunciante = $emailService->enviarEmail(
+                    $devolucaoRef['anunciante_email'],
+                    'nova_devolucao_anunciante',
+                    $devolucaoRef,
+                    (int)$anunciante_id,
+                    'anunciante'
+                );
+            }
+
+
+        } catch (Exception $e) {
+            error_log('[Devolucoes][Email] ERRO ao enviar emails: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
         }
     }
 
@@ -801,6 +917,11 @@ class Devolucoes {
     function aprovarDevolucao($devolucao_id, $anunciante_id, $notas_anunciante = '') {
         try {
 
+            $notas_anunciante = trim((string)$notas_anunciante);
+            if ($notas_anunciante === '') {
+                $notas_anunciante = 'A devolução foi aprovada após validação do pedido.';
+            }
+
             $devolucao = $this->obterDetalhesDados($devolucao_id);
 
             if (!$devolucao) {
@@ -849,6 +970,11 @@ class Devolucoes {
 
     function rejeitarDevolucao($devolucao_id, $anunciante_id, $notas_anunciante) {
         try {
+            $notas_anunciante = trim((string)$notas_anunciante);
+            if ($notas_anunciante === '') {
+                $notas_anunciante = 'Pedido rejeitado pelo anunciante após análise.';
+            }
+
             $devolucao = $this->obterDetalhesDados($devolucao_id);
 
             if (!$devolucao) {
@@ -888,7 +1014,7 @@ class Devolucoes {
         }
     }
 
-    function confirmarEnvioCliente($devolucao_id, $cliente_id, $codigo_rastreio = '') {
+    function confirmarEnvioCliente($devolucao_id, $cliente_id) {
         try {
             $devolucao = $this->obterDetalhesDados($devolucao_id);
 
@@ -904,33 +1030,40 @@ class Devolucoes {
                 return json_encode(['flag' => false, 'msg' => 'Apenas devoluções aprovadas podem ter envio confirmado.'], JSON_UNESCAPED_UNICODE);
             }
 
+            $codigo_envio_devolucao = $this->gerarCodigoEnvioDevolucaoUnico();
+
             $sql = "UPDATE devolucoes
                     SET estado = 'produto_enviado',
-                        codigo_rastreio = ?,
+                        codigo_envio_devolucao = ?,
+                        codigo_rastreio = NULL,
                         data_envio_cliente = NOW()
                     WHERE id = ?";
 
             $stmt = $this->conn->prepare($sql);
-            $stmt->bind_param('si', $codigo_rastreio, $devolucao_id);
+            $stmt->bind_param('si', $codigo_envio_devolucao, $devolucao_id);
 
             if (!$stmt->execute()) {
                 throw new Exception("Erro ao confirmar envio");
             }
 
-            $obs = $codigo_rastreio ? "Código de rastreio: {$codigo_rastreio}" : "Sem código de rastreio";
+            $obs = "Código interno de envio: {$codigo_envio_devolucao}";
             $this->registrarHistorico($devolucao_id, 'aprovada', 'produto_enviado', 'cliente', $obs);
 
 
             $this->enviarNotificacaoEnvio($devolucao_id);
 
-            return json_encode(['flag' => true, 'msg' => 'Envio confirmado! O vendedor será notificado.'], JSON_UNESCAPED_UNICODE);
+            return json_encode([
+                'flag' => true,
+                'msg' => 'Envio confirmado! O vendedor foi notificado por email.',
+                'codigo_envio_devolucao' => $codigo_envio_devolucao
+            ], JSON_UNESCAPED_UNICODE);
 
         } catch (Exception $e) {
             return json_encode(['flag' => false, 'msg' => 'Erro ao confirmar envio.'], JSON_UNESCAPED_UNICODE);
         }
     }
 
-    function confirmarRecebimentoVendedor($devolucao_id, $anunciante_id, $notas_recebimento = '') {
+    function confirmarRecebimentoVendedor($devolucao_id, $anunciante_id, $notas_recebimento = '', $codigo_envio_confirmacao = '') {
         try {
             $devolucao = $this->obterDetalhesDados($devolucao_id);
 
@@ -944,6 +1077,21 @@ class Devolucoes {
 
             if ($devolucao['estado'] !== 'produto_enviado') {
                 return json_encode(['flag' => false, 'msg' => 'Produto ainda não foi enviado pelo cliente.'], JSON_UNESCAPED_UNICODE);
+            }
+
+            $codigoEsperado = strtoupper(trim((string)($devolucao['codigo_envio_devolucao'] ?? '')));
+            $codigoInformado = strtoupper(trim((string)$codigo_envio_confirmacao));
+
+            if ($codigoEsperado === '') {
+                return json_encode(['flag' => false, 'msg' => 'Esta devolução não possui código de envio gerado.'], JSON_UNESCAPED_UNICODE);
+            }
+
+            if ($codigoInformado === '') {
+                return json_encode(['flag' => false, 'msg' => 'Informe o código de envio para confirmar o recebimento.'], JSON_UNESCAPED_UNICODE);
+            }
+
+            if ($codigoInformado !== $codigoEsperado) {
+                return json_encode(['flag' => false, 'msg' => 'Código de envio inválido para esta devolução.'], JSON_UNESCAPED_UNICODE);
             }
 
             $sql = "UPDATE devolucoes
@@ -960,7 +1108,13 @@ class Devolucoes {
                 throw new Exception("Erro ao confirmar recebimento");
             }
 
-            $this->registrarHistorico($devolucao_id, 'produto_enviado', 'produto_recebido', 'anunciante', $notas_recebimento);
+            $obsRecebimento = trim((string)$notas_recebimento);
+            if ($obsRecebimento !== '') {
+                $obsRecebimento .= ' | ';
+            }
+            $obsRecebimento .= 'Código de envio validado: ' . $codigoInformado;
+
+            $this->registrarHistorico($devolucao_id, 'produto_enviado', 'produto_recebido', 'anunciante', $obsRecebimento);
 
 
             $this->enviarNotificacaoRecebimento($devolucao_id);
@@ -1224,6 +1378,68 @@ class Devolucoes {
         return $prefix . $timestamp . $random;
     }
 
+    private function gerarCodigoDevolucaoUnico($codigosLocais = []) {
+        $tentativas = 0;
+
+        do {
+            $tentativas++;
+            $codigo = $this->gerarCodigoDevolucao();
+
+            if (in_array($codigo, $codigosLocais, true)) {
+                continue;
+            }
+
+            $sql = "SELECT 1 FROM devolucoes WHERE codigo_devolucao = ? LIMIT 1";
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                return $codigo;
+            }
+            $stmt->bind_param('s', $codigo);
+            $stmt->execute();
+            $exists = $stmt->get_result()->num_rows > 0;
+            $stmt->close();
+
+            if (!$exists) {
+                return $codigo;
+            }
+        } while ($tentativas < 15);
+
+        return $this->gerarCodigoDevolucao();
+    }
+
+    private function gerarCodigoEnvioDevolucao() {
+        $prefix = 'DEVENV';
+        $timestamp = date('YmdHis');
+        $random = str_pad((string)mt_rand(0, 999), 3, '0', STR_PAD_LEFT);
+        return $prefix . $timestamp . $random;
+    }
+
+    private function gerarCodigoEnvioDevolucaoUnico() {
+        $tentativas = 0;
+
+        do {
+            $tentativas++;
+            $codigo = $this->gerarCodigoEnvioDevolucao();
+
+            $sql = "SELECT 1 FROM devolucoes WHERE codigo_envio_devolucao = ? LIMIT 1";
+            $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                return $codigo;
+            }
+
+            $stmt->bind_param('s', $codigo);
+            $stmt->execute();
+            $exists = $stmt->get_result()->num_rows > 0;
+            $stmt->close();
+
+            if (!$exists) {
+                return $codigo;
+            }
+        } while ($tentativas < 15);
+
+        return $this->gerarCodigoEnvioDevolucao();
+    }
+
     private function registrarHistorico($devolucao_id, $estado_anterior, $estado_novo, $alterado_por, $observacao = '') {
         $sql = "INSERT INTO historico_devolucoes (devolucao_id, estado_anterior, estado_novo, alterado_por, observacao)
                 VALUES (?, ?, ?, ?, ?)";
@@ -1329,16 +1545,28 @@ class Devolucoes {
             }
 
             if (!empty($devolucao['cliente_email'])) {
-                $emailService->enviarEmail(
+                $okCliente = $emailService->enviarEmail(
                     $devolucao['cliente_email'],
                     'reembolso_processado',
                     $devolucao,
                     $devolucao['cliente_id'],
                     'cliente'
                 );
+                if (!$okCliente) {
+                    error_log('[Devolucoes][NotificacaoReembolso] Falha ao enviar email para cliente_id=' . (int)$devolucao['cliente_id'] . ' devolucao_id=' . (int)$devolucao_id);
+                }
             }
 
+            $this->criarNotificacaoSistema(
+                $devolucao['cliente_id'],
+                'devolucao_reembolsada',
+                'fa-euro-sign Reembolso Processado',
+                "O reembolso da devolução #{$devolucao['codigo_devolucao']} foi processado com sucesso.",
+                $devolucao_id
+            );
+
         } catch (Exception $e) {
+            error_log('[Devolucoes][NotificacaoReembolso] Exceção: ' . $e->getMessage());
         }
     }
 
@@ -1352,26 +1580,43 @@ class Devolucoes {
 
 
             if (!empty($devolucao['anunciante_email'])) {
-                $emailService->enviarEmail(
+                $okAnunciante = $emailService->enviarEmail(
                     $devolucao['anunciante_email'],
                     'devolucao_enviada',
                     $devolucao,
                     $devolucao['anunciante_id'],
                     'anunciante'
                 );
+                if (!$okAnunciante) {
+                    error_log('[Devolucoes][NotificacaoEnvio] Falha ao enviar email para anunciante_id=' . (int)$devolucao['anunciante_id'] . ' devolucao_id=' . (int)$devolucao_id);
+                }
+            }
+
+            if (!empty($devolucao['cliente_email'])) {
+                $okCliente = $emailService->enviarEmail(
+                    $devolucao['cliente_email'],
+                    'devolucao_envio_confirmado',
+                    $devolucao,
+                    $devolucao['cliente_id'],
+                    'cliente'
+                );
+                if (!$okCliente) {
+                    error_log('[Devolucoes][NotificacaoEnvio] Falha ao enviar email para cliente_id=' . (int)$devolucao['cliente_id'] . ' devolucao_id=' . (int)$devolucao_id);
+                }
             }
 
 
-            $rastreio = !empty($devolucao['codigo_rastreio']) ? " (Rastreio: {$devolucao['codigo_rastreio']})" : "";
+            $codigoEnvio = !empty($devolucao['codigo_envio_devolucao']) ? " [Cód. envio: {$devolucao['codigo_envio_devolucao']}]" : "";
             $this->criarNotificacaoSistema(
                 $devolucao['anunciante_id'],
                 'devolucao_enviada',
                 "fa-shipping-fast Cliente Enviou Produto",
-                "O cliente confirmou o envio do produto da devolução #{$devolucao['codigo_devolucao']}{$rastreio}. Aguarde recebimento e confirme no sistema.",
+                "O cliente confirmou o envio do produto da devolução #{$devolucao['codigo_devolucao']}{$codigoEnvio}. Aguarde recebimento e confirme no sistema.",
                 $devolucao_id
             );
 
         } catch (Exception $e) {
+            error_log('[Devolucoes][NotificacaoEnvio] Exceção: ' . $e->getMessage());
         }
     }
 
@@ -1385,13 +1630,16 @@ class Devolucoes {
 
 
             if (!empty($devolucao['cliente_email'])) {
-                $emailService->enviarEmail(
+                $okCliente = $emailService->enviarEmail(
                     $devolucao['cliente_email'],
                     'devolucao_recebida',
                     $devolucao,
                     $devolucao['cliente_id'],
                     'cliente'
                 );
+                if (!$okCliente) {
+                    error_log('[Devolucoes][NotificacaoRecebimento] Falha ao enviar email para cliente_id=' . (int)$devolucao['cliente_id'] . ' devolucao_id=' . (int)$devolucao_id);
+                }
             }
 
 
@@ -1404,6 +1652,7 @@ class Devolucoes {
             );
 
         } catch (Exception $e) {
+            error_log('[Devolucoes][NotificacaoRecebimento] Exceção: ' . $e->getMessage());
         }
     }
 
@@ -1447,8 +1696,20 @@ class Devolucoes {
             }
 
 
-            $allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            if (!in_array($file['type'], $allowed)) {
+            $allowed = ['image/jpeg', 'image/png', 'image/webp'];
+            $mime = '';
+            if (function_exists('finfo_open')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                if ($finfo) {
+                    $mime = finfo_file($finfo, $file['tmp_name']) ?: '';
+                    finfo_close($finfo);
+                }
+            }
+            if ($mime === '') {
+                $mime = mime_content_type($file['tmp_name']) ?: '';
+            }
+
+            if (!in_array($mime, $allowed, true)) {
                 return json_encode(['flag' => false, 'msg' => 'Formato inválido. Use JPEG, PNG ou WEBP'], JSON_UNESCAPED_UNICODE);
             }
 
@@ -1460,11 +1721,19 @@ class Devolucoes {
 
             $upload_dir = __DIR__ . '/../../assets/media/devolucoes/';
             if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
+                if (!mkdir($upload_dir, 0777, true) && !is_dir($upload_dir)) {
+                    return json_encode(['flag' => false, 'msg' => 'Diretório de upload indisponível'], JSON_UNESCAPED_UNICODE);
+                }
             }
 
 
-            $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if ($extension === 'jpeg') {
+                $extension = 'jpg';
+            }
+            if (!in_array($extension, ['jpg', 'png', 'webp'], true)) {
+                $extension = 'jpg';
+            }
             $filename = uniqid('dev_') . '_' . time() . '.' . $extension;
             $filepath = $upload_dir . $filename;
 

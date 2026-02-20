@@ -11,6 +11,72 @@ class GestaoProdutos {
         $this->conn = $conn;
     }
 
+    function resolverCaminhoImagemProduto($foto){
+        try {
+
+        $caminhoFallback = 'src/img/WeGreenfav.png';
+        $foto = trim((string)$foto);
+
+        if($foto == ""){
+            return $caminhoFallback;
+        }
+
+        $candidatos = array();
+        if (preg_match('/^(src\/|assets\/|uploads\/)/i', $foto)) {
+            $candidatos[] = $foto;
+        } else {
+            $candidatos[] = 'src/img/' . $foto;
+            $candidatos[] = 'src/uploads/' . $foto;
+            $candidatos[] = 'assets/media/' . $foto;
+            $candidatos[] = 'assets/uploads/' . $foto;
+        }
+
+        foreach($candidatos as $caminho){
+            $caminhoFisico = __DIR__ . '/../../' . str_replace('/', DIRECTORY_SEPARATOR, $caminho);
+            if(file_exists($caminhoFisico)){
+                return $caminho;
+            }
+        }
+
+        return $caminhoFallback;
+
+        } catch (Exception $e) {
+            return 'src/img/WeGreenfav.png';
+        }
+    }
+
+    function limparNotificacoesLidasProduto($produto_id, $tipos = array('produto')) {
+        try {
+
+        $produto_id = (int)$produto_id;
+        if ($produto_id <= 0 || !is_array($tipos) || empty($tipos)) {
+            return;
+        }
+
+        $tiposFiltrados = array_values(array_filter($tipos, function($tipo) {
+            return is_string($tipo) && trim($tipo) !== '';
+        }));
+
+        if (empty($tiposFiltrados)) {
+            return;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($tiposFiltrados), '?'));
+        $sql = "DELETE FROM notificacoes_lidas WHERE referencia_id = ? AND tipo_notificacao IN ($placeholders)";
+        $stmt = $this->conn->prepare($sql);
+
+        if ($stmt) {
+            $types = 'i' . str_repeat('s', count($tiposFiltrados));
+            $params = array_merge(array($produto_id), $tiposFiltrados);
+            $stmt->bind_param($types, ...$params);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        } catch (Exception $e) {
+        }
+    }
+
     function getMeusProdutos($ID_User){
         try {
 
@@ -25,12 +91,15 @@ class GestaoProdutos {
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
+                $motivoRejeicao = trim((string)($row['motivo_rejeicao'] ?? ''));
+                $isRejeitado = $motivoRejeicao !== '' && $motivoRejeicao !== 'PENDENTE_REVISAO_ANUNCIANTE' && $motivoRejeicao !== 'APROVADO_ADMIN';
+
                 if($row['ativo'] == 1)
                 {
                     $text = "<i class='fas fa-check-circle'></i> ATIVO";
                     $text2 = 'badge-ativo';
                 }
-                else if($row['ativo'] == 2)
+                else if($isRejeitado)
                 {
                     $text = "<i class='fas fa-times-circle'></i> REJEITADO";
                     $text2 = 'badge-rejeitado';
@@ -43,7 +112,8 @@ class GestaoProdutos {
 
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
-                $msg .= "<td><img src='".$row['foto']."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;'></td>";
+                $fotoProduto = htmlspecialchars($this->resolverCaminhoImagemProduto($row['foto']), ENT_QUOTES, 'UTF-8');
+                $msg .= "<td><img src='".$fotoProduto."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;' onerror=\"this.onerror=null;this.src='src/img/WeGreenfav.png';\"></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['genero']."</td>";
@@ -82,12 +152,15 @@ class GestaoProdutos {
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
 
+                $motivoRejeicao = trim((string)($row['motivo_rejeicao'] ?? ''));
+                $isRejeitado = $motivoRejeicao !== '' && $motivoRejeicao !== 'PENDENTE_REVISAO_ANUNCIANTE' && $motivoRejeicao !== 'APROVADO_ADMIN';
+
                 if($row['ativo'] == 1)
                 {
                     $text = "Ativo";
                     $text2 = 'badge-ativo';
                 }
-                else if($row['ativo'] == 2)
+                else if($isRejeitado)
                 {
                     $text = "Rejeitado";
                     $text2 = 'badge-rejeitado';
@@ -99,17 +172,18 @@ class GestaoProdutos {
                 }
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
-                $msg .= "<td><img src='".$row['foto']."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;'></td>";
+                $fotoProduto = htmlspecialchars($this->resolverCaminhoImagemProduto($row['foto']), ENT_QUOTES, 'UTF-8');
+                $msg .= "<td><img src='".$fotoProduto."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;' onerror=\"this.onerror=null;this.src='src/img/WeGreenfav.png';\"></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['genero']."</td>";
                 $msg .= "<td>".$row['preco']."€</td>";
                 $msg .= "<td><span class='status-badge ".$text2."'>".$text."</span></td>";
 
-                if (!empty($row['motivo_rejeicao']) && $row['motivo_rejeicao'] === 'AGUARDAR_RESPOSTA_ANUNCIANTE') {
-                    $msg .= "<td><button class='btn-edit' disabled title='A aguardar resposta do anunciante' style='opacity:0.6;cursor:not-allowed;'><i class='fas fa-hourglass-half'></i> A aguardar anunciante</button></td>";
-                } else {
+                if (!empty($row['motivo_rejeicao']) && $row['motivo_rejeicao'] === 'PENDENTE_REVISAO_ANUNCIANTE') {
                     $msg .= "<td><button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto'><i class='fas fa-search'></i> Verificar</button></td>";
+                } else {
+                    $msg .= "<td><button class='btn-edit' disabled title='Produto desativado manualmente' style='opacity:0.6;cursor:not-allowed;'><i class='fas fa-pause-circle'></i> Desativado</button></td>";
                 }
 
                 $msg .= "</tr>";
@@ -193,12 +267,15 @@ class GestaoProdutos {
 
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
+                $motivoRejeicao = trim((string)($row['motivo_rejeicao'] ?? ''));
+                $isRejeitado = $motivoRejeicao !== '' && $motivoRejeicao !== 'PENDENTE_REVISAO_ANUNCIANTE' && $motivoRejeicao !== 'APROVADO_ADMIN';
+
                 if($row['ativo'] == 1)
                 {
                     $text = "Ativo";
                     $text2 = 'badge-ativo';
                 }
-                else if($row['ativo'] == 2)
+                else if($isRejeitado)
                 {
                     $text = "Rejeitado";
                     $text2 = 'badge-rejeitado';
@@ -211,7 +288,8 @@ class GestaoProdutos {
 
                 $msg .= "<tr>";
                 $msg .= "<th scope='row'>".$row['Produto_id']."</th>";
-                $msg .= "<td><img src='".$row['foto']."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;'></td>";
+                $fotoProduto = htmlspecialchars($this->resolverCaminhoImagemProduto($row['foto']), ENT_QUOTES, 'UTF-8');
+                $msg .= "<td><img src='".$fotoProduto."' class='rounded-circle profile-img-small me-1' width='100px' style='object-fit: cover;' onerror=\"this.onerror=null;this.src='src/img/WeGreenfav.png';\"></td>";
                 $msg .= "<td>".$row['nome']."</td>";
                 $msg .= "<td>".$row['ProdutosNome']."</td>";
                 $msg .= "<td>".$row['NomeAnunciante']."</td>";
@@ -220,21 +298,22 @@ class GestaoProdutos {
                 $msg .= "<td>".$row['marca']."</td>";
                 $msg .= "<td>";
 
-                if ($row['ativo'] == 0) {
-                    if (!empty($row['motivo_rejeicao']) && $row['motivo_rejeicao'] === 'AGUARDAR_RESPOSTA_ANUNCIANTE') {
-                        $msg .= "<button class='btn-edit' disabled title='A aguardar resposta do anunciante' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;'><i class='fas fa-hourglass-half'></i> A aguardar anunciante</button><br>";
-                    } else {
-                        $msg .= "<button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Verificar Produto' style='margin-bottom: 8px;'><i class='fas fa-search'></i> Verificar</button><br>";
-                    }
+                if ($row['ativo'] == 0 && !empty($row['motivo_rejeicao']) && $row['motivo_rejeicao'] === 'PENDENTE_REVISAO_ANUNCIANTE') {
+                    $msg .= "<button class='btn-edit' onclick='getDadosInativos(".$row['Produto_id'].")' title='Rever pedido de aprovação' style='margin-bottom: 8px;'><i class='fas fa-search'></i> Rever Pedido</button><br>";
                 } elseif ($row['ativo'] == 1) {
-                    $msg .= "<button class='btn-edit' disabled title='Produto já aprovado' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;'><i class='fas fa-check-circle'></i> Aprovado</button><br>";
+                    $msg .= "<button class='btn-edit' disabled title='Produto publicado e ativo' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;'><i class='fas fa-check-circle'></i> Publicado</button><br>";
+                } elseif ($row['ativo'] == 0) {
+                    $msg .= "<button class='btn-edit' disabled title='Produto desativado manualmente pelo administrador' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;'><i class='fas fa-pause-circle'></i> Desativado Manual</button><br>";
                 } else {
                     $msg .= "<button class='btn-edit' disabled title='Produto rejeitado' style='margin-bottom: 8px;opacity:0.6;cursor:not-allowed;background:#dc2626;'><i class='fas fa-times-circle'></i> Rejeitado</button><br>";
                 }
+
                 if ($row['ativo'] == 1) {
-                    $msg .= "<button class='btn-desativar' onclick='getDesativacao(".$row['Produto_id'].")' title='Desativar Produto'><i class='fas fa-times-circle'></i> Desativar</button>";
+                    $msg .= "<button class='btn-desativar' onclick='getDesativacao(".$row['Produto_id'].")' title='Desativar imediatamente'><i class='fas fa-times-circle'></i> Desativar Agora</button>";
+                } elseif ($row['ativo'] == 0 && (empty($row['motivo_rejeicao']) || $row['motivo_rejeicao'] !== 'PENDENTE_REVISAO_ANUNCIANTE')) {
+                    $msg .= "<button class='btn-edit' onclick='getAtivacao(".$row['Produto_id'].")' title='Ativar imediatamente'><i class='fas fa-check-circle'></i> Ativar Agora</button>";
                 } else {
-                    $msg .= "<button class='btn-desativar' disabled title='Produto já inativo ou rejeitado' style='opacity:0.6;cursor:not-allowed;'><i class='fas fa-times-circle'></i> Desativar</button>";
+                    $msg .= "<button class='btn-desativar' disabled title='Ação indisponível para este estado' style='opacity:0.6;cursor:not-allowed;'><i class='fas fa-ban'></i> Indisponível</button>";
                 }
                 $msg .= "</td>";
                 $msg .= "</tr>";
@@ -297,7 +376,7 @@ class GestaoProdutos {
 
         $sql = "UPDATE Produtos
             SET ativo = 0,
-                motivo_rejeicao = 'AGUARDAR_RESPOSTA_ANUNCIANTE'
+                motivo_rejeicao = NULL
                 WHERE Produto_id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $Produto_id);
@@ -320,14 +399,50 @@ class GestaoProdutos {
             return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
+    function getAtivacao($Produto_id){
+        try {
+
+        $msg = "";
+        $flag = true;
+        $sql = "";
+
+        $sql = "UPDATE Produtos
+            SET ativo = 1,
+                motivo_rejeicao = NULL
+                WHERE Produto_id = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $Produto_id);
+
+        if ($stmt->execute()) {
+            $msg = "Ativado com Sucesso";
+        } else {
+            $flag = false;
+            $msg = "Error: " . $sql . "<br>" . $this->conn->error;
+        }
+
+        $resp = json_encode(array(
+            "flag" => $flag,
+            "msg" => $msg
+        ), JSON_UNESCAPED_UNICODE);
+
+        return($resp);
+
+        } catch (Exception $e) {
+            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+        }
+    }
     function rejeitaEditProduto($Produto_id, $motivo_rejeicao = ''){
         try {
 
         $msg = "";
         $flag = true;
+        $motivo_rejeicao = trim((string)$motivo_rejeicao);
+        if ($motivo_rejeicao === '') {
+            $motivo_rejeicao = 'Produto não cumpre os critérios de aprovação.';
+        }
 
 
-        $sqlDados = "SELECT p.nome AS nome_produto, u.email, u.nome AS nome_anunciante
+        $sqlDados = "SELECT p.nome AS nome_produto, u.email, u.nome AS nome_anunciante, u.id AS anunciante_id
                      FROM Produtos p
                      INNER JOIN Utilizadores u ON p.anunciante_id = u.id
                      WHERE p.Produto_id = ?";
@@ -338,12 +453,14 @@ class GestaoProdutos {
         $dadosAnunciante = $resultDados->fetch_assoc();
 
         $sql = "UPDATE Produtos
-        SET ativo = 2, motivo_rejeicao = ? WHERE Produto_id = ?";
+        SET ativo = 0, motivo_rejeicao = ? WHERE Produto_id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("si", $motivo_rejeicao, $Produto_id);
 
         if ($stmt->execute()) {
             $msg = "Rejeitado com Sucesso";
+
+            $this->limparNotificacoesLidasProduto($Produto_id, array('produto', 'produto_rejeitado'));
 
 
             if ($dadosAnunciante && !empty($dadosAnunciante['email'])) {
@@ -377,11 +494,12 @@ class GestaoProdutos {
         $msg = "";
         $flag = true;
 
-        $sql = "UPDATE Produtos SET ativo = 1, motivo_rejeicao = NULL WHERE Produto_id = ?";
+        $sql = "UPDATE Produtos SET ativo = 1, motivo_rejeicao = 'APROVADO_ADMIN' WHERE Produto_id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $Produto_id);
 
         if ($stmt->execute()) {
+            $this->limparNotificacoesLidasProduto($Produto_id, array('produto', 'produto_aprovado'));
             $msg = "Produto aprovado com sucesso";
         } else {
             $flag = false;

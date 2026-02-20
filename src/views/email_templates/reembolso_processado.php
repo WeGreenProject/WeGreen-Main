@@ -143,7 +143,13 @@
                                                 'paypal' => '💰 PayPal',
                                                 'klarna' => '💸 Klarna'
                                             ];
-                                            echo $metodos[$payment_method] ?? '💳 ' . $payment_method;
+                                            $paymentMethodRaw = $payment_method ?? $metodo_pagamento ?? $metodo_pagamento_original ?? '';
+                                            $paymentMethodKey = strtolower(trim((string)$paymentMethodRaw));
+                                            if ($paymentMethodKey === '') {
+                                                echo '💳 Método original';
+                                            } else {
+                                                echo $metodos[$paymentMethodKey] ?? ('💳 ' . htmlspecialchars((string)$paymentMethodRaw));
+                                            }
                                             ?>
                                         </p>
                                         <p style="margin: 10px 0 0 0; color: #166534; font-size: 12px;">

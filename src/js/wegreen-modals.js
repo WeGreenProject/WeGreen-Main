@@ -1,7 +1,4 @@
-
-
 (function () {
-  
   if (!document.getElementById("wegreen-modal-styles")) {
     const style = document.createElement("style");
     style.id = "wegreen-modal-styles";
@@ -200,7 +197,8 @@ function showModernConfirmModal(title, message, opts) {
     showCancelButton: true,
     confirmButtonText:
       opts.confirmText || '<i class="fas fa-check"></i> Sim, confirmar',
-    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+    cancelButtonText:
+      opts.cancelText || '<i class="fas fa-times"></i> Cancelar',
     customClass: {
       confirmButton: "swal2-confirm-modern",
       cancelButton: "swal2-cancel-modern",
@@ -208,4 +206,31 @@ function showModernConfirmModal(title, message, opts) {
     },
     buttonsStyling: false,
   });
+}
+
+function showModernLoadingModal(title, message) {
+  return Swal.fire({
+    html: `
+      <div style="text-align: center; padding: 6px 0;">
+        <div style="width: 76px; height: 76px; margin: 0 auto 18px; border-radius: 50%; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(60, 179, 113, 0.25);">
+          <i class="fas fa-sync-alt" style="font-size: 32px; color: #2d8a5a;"></i>
+        </div>
+        <h2 style="margin: 0 0 8px 0; color: #1f2937; font-size: 24px; font-weight: 700;">${title || "Processando..."}</h2>
+        <p style="margin: 0; color: #64748b; font-size: 15px;">${message || "Aguarde um momento..."}</p>
+      </div>
+    `,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showConfirmButton: false,
+    customClass: {
+      popup: "swal2-border-radius",
+    },
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+}
+
+function closeModernLoadingModal() {
+  Swal.close();
 }

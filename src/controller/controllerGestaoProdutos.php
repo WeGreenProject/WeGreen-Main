@@ -135,4 +135,9 @@ if ($op == 17) {
     $resp = $func->aprovarProduto($_POST['Produto_id']);
     echo $resp;
 }
+
+if ($op == 18) {
+    $resp = $func->getAtivacao($_POST['produto_id']);
+    echo $resp;
+}
 ?>

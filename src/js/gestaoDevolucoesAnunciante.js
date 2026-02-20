@@ -151,13 +151,6 @@ function carregarEstatisticas() {
             ).toFixed(2),
         );
 
-        
-        const pendentes = response.pendentes || 0;
-        if (pendentes > 0) {
-          $(".notification-badge").text(pendentes).show();
-        } else {
-          $(".notification-badge").hide();
-        }
       }
     },
   });

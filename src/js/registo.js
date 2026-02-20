@@ -1,47 +1,62 @@
 function registaUser() {
-  
   const nome = $("#nome").val().trim();
   const apelido = $("#apelido").val().trim();
   const email = $("#email").val().trim();
   const nif = $("#nif").val().trim();
   const morada = $("#morada").val().trim();
+  const codigoPostal = $("#codigoPostal").val().trim();
+  const distrito = $("#distrito").val();
+  const localidade = $("#localidade").val().trim();
   const password = $("#password").val();
   const tipoUtilizador = $("#tipoUtilizador").val();
 
-  if (!nome || !apelido || !email || !password || !morada) {
-    alerta(
+  if (
+    !nome ||
+    !apelido ||
+    !email ||
+    !password ||
+    !morada ||
+    !codigoPostal ||
+    !distrito ||
+    !localidade
+  ) {
+    showModernWarningModal(
       "Atenção",
       "Por favor, preencha todos os campos obrigatórios",
-      "warning",
     );
     return;
   }
 
   if (morada.length < 10) {
-    alerta(
+    showModernWarningModal(
       "Atenção",
       "A morada deve ter pelo menos 10 caracteres (Rua, Número, Código Postal, Cidade)",
-      "warning",
     );
     return;
   }
 
+  if (!/^\d{4}-\d{3}$/.test(codigoPostal)) {
+    showModernWarningModal("Atenção", "Código postal inválido (use XXXX-XXX)");
+    return;
+  }
+
   if (!tipoUtilizador) {
-    alerta("Atenção", "Por favor, selecione o tipo de conta", "warning");
+    showModernWarningModal("Atenção", "Por favor, selecione o tipo de conta");
     return;
   }
 
   if (password.length < 6) {
-    alerta("Atenção", "A password deve ter pelo menos 6 caracteres", "warning");
+    showModernWarningModal(
+      "Atenção",
+      "A password deve ter pelo menos 6 caracteres",
+    );
     return;
   }
 
-  
   if (nif && !/^\d{9}$/.test(nif)) {
-    alerta(
+    showModernWarningModal(
       "Atenção",
       "NIF deve conter exatamente 9 dígitos numéricos",
-      "warning",
     );
     return;
   }
@@ -55,41 +70,64 @@ function registaUser() {
   dados.append("morada", morada);
   dados.append("password", password);
   dados.append("tipoUtilizador", tipoUtilizador);
+  dados.append("codigo_postal", codigoPostal);
+  dados.append("distrito", distrito);
+  dados.append("localidade", localidade);
 
   $.ajax({
     url: "src/controller/controllerRegisto.php",
     method: "POST",
     data: dados,
-    dataType: "html",
+    dataType: "json",
     cache: false,
     contentType: false,
     processData: false,
   })
 
-    .done(function (msg) {
-      let obj = JSON.parse(msg);
-      console.log(msg);
-      if (obj.flag) {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Conta Criada!",
-          text: obj.msg,
-          showConfirmButton: true,
-          confirmButtonText: "Iniciar Sessão",
-          confirmButtonColor: "#3cb371",
+    .done(function (obj) {
+      const sucesso = !!(obj && (obj.flag === true || obj.success === true));
+      const mensagem =
+        (obj && (obj.msg || obj.message)) ||
+        "Não foi possível concluir o registo.";
+
+      if (sucesso) {
+        showModernSuccessModal("Conta Criada!", mensagem, {
+          onClose: function (result) {
+            if (result && result.isConfirmed) {
+              window.location.href = "login.html";
+            }
+          },
         }).then((result) => {
           if (result.isConfirmed) {
             window.location.href = "login.html";
           }
         });
       } else {
-        alerta("Erro no Registo", obj.msg, "error");
+        if (!sucesso) {
+          showModernErrorModal("Erro no Registo", mensagem);
+        }
       }
     })
 
     .fail(function (jqXHR, textStatus) {
-      alert("Request failed: " + textStatus);
+      let serverMessage =
+        (jqXHR &&
+          jqXHR.responseJSON &&
+          (jqXHR.responseJSON.msg || jqXHR.responseJSON.message)) ||
+        "Erro de comunicação com o servidor. Tente novamente.";
+
+      if (
+        (!jqXHR.responseJSON || !serverMessage) &&
+        jqXHR &&
+        typeof jqXHR.responseText === "string"
+      ) {
+        try {
+          const parsed = JSON.parse(jqXHR.responseText);
+          serverMessage = parsed.msg || parsed.message || serverMessage;
+        } catch (e) {}
+      }
+
+      showModernErrorModal("Erro no Registo", serverMessage);
     });
 }
 function alerta2(msg) {
@@ -113,14 +151,22 @@ function alerta2(msg) {
   });
 }
 function alerta(titulo, msg, icon) {
-  Swal.fire({
-    position: "center",
-    icon: icon,
-    title: titulo,
-    text: msg,
-    showConfirmButton: true,
-    confirmButtonColor: "#3cb371",
-  });
+  if (icon === "warning") {
+    showModernWarningModal(titulo, msg);
+    return;
+  }
+
+  if (icon === "error") {
+    showModernErrorModal(titulo, msg);
+    return;
+  }
+
+  if (icon === "success") {
+    showModernSuccessModal(titulo, msg);
+    return;
+  }
+
+  showModernInfoModal(titulo, msg);
 }
 
 function togglePassword(fieldId) {

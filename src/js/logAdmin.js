@@ -56,22 +56,6 @@ $(function () {
   getCardLog();
 });
 
-const userMenuBtn = document.getElementById("userMenuBtn");
-const userDropdown = document.getElementById("userDropdown");
-
-if (userMenuBtn) {
-  userMenuBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    userDropdown.classList.toggle("active");
-  });
-}
-
-document.addEventListener("click", function (e) {
-  if (!userMenuBtn?.contains(e.target) && !userDropdown?.contains(e.target)) {
-    userDropdown?.classList.remove("active");
-  }
-});
-
 function logout() {
   showModernConfirmModal(
     "Terminar Sessão",

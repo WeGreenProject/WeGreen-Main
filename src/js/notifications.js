@@ -1,7 +1,19 @@
-
-
-let notificationsDropdownOpen = false;
+﻿let notificationsDropdownOpen = false;
 let notificationsCache = [];
+
+function mostrarModalSucesso(titulo, mensagem, opcoes) {
+  if (typeof showModernSuccessModal === "function") {
+    return showModernSuccessModal(titulo, mensagem, opcoes || {});
+  }
+  return Swal.fire({ icon: "success", title: titulo, text: mensagem });
+}
+
+function mostrarModalErro(titulo, mensagem) {
+  if (typeof showModernErrorModal === "function") {
+    return showModernErrorModal(titulo, mensagem);
+  }
+  return Swal.fire({ icon: "error", title: titulo, text: mensagem });
+}
 
 function escapeHtml(value) {
   if (value === null || value === undefined) return "";
@@ -38,48 +50,30 @@ function normalizeIconMarkup(iconValue, tipo) {
  * Atualizar contagem de notificações
  */
 function atualizarNotificacoes() {
-  console.log("[Notificações] Atualizando contagem...");
   $.ajax({
     url: "src/controller/controllerNotifications.php?op=1",
     method: "GET",
     dataType: "json",
     success: function (response) {
-      console.log("[Notificações] Resposta recebida:", response);
       const ok =
         response && (response.success === true || response.flag === true);
       if (ok) {
         const badge = $(".notification-badge");
         const count = parseInt(response.count);
 
-        console.log("[Notificações] Contagem:", count);
-        console.log(
-          "[Notificações] Badge encontrado:",
-          badge.length,
-          "elemento(s)",
-        );
-
         if (count > 0) {
           badge
             .text(count > 99 ? "99+" : count)
             .show()
             .css("display", "inline-block");
-          console.log("[Notificações] Badge mostrado com contagem:", count);
         } else {
           // Forçar hide com CSS inline para garantir
           badge.text("").hide().css({ display: "none", visibility: "hidden" });
-          console.log("[Notificações] Badge escondido (count = 0)");
         }
       } else {
-        console.warn(
-          "[Notificações] Resposta sem sucesso:",
-          response ? response.message || response.msg : "resposta vazia",
-        );
       }
     },
     error: function (xhr, status, error) {
-      console.error("[Notificações] Erro ao atualizar:", error);
-      console.error("[Notificações] Status:", status);
-      console.error("[Notificações] Resposta:", xhr.responseText);
     },
   });
 }
@@ -88,14 +82,11 @@ function atualizarNotificacoes() {
  * Carregar lista de notificações
  */
 function carregarNotificacoes() {
-  console.log("[Notificações] Carregando lista...");
   $.ajax({
     url: "src/controller/controllerNotifications.php?op=2",
     method: "GET",
     dataType: "json",
     success: function (response) {
-      console.log("[Notificações] Resposta bruta:", JSON.stringify(response));
-      console.log("[Notificações] Lista recebida:", response);
       const ok =
         response && (response.success === true || response.flag === true);
       const lista = response
@@ -103,21 +94,12 @@ function carregarNotificacoes() {
         : [];
       if (ok) {
         notificationsCache = lista;
-        console.log("[Notificações] Total de itens:", lista ? lista.length : 0);
-        console.log("[Notificações] Dados:", lista);
         renderizarNotificacoes(lista);
       } else {
-        console.warn(
-          "[Notificações] Erro ao listar:",
-          response ? response.message || response.msg : "resposta vazia",
-        );
         renderizarNotificacoes([]);
       }
     },
     error: function (xhr, status, error) {
-      console.error("[Notificações] Erro ao carregar:", error);
-      console.error("[Notificações] Status:", status);
-      console.error("[Notificações] Resposta:", xhr.responseText);
       renderizarNotificacoes([]);
     },
   });
@@ -128,14 +110,7 @@ function carregarNotificacoes() {
  */
 function renderizarNotificacoes(notificacoes) {
   const container = $("#notificationsList");
-  console.log(
-    "[Notificações] Renderizando",
-    notificacoes ? notificacoes.length : 0,
-    "notificações",
-  );
-
   if (!notificacoes || notificacoes.length === 0) {
-    console.log("[Notificações] Mostrando mensagem 'sem notificações'");
     container.html(`
             <div class="notifications-empty">
                 <i class="fas fa-bell-slash"></i>
@@ -182,6 +157,8 @@ function getIconeByTipo(tipo) {
     devolucao: "↩️",
     utilizador: "👤",
     produto: "📦",
+    suporte: "🎧",
+    chat: "💬",
   };
   return icones[tipo] || "🔔";
 }
@@ -239,11 +216,99 @@ function fecharNotificationsDropdown() {
   $(document).off("click.notifications");
 }
 
+function executarLogoutGlobal() {
+  $.ajax({
+    url: "src/controller/controllerPerfil.php?op=2",
+    method: "GET",
+    timeout: 5000,
+  }).always(function () {
+    window.location.href = "index.html";
+  });
+}
+
+if (typeof window.logout !== "function") {
+  window.logout = function () {
+    if (typeof showModernConfirmModal === "function") {
+      showModernConfirmModal(
+        "Terminar Sessão?",
+        "Tem a certeza que pretende sair?",
+        {
+          confirmText: '<i class="fas fa-check"></i> Sim, sair',
+          icon: "fa-sign-out-alt",
+          iconBg:
+            "background: linear-gradient(135deg, #dc3545 0%, #c92a2a 100%); box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);",
+        },
+      ).then(function (result) {
+        if (result && result.isConfirmed) {
+          executarLogoutGlobal();
+        }
+      });
+      return;
+    }
+
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        icon: "warning",
+        title: "Terminar Sessão?",
+        text: "Tem a certeza que pretende sair?",
+        showCancelButton: true,
+        confirmButtonText: "Sim, sair",
+        cancelButtonText: "Cancelar",
+      }).then(function (result) {
+        if (result && result.isConfirmed) {
+          executarLogoutGlobal();
+        }
+      });
+      return;
+    }
+
+    executarLogoutGlobal();
+  };
+}
+
+function inicializarDropdownUtilizador() {
+  const $btn = $("#userMenuBtn");
+  const $dropdown = $("#userDropdown");
+
+  if (!$btn.length || !$dropdown.length) {
+    return;
+  }
+
+  $btn.off("click.userDropdown").on("click.userDropdown", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === "function") {
+      e.stopImmediatePropagation();
+    }
+
+    const estaAberto = $dropdown.hasClass("active");
+    if (estaAberto) {
+      $dropdown.removeClass("active");
+    } else {
+      $dropdown.addClass("active");
+    }
+  });
+
+  $dropdown.off("click.userDropdown").on("click.userDropdown", function (e) {
+    e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === "function") {
+      e.stopImmediatePropagation();
+    }
+  });
+
+  $(document)
+    .off("click.userDropdown")
+    .on("click.userDropdown", function (e) {
+      if (!$(e.target).closest(".navbar-user, #userDropdown").length) {
+        $dropdown.removeClass("active");
+      }
+    });
+}
+
 /**
  * Abrir notificação (redirecionar e marcar como lida)
  */
 function abrirNotificacao(tipo, notifId, link) {
-  console.log("[Notificações] Abrindo notificação:", { tipo, notifId, link });
   const tipoNotificacao = (tipo || "").toString().trim();
   const referenciaId = parseInt(notifId, 10);
   const destino = (link || "").toString().trim();
@@ -280,11 +345,8 @@ function abrirNotificacao(tipo, notifId, link) {
     },
   })
     .done(function (response) {
-      console.log("[Notificações] Marcada como lida:", response);
     })
     .fail(function (xhr, status, error) {
-      console.error("[Notificações] Erro ao marcar como lida:", error);
-      console.error("[Notificações] Resposta:", xhr.responseText);
     })
     .always(function () {
       clearTimeout(fallbackRedirect);
@@ -296,27 +358,15 @@ function abrirNotificacao(tipo, notifId, link) {
  * Marcar todas como lidas
  */
 function marcarTodasComoLidas() {
-  console.log("[Notificações] Marcando todas como lidas...");
-  console.log(
-    "[Notificações] Notificações em cache:",
-    notificationsCache.length,
-  );
-
   $.ajax({
     url: "src/controller/controllerNotifications.php",
     method: "POST",
     data: { op: 4 },
     dataType: "json",
     success: function (response) {
-      console.log(
-        "[Notificações] Resposta marcar todas (raw):",
-        JSON.stringify(response),
-      );
-      console.log("[Notificações] Resposta marcar todas:", response);
       const ok =
         response && (response.success === true || response.flag === true);
       if (ok) {
-        console.log("[Notificações] Todas marcadas com sucesso!");
         // Limpar cache local
         notificationsCache = [];
         // Atualizar interface
@@ -325,21 +375,15 @@ function marcarTodasComoLidas() {
         // Fechar dropdown após marcar
         setTimeout(fecharNotificationsDropdown, 500);
       } else {
-        console.error(
-          "[Notificações] Erro ao marcar todas:",
-          response ? response.message || response.msg : "resposta vazia",
-        );
-        alert(
+        mostrarModalErro(
+          "Erro",
           "Erro ao marcar notificações como lidas: " +
             (response ? response.message || response.msg : "Resposta inválida"),
         );
       }
     },
     error: function (xhr, status, error) {
-      console.error("[Notificações] Erro AJAX ao marcar todas:", error);
-      console.error("[Notificações] Status:", status);
-      console.error("[Notificações] Resposta:", xhr.responseText);
-      alert("Erro ao marcar notificações: " + error);
+      mostrarModalErro("Erro", "Erro ao marcar notificações: " + error);
     },
   });
 }
@@ -373,6 +417,8 @@ $(document).ready(function () {
     e.stopPropagation();
     toggleNotificationsDropdown();
   });
+
+  inicializarDropdownUtilizador();
 
   // Atualização automática
   atualizarNotificacoes(); // Primeira chamada

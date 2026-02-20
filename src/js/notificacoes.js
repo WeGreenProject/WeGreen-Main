@@ -1,8 +1,24 @@
 let currentFilter = "todas";
 let currentPage = 1;
 const itemsPerPage = 20;
+const autoRefreshIntervalMs = 15000;
 let allNotifications = [];
 let filteredNotifications = [];
+let notificationsRefreshTimer = null;
+
+function mostrarModalSucesso(titulo, mensagem, opcoes) {
+  if (typeof showModernSuccessModal === "function") {
+    return showModernSuccessModal(titulo, mensagem, opcoes || {});
+  }
+  return Swal.fire({ icon: "success", title: titulo, text: mensagem });
+}
+
+function mostrarModalErro(titulo, mensagem) {
+  if (typeof showModernErrorModal === "function") {
+    return showModernErrorModal(titulo, mensagem);
+  }
+  return Swal.fire({ icon: "error", title: titulo, text: mensagem });
+}
 
 function respostaOk(response) {
   return Boolean(
@@ -48,7 +64,44 @@ function normalizarNotificacoes(lista) {
 $(document).ready(function () {
   carregarTodasNotificacoes();
   setupFilterButtons();
+  iniciarAutoAtualizacaoNotificacoes();
+
+  $(document).on("visibilitychange", function () {
+    if (document.visibilityState === "visible") {
+      carregarTodasNotificacoes();
+      iniciarAutoAtualizacaoNotificacoes();
+    } else {
+      pararAutoAtualizacaoNotificacoes();
+    }
+  });
+
+  $(window).on("focus", function () {
+    carregarTodasNotificacoes();
+  });
+
+  $(window).on("beforeunload", function () {
+    pararAutoAtualizacaoNotificacoes();
+  });
 });
+
+function iniciarAutoAtualizacaoNotificacoes() {
+  if (notificationsRefreshTimer) {
+    return;
+  }
+
+  notificationsRefreshTimer = setInterval(function () {
+    carregarTodasNotificacoes();
+  }, autoRefreshIntervalMs);
+}
+
+function pararAutoAtualizacaoNotificacoes() {
+  if (!notificationsRefreshTimer) {
+    return;
+  }
+
+  clearInterval(notificationsRefreshTimer);
+  notificationsRefreshTimer = null;
+}
 
 function setupFilterButtons() {
   $(".filter-btn").click(function () {
@@ -66,7 +119,9 @@ function carregarTodasNotificacoes() {
     method: "GET",
     data: {
       op: 5,
-    }, 
+      _ts: Date.now(),
+    },
+    cache: false,
     dataType: "json",
     success: function (response) {
       if (respostaOk(response)) {
@@ -93,6 +148,14 @@ function aplicarFiltro() {
     filteredNotifications = allNotifications.filter((n) => n.lida);
   }
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredNotifications.length / itemsPerPage),
+  );
+  if (currentPage > totalPages) {
+    currentPage = totalPages;
+  }
+
   renderizarNotificacoes();
 }
 
@@ -104,7 +167,6 @@ function renderizarNotificacoes() {
     return;
   }
 
-  
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const pageNotifications = filteredNotifications.slice(start, end);
@@ -148,11 +210,10 @@ function renderizarNotificacoes() {
 
   container.html(html);
 
-  
   const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
   if (totalPages > 1) {
     $("#pagination").show();
-    $("#pageInfo").text(`P�gina ${currentPage} de ${totalPages}`);
+    $("#pageInfo").text(`Página ${currentPage} de ${totalPages}`);
   } else {
     $("#pagination").hide();
   }
@@ -162,7 +223,7 @@ function mostrarEmpty() {
   $("#notificationsContainer").html(`
                 <div class="empty-state">
                     <i class="fas fa-bell-slash"></i>
-                    <p>Nenhuma notifica��o encontrada</p>
+                    <p>Nenhuma notificação encontrada</p>
                 </div>
             `);
   $("#pagination").hide();
@@ -174,9 +235,9 @@ function calcularTempoDecorrido(data) {
   const diff = Math.floor((agora - dataNotif) / 1000);
 
   if (diff < 60) return "Agora mesmo";
-  if (diff < 3600) return `${Math.floor(diff / 60)} min atr�s`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h atr�s`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)}d atr�s`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} min atrás`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h atrás`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)}d atrás`;
 
   return dataNotif.toLocaleDateString("pt-PT");
 }
@@ -265,7 +326,6 @@ function renderIconeNotificacao(notif) {
 }
 
 function abrirNotificacao(tipo, id, link) {
-  
   $.post("src/controller/controllerNotifications.php", {
     op: 3,
     tipo: tipo,
@@ -287,7 +347,6 @@ function marcarComoLida(tipo, id) {
     dataType: "json",
     success: function (response) {
       if (respostaOk(response)) {
-        
         carregarTodasNotificacoes();
       } else {
       }
@@ -304,19 +363,23 @@ function marcarTodasComoLidas() {
     dataType: "json",
     success: function (response) {
       if (respostaOk(response)) {
-        
         carregarTodasNotificacoes();
-        
-        alert("Todas as notifica��es foram marcadas como lidas!");
+
+        mostrarModalSucesso(
+          "Sucesso",
+          "Todas as notificações foram marcadas como lidas!",
+          { timer: 1800 },
+        );
       } else {
-        alert(
-          "Erro ao marcar notifica��es: " +
-            (response ? response.message : "Resposta inv�lida"),
+        mostrarModalErro(
+          "Erro",
+          "Erro ao marcar notificações: " +
+            (response ? response.message || response.msg : "Resposta inválida"),
         );
       }
     },
     error: function (xhr, status, error) {
-      alert("Erro ao marcar notifica��es. Tente novamente.");
+      mostrarModalErro("Erro", "Erro ao marcar notificações. Tente novamente.");
     },
   });
 }

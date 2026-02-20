@@ -16,6 +16,26 @@ class Perfil{
         ProfileAddressFieldsService::garantirCamposEnderecoPerfil($this->conn);
     }
 
+    private function validarPasswordConta($passwordDigitada, $passwordGuardada) {
+        if (!is_string($passwordGuardada) || $passwordGuardada === '') {
+            return false;
+        }
+
+        if (hash_equals($passwordGuardada, $passwordDigitada)) {
+            return true;
+        }
+
+        if (strlen($passwordGuardada) === 32 && ctype_xdigit($passwordGuardada)) {
+            return hash_equals(strtolower($passwordGuardada), md5($passwordDigitada));
+        }
+
+        if (strpos($passwordGuardada, '$2y$') === 0 || strpos($passwordGuardada, '$argon2') === 0) {
+            return password_verify($passwordDigitada, $passwordGuardada);
+        }
+
+        return false;
+    }
+
     function getDadosTipoPerfil($ID_User,$tpUser){
         try {
 
@@ -28,9 +48,15 @@ class Perfil{
         $stmt->execute();
         $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                if($tpUser == 1)
+                if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $tipoAtual = isset($row['tipo_utilizador_id']) ? (int)$row['tipo_utilizador_id'] : (int)$tpUser;
+
+                                if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['tipo']) && (int)$_SESSION['tipo'] !== $tipoAtual) {
+                                        $_SESSION['tipo'] = $tipoAtual;
+                                }
+
+                                if($tipoAtual == 1)
                 {
                     $msg  = "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
@@ -40,7 +66,7 @@ class Perfil{
                     $msg .= "<li><hr class='dropdown-divider'></li>";
                     $msg .= "<li><a href='#' class='dropdown-item text-danger' onclick='event.preventDefault(); logout();'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
                 }
-                else if($tpUser == 2)
+                else if($tipoAtual == 2)
                 {
                     $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
@@ -54,7 +80,7 @@ class Perfil{
                     $msg .= "<li><hr class='dropdown-divider'></li>";
                     $msg .= "<li><a href='#' class='dropdown-item text-danger' onclick='event.preventDefault(); logout();'><i class='fas fa-sign-out-alt me-2'></i>Sair</a></li>";
                 }
-                else if($tpUser == 3)
+                else if($tipoAtual == 3)
                 {
                     $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
                     $msg .= "<h6 class='mb-0 text-wegreen-accent'>Olá, " . $row['nome'] . "!</h6>";
@@ -69,7 +95,7 @@ class Perfil{
                 else
                 {
                     $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
-                    $msg .= "<h6 class='mb-0 text-wegreen-accent'>Dectetamos um erro na sua conta!</h6>";
+                    $msg .= "<h6 class='mb-0 text-wegreen-accent'>Detectamos um erro na sua conta!</h6>";
                     $msg .= "</div></li>";
                     $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
                 }
@@ -80,7 +106,7 @@ class Perfil{
         else
         {
             $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
-            $msg .= "<h6 class='mb-0 text-wegreen-accent'>Dectetamos um erro na sua conta!</h6>";
+            $msg .= "<h6 class='mb-0 text-wegreen-accent'>Detectamos um erro na sua conta!</h6>";
             $msg .= "</div></li>";
             $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
         }
@@ -95,7 +121,7 @@ class Perfil{
 
     function getDadosTipoPerfilCompleto($ID_User, $tpUser) {
         try {
-        if ($ID_User && $tpUser) {
+        if ($ID_User) {
             return $this->getDadosTipoPerfil($ID_User, $tpUser);
         } else {
             return "<li><a class='dropdown-item' href='login.html'><i class='fas fa-sign-in-alt me-2'></i>Entrar na sua conta</a></li>";
@@ -302,7 +328,6 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
     $flag = false;
     $msg = "";
-    $ID_Consumidor = 1;
 
     $assuntoTexto = trim((string)$assunto);
     $mensagemTexto = trim((string)$mensagem);
@@ -316,8 +341,25 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
 
     $nomeRemetente = '';
     $emailRemetente = '';
-    $idRemetente = 0;
+    $idRemetente = null;
     $mensagemFinal = $mensagemTexto;
+    $criarChat = false;
+
+    $admins = $this->obterAdministradoresSuporte();
+    $adminIds = [];
+    $adminEmails = [];
+
+    foreach ($admins as $admin) {
+        if (!empty($admin['id'])) {
+            $adminIds[] = (int)$admin['id'];
+        }
+        if (!empty($admin['email'])) {
+            $adminEmails[] = trim((string)$admin['email']);
+        }
+    }
+
+    $adminIds = array_values(array_unique($adminIds));
+    $adminEmails = array_values(array_unique($adminEmails));
 
     if ($ID_Anunciante !== null) {
         $idRemetente = (int)$ID_Anunciante;
@@ -337,6 +379,8 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
         if (!empty($assuntoTexto)) {
             $mensagemFinal = "Assunto: {$assuntoTexto}\nMensagem: {$mensagemTexto}";
         }
+
+        $criarChat = true;
     } else {
         $nomeRemetente = trim((string)$nome);
         $emailRemetente = trim((string)$email);
@@ -345,25 +389,66 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
             $mensagemFinal .= "Assunto: {$assuntoTexto}\n";
         }
         $mensagemFinal .= "Mensagem: {$mensagemTexto}";
-    }
-
-    $stmt = $this->conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
-    $stmt->bind_param("iis", $idRemetente, $ID_Consumidor, $mensagemFinal);
-
-    if ($stmt->execute()) {
-        $flag = true;
-        $ticketId = (int)$stmt->insert_id;
-
-        $this->enviarEmailSuporteAdmin($ticketId, $nomeRemetente, $emailRemetente, $assuntoTexto, $mensagemTexto, $idRemetente);
 
         if (filter_var($emailRemetente, FILTER_VALIDATE_EMAIL)) {
-            $this->enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $emailRemetente, $assuntoTexto, $mensagemTexto);
+            $stmtUser = $this->conn->prepare("SELECT id, nome, email FROM Utilizadores WHERE LOWER(email) = LOWER(?) LIMIT 1");
+            $stmtUser->bind_param("s", $emailRemetente);
+            $stmtUser->execute();
+            $resUser = $stmtUser->get_result();
+
+            if ($resUser && $resUser->num_rows > 0) {
+                $userPlataforma = $resUser->fetch_assoc();
+                $idRemetente = (int)$userPlataforma['id'];
+                if ($nomeRemetente === '') {
+                    $nomeRemetente = trim((string)($userPlataforma['nome'] ?? 'Utilizador WeGreen'));
+                }
+                $emailRemetente = trim((string)($userPlataforma['email'] ?? $emailRemetente));
+                $criarChat = true;
+            }
+
+            $stmtUser->close();
+        }
+    }
+
+    $ticketId = 0;
+
+    if ($criarChat) {
+        if (empty($adminIds)) {
+            return json_encode([
+                "flag" => false,
+                "msg" => "Não existem administradores disponíveis para receber a mensagem no chat."
+            ], JSON_UNESCAPED_UNICODE);
+        }
+
+        $stmt = $this->conn->prepare("INSERT INTO mensagensadmin (remetente_id, destinatario_id, mensagem) VALUES (?, ?, ?)");
+        foreach ($adminIds as $adminId) {
+            $stmt->bind_param("iis", $idRemetente, $adminId, $mensagemFinal);
+            if ($stmt->execute()) {
+                if ($ticketId === 0) {
+                    $ticketId = (int)$stmt->insert_id;
+                }
+                $flag = true;
+            }
+        }
+        $stmt->close();
+
+        if (!$flag) {
+            return json_encode([
+                "flag" => false,
+                "msg" => "Erro ao enviar mensagem para o chat de suporte."
+            ], JSON_UNESCAPED_UNICODE);
         }
 
         $msg = "Mensagem enviada com sucesso!";
     } else {
-        $flag = false;
-        $msg = "Erro ao enviar mensagem.";
+        $flag = true;
+        $msg = "Mensagem enviada por email para o suporte com sucesso!";
+    }
+
+    $this->enviarEmailSuporteAdmin($ticketId, $nomeRemetente, $emailRemetente, $assuntoTexto, $mensagemTexto, (int)($idRemetente ?? 0), $adminEmails);
+
+    if (filter_var($emailRemetente, FILTER_VALIDATE_EMAIL)) {
+        $this->enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $emailRemetente, $assuntoTexto, $mensagemTexto);
     }
 
     $resp = json_encode([
@@ -371,20 +456,72 @@ function AdicionarMensagemContacto($ID_Anunciante, $mensagem, $nome = null, $ema
         "msg" => $msg
     ], JSON_UNESCAPED_UNICODE);
 
-    $stmt->close();
-
     return $resp;
     } catch (Exception $e) {
         return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
     }
 }
 
-private function enviarEmailSuporteAdmin($ticketId, $nomeRemetente, $emailRemetente, $assunto, $mensagem, $remetenteId) {
+private function obterAdministradoresSuporte() {
+    $admins = [];
+
+    try {
+        $stmt = $this->conn->prepare("SELECT id, email FROM Utilizadores WHERE tipo_utilizador_id = 1");
+        if ($stmt) {
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            while ($result && ($row = $result->fetch_assoc())) {
+                $email = trim((string)($row['email'] ?? ''));
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $admins[] = [
+                        'id' => (int)$row['id'],
+                        'email' => $email
+                    ];
+                }
+            }
+
+            $stmt->close();
+        }
+    } catch (Exception $e) {
+    }
+
     try {
         $config = require __DIR__ . '/../config/email_config.php';
-        $adminEmail = trim((string)($config['admin']['email'] ?? ''));
+        $configAdminEmail = trim((string)($config['admin']['email'] ?? ''));
+        if (filter_var($configAdminEmail, FILTER_VALIDATE_EMAIL)) {
+            $existe = false;
+            foreach ($admins as $admin) {
+                if (strcasecmp((string)$admin['email'], $configAdminEmail) === 0) {
+                    $existe = true;
+                    break;
+                }
+            }
 
-        if (!filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+            if (!$existe) {
+                $admins[] = [
+                    'id' => null,
+                    'email' => $configAdminEmail
+                ];
+            }
+        }
+    } catch (Exception $e) {
+    }
+
+    return $admins;
+}
+
+private function enviarEmailSuporteAdmin($ticketId, $nomeRemetente, $emailRemetente, $assunto, $mensagem, $remetenteId, $adminEmails = []) {
+    try {
+        if (empty($adminEmails)) {
+            return;
+        }
+
+        $adminEmails = array_values(array_unique(array_filter($adminEmails, function ($email) {
+            return filter_var($email, FILTER_VALIDATE_EMAIL);
+        })));
+
+        if (empty($adminEmails)) {
             return;
         }
 
@@ -406,8 +543,12 @@ private function enviarEmailSuporteAdmin($ticketId, $nomeRemetente, $emailRemete
         include $templatePath;
         $htmlBody = ob_get_clean();
 
-        $subject = "[Suporte WeGreen] Nova mensagem #{$ticketId}";
-        $emailService->send($adminEmail, $subject, $htmlBody);
+        $ticketLabel = ($ticketId > 0) ? "#{$ticketId}" : ('#' . date('YmdHis'));
+        $subject = "[Suporte WeGreen] Nova mensagem {$ticketLabel}";
+
+        foreach ($adminEmails as $adminEmail) {
+            $emailService->send($adminEmail, $subject, $htmlBody);
+        }
     } catch (Exception $e) {
     }
 }
@@ -837,7 +978,7 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
     else
     {
         $msg .= "<li><div class='dropdown-header d-flex align-items-center'>";
-        $msg .= "<h6 class='mb-0 text-wegreen-accent'>Dectetamos um erro na sua conta!</h6>";
+        $msg .= "<h6 class='mb-0 text-wegreen-accent'>Detectamos um erro na sua conta!</h6>";
         $msg .= "</div></li>";
         $msg .= "<li><a class='dropdown-item' href='login.html'>Mudar de Conta</a></li>";
     }
@@ -974,40 +1115,96 @@ private function enviarConfirmacaoSuporteRemetente($ticketId, $nomeRemetente, $e
     function alterarSenha($idUser, $senhaAtual, $novaSenha) {
         try {
 
-        $sql = "SELECT password FROM Utilizadores WHERE id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $idUser);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $transacaoIniciada = false;
 
-        if($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
+        $idUser = (int)$idUser;
+        $senhaAtual = (string)$senhaAtual;
+        $novaSenha = (string)$novaSenha;
 
-            if(password_verify($senhaAtual, $row['password'])) {
-                $novaSenhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
+        if ($idUser <= 0 || $senhaAtual === '' || $novaSenha === '') {
+            return json_encode(['success' => false, 'message' => 'Dados insuficientes para alterar a senha.'], JSON_UNESCAPED_UNICODE);
+        }
 
-                $sqlUpdate = "UPDATE Utilizadores SET password = ? WHERE id = ?";
-                $stmtUpdate = $this->conn->prepare($sqlUpdate);
-                $stmtUpdate->bind_param("si", $novaSenhaHash, $idUser);
+        if (strlen($novaSenha) < 6) {
+            return json_encode(['success' => false, 'message' => 'A nova senha deve ter no mínimo 6 caracteres.'], JSON_UNESCAPED_UNICODE);
+        }
 
-                if($stmtUpdate->execute()) {
-                    $stmt->close();
-                    $stmtUpdate->close();
-                    return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso!'], JSON_UNESCAPED_UNICODE);
-                } else {
-                    $stmt->close();
-                    $stmtUpdate->close();
-                    return json_encode(['success' => false, 'message' => 'Erro ao atualizar a senha.'], JSON_UNESCAPED_UNICODE);
-                }
-            } else {
-                $stmt->close();
-                return json_encode(['success' => false, 'message' => 'Senha atual incorreta.'], JSON_UNESCAPED_UNICODE);
-            }
-        } else {
-            $stmt->close();
+        $sqlUtilizador = "SELECT id, nome, email, tipo_utilizador_id, password FROM Utilizadores WHERE id = ? LIMIT 1";
+        $stmtUtilizador = $this->conn->prepare($sqlUtilizador);
+        $stmtUtilizador->bind_param("i", $idUser);
+        $stmtUtilizador->execute();
+        $resultUtilizador = $stmtUtilizador->get_result();
+
+        if ($resultUtilizador->num_rows === 0) {
+            $stmtUtilizador->close();
             return json_encode(['success' => false, 'message' => 'Utilizador não encontrado.'], JSON_UNESCAPED_UNICODE);
         }
+
+        $utilizadorAtual = $resultUtilizador->fetch_assoc();
+        $stmtUtilizador->close();
+
+        if (!$this->validarPasswordConta($senhaAtual, (string)$utilizadorAtual['password'])) {
+            return json_encode(['success' => false, 'message' => 'Senha atual incorreta.'], JSON_UNESCAPED_UNICODE);
+        }
+
+        $idsParaAtualizar = [(int)$utilizadorAtual['id']];
+        $tipoAtual = (int)$utilizadorAtual['tipo_utilizador_id'];
+        $emailAtual = trim((string)$utilizadorAtual['email']);
+
+        if ($emailAtual !== '' && in_array($tipoAtual, [2, 3], true)) {
+            $sqlDual = "SELECT id FROM Utilizadores WHERE email = ? AND tipo_utilizador_id IN (2, 3)";
+            $stmtDual = $this->conn->prepare($sqlDual);
+            $stmtDual->bind_param("s", $emailAtual);
+            $stmtDual->execute();
+            $resultDual = $stmtDual->get_result();
+
+            while ($rowDual = $resultDual->fetch_assoc()) {
+                $idsParaAtualizar[] = (int)$rowDual['id'];
+            }
+
+            $stmtDual->close();
+            $idsParaAtualizar = array_values(array_unique($idsParaAtualizar));
+        }
+
+        $novaSenhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
+
+        $this->conn->begin_transaction();
+        $transacaoIniciada = true;
+        $sqlUpdate = "UPDATE Utilizadores SET password = ? WHERE id = ?";
+        $stmtUpdate = $this->conn->prepare($sqlUpdate);
+
+        foreach ($idsParaAtualizar as $targetId) {
+            $stmtUpdate->bind_param("si", $novaSenhaHash, $targetId);
+            if (!$stmtUpdate->execute()) {
+                $stmtUpdate->close();
+                $this->conn->rollback();
+                return json_encode(['success' => false, 'message' => 'Erro ao atualizar a senha.'], JSON_UNESCAPED_UNICODE);
+            }
+        }
+
+        $stmtUpdate->close();
+        $this->conn->commit();
+        $transacaoIniciada = false;
+
+        $emailDestino = trim((string)$utilizadorAtual['email']);
+        $nomeDestino = trim((string)$utilizadorAtual['nome']);
+        if ($emailDestino !== '') {
+            try {
+                $emailService = new EmailService($this->conn);
+                $emailService->enviarPasswordAlterada($emailDestino, $nomeDestino !== '' ? $nomeDestino : 'Utilizador', 'alteracao_conta');
+            } catch (\Exception $e) {
+            }
+        }
+
+        if (count($idsParaAtualizar) > 1) {
+            return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso em todas as contas associadas.'], JSON_UNESCAPED_UNICODE);
+        }
+
+        return json_encode(['success' => true, 'message' => 'Senha alterada com sucesso!'], JSON_UNESCAPED_UNICODE);
         } catch (Exception $e) {
+            if (!empty($transacaoIniciada)) {
+                $this->conn->rollback();
+            }
             return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }

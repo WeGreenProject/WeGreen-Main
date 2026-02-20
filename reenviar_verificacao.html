@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
@@ -80,7 +80,6 @@
             return;
           }
 
-          
           const originalText = btnSubmit.innerHTML;
           btnSubmit.innerHTML =
             '<i class="fas fa-spinner fa-spin"></i> Enviando...';
@@ -96,7 +95,7 @@
               {
                 method: "POST",
                 body: formData,
-              }
+              },
             );
 
             const result = await response.json();
@@ -119,7 +118,6 @@
               });
             }
           } catch (error) {
-            console.error("Erro:", error);
             Swal.fire({
               icon: "error",
               title: "Erro",

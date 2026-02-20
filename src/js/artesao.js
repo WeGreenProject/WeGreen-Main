@@ -1,4 +1,4 @@
-function getFiltrosArtesaoCategoria()
+﻿function getFiltrosArtesaoCategoria()
 {
     let dados = new FormData();
     dados.append("op",1);
@@ -13,7 +13,6 @@ function getFiltrosArtesaoCategoria()
     processData: false
     })
     .done(function( msg ) {
-        console.log(msg);
         $('#CategoriaSelect').html(msg);
 
     })
@@ -37,7 +36,6 @@ function getFiltrosArtesaoTamanho()
     processData: false
     })
     .done(function( msg ) {
-        console.log(msg);
         $('#tamanhoSelect').html(msg);
 
     })
@@ -61,7 +59,6 @@ function getFiltrosArtesaoEstado()
     processData: false
     })
     .done(function( msg ) {
-        console.log(msg);
         $('#estadoSelect').html(msg);
 
     })
@@ -128,7 +125,6 @@ function getProdutoArtesaoMostrar()
     })
     
     .done(function( msg ) {
-        console.log(msg);
          $('#ProdutoInfo').html(msg);
 
          $('.btnComprarAgora').on('click', function() {

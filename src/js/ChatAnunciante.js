@@ -1,13 +1,9 @@
-
-
-let clienteAtual = null;
-let imagemAnexada = null;
+﻿let clienteAtual = null;
+let ficheiroAnexado = null;
 
 function getSideBar() {
   let dados = new FormData();
-  dados.append("op", 1); 
-
-  console.log("getSideBar() chamada");
+  dados.append("op", 1);
 
   $.ajax({
     url: "src/controller/controllerChatAnunciante.php",
@@ -19,46 +15,32 @@ function getSideBar() {
     processData: false,
   })
     .done(function (msg) {
-      console.log("getSideBar response:", msg);
       $("#ListaClientes").html(msg);
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro ao carregar clientes:", textStatus, errorThrown);
-      console.error("Response:", jqXHR.responseText);
       alerta("Erro", "Não foi possível carregar as conversas", "error");
     });
 }
 
 function selecionarCliente(clienteId, clienteNome) {
-  console.log("selecionarCliente() chamada", clienteId, clienteNome);
   clienteAtual = clienteId;
 
-  
   const iniciais = getIniciais(clienteNome);
   $("#chatUserAvatar").text(iniciais);
   $("#chatUserName").text(clienteNome);
 
-  
   $("#BotaoEscrever").addClass("active");
   $(".empty-chat").hide();
 
-  
   $(".conversation-item").removeClass("active");
   $(`[data-cliente-id="${clienteId}"]`).addClass("active");
 
-  
   getConversas(clienteId);
-
-  console.log(
-    "Input container agora tem classe active:",
-    $("#BotaoEscrever").hasClass("active"),
-  );
 }
 
 function getConversas(clienteId) {
-  console.log("getConversas() chamada", clienteId);
   let dados = new FormData();
-  dados.append("op", 2); 
+  dados.append("op", 2);
   dados.append("IdCliente", clienteId);
 
   $.ajax({
@@ -74,13 +56,10 @@ function getConversas(clienteId) {
       $("#chatMessages").html(msg);
       scrollToBottom();
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Erro ao carregar mensagens:", textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
 }
 
 function enviarMensagem() {
-  console.log("enviarMensagem() chamada");
   if (!clienteAtual) {
     alerta("Aviso", "Selecione um cliente primeiro", "warning");
     return;
@@ -88,17 +67,17 @@ function enviarMensagem() {
 
   const mensagem = $("#messageInput").val().trim();
 
-  if (!mensagem && !imagemAnexada) {
+  if (!mensagem && !ficheiroAnexado) {
     return;
   }
 
   let dados = new FormData();
-  dados.append("op", 3); 
+  dados.append("op", 3);
   dados.append("IdCliente", clienteAtual);
   dados.append("mensagem", mensagem);
 
-  if (imagemAnexada) {
-    dados.append("imagem", imagemAnexada);
+  if (ficheiroAnexado) {
+    dados.append("imagem", ficheiroAnexado);
   }
 
   $.ajax({
@@ -125,35 +104,91 @@ function enviarMensagem() {
       }
     })
     .fail(function (jqXHR, textStatus) {
-      console.error("Erro ao enviar mensagem:", textStatus);
       alerta("Erro", "Não foi possível enviar a mensagem", "error");
     });
 }
 
-function anexarImagem(file) {
-  if (!file || !file.type.startsWith("image/")) {
-    alerta("Aviso", "Por favor, selecione apenas imagens", "warning");
+function anexarFicheiro(file) {
+  if (!file) {
     return;
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    alerta("Aviso", "A imagem deve ter no máximo 5MB", "warning");
+  const tiposPermitidos = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/plain",
+  ];
+
+  const extensoesPermitidas = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "txt",
+  ];
+
+  const extensao = (file.name.split(".").pop() || "").toLowerCase();
+  const tipoValido = file.type ? tiposPermitidos.includes(file.type) : false;
+  const extensaoValida = extensoesPermitidas.includes(extensao);
+
+  if (!tipoValido && !extensaoValida) {
+    alerta("Aviso", "Tipo de ficheiro não suportado", "warning");
     return;
   }
 
-  imagemAnexada = file;
+  if (file.size > 10 * 1024 * 1024) {
+    alerta("Aviso", "O ficheiro deve ter no máximo 10MB", "warning");
+    return;
+  }
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    $("#previewImg").attr("src", e.target.result);
-    $("#imagePreview").show();
-  };
-  reader.readAsDataURL(file);
+  ficheiroAnexado = file;
+
+  if (file.type && file.type.startsWith("image/")) {
+    $("#filePreviewInfo").remove();
+    $("#previewImg").show();
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      $("#previewImg").attr("src", e.target.result);
+      $("#imagePreview").show();
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  $("#previewImg").attr("src", "").hide();
+
+  if (!$("#filePreviewInfo").length) {
+    $("#imagePreview").prepend(
+      `<div id="filePreviewInfo" style="display:flex; align-items:center; gap:8px; padding:8px 30px 8px 10px; border-radius:8px; background:#f6f8fa; color:#2d3748; max-width:260px;">
+         <i class="fas fa-file-alt" style="color:#3cb371;"></i>
+         <span id="filePreviewName" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></span>
+       </div>`,
+    );
+  }
+
+  $("#filePreviewName").text(file.name);
+  $("#imagePreview").show();
 }
 
 function limparPreview() {
-  imagemAnexada = null;
+  ficheiroAnexado = null;
+  $("#filePreviewInfo").remove();
   $("#previewImg").attr("src", "");
+  $("#previewImg").show();
   $("#imagePreview").hide();
   $("#fileInput").val("");
 }
@@ -162,7 +197,7 @@ function pesquisarChat() {
   const termo = $("#searchInput").val().trim();
 
   let dados = new FormData();
-  dados.append("op", 4); 
+  dados.append("op", 4);
   dados.append("pesquisa", termo);
 
   $.ajax({
@@ -177,9 +212,25 @@ function pesquisarChat() {
     .done(function (msg) {
       $("#ListaClientes").html(msg);
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Erro na pesquisa:", textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
+}
+
+function abrirConversaPorUtilizadorId(utilizadorId, tentativas = 0) {
+  const id = Number(utilizadorId || 0);
+  if (id <= 0) return;
+
+  const $item = $(`.conversation-item[data-cliente-id="${id}"]`).first();
+
+  if ($item.length) {
+    const nome =
+      $item.find(".conversation-name").first().text().trim() || "Utilizador";
+    selecionarCliente(id, nome);
+    return;
+  }
+
+  if (tentativas < 8) {
+    setTimeout(() => abrirConversaPorUtilizadorId(id, tentativas + 1), 250);
+  }
 }
 
 function scrollToBottom() {
@@ -216,10 +267,20 @@ function alerta(titulo, msg, icon) {
 }
 
 $(document).ready(function () {
-  
   getSideBar();
 
-  
+  const urlParams = new URLSearchParams(window.location.search);
+  const utilizadorIdParam =
+    urlParams.get("utilizador") || urlParams.get("cliente");
+  const utilizadorId = Number(utilizadorIdParam || 0);
+
+  if (utilizadorId > 0) {
+    setTimeout(() => {
+      abrirConversaPorUtilizadorId(utilizadorId);
+      window.history.replaceState({}, document.title, "ChatAnunciante.php");
+    }, 500);
+  }
+
   $("#messageInput").on("keypress", function (e) {
     if (e.which === 13 && !e.shiftKey) {
       e.preventDefault();
@@ -227,68 +288,58 @@ $(document).ready(function () {
     }
   });
 
-  
   $("#messageInput").on("paste", function (e) {
     const items = e.originalEvent.clipboardData.items;
     for (let item of items) {
       if (item.type.indexOf("image") !== -1) {
         e.preventDefault();
         const blob = item.getAsFile();
-        anexarImagem(blob);
+        anexarFicheiro(blob);
         break;
       }
     }
   });
 
-  
   $("#attachBtn").on("click", function () {
     $("#fileInput").click();
   });
 
-  
   $("#fileInput").on("change", function () {
     const file = this.files[0];
     if (file) {
-      anexarImagem(file);
+      anexarFicheiro(file);
     }
   });
 
-  
   $(document).on("click", "#removePreview", function () {
     limparPreview();
   });
 
-  
   $("#sendButton, #sendBtn").on("click", function () {
     enviarMensagem();
   });
 
-  
   setInterval(function () {
     if (clienteAtual) {
       getConversas(clienteAtual);
     }
   }, 5000);
 
-  
   $("#userMenuBtn").on("click", function (e) {
     e.stopPropagation();
     $("#userDropdown").toggleClass("active");
   });
 
-  
   $(document).on("click", function (e) {
     if (!$(e.target).closest(".navbar-user").length) {
       $("#userDropdown").removeClass("active");
     }
   });
 
-  
   $("#userDropdown").on("click", function (e) {
     e.stopPropagation();
   });
 
-  
   $("#searchInput").on("input", function () {
     pesquisarChat();
   });
@@ -330,7 +381,6 @@ function showPasswordModal() {
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      
       alerta("Sucesso", "Senha alterada com sucesso!", "success");
       $("#userDropdown").removeClass("active");
     }

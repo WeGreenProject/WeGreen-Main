@@ -31,8 +31,9 @@
                                 ✅ Encomenda Confirmada!
                             </h2>
 
+                            <?php $nomeSaudacao = $nome_cliente ?? $nome_destinatario ?? $nome_utilizador ?? 'Cliente'; ?>
                             <p style="margin: 0 0 15px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                                Olá <strong><?php echo htmlspecialchars($nome_cliente); ?></strong>,
+                                Olá <strong><?php echo htmlspecialchars($nomeSaudacao); ?></strong>,
                             </p>
 
                             <p style="margin: 0 0 25px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
@@ -59,7 +60,7 @@
                                         <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 14px;">
                                             <strong>Método de Pagamento:</strong>
                                             <?php
-                                            
+
                                             $metodo = isset($payment_method) ? $payment_method : 'Stripe (Cartão de Crédito)';
                                             echo htmlspecialchars($metodo);
                                             ?>
@@ -149,9 +150,11 @@
                             </div>
 
                             <!-- Mapa da Morada -->
+                            <?php $destinoMapa = ($tipo_entrega === 'ponto_recolha' ? ($morada_ponto_recolha ?? $morada) : ($morada_completa ?? $morada)); ?>
+                            <?php $mapsLink = 'https://www.google.com/maps/search/?api=1&query=' . urlencode($destinoMapa); ?>
                             <?php if (isset($mapa_url) && !empty($mapa_url)): ?>
                             <div style="margin-bottom: 25px; border-radius: 8px; overflow: hidden; border: 2px solid #e5e7eb;">
-                                <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($tipo_entrega === 'ponto_recolha' ? ($morada_ponto_recolha ?? $morada) : ($morada_completa ?? $morada)); ?>"
+                                <a href="<?php echo htmlspecialchars($mapsLink); ?>"
                                    target="_blank"
                                    style="display: block; text-decoration: none;">
                                     <img src="<?php echo htmlspecialchars($mapa_url); ?>"
@@ -159,7 +162,7 @@
                                          style="width: 100%; max-width: 600px; height: auto; display: block; border: 0;">
                                 </a>
                                 <p style="margin: 0; padding: 10px; background-color: #f3f4f6; text-align: center; font-size: 12px; color: #6b7280;">
-                                    <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($tipo_entrega === 'ponto_recolha' ? ($morada_ponto_recolha ?? $morada) : ($morada_completa ?? $morada)); ?>"
+                                    <a href="<?php echo htmlspecialchars($mapsLink); ?>"
                                        target="_blank"
                                        style="color: #22c55e; text-decoration: none; font-weight: 600;">
                                         📍 Ver no Google Maps
@@ -167,6 +170,12 @@
                                 </p>
                             </div>
                             <?php endif; ?>
+
+                            <p style="margin: -10px 0 25px 0; text-align: center;">
+                                <a href="<?php echo htmlspecialchars($mapsLink); ?>" target="_blank" style="color: #22c55e; text-decoration: none; font-size: 13px; font-weight: 600;">
+                                    Abrir localização no Google Maps
+                                </a>
+                            </p>
 
                             <!-- Próximos Passos -->
                             <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; padding: 20px; margin-bottom: 25px;">

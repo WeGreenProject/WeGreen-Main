@@ -52,4 +52,23 @@ if ($op == 6) {
     $resp = $func->getReports();
     echo $resp;
 }
+
+if ($op == 7) {
+    $idReport = isset($_POST['idReport']) ? (int)$_POST['idReport'] : 0;
+    $resp = $func->getReportDetalhes($idReport);
+    echo $resp;
+}
+
+if ($op == 8) {
+    $idReport = isset($_POST['idReport']) ? (int)$_POST['idReport'] : 0;
+    $estado = trim((string)($_POST['estado'] ?? ''));
+    $resp = $func->atualizarEstadoReport($idReport, $estado);
+    echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+}
+
+if ($op == 9) {
+    $idReport = isset($_POST['idReport']) ? (int)$_POST['idReport'] : 0;
+    $resp = $func->eliminarComentarioDoReport($idReport);
+    echo json_encode($resp, JSON_UNESCAPED_UNICODE);
+}
 ?>

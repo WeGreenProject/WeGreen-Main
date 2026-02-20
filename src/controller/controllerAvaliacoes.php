@@ -68,6 +68,8 @@ if ($op == 'obterAvaliacoes') {
     echo json_encode([
         'success' => true,
         'message' => 'OK',
+        'autenticado' => isset($_SESSION['utilizador']),
+        'utilizador_id_atual' => isset($_SESSION['utilizador']) ? (int)$_SESSION['utilizador'] : 0,
         'avaliacoes' => $avaliacoes,
         'estatisticas' => $estatisticas
     ], JSON_UNESCAPED_UNICODE);
@@ -131,6 +133,29 @@ if ($op == 'obterProdutosParaAvaliar') {
         'success' => true,
         'message' => 'OK',
         'produtos' => $resp
+    ], JSON_UNESCAPED_UNICODE);
+}
+
+if ($op == 'reportarAvaliacao') {
+    if (!isset($_SESSION['utilizador'])) {
+        echo json_encode(['success' => false, 'message' => 'Sessão não iniciada']);
+        exit;
+    }
+
+    $avaliacao_id = $_POST['avaliacao_id'] ?? null;
+    $motivo = trim((string)($_POST['motivo'] ?? ''));
+    $descricao = trim((string)($_POST['descricao'] ?? ''));
+    $denunciante_id = (int)$_SESSION['utilizador'];
+
+    if (empty($avaliacao_id) || $motivo === '') {
+        echo json_encode(['success' => false, 'message' => 'Dados obrigatórios não fornecidos']);
+        exit;
+    }
+
+    $resp = $func->reportarAvaliacao((int)$avaliacao_id, $denunciante_id, $motivo, $descricao);
+    echo json_encode([
+        'success' => (bool)($resp['success'] ?? false),
+        'message' => $resp['message'] ?? 'Erro ao reportar avaliação'
     ], JSON_UNESCAPED_UNICODE);
 }
 ?>

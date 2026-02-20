@@ -279,21 +279,6 @@ function atualizarContadorFavoritos() {
   });
 }
 
-$("#userMenuBtn").on("click", function (e) {
-  e.stopPropagation();
-  $("#userDropdown").toggleClass("active");
-});
-
-$(document).on("click", function (e) {
-  if (!$(e.target).closest(".navbar-user").length) {
-    $("#userDropdown").removeClass("active");
-  }
-});
-
-$("#userDropdown").on("click", function (e) {
-  e.stopPropagation();
-});
-
 function showPasswordModal() {
   Swal.fire({
     title: "Alterar Senha",

@@ -177,14 +177,12 @@ if ($op == 11) {
     }
 
     $devolucao_id = $_POST['devolucao_id'] ?? null;
-    $codigo_rastreio = $_POST['codigo_rastreio'] ?? '';
-
     if (!$devolucao_id) {
         echo json_encode(['flag' => false, 'msg' => 'ID da devolução não fornecido'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    $resp = $func->confirmarEnvioCliente($devolucao_id, $_SESSION['utilizador'], $codigo_rastreio);
+    $resp = $func->confirmarEnvioCliente($devolucao_id, $_SESSION['utilizador']);
     echo $resp;
 }
 
@@ -196,13 +194,14 @@ if ($op == 12) {
 
     $devolucao_id = $_POST['devolucao_id'] ?? null;
     $notas_recebimento = $_POST['notas_recebimento'] ?? '';
+    $codigo_envio_confirmacao = $_POST['codigo_envio_confirmacao'] ?? '';
 
     if (!$devolucao_id) {
         echo json_encode(['flag' => false, 'msg' => 'ID da devolução não fornecido'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    $resp = $func->confirmarRecebimentoVendedor($devolucao_id, $_SESSION['utilizador'], $notas_recebimento);
+    $resp = $func->confirmarRecebimentoVendedor($devolucao_id, $_SESSION['utilizador'], $notas_recebimento, $codigo_envio_confirmacao);
     echo $resp;
 }
 ?>

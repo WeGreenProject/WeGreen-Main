@@ -1,8 +1,13 @@
 <?php
 session_start();
 
-if(!isset($_SESSION['utilizador']) || !in_array($_SESSION['tipo'], [1, 2, 3])){
+if(!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])){
     header("Location: login.html");
+    exit();
+}
+
+if(!in_array((int)$_SESSION['tipo'], [1, 2, 3], true)){
+    header("Location: forbiddenerror.html");
     exit();
 }
 

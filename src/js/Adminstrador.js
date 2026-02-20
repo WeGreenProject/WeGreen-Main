@@ -1,4 +1,4 @@
-function getDadosPlanos() {
+﻿function getDadosPlanos() {
   let dados = new FormData();
   dados.append("op", 1);
 
@@ -96,7 +96,6 @@ function getVendasGrafico() {
     data: { op: 5 },
     dataType: "json",
     success: function (response) {
-      console.log("Resposta AJAX:", response);
       const ctx3 = canvas.getContext("2d");
 
       if (typeof salesChartInstance !== "undefined" && salesChartInstance) {
@@ -169,8 +168,6 @@ function getVendasGrafico() {
       });
     },
     error: function (xhr, status, error) {
-      console.error("Erro AJAX:", error);
-      console.error("Resposta do servidor:", xhr.responseText);
     },
   });
 }
@@ -183,7 +180,6 @@ function getTopTipoGrafico() {
     data: { op: 6 },
     dataType: "json",
     success: function (response) {
-      console.log("Resposta AJAX:", response);
       const ctx3 = canvas.getContext("2d");
 
       if (
@@ -237,8 +233,6 @@ function getTopTipoGrafico() {
       });
     },
     error: function (xhr, status, error) {
-      console.error("Erro AJAX:", error);
-      console.error("Resposta do servidor:", xhr.responseText);
     },
   });
 }

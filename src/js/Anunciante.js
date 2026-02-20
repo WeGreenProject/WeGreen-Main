@@ -3,7 +3,6 @@
     try {
       return JSON.parse(payload);
     } catch (error) {
-      console.error("Resposta JSON inválida:", payload, error);
       return null;
     }
   }
@@ -30,7 +29,6 @@ function getDadosPlanos() {
       }
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Plano:", textStatus);
   });
 }
 
@@ -47,7 +45,6 @@ function CarregaProdutos() {
       `);
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Produtos:", textStatus);
   });
 }
 
@@ -64,7 +61,6 @@ function CarregaPontos() {
       `);
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Pontos:", textStatus);
   });
 }
 function getGastos() {
@@ -81,7 +77,6 @@ function getGastos() {
       `);
     },
   ).fail(function (jqXHR, textStatus) {
-    console.error("Erro ao carregar Gastos:", textStatus);
   });
 }
 
@@ -182,7 +177,6 @@ function renderTopProductsChart() {
   }).done(function (resp) {
     const ctx = document.getElementById("topProductsChart");
     if (!ctx) {
-      console.warn("Elemento topProductsChart não encontrado");
       return;
     }
     if (window.topProductsChartInstance)
@@ -332,7 +326,6 @@ function renderRecentProducts() {
       container.html(html);
     })
     .fail(function (xhr, status, error) {
-      console.error("Erro ao carregar produtos recentes:", error);
       $("#recentProducts").html(
         '<div style="color: #E53E3E; text-align: center; padding: 20px;">Erro ao carregar produtos</div>',
       );
@@ -544,7 +537,6 @@ function loadReportStats() {
 function loadCategorySalesChart() {
   const ctx = document.getElementById("categorySalesChart");
   if (!ctx) {
-    console.warn("Elemento categorySalesChart não encontrado");
     return;
   }
   if (
@@ -584,7 +576,6 @@ function loadCategorySalesChart() {
 function loadDailyRevenueChart() {
   const ctx = document.getElementById("dailyRevenueChart");
   if (!ctx) {
-    console.warn("Elemento dailyRevenueChart não encontrado");
     return;
   }
   if (
@@ -982,7 +973,6 @@ function removerEmMassa() {
         traditional: true,
         dataType: "json",
         success: function (response) {
-          console.log("Response:", response);
           if (response.success) {
             window.isReloading = true;
             wgSuccess(
@@ -999,7 +989,6 @@ function removerEmMassa() {
           }
         },
         error: function (xhr, status, error) {
-          console.error("Erro ao remover:", error, xhr.responseText);
           wgError("Erro", "Não foi possível remover os produtos.");
         },
       });
@@ -1009,7 +998,6 @@ function removerEmMassa() {
 
 function carregarProdutos() {
   if (window.isReloading) {
-    console.log("Cancelando carregarProdutos: página vai recarregar");
     return;
   }
 
@@ -1101,7 +1089,6 @@ function carregarProdutosNow() {
         });
     })
     .fail(function (xhr, status, error) {
-      console.error("Erro ao carregar produtos:", error);
       wgError("Erro", "Não foi possível carregar os produtos.");
     });
 }
@@ -1352,7 +1339,6 @@ function abrirModalProduto(titulo, dados = {}) {
                 renderPhotoPreview();
               })
               .catch((err) => {
-                console.error("Erro ao carregar foto existente:", err);
               });
           }
         });
@@ -1666,7 +1652,6 @@ function abrirModalProduto(titulo, dados = {}) {
             dados =
               typeof response === "string" ? JSON.parse(response) : response;
           } catch (e) {
-            console.error("Erro ao processar resposta:", e);
             Swal.showValidationMessage(
               "Erro ao processar resposta do servidor",
             );
@@ -1697,7 +1682,6 @@ function abrirModalProduto(titulo, dados = {}) {
           }
         })
         .catch((error) => {
-          console.error("Erro ao guardar produto:", error);
           Swal.showValidationMessage(
             "Erro ao guardar produto. Tente novamente.",
           );
@@ -1865,7 +1849,6 @@ function carregarPerfil() {
     `);
     },
   ).fail(function (jqXHR, textStatus, errorThrown) {
-    console.error("Erro ao carregar perfil:", textStatus, errorThrown);
     Swal.fire("Erro", "Não foi possível carregar o perfil.", "error");
   });
 }
@@ -2024,13 +2007,11 @@ function carregarEstatisticasProdutos() {
         },
         "json",
       ).fail(function (xhr, status, error) {
-        console.error("Erro ao carregar limite:", error, xhr.responseText);
         wgError("Erro", "Não foi possível carregar o limite de produtos.");
       });
     },
     "json",
   ).fail(function (xhr, status, error) {
-    console.error("Erro ao carregar estatísticas:", error, xhr.responseText);
     wgError("Erro", "Não foi possível carregar os produtos.");
   });
 }
@@ -2717,7 +2698,6 @@ function carregarEncomendas() {
         if (!encomendas) return;
         renderEncomendas(encomendas);
       } catch (e) {
-        console.error("Erro ao carregar encomendas:", e);
         wgError("Erro", "Não foi possível carregar as encomendas");
       }
     },
@@ -2757,8 +2737,6 @@ function renderEncomendas(encomendas) {
       aplicarFiltrosEncomendas();
       return;
     } catch (e) {
-      console.warn("Erro ao atualizar tabela, recriando:", e);
-
       try {
         $("#encomendasTable").DataTable().destroy();
       } catch (e2) {}
@@ -3016,7 +2994,6 @@ function initEncomendasTable() {
         responsive: true,
       });
     } catch (e) {
-      console.error("Erro ao inicializar tabela de encomendas:", e);
     }
   }
 }
@@ -3245,8 +3222,9 @@ function verDetalhesEncomenda(encomendaId) {
                             <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Transportadora:</strong> ${
                               encomenda.transportadora || "N/A"
                             }</p>
-                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Rastreio:</strong> ${
-                              encomenda.codigo_rastreio || "N/A"
+                            <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Código de confirmação:</strong> ${
+                              encomenda.codigo_confirmacao_recepcao ||
+                              "Será gerado quando o estado for Enviado"
                             }</p>
                             <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Prazo:</strong> ${prazoEntrega}</p>
                             <p style="margin: 6px 0; font-size: 14px; color: #4a5568;"><strong style="color: #2d3748;">Decorrido:</strong> ${diasDesdeEncomenda} dia(s)</p>
@@ -3358,6 +3336,25 @@ function verDetalhesEncomenda(encomendaId) {
 }
 
 function editarStatusEncomenda(encomendaId, statusAtual) {
+  const estadoAtualTexto = (statusAtual || "").toString().trim();
+  const estadoAtualNormalizado = estadoAtualTexto.toLowerCase();
+
+  if (estadoAtualNormalizado.includes("entreg")) {
+    wgWarning(
+      "Não é possível alterar",
+      "Esta encomenda já se encontra com estado Entregue. Motivo: estado final concluído.",
+    );
+    return;
+  }
+
+  if (estadoAtualNormalizado.includes("cancelad")) {
+    wgWarning(
+      "Não é possível alterar",
+      "Esta encomenda foi cancelada pelo cliente. Motivo: a encomenda já foi encerrada pelo cliente.",
+    );
+    return;
+  }
+
   const fluxoStatus = {
     Pendente: ["Pendente", "Processando", "Cancelado"],
     Processando: ["Processando", "Enviado", "Cancelado"],
@@ -3369,11 +3366,6 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
   const opcoesPermitidas = fluxoStatus[statusAtual] || [
     statusAtual || "Pendente",
   ];
-  const terminal =
-    statusAtual === "Entregue" ||
-    statusAtual === "Cancelado" ||
-    opcoesPermitidas.length === 1;
-
   const iconeStatus = {
     Pendente: "⏳",
     Processando: "📦",
@@ -3388,10 +3380,6 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
         `<option value="${estado}" ${statusAtual === estado ? "selected" : ""}>${iconeStatus[estado] || "•"} ${estado}</option>`,
     )
     .join("");
-
-  const rastreioTipo =
-    document.body.getAttribute("data-plano-rastreio") || "Basico";
-  const temRastreioAvancado = rastreioTipo.toLowerCase().includes("avan");
 
   Swal.fire({
     title: "Alterar Status da Encomenda",
@@ -3414,45 +3402,10 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
                         <i class="fas fa-exchange-alt" style="margin-right: 6px; color: #3cb371;"></i>
                         Novo Status
                     </label>
-                    <select id="novoStatus" style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; background: white; color: #1e293b; font-weight: 500; transition: all 0.3s;" onchange="toggleCodigoRastreio()" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'">
+                  <select id="novoStatus" style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; background: white; color: #1e293b; font-weight: 500; transition: all 0.3s;" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'">
                     ${opcoesStatusHtml}
                     </select>
-                  <small style="color: #64748b; font-size: 12px; display: block; margin-top: 6px;">
-                    Apenas é permitido avançar para o próximo estado.
-                  </small>
                 </div>
-
-                <!-- Código de rastreio (condicional — só Rastreio Avançado) -->
-                ${
-                  temRastreioAvancado
-                    ? `
-                <div id="codigoRastreioContainer" style="display: ${statusAtual === "Enviado" ? "block" : "none"}; margin-bottom: 18px;">
-                    <label style="display: block; margin-bottom: 8px; color: #2d3748; font-weight: 600; font-size: 14px;">
-                        <i class="fas fa-barcode" style="margin-right: 6px; color: #3cb371;"></i>
-                        Código de Rastreio
-                        <span style="color: #ef4444; margin-left: 4px;">*</span>
-                    </label>
-                    <input type="text" id="codigoRastreio" placeholder="Ex: BR123456789PT" style="width: 100%; padding: 12px 16px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; transition: all 0.3s;" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'">
-                    <small style="color: #64748b; font-size: 12px; display: block; margin-top: 6px;">
-                        <i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i>
-                        Obrigatório ao marcar como "Enviado"
-                    </small>
-                </div>
-                `
-                    : `
-                <div id="codigoRastreioContainer" style="display: none;"></div>
-                <input type="hidden" id="codigoRastreio" value="">
-                <div style="background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-lock" style="color: #d97706; font-size: 16px;"></i>
-                        <div>
-                            <p style="margin: 0; font-size: 13px; font-weight: 600; color: #92400e;">Rastreio Avançado</p>
-                            <p style="margin: 2px 0 0; font-size: 12px; color: #a16207;">Disponível no Plano Profissional Eco+. <a href="planos.php" style="color: #3cb371; font-weight: 600;">Fazer upgrade</a></p>
-                        </div>
-                    </div>
-                </div>
-                `
-                }
 
                 <!-- Observações -->
                 <div style="margin-bottom: 10px;">
@@ -3464,20 +3417,6 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
                     <textarea id="observacao" placeholder="Adicione informações adicionais sobre a alteração..." style="width: 100%; min-height: 100px; padding: 12px 16px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; resize: vertical; font-family: inherit; transition: all 0.3s;" onfocus="this.style.borderColor='#3cb371'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
                 </div>
             </div>
-
-            <script>
-                function toggleCodigoRastreio() {
-                    const status = document.getElementById('novoStatus').value;
-                    const container = document.getElementById('codigoRastreioContainer');
-                    if (!container || container.querySelector('input[type="hidden"]')) return;
-                    if (status === 'Enviado') {
-                        container.style.display = 'block';
-                        container.style.animation = 'slideDown 0.3s ease-out';
-                    } else {
-                        container.style.display = 'none';
-                    }
-                }
-            </script>
         `,
     showCancelButton: true,
     confirmButtonText:
@@ -3505,19 +3444,9 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
         title.style.fontSize = "20px";
         title.style.fontWeight = "700";
       }
-
-      if (terminal) {
-        const select = document.getElementById("novoStatus");
-        if (select) {
-          select.disabled = true;
-          select.style.background = "#f8fafc";
-          select.style.cursor = "not-allowed";
-        }
-      }
     },
     preConfirm: () => {
       const status = document.getElementById("novoStatus").value;
-      const codigoRastreio = document.getElementById("codigoRastreio").value;
 
       if (!opcoesPermitidas.includes(status)) {
         Swal.showValidationMessage(
@@ -3526,21 +3455,9 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
         return false;
       }
 
-      if (
-        temRastreioAvancado &&
-        status === "Enviado" &&
-        !codigoRastreio.trim()
-      ) {
-        Swal.showValidationMessage(
-          '<i class="fas fa-exclamation-triangle"></i> Código de rastreio é obrigatório ao marcar como "Enviado"',
-        );
-        return false;
-      }
-
       return {
         status: status,
         observacao: document.getElementById("observacao").value,
-        codigo_rastreio: codigoRastreio,
       };
     },
   }).then((result) => {
@@ -3552,7 +3469,6 @@ function editarStatusEncomenda(encomendaId, statusAtual) {
           encomenda_id: encomendaId,
           novo_estado: result.value.status,
           observacao: result.value.observacao,
-          codigo_rastreio: result.value.codigo_rastreio,
         },
         function (resp) {
           const dados = parseJsonSafe(resp);

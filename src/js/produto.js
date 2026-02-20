@@ -1,4 +1,4 @@
-function getProdutoMostrar() {
+﻿function getProdutoMostrar() {
   const params = new URLSearchParams(window.location.search);
   const produtoID = params.get("id");
 
@@ -21,7 +21,6 @@ function getProdutoMostrar() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoInfo").html(msg);
 
       $(".btnComprarAgora").on("click", function () {
@@ -30,9 +29,6 @@ function getProdutoMostrar() {
       });
 
       setTimeout(function () {
-        console.log(
-          "✅ HTML do produto carregado, iniciando carregamento de avaliações...",
-        );
         carregarAvaliacoes(produtoID);
       }, 100);
     })
@@ -103,8 +99,6 @@ function comprarAgora(produtoId) {
     processData: false,
   })
     .done(function (response) {
-      console.log("Resposta do servidor:", response);
-
       if (!response || response.flag !== true) {
         const msg =
           (response && response.msg) ||
@@ -124,8 +118,6 @@ function comprarAgora(produtoId) {
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX:", textStatus, errorThrown);
-
       let msg = "Não foi possível adicionar o produto ao carrinho";
       if (jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.msg) {
         msg = jqXHR.responseJSON.msg;
@@ -151,14 +143,9 @@ function alerta(titulo, msg, icon) {
 
 $(function () {
   getProdutoMostrar();
-
-  
-  
 });
 
 function carregarAvaliacoes(produtoId) {
-  console.log("🔍 Carregando avaliações para produto ID:", produtoId);
-
   $.ajax({
     url: "src/controller/controllerAvaliacoes.php",
     method: "POST",
@@ -167,17 +154,12 @@ function carregarAvaliacoes(produtoId) {
       produto_id: produtoId,
     },
     dataType: "json",
-    cache: false, 
+    cache: false,
     success: function (response) {
-      console.log("✅ Resposta recebida:", response);
-
       if (response && response.success) {
-        console.log("📊 Avaliações:", response.avaliacoes);
-        console.log("📈 Estatísticas:", response.estatisticas);
-
-        
+        utilizadorAutenticado = Boolean(response.autenticado);
+        utilizadorIdAtual = Number(response.utilizador_id_atual || 0);
         if (!response.avaliacoes || !response.estatisticas) {
-          console.error("❌ Dados de avaliações inválidos na resposta");
           $("#ListaAvaliacoes").html(
             '<div class="text-center py-2" style="color: #888;"><small>Erro ao carregar avaliações</small></div>',
           );
@@ -186,16 +168,12 @@ function carregarAvaliacoes(produtoId) {
 
         renderizarAvaliacoes(response.avaliacoes, response.estatisticas);
       } else {
-        console.error("❌ Resposta sem sucesso:", response);
         $("#ListaAvaliacoes").html(
           '<div class="text-center py-2" style="color: #888;"><small>Erro ao carregar avaliações</small></div>',
         );
       }
     },
     error: function (xhr, status, error) {
-      console.error("❌ Erro AJAX:", { xhr, status, error });
-      console.error("Resposta do servidor:", xhr.responseText);
-
       $("#ListaAvaliacoes").html(
         '<div class="text-center py-2" style="color: #888;"><small>Erro ao carregar avaliações</small></div>',
       );
@@ -206,39 +184,27 @@ function carregarAvaliacoes(produtoId) {
 let avaliacoesGlobal = [];
 let paginaAtual = 1;
 const avaliacoesPorPagina = 3;
+let utilizadorAutenticado = false;
+let utilizadorIdAtual = 0;
 
 function renderizarAvaliacoes(avaliacoes, estatisticas) {
-  console.log("🎨 Iniciando renderização de avaliações...");
-
-  
   if (!$("#MediaAvaliacoes").length) {
-    console.error("❌ Elemento #MediaAvaliacoes não encontrado no DOM");
     return;
   }
   if (!$("#barrasEstrelas").length) {
-    console.error("❌ Elemento #barrasEstrelas não encontrado no DOM");
     return;
   }
   if (!$("#ListaAvaliacoes").length) {
-    console.error("❌ Elemento #ListaAvaliacoes não encontrado no DOM");
     return;
   }
 
-  
   avaliacoesGlobal = avaliacoes;
 
-  
   const starsHtml = gerarEstrelasHtml(estatisticas.media, "small");
   $("#MediaAvaliacoes .stars-display").html(starsHtml);
   $("#MediaAvaliacoes .rating-text").text(estatisticas.media.toFixed(1));
   $("#MediaAvaliacoes .total-reviews").text(`(${estatisticas.total})`);
-  console.log("✅ Média atualizada:", estatisticas.media);
-
-  
   renderizarBarrasEstatisticas(estatisticas);
-  console.log("✅ Barras de estatísticas renderizadas");
-
-  
   if (avaliacoes.length === 0) {
     $("#ListaAvaliacoes").html(`
       <div class="text-center py-3" style="color: #888;">
@@ -247,12 +213,9 @@ function renderizarAvaliacoes(avaliacoes, estatisticas) {
       </div>
     `);
     $("#PaginacaoAvaliacoes").html("");
-    console.log("ℹ️ Nenhuma avaliação para exibir");
     return;
   }
 
-  
-  console.log(`✅ Renderizando ${avaliacoes.length} avaliação(ões)...`);
   renderizarPagina(1);
 }
 
@@ -287,14 +250,19 @@ function renderizarPagina(numeroPagina) {
           </div>
           <div class="d-flex align-items-center gap-2">
             <small style="color: #888; font-size: 11px;">${dataFormatada}</small>
-            <button onclick="abrirModalReporte(${avaliacao.id})"
+            ${
+              utilizadorAutenticado &&
+              Number(avaliacao.utilizador_id || 0) !== utilizadorIdAtual
+                ? `<button onclick="abrirModalReporte(${avaliacao.id})"
                     class="btn btn-sm"
                     title="Reportar avaliação"
                     style="color: #ef4444; background: transparent; border: none; padding: 4px 8px; transition: all 0.3s ease;"
                     onmouseover="this.style.background='#fee2e2'; this.style.borderRadius='6px';"
                     onmouseout="this.style.background='transparent';">
-              <i class="fas fa-flag" style="font-size: 12px;"></i>
-            </button>
+                <i class="fas fa-flag" style="font-size: 12px;"></i>
+              </button>`
+                : ""
+            }
           </div>
         </div>
         ${
@@ -313,7 +281,6 @@ function renderizarPagina(numeroPagina) {
   html += "</div>";
   $("#ListaAvaliacoes").html(html);
 
-  
   renderizarPaginacao();
 }
 
@@ -328,7 +295,6 @@ function renderizarPaginacao() {
   let html =
     '<div class="d-flex align-items-center justify-content-center gap-2">';
 
-  
   const anteriorDisabled = paginaAtual === 1;
   html += `
     <button
@@ -352,7 +318,6 @@ function renderizarPaginacao() {
     </button>
   `;
 
-  
   html += '<div class="d-flex gap-2">';
   for (let i = 1; i <= totalPaginas; i++) {
     const ativo = i === paginaAtual;
@@ -382,7 +347,6 @@ function renderizarPaginacao() {
   }
   html += "</div>";
 
-  
   const proximoDisabled = paginaAtual === totalPaginas;
   html += `
     <button
@@ -473,6 +437,11 @@ function escapeHtml(text) {
  * Abrir modal de reportar avaliação
  */
 function abrirModalReporte(avaliacaoId) {
+  if (!utilizadorAutenticado) {
+    ErrorSession();
+    return;
+  }
+
   $("#reportAvaliacaoId").val(avaliacaoId);
   $("#reportMotivo").val("");
   $("#reportDescricao").val("");
@@ -487,78 +456,70 @@ function abrirModalReporte(avaliacaoId) {
  * Enviar reporte (preparado para backend)
  */
 function enviarReporte() {
+  if (!utilizadorAutenticado) {
+    ErrorSession();
+    return;
+  }
+
   const avaliacaoId = $("#reportAvaliacaoId").val();
   const motivo = $("#reportMotivo").val();
   const descricao = $("#reportDescricao").val();
 
   if (!motivo) {
-    Swal.fire({
-      icon: "warning",
-      title: "Atenção",
-      text: "Por favor, selecione um motivo para o reporte.",
-      confirmButtonColor: "#3cb371",
-    });
+    showModernWarningModal(
+      "Atenção",
+      "Por favor, selecione um motivo para o reporte.",
+    );
     return;
   }
 
-  console.log("📝 Reporte preparado:");
-  console.log("- Avaliação ID:", avaliacaoId);
-  console.log("- Motivo:", motivo);
-  console.log("- Descrição:", descricao);
+  const dados = new FormData();
+  dados.append("op", "reportarAvaliacao");
+  dados.append("avaliacao_id", avaliacaoId);
+  dados.append("motivo", motivo);
+  dados.append("descricao", descricao || "");
 
-  // TODO: Implementar chamada AJAX ao backend
-  // const dados = new FormData();
-  // dados.append('op', 'reportarAvaliacao');
-  // dados.append('avaliacao_id', avaliacaoId);
-  // dados.append('motivo', motivo);
-  // dados.append('descricao', descricao);
-  //
-  // $.ajax({
-  //   url: 'src/controller/controllerAvaliacoes.php',
-  //   method: 'POST',
-  //   data: dados,
-  //   processData: false,
-  //   contentType: false,
-  //   dataType: 'json',
-  //   cache: false
-  // })
-  // .done(function(response) {
-  //   if (response.success) {
-  //     Swal.fire({
-  //       icon: 'success',
-  //       title: 'Reporte Enviado!',
-  //       text: response.message,
-  //       confirmButtonColor: '#3cb371',
-  //       timer: 3000
-  //     });
-  //   } else {
-  //     Swal.fire({
-  //       icon: 'error',
-  //       title: 'Erro',
-  //       text: response.message,
-  //       confirmButtonColor: '#ef4444'
-  //     });
-  //   }
-  // })
-  // .fail(function() {
-  //   Swal.fire({
-  //     icon: 'error',
-  //     title: 'Erro de Comunicação',
-  //     text: 'Não foi possível enviar o reporte. Tente novamente.',
-  //     confirmButtonColor: '#ef4444'
-  //   });
-  // });
+  $.ajax({
+    url: "src/controller/controllerAvaliacoes.php",
+    method: "POST",
+    data: dados,
+    processData: false,
+    contentType: false,
+    dataType: "json",
+    cache: false,
+  })
+    .done(function (response) {
+      if (response && response.success) {
+        const modalInstance = bootstrap.Modal.getInstance(
+          document.getElementById("modalReportarAvaliacao"),
+        );
+        if (modalInstance) {
+          modalInstance.hide();
+        }
 
-  // Por agora, apenas fechar o modal e mostrar confirmação
-  bootstrap.Modal.getInstance(
-    document.getElementById("modalReportarAvaliacao"),
-  ).hide();
+        showModernSuccessModal(
+          "Reporte Enviado!",
+          response.message ||
+            "Obrigado pelo seu reporte. A nossa equipa irá analisar esta avaliação.",
+          { timer: 3000 },
+        );
+      } else {
+        const mensagem =
+          (response && response.message) ||
+          "Não foi possível enviar o reporte.";
 
-  Swal.fire({
-    icon: "success",
-    title: "Reporte Enviado!",
-    text: "Obrigado pelo seu reporte. A nossa equipa irá analisar esta avaliação.",
-    confirmButtonColor: "#3cb371",
-    timer: 3000,
-  });
+        if (/sessão não iniciada/i.test(mensagem)) {
+          ErrorSession();
+          return;
+        }
+
+        showModernErrorModal("Erro", mensagem);
+      }
+    })
+    .fail(function () {
+      showModernErrorModal(
+        "Erro de Comunicação",
+        "Não foi possível enviar o reporte. Tente novamente.",
+      );
+    });
 }

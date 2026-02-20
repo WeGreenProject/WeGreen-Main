@@ -32,14 +32,24 @@ if ($op == 2) {
 }
 
 if ($op == 3) {
+    $nome = trim((string)($_POST['clientNome'] ?? ''));
+    $email = trim((string)($_POST['clientEmail'] ?? ''));
+    $telefone = trim((string)($_POST['clientTelefone'] ?? ''));
+    $tipo = (int)($_POST['clientTipo'] ?? 0);
+    $nif = trim((string)($_POST['clientNif'] ?? ''));
+    $password = (string)($_POST['clientPassword'] ?? '');
+    $morada = trim((string)($_POST['clientMorada'] ?? ''));
+    $foto = $_FILES['foto'] ?? null;
+
     $resp = $func->registaClientes(
-        $_POST["clientNome"],
-        $_POST["clientEmail"],
-        $_POST["clientTelefone"],
-        $_POST["clientTipo"],
-        $_POST["clientNif"],
-        $_POST["clientPassword"],
-        $_FILES['foto']
+        $nome,
+        $email,
+        $telefone,
+        $tipo,
+        $nif,
+        $password,
+        $morada,
+        $foto
     );
     echo $resp;
 }

@@ -1,13 +1,9 @@
-
-
-let vendedorAtual = null;
-let imagemAnexada = null;
+﻿let vendedorAtual = null;
+let ficheiroAnexado = null;
 
 function getSideBar() {
   let dados = new FormData();
   dados.append("op", 1);
-
-  console.log("getSideBar() chamada");
 
   $.ajax({
     url: "src/controller/controllerChatCliente.php",
@@ -19,51 +15,33 @@ function getSideBar() {
     processData: false,
   })
     .done(function (msg) {
-      console.log("getSideBar response:", msg);
       $("#ListaVendedores").html(msg);
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro ao carregar vendedores:", textStatus, errorThrown);
-      console.error("Response:", jqXHR.responseText);
       alerta("Erro", "Não foi possível carregar as conversas", "error");
     });
 }
 
 function selecionarVendedor(vendedorId, vendedorNome) {
-  console.log("selecionarVendedor() chamada", vendedorId, vendedorNome);
   vendedorAtual = vendedorId;
 
-  
   const iniciais = getIniciais(vendedorNome);
   $("#chatUserAvatar").text(iniciais);
   $("#chatUserName").text(vendedorNome);
 
-  
   $("#BotaoEscrever").addClass("active");
   $(".empty-chat").hide();
 
-  
   $(".conversation-item").removeClass("active");
   $(`[data-vendedor-id="${vendedorId}"]`).addClass("active");
 
-  
   getConversas(vendedorId);
-
-  console.log(
-    "Input container agora tem classe active:",
-    $("#BotaoEscrever").hasClass("active"),
-  );
 }
 
 function iniciarConversaComVendedor(vendedorId) {
-  console.log("iniciarConversaComVendedor() chamada", vendedorId);
-
-  
   let dados = new FormData();
-  dados.append("op", 5); 
+  dados.append("op", 5);
   dados.append("vendedorId", vendedorId);
-
-  console.log("Enviando request para op=5, vendedorId:", vendedorId);
 
   $.ajax({
     url: "src/controller/controllerChatCliente.php",
@@ -75,14 +53,9 @@ function iniciarConversaComVendedor(vendedorId) {
     processData: false,
   })
     .done(function (resp) {
-      console.log("Resposta recebida de op=5:", resp);
-
       if (resp.flag) {
-        
-        console.log("Vendedor encontrado:", resp.nome);
         selecionarVendedor(vendedorId, resp.nome);
 
-        
         Swal.fire({
           icon: "success",
           title: "Chat Iniciado",
@@ -93,12 +66,10 @@ function iniciarConversaComVendedor(vendedorId) {
           position: "top-end",
         });
 
-        
         setTimeout(() => {
           $("#messageInput").focus();
         }, 500);
       } else {
-        console.error("Erro no flag:", resp);
         alerta(
           "Erro",
           resp.msg || "Não foi possível iniciar a conversa",
@@ -107,18 +78,13 @@ function iniciarConversaComVendedor(vendedorId) {
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX ao iniciar conversa:");
-      console.error("Status:", textStatus);
-      console.error("Error:", errorThrown);
-      console.error("Response:", jqXHR.responseText);
       alerta("Erro", "Erro ao conectar com o vendedor", "error");
     });
 }
 
 function getConversas(vendedorId) {
-  console.log("getConversas() chamada", vendedorId);
   let dados = new FormData();
-  dados.append("op", 2); 
+  dados.append("op", 2);
   dados.append("IdVendedor", vendedorId);
 
   $.ajax({
@@ -134,13 +100,10 @@ function getConversas(vendedorId) {
       $("#chatMessages").html(msg);
       scrollToBottom();
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Erro ao carregar mensagens:", textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
 }
 
 function enviarMensagem() {
-  console.log("enviarMensagem() chamada");
   if (!vendedorAtual) {
     alerta("Aviso", "Selecione um vendedor primeiro", "warning");
     return;
@@ -148,17 +111,17 @@ function enviarMensagem() {
 
   const mensagem = $("#messageInput").val().trim();
 
-  if (!mensagem && !imagemAnexada) {
+  if (!mensagem && !ficheiroAnexado) {
     return;
   }
 
   let dados = new FormData();
-  dados.append("op", 3); 
+  dados.append("op", 3);
   dados.append("IdVendedor", vendedorAtual);
   dados.append("mensagem", mensagem);
 
-  if (imagemAnexada) {
-    dados.append("imagem", imagemAnexada);
+  if (ficheiroAnexado) {
+    dados.append("imagem", ficheiroAnexado);
   }
 
   $.ajax({
@@ -185,35 +148,91 @@ function enviarMensagem() {
       }
     })
     .fail(function (jqXHR, textStatus) {
-      console.error("Erro ao enviar mensagem:", textStatus);
       alerta("Erro", "Não foi possível enviar a mensagem", "error");
     });
 }
 
-function anexarImagem(file) {
-  if (!file || !file.type.startsWith("image/")) {
-    alerta("Aviso", "Por favor, selecione apenas imagens", "warning");
+function anexarFicheiro(file) {
+  if (!file) {
     return;
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    alerta("Aviso", "A imagem deve ter no máximo 5MB", "warning");
+  const tiposPermitidos = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/plain",
+  ];
+
+  const extensoesPermitidas = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "txt",
+  ];
+
+  const extensao = (file.name.split(".").pop() || "").toLowerCase();
+  const tipoValido = file.type ? tiposPermitidos.includes(file.type) : false;
+  const extensaoValida = extensoesPermitidas.includes(extensao);
+
+  if (!tipoValido && !extensaoValida) {
+    alerta("Aviso", "Tipo de ficheiro não suportado", "warning");
     return;
   }
 
-  imagemAnexada = file;
+  if (file.size > 10 * 1024 * 1024) {
+    alerta("Aviso", "O ficheiro deve ter no máximo 10MB", "warning");
+    return;
+  }
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    $("#previewImg").attr("src", e.target.result);
-    $("#imagePreview").show();
-  };
-  reader.readAsDataURL(file);
+  ficheiroAnexado = file;
+
+  if (file.type && file.type.startsWith("image/")) {
+    $("#filePreviewInfo").remove();
+    $("#previewImg").show();
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      $("#previewImg").attr("src", e.target.result);
+      $("#imagePreview").show();
+    };
+    reader.readAsDataURL(file);
+    return;
+  }
+
+  $("#previewImg").attr("src", "").hide();
+
+  if (!$("#filePreviewInfo").length) {
+    $("#imagePreview").prepend(
+      `<div id="filePreviewInfo" style="display:flex; align-items:center; gap:8px; padding:8px 30px 8px 10px; border-radius:8px; background:#f6f8fa; color:#2d3748; max-width:260px;">
+         <i class="fas fa-file-alt" style="color:#3cb371;"></i>
+         <span id="filePreviewName" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></span>
+       </div>`,
+    );
+  }
+
+  $("#filePreviewName").text(file.name);
+  $("#imagePreview").show();
 }
 
 function limparPreview() {
-  imagemAnexada = null;
+  ficheiroAnexado = null;
+  $("#filePreviewInfo").remove();
   $("#previewImg").attr("src", "");
+  $("#previewImg").show();
   $("#imagePreview").hide();
   $("#fileInput").val("");
 }
@@ -222,7 +241,7 @@ function pesquisarChat() {
   const termo = $("#searchInput").val().trim();
 
   let dados = new FormData();
-  dados.append("op", 4); 
+  dados.append("op", 4);
   dados.append("pesquisa", termo);
 
   $.ajax({
@@ -237,9 +256,7 @@ function pesquisarChat() {
     .done(function (msg) {
       $("#ListaVendedores").html(msg);
     })
-    .fail(function (jqXHR, textStatus) {
-      console.error("Erro na pesquisa:", textStatus);
-    });
+    .fail(function (jqXHR, textStatus) {});
 }
 
 function scrollToBottom() {
@@ -276,32 +293,21 @@ function alerta(titulo, msg, icon) {
 }
 
 $(document).ready(function () {
-  console.log("ChatCliente.js carregado");
-
-  
   getSideBar();
 
-  
   const urlParams = new URLSearchParams(window.location.search);
   const vendedorId = urlParams.get("vendedor");
   const produtoId = urlParams.get("produto");
 
-  console.log("URL params:", { vendedorId, produtoId });
-  console.log("URL completa:", window.location.href);
-
   if (vendedorId) {
-    console.log("Auto-iniciando conversa com vendedor:", vendedorId);
-    
     setTimeout(() => {
       iniciarConversaComVendedor(vendedorId);
-      
+
       window.history.replaceState({}, document.title, "ChatCliente.php");
     }, 800);
   } else {
-    console.log("Nenhum vendedor especificado na URL");
   }
 
-  
   $("#messageInput").on("keypress", function (e) {
     if (e.which === 13 && !e.shiftKey) {
       e.preventDefault();
@@ -309,63 +315,54 @@ $(document).ready(function () {
     }
   });
 
-  
   $("#messageInput").on("paste", function (e) {
     const items = e.originalEvent.clipboardData.items;
     for (let item of items) {
       if (item.type.indexOf("image") !== -1) {
         e.preventDefault();
         const blob = item.getAsFile();
-        anexarImagem(blob);
+        anexarFicheiro(blob);
         break;
       }
     }
   });
 
-  
   $("#attachBtn").on("click", function () {
     $("#fileInput").click();
   });
 
-  
   $("#fileInput").on("change", function () {
     const file = this.files[0];
     if (file) {
-      anexarImagem(file);
+      anexarFicheiro(file);
     }
   });
 
-  
   $(document).on("click", "#removePreview", function () {
     limparPreview();
   });
 
-  
   $("#sendButton").on("click", function () {
     enviarMensagem();
   });
 
-  
   setInterval(function () {
     if (vendedorAtual) {
       getConversas(vendedorAtual);
     }
   }, 5000);
 
-  
   $("#userMenuBtn").on("click", function (e) {
     e.stopPropagation();
     $("#userDropdown").toggleClass("active");
   });
 
-  
   $(document).on("click", function (e) {
     if (!$(e.target).closest(".navbar-user").length) {
       $("#userDropdown").removeClass("active");
     }
   });
 
-  
   $("#userDropdown").on("click", function (e) {
     e.stopPropagation();
   });
@@ -407,7 +404,6 @@ function showPasswordModal() {
     },
   }).then((result) => {
     if (result.isConfirmed) {
-      
       alerta("Sucesso", "Senha alterada com sucesso!", "success");
       $("#userDropdown").removeClass("active");
     }

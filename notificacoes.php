@@ -6,6 +6,11 @@ if(!isset($_SESSION['utilizador']) || !isset($_SESSION['tipo'])) {
     exit();
 }
 
+if(!in_array((int)$_SESSION['tipo'], [1, 2, 3], true)) {
+  header("Location: forbiddenerror.html");
+  exit();
+}
+
 $tipo_utilizador = $_SESSION['tipo'];
 $nome_utilizador = $_SESSION['nome'] ?? 'Utilizador';
 
@@ -28,6 +33,8 @@ if ($tipo_utilizador == 1) {
   <link rel="icon" type="image/png" href="src/img/WeGreenfav.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="src/js/lib/jquery.js"></script>
+  <script src="src/js/lib/sweatalert.js"></script>
+  <script src="src/js/wegreen-modals.js"></script>
   <link rel="stylesheet" href="src/css/notificacoes.css">
 </head>
 

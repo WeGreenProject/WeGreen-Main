@@ -1,4 +1,4 @@
-function getFiltrosMulherCategoria() {
+﻿function getFiltrosMulherCategoria() {
   let dados = new FormData();
   dados.append("op", 1);
 
@@ -12,7 +12,6 @@ function getFiltrosMulherCategoria() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#CategoriaSelect").html(msg);
     })
 
@@ -34,7 +33,6 @@ function getFiltrosMulherTamanho() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#tamanhoSelect").html(msg);
     })
 
@@ -56,7 +54,6 @@ function getFiltrosMulherEstado() {
     processData: false,
   })
     .done(function (msg) {
-      console.log(msg);
       $("#estadoSelect").html(msg);
     })
 
@@ -126,7 +123,6 @@ function getProdutoMulherMostrar() {
   })
 
     .done(function (msg) {
-      console.log(msg);
       $("#ProdutoInfo").html(msg);
       $(".btnComprarAgora").on("click", function () {
         const produtoId = $(this).data("id");
@@ -197,8 +193,6 @@ function comprarAgora(produtoId) {
     processData: false,
   })
     .done(function (response) {
-      console.log("Resposta do servidor:", response);
-
       if (response.includes("Erro")) {
         Swal.fire({
           title: "Erro!",
@@ -218,7 +212,6 @@ function comprarAgora(produtoId) {
       }
     })
     .fail(function (jqXHR, textStatus, errorThrown) {
-      console.error("Erro AJAX:", textStatus, errorThrown);
       Swal.fire({
         title: "Erro!",
         text: "Não foi possível adicionar o produto ao carrinho",

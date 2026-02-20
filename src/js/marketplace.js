@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
   
   loadProducts();
 
@@ -103,14 +103,12 @@ function loadProducts() {
     },
     dataType: "json",
     success: function (response) {
-      console.log("Resposta recebida:", response);
       if (response.success) {
         marketplaceIsCliente = response.isCliente === true;
         displayProducts(response.produtos, response.isCliente);
         updateResultsCount(response.total);
       } else {
         marketplaceIsCliente = false;
-        console.error("Erro no response:", response.error || response);
         const errorMsg = response.error || "Erro ao carregar produtos";
         $("#productsGrid").html(`
                     <div class="col-12 text-center py-5">
@@ -124,8 +122,6 @@ function loadProducts() {
     },
     error: function (xhr, status, error) {
       marketplaceIsCliente = false;
-      console.error("Erro AJAX:", { xhr, status, error });
-      console.error("Response Text:", xhr.responseText);
       $("#productsGrid").html(`
                 <div class="col-12 text-center py-5">
                     <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>

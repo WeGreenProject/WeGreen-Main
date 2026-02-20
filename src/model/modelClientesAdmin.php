@@ -10,6 +10,68 @@ class ClientesAdmin {
         $this->conn = $conn;
     }
 
+    private function obterNomeTipoUtilizador($tipo) {
+        $tipoInt = (int)$tipo;
+        if ($tipoInt === 1) return 'Administrador';
+        if ($tipoInt === 2) return 'Cliente';
+        if ($tipoInt === 3) return 'Anunciante';
+        return 'Utilizador';
+    }
+
+    private function obterTiposPorEmail($email, $ignorarId = null) {
+        $sql = "SELECT DISTINCT tipo_utilizador_id FROM utilizadores WHERE LOWER(email) = LOWER(?)";
+        if ($ignorarId !== null) {
+            $sql .= " AND id <> ?";
+        }
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) {
+            return [];
+        }
+
+        if ($ignorarId !== null) {
+            $stmt->bind_param("si", $email, $ignorarId);
+        } else {
+            $stmt->bind_param("s", $email);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $tipos = [];
+        while ($row = $result->fetch_assoc()) {
+            $tipos[] = (int)$row['tipo_utilizador_id'];
+        }
+
+        $stmt->close();
+        return $tipos;
+    }
+
+    private function validarRegraTipoPorEmail($email, $tipo, $ignorarId = null) {
+        $tiposExistentes = $this->obterTiposPorEmail($email, $ignorarId);
+        $tipo = (int)$tipo;
+
+        if (in_array($tipo, $tiposExistentes, true)) {
+            $nomeTipo = $this->obterNomeTipoUtilizador($tipo);
+            return [
+                'ok' => false,
+                'msg' => "Já existe uma conta de {$nomeTipo} com este email."
+            ];
+        }
+
+        $temAdmin = in_array(1, $tiposExistentes, true);
+        $temCliente = in_array(2, $tiposExistentes, true);
+
+        if (($tipo === 1 && $temCliente) || ($tipo === 2 && $temAdmin)) {
+            return [
+                'ok' => false,
+                'msg' => 'Este email já está associado a um perfil incompatível (Administrador/Cliente). Use um email diferente.'
+            ];
+        }
+
+        return ['ok' => true, 'msg' => 'OK'];
+    }
+
     function getClientes($ID_Utilizador){
         try {
 
@@ -116,12 +178,56 @@ class ClientesAdmin {
             return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
         }
     }
-    function registaClientes($nome, $email, $telefone, $tipo, $nif, $password, $foto){
+    function registaClientes($nome, $email, $telefone, $tipo, $nif, $password, $morada = '', $foto = null){
         try {
 
     $msg = "";
     $flag = true;
     $sql = "";
+
+    $nome = trim((string)$nome);
+    $email = trim((string)$email);
+    $telefone = trim((string)$telefone);
+    $nif = trim((string)$nif);
+    $morada = trim((string)$morada);
+    $password = (string)$password;
+    $tipo = (int)$tipo;
+
+    if ($nome === '' || $email === '' || $tipo <= 0 || $password === '') {
+        return json_encode([
+            "flag" => false,
+            "msg" => "Preencha os campos obrigatórios: nome, email, tipo de utilizador e senha."
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    if (!in_array($tipo, [1, 2, 3], true)) {
+        return json_encode([
+            "flag" => false,
+            "msg" => "Tipo de utilizador inválido. Selecione Administrador, Cliente ou Anunciante."
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return json_encode([
+            "flag" => false,
+            "msg" => "Email inválido."
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    $regraTipo = $this->validarRegraTipoPorEmail($email, $tipo);
+    if (!$regraTipo['ok']) {
+        return json_encode([
+            "flag" => false,
+            "msg" => $regraTipo['msg']
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
+    if (strlen($password) < 6) {
+        return json_encode([
+            "flag" => false,
+            "msg" => "A senha deve ter pelo menos 6 caracteres."
+        ], JSON_UNESCAPED_UNICODE);
+    }
 
     $password_temporaria = $password;
     $password_hash = md5($password);
@@ -130,17 +236,19 @@ class ClientesAdmin {
     $resp = json_decode($resp, TRUE);
 
     if($resp['flag']){
-        $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password, foto) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password, morada, foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("sssisss", $nome, $email, $telefone, $tipo, $nif, $password_hash, $resp['target']);
+        $stmt->bind_param("sssissss", $nome, $email, $telefone, $tipo, $nif, $password_hash, $morada, $resp['target']);
     } else {
-        $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password) VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO utilizadores (nome, email, telefone, tipo_utilizador_id, nif, password, morada) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("sssiss", $nome, $email, $telefone, $tipo, $nif, $password_hash);
+        $stmt->bind_param("sssisss", $nome, $email, $telefone, $tipo, $nif, $password_hash, $morada);
     }
 
+    $nomeTipo = $this->obterNomeTipoUtilizador($tipo);
+
     if ($stmt->execute()) {
-        $msg = "Cliente registado com sucesso!";
+        $msg = $nomeTipo . " registado com sucesso!";
 
         try {
             require_once __DIR__ . '/../services/EmailService.php';
@@ -157,7 +265,18 @@ class ClientesAdmin {
         }
     } else {
         $flag = false;
-        $msg = "Error: " . $stmt->error;
+        if ((int)$stmt->errno === 1062) {
+            $erroLower = strtolower((string)$stmt->error);
+            if (strpos($erroLower, 'email') !== false) {
+                $msg = "Já existe um utilizador registado com este email.";
+            } elseif (strpos($erroLower, 'nif') !== false) {
+                $msg = "Já existe um utilizador registado com este NIF.";
+            } else {
+                $msg = "Já existe um utilizador com esses dados. Verifique email/NIF.";
+            }
+        } else {
+            $msg = "Não foi possível registar o " . strtolower($nomeTipo) . ".";
+        }
     }
     $stmt->close();
 
@@ -168,7 +287,7 @@ class ClientesAdmin {
 
     return $resp;
         } catch (Exception $e) {
-            return json_encode(['success' => false, 'message' => 'Erro interno do servidor'], JSON_UNESCAPED_UNICODE);
+            return json_encode(['flag' => false, 'msg' => 'Erro interno do servidor ao registar utilizador.'], JSON_UNESCAPED_UNICODE);
         }
 }
     function removerClientes($ID_Cliente){
@@ -213,10 +332,7 @@ function uploads($foto, $nome){
     }
 
     if(isset($foto) && is_array($foto) && !empty($foto['tmp_name']) && $foto['error'] === 0){
-        file_put_contents('debug_upload.txt', "Entrou na condição de upload\n", FILE_APPEND);
-
         if(is_uploaded_file($foto['tmp_name'])){
-            file_put_contents('debug_upload.txt', "is_uploaded_file OK\n", FILE_APPEND);
             $fonte = $foto['tmp_name'];
             $ficheiro = $foto['name'];
             $end = explode(".", $ficheiro);
