@@ -606,4 +606,10 @@ composer install
 
 ## Autor
 
-**Manuel Silvestre**
+[**Manuel Silvestre**](https://github.com/Wand-DenaXy)
+
+[**Jessica Isabel**](https://github.com/jessicaisabelf)
+
+[**Pedro Pereira**](https://github.com/PedroPereira128)
+
+[**João**](https://github.com/JMSS95)
